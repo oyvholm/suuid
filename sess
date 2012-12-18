@@ -12,10 +12,13 @@
 #=======================================================================
 
 use strict;
+use sigtrap handler => \&handle_signal, 'normal-signals';
 use Getopt::Long;
 use Time::HiRes;
 
 $| = 1;
+
+$SIG{'TERM'} = 'handle_signal';
 
 our $Debug = 0;
 
@@ -151,6 +154,17 @@ sub write_end_entry {
     return;
     # }}}
 } # write_end_entry()
+
+sub handle_signal {
+    # {{{
+    my $sig = shift;
+    msg(0, "Received $sig signal, aborting");
+    defined($end_time) || ($end_time = Time::HiRes::time());
+    defined($retval) || ($retval = '');
+    write_end_entry();
+    exit(1);
+    # }}}
+} # handle_signal()
 
 sub suuid_xml {
     # {{{
