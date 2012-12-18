@@ -110,8 +110,16 @@ my $begin_time = Time::HiRes::time();
 my $retval = system(@Cmd);
 my $end_time = Time::HiRes::time();
 msg(2, "SESS_UUID before s: '$ENV{'SESS_UUID'}'");
-$ENV{'SESS_UUID'} =~ s/$descname\/$uuid,//;
+$ENV{'SESS_UUID'} = remove_last_uuid($ENV{'SESS_UUID'});
 msg(2, "SESS_UUID after s : '$ENV{'SESS_UUID'}'");
+
+sub remove_last_uuid {
+    # {{{
+    my $txt = shift;
+    $txt =~ s/$descname\/$uuid,?//;
+    return($txt);
+    # }}}
+} # remove_last_uuid()
 
 my $end_cmd = sprintf(
     "suuid --raw%s -c \"<sess_end> <finished>%s</finished> <cmd>%s</cmd>%s <duration>%s </duration> <exit>%s</exit> </sess_end>\"",
