@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 #=======================================================================
 # sess
@@ -12,11 +12,12 @@
 #=======================================================================
 
 use strict;
+use warnings;
 use sigtrap handler => \&handle_signal, 'normal-signals';
 use Getopt::Long;
 use Time::HiRes;
 
-$| = 1;
+local $| = 1;
 
 $SIG{'TERM'} = 'handle_signal';
 
@@ -37,19 +38,19 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s/^.*\/(.*?)$/$1/;
-our $VERSION = "0.00";
+our $VERSION = '0.00';
 
-Getopt::Long::Configure("bundling");
+Getopt::Long::Configure('bundling');
 GetOptions(
 
-    "comment|c=s" => \$Opt{'comment'},
-    "debug" => \$Opt{'debug'},
-    "description|d=s" => \$Opt{'description'},
-    "help|h" => \$Opt{'help'},
-    "quiet|q+" => \$Opt{'quiet'},
-    "tag|t=s" => \$Opt{'tag'},
-    "verbose|v+" => \$Opt{'verbose'},
-    "version" => \$Opt{'version'},
+    'comment|c=s' => \$Opt{'comment'},
+    'debug' => \$Opt{'debug'},
+    'description|d=s' => \$Opt{'description'},
+    'help|h' => \$Opt{'help'},
+    'quiet|q+' => \$Opt{'quiet'},
+    'tag|t=s' => \$Opt{'tag'},
+    'verbose|v+' => \$Opt{'verbose'},
+    'version' => \$Opt{'version'},
 
 ) || die("$progname: Option error. Use -h for help.\n");
 
@@ -186,6 +187,7 @@ sub suuid_xml {
 sub print_version {
     # Print program version {{{
     print("$progname v$VERSION\n");
+    return;
     # }}}
 } # print_version()
 
@@ -197,7 +199,7 @@ sub usage {
         print("\n");
         print_version();
     }
-    print(<<END);
+    print(<<"END");
 
 Usage: $progname [options] [--] command
 
@@ -293,6 +295,7 @@ sub msg {
     if ($Opt{'verbose'} >= $verbose_level) {
         print(STDERR "$progname: $Txt\n");
     }
+    return;
     # }}}
 } # msg()
 
@@ -305,7 +308,7 @@ sub D {
     $File =~ s#\\#/#g;
     $File =~ s#^.*/(.*?)$#$1#;
     print(STDERR "$File:$call_info[2] $$ $Txt\n");
-    return("");
+    return('');
     # }}}
 } # D()
 
