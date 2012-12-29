@@ -88,7 +88,12 @@ sub main {
     my $v1_templ = "$Lh\{8}-$Lh\{4}-1$Lh\{3}-$Lh\{4}-$Lh\{12}";
 
     my @Cmd = @ARGV;
+
+    # Check that a command was specified on the command line
     scalar(@Cmd) || die("$progname: No command specified. Use -h for help.\n");
+
+    # $begin_cmd is the actual suuid command with custom XML written to 
+    # the log file
     my $begin_cmd = sprintf(
         "suuid --raw%s -c \"<sess_begin> <cmd>%s</cmd>%s </sess_begin>\"",
         (length($Opt{'tag'})
@@ -101,30 +106,51 @@ sub main {
             : ""
         ),
     );
+
+    # Generate session UUID and write it to the log file by executing 
+    # $begin_cmd
     chomp($uuid = `$begin_cmd`);
+
+    # If the suuid(1) executable failed in some way, or it isn't 
+    # available, abort
     if (!defined($uuid) || $uuid !~ /^$v1_templ$/) {
         die("$progname: Error generating UUID, session not started\n");
     }
+
     defined($ENV{'SESS_UUID'}) || ($ENV{'SESS_UUID'} = "");
 
+    # Make sure there's no illegal characters in the -d/--description 
+    # argument
     $descname = $Opt{'description'};
     ($descname =~ /[^$legal_descchars]/) && die("$progname: $descname: Invalid characters in description\n");
+
+    # Remove all full stops from the beginning of the command to avoid 
+    # setting $descname to '.' when './command' is specified
     my $stripstr = $cmd_str;
     $stripstr =~ s/^\.+//;
+
+    # If -d/--description is used, set $descname to the first sequence 
+    # of legal characters
     (!length($Opt{'description'}) && $stripstr =~ /^[^$legal_descchars]*([$legal_descchars]+).*/)
         && ($descname = $1);
     msg(1, "descname = '$descname'");
 
     $Opt{'quiet'} < 2 && print(STDERR "sess.begin:$descname/$uuid\n");
 
+    # Add current UUID to the $SESS_UUID environment variable to make it 
+    # appear in the environment of the executed command
     my $env_str = $ENV{'SESS_UUID'};
     $env_str =~ s/,+$//;
     $env_str .= ",$descname/$uuid,";
     $ENV{'SESS_UUID'} = $env_str;
+
+    # Execute the command, log start and end time with sub-second 
+    # precision
     $begin_time = Time::HiRes::time();
     $retval = system(@Cmd);
     $end_time = Time::HiRes::time();
 
+    # Finish up by writing the end entry to the log file and then exit
     write_end_entry();
     return($retval);
     # }}}
@@ -157,8 +183,15 @@ sub write_end_entry {
             ? " <exit>$retval</exit>"
             : "",
     );
+
+    # Strip the current session UUID from the environment variable 
+    # $SESS_UUID to prevent it from appearing in a <sess> element
     $ENV{'SESS_UUID'} = remove_last_uuid($ENV{'SESS_UUID'});
+
+    # Generate UUID for the end entry and write it to the log file by 
+    # executing $end_cmd
     chomp(my $end_uuid = `$end_cmd`);
+
     $Opt{'quiet'} < 2 && print(STDERR "sess.end:$descname/$end_uuid");
     $Opt{'quiet'} < 1 && printf(STDERR " -- %s, exit code '%s'.",
                                 time_period($end_time - $begin_time), $retval);
@@ -172,7 +205,13 @@ sub handle_signal {
     my $sig = shift;
     msg(0, "Received $sig signal, aborting");
     defined($end_time) || ($end_time = Time::HiRes::time());
+
+    # Because the program was interrupted, there may be no exit value to 
+    # return, so blank it
     defined($retval) || ($retval = '');
+
+    # Write what we've got to the log file and then exit with an error 
+    # value
     write_end_entry();
     exit(1);
     # }}}
