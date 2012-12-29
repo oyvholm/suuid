@@ -124,9 +124,6 @@ sub main {
     $begin_time = Time::HiRes::time();
     $retval = system(@Cmd);
     $end_time = Time::HiRes::time();
-    msg(2, "SESS_UUID before s: '$ENV{'SESS_UUID'}'");
-    $ENV{'SESS_UUID'} = remove_last_uuid($ENV{'SESS_UUID'});
-    msg(2, "SESS_UUID after s : '$ENV{'SESS_UUID'}'");
 
     write_end_entry();
     return($retval);
