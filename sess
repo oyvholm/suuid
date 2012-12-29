@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 #=======================================================================
 # sess
@@ -12,11 +12,12 @@
 #=======================================================================
 
 use strict;
+use warnings;
 use sigtrap handler => \&handle_signal, 'normal-signals';
 use Getopt::Long;
 use Time::HiRes;
 
-$| = 1;
+local $| = 1;
 
 $SIG{'TERM'} = 'handle_signal';
 
@@ -37,19 +38,19 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s/^.*\/(.*?)$/$1/;
-our $VERSION = "0.00";
+our $VERSION = '0.00';
 
-Getopt::Long::Configure("bundling");
+Getopt::Long::Configure('bundling');
 GetOptions(
 
-    "comment|c=s" => \$Opt{'comment'},
-    "debug" => \$Opt{'debug'},
-    "description|d=s" => \$Opt{'description'},
-    "help|h" => \$Opt{'help'},
-    "quiet|q+" => \$Opt{'quiet'},
-    "tag|t=s" => \$Opt{'tag'},
-    "verbose|v+" => \$Opt{'verbose'},
-    "version" => \$Opt{'version'},
+    'comment|c=s' => \$Opt{'comment'},
+    'debug' => \$Opt{'debug'},
+    'description|d=s' => \$Opt{'description'},
+    'help|h' => \$Opt{'help'},
+    'quiet|q+' => \$Opt{'quiet'},
+    'tag|t=s' => \$Opt{'tag'},
+    'verbose|v+' => \$Opt{'verbose'},
+    'version' => \$Opt{'version'},
 
 ) || die("$progname: Option error. Use -h for help.\n");
 
@@ -71,52 +72,66 @@ if ($Opt{'version'}) {
     exit(0);
 }
 
-my $Lh = "[0-9a-fA-F]";
-my $v1_templ = "$Lh\{8}-$Lh\{4}-1$Lh\{3}-$Lh\{4}-$Lh\{12}";
-
-my @Cmd = @ARGV;
+my $descname;
+my $uuid;
 my $cmd_str = join(" ", @ARGV);
-scalar(@Cmd) || die("$progname: No command specified. Use -h for help.\n");
-my $begin_cmd = sprintf(
-    "suuid --raw%s -c \"<sess_begin> <cmd>%s</cmd>%s </sess_begin>\"",
-    (length($Opt{'tag'})
-        ? " --tag $Opt{'tag'}"
-        : ""
-    ),
-    suuid_xml($cmd_str),
-    (length($Opt{'comment'})
-        ? sprintf(" <comment>%s</comment>", suuid_xml($Opt{'comment'}))
-        : ""
-    ),
-);
-chomp(my $uuid = `$begin_cmd`);
-if (!defined($uuid) || $uuid !~ /^$v1_templ$/) {
-    die("$progname: Error generating UUID, session not started\n");
-}
-defined($ENV{'SESS_UUID'}) || ($ENV{'SESS_UUID'} = "");
+my $begin_time;
+my $end_time;
+my $retval;
 
-my $descname = $Opt{'description'};
-($descname =~ /[^$legal_descchars]/) && die("$progname: $descname: Invalid characters in description\n");
-my $stripstr = $cmd_str;
-$stripstr =~ s/^\.+//;
-(!length($Opt{'description'}) && $stripstr =~ /^[^$legal_descchars]*([$legal_descchars]+).*/)
-    && ($descname = $1);
-msg(1, "descname = '$descname'");
+exit(main(%Opt));
 
-$Opt{'quiet'} < 2 && print(STDERR "sess.begin:$descname/$uuid\n");
+sub main {
+    # {{{
+    my %Opt = @_;
+    my $Lh = "[0-9a-fA-F]";
+    my $v1_templ = "$Lh\{8}-$Lh\{4}-1$Lh\{3}-$Lh\{4}-$Lh\{12}";
 
-my $env_str = $ENV{'SESS_UUID'};
-$env_str =~ s/,+$//;
-$env_str .= ",$descname/$uuid,";
-$ENV{'SESS_UUID'} = $env_str;
-my $begin_time = Time::HiRes::time();
-my $retval = system(@Cmd);
-my $end_time = Time::HiRes::time();
-msg(2, "SESS_UUID before s: '$ENV{'SESS_UUID'}'");
-$ENV{'SESS_UUID'} = remove_last_uuid($ENV{'SESS_UUID'});
-msg(2, "SESS_UUID after s : '$ENV{'SESS_UUID'}'");
+    my @Cmd = @ARGV;
+    scalar(@Cmd) || die("$progname: No command specified. Use -h for help.\n");
+    my $begin_cmd = sprintf(
+        "suuid --raw%s -c \"<sess_begin> <cmd>%s</cmd>%s </sess_begin>\"",
+        (length($Opt{'tag'})
+            ? " --tag $Opt{'tag'}"
+            : ""
+        ),
+        suuid_xml($cmd_str),
+        (length($Opt{'comment'})
+            ? sprintf(" <comment>%s</comment>", suuid_xml($Opt{'comment'}))
+            : ""
+        ),
+    );
+    chomp($uuid = `$begin_cmd`);
+    if (!defined($uuid) || $uuid !~ /^$v1_templ$/) {
+        die("$progname: Error generating UUID, session not started\n");
+    }
+    defined($ENV{'SESS_UUID'}) || ($ENV{'SESS_UUID'} = "");
 
-write_end_entry();
+    $descname = $Opt{'description'};
+    ($descname =~ /[^$legal_descchars]/) && die("$progname: $descname: Invalid characters in description\n");
+    my $stripstr = $cmd_str;
+    $stripstr =~ s/^\.+//;
+    (!length($Opt{'description'}) && $stripstr =~ /^[^$legal_descchars]*([$legal_descchars]+).*/)
+        && ($descname = $1);
+    msg(1, "descname = '$descname'");
+
+    $Opt{'quiet'} < 2 && print(STDERR "sess.begin:$descname/$uuid\n");
+
+    my $env_str = $ENV{'SESS_UUID'};
+    $env_str =~ s/,+$//;
+    $env_str .= ",$descname/$uuid,";
+    $ENV{'SESS_UUID'} = $env_str;
+    $begin_time = Time::HiRes::time();
+    $retval = system(@Cmd);
+    $end_time = Time::HiRes::time();
+    msg(2, "SESS_UUID before s: '$ENV{'SESS_UUID'}'");
+    $ENV{'SESS_UUID'} = remove_last_uuid($ENV{'SESS_UUID'});
+    msg(2, "SESS_UUID after s : '$ENV{'SESS_UUID'}'");
+
+    write_end_entry();
+    return($retval);
+    # }}}
+} # main()
 
 sub remove_last_uuid {
     # {{{
@@ -186,6 +201,7 @@ sub suuid_xml {
 sub print_version {
     # Print program version {{{
     print("$progname v$VERSION\n");
+    return;
     # }}}
 } # print_version()
 
@@ -197,7 +213,7 @@ sub usage {
         print("\n");
         print_version();
     }
-    print(<<END);
+    print(<<"END");
 
 Usage: $progname [options] [--] command
 
@@ -293,6 +309,7 @@ sub msg {
     if ($Opt{'verbose'} >= $verbose_level) {
         print(STDERR "$progname: $Txt\n");
     }
+    return;
     # }}}
 } # msg()
 
@@ -305,7 +322,7 @@ sub D {
     $File =~ s#\\#/#g;
     $File =~ s#^.*/(.*?)$#$1#;
     print(STDERR "$File:$call_info[2] $$ $Txt\n");
-    return("");
+    return('');
     # }}}
 } # D()
 
