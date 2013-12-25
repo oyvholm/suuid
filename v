@@ -135,8 +135,15 @@ $ENV{'SESS_UUID'} .= "v/$uuid,";
 system(@vim_str, @ARGV);
 $ENV{'SESS_UUID'} =~ s/v\/$uuid,//;
 
-my ($change_str, $other_str) = ("", "");
+my ($change_str, $gone_str, $other_str) = ("", "", "");
 for my $Curr (@Files) {
+    if (!-r $Curr) {
+        $gone_str .= sprintf(
+            " <file> <name>%s</name> </file>",
+            suuid_xml($Curr),
+        );
+        next;
+    }
     chomp($smsum{"n.$Curr"} = `smsum <"$Curr"`);
     chomp($gitsum{"n.$Curr"} = `git hash-object "$Curr"`);
 
@@ -171,6 +178,9 @@ for my $Curr (@Files) {
 
 if (length($change_str)) {
     $change_str = " <changed>$change_str </changed>";
+}
+if (length($gone_str)) {
+    $gone_str = " <gone>$gone_str </gone>";
 }
 
 for my $Curr (@Other) {
@@ -207,7 +217,7 @@ if (length($other_str)) {
     $other_str = " <created>$other_str </created>";
 }
 
-system("suuid --raw -t $Opt{'tag'}_end -c '<$Opt{'tag'} w=\"end\"> <finished>$uuid</finished>$change_str$other_str </$Opt{'tag'}>'");
+system("suuid --raw -t $Opt{'tag'}_end -c '<$Opt{'tag'} w=\"end\"> <finished>$uuid</finished>$change_str$gone_str$other_str </$Opt{'tag'}>'");
 
 sub sec_to_string {
     # Convert seconds since 1970 to "yyyy-mm-ddThh:mm:ssZ" {{{
