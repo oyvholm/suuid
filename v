@@ -61,9 +61,11 @@ my $Lh = "[0-9a-fA-F]";
 my $v1_templ = "$Lh\{8}-$Lh\{4}-1$Lh\{3}-$Lh\{4}-$Lh\{12}";
 
 my $comm_str = "";
+
 if (length($Opt{'comment'})) {
     $comm_str = sprintf(" <comment>%s</comment>", $Opt{'comment'});
 }
+
 my @Fancy = ("<cmdline>" . suuid_xml($cmdline_str) . "</cmdline>");
 my @Files = ();
 my @Other = ();
@@ -71,28 +73,35 @@ my @stat_array = ();
 my %smsum = ();
 my %gitsum = ();
 my ($old_mdate, $new_mdate) = ("", "");
+
 for my $curr_arg (@ARGV) {
     if (-r $curr_arg) {
         my $chk_swap = $curr_arg;
+
         if ($chk_swap =~ /\//) {
             $chk_swap =~ s/^(.*\/)(.+?)$/$1.$2.swp/;
         } else {
             $chk_swap = ".$curr_arg.swp";
         }
         D("\$chk_swap = '$chk_swap'");
+
         if (-e $chk_swap) {
             die("$progname: $curr_arg: Swap file $chk_swap exists, seems as the file is being edited already\n");
         }
+
         unless (@stat_array = stat($curr_arg)) {
             die("$progname: $curr_arg: Cannot stat file: $!\n");
         }
+
         $old_mdate = sec_to_string($stat_array[9]);
         my $head_str = $Opt{'last'} ? "tail" : "head";
+
         chomp(my $file_id = `finduuid "$curr_arg" | $head_str -1`);
         chomp($smsum{"o.$curr_arg"} = `smsum <"$curr_arg"`);
         length($smsum{"o.$curr_arg"}) || die("$progname: Error calculating smsum\n");
         chomp($gitsum{"o.$curr_arg"} = `git hash-object "$curr_arg"`);
         length($gitsum{"o.$curr_arg"}) || die("$progname: Error calculating gitsum\n");
+
         push(@Files, $curr_arg);
         push(@Fancy,
             "<file> " .
@@ -110,11 +119,14 @@ for my $curr_arg (@ARGV) {
         push(@Other, $curr_arg);
     }
 }
+
 my $cmd_str = suuid_xml(join(" ", @Fancy), 1);
 chomp(my $uuid=`suuid --raw -t $Opt{'tag'}_begin -w eo -c '<$Opt{'tag'} w="begin"> $cmd_str$comm_str </$Opt{'tag'}>'`);
+
 if (!defined($uuid) || $uuid !~ /^$v1_templ$/) {
     die("$progname: suuid error\n");
 }
+
 defined($ENV{'SESS_UUID'}) || ($ENV{'SESS_UUID'} = "");
 
 my @vim_str = $Opt{'gui'} ? ("gvim", "-f") : ("vim");
@@ -127,12 +139,16 @@ my ($change_str, $other_str) = ("", "");
 for my $Curr (@Files) {
     chomp($smsum{"n.$Curr"} = `smsum <"$Curr"`);
     chomp($gitsum{"n.$Curr"} = `git hash-object "$Curr"`);
+
     if ($smsum{"o.$Curr"} ne $smsum{"n.$Curr"}) {
         chomp(my $file_id = `finduuid "$Curr" | head -1`);
+
         unless (@stat_array = stat($Curr)) {
             die("$progname: $Curr: Cannot stat file: $!\n");
         }
+
         $new_mdate = sec_to_string($stat_array[9]);
+
         $change_str .= sprintf(
             " <file>" .
                 " <name>%s</name>" .
@@ -152,6 +168,7 @@ for my $Curr (@Files) {
         );
     }
 }
+
 if (length($change_str)) {
     $change_str = " <changed>$change_str </changed>";
 }
@@ -159,12 +176,16 @@ if (length($change_str)) {
 for my $Curr (@Other) {
     if (-r $Curr) {
         chomp(my $file_id = `finduuid "$Curr" | head -1`);
+
         unless (@stat_array = stat($Curr)) {
             die("$progname: $Curr: Cannot stat file: $!\n");
         }
+
         my $mtime = sec_to_string($stat_array[9]);
+
         chomp(my $smsum = `smsum <"$Curr"`);
         chomp(my $gitsum = `git hash-object "$Curr"`);
+
         $other_str .= sprintf(
             " <file>" .
                 " <name>%s</name>" .
@@ -181,6 +202,7 @@ for my $Curr (@Other) {
         );
     }
 }
+
 if (length($other_str)) {
     $other_str = " <created>$other_str </created>";
 }
