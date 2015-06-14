@@ -55,6 +55,12 @@ sub main {
     my %Opt = @_;
     my $Retval = 0;
 
+    while (my $line = <>) {
+        if ($line =~ /^\s*<suuid t="2\d\d\d-\d\d-\d\dT\d\d:\d\d.*Z.*<\/suuid>$/) {
+            print($line);
+        }
+    }
+
     return($Retval);
     # }}}
 } # main()
