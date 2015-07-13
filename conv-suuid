@@ -74,7 +74,7 @@ sub main {
     }
 
     if ($Opt{'output-format'} eq 'postgres') {
-        print("COPY uuids (u, host, cwd, s) FROM stdin;\n");
+        print("COPY uuids (u, host, cwd, username, s) FROM stdin;\n");
     }
     while (my $line = <>) {
         if ($line =~ /^\s*(<suuid t="2\d\d\d-\d\d-\d\dT\d\d:\d\d.*Z.*<\/suuid>)$/) {
@@ -83,14 +83,17 @@ sub main {
                 my ($date, $uuid) = ($1, $2);
                 my $host = '';
                 my $cwd = '';
+                my $username = '';
                 ($suuid =~ /<host>([^<]+)<\/host>/) && ($host = $1);
                 ($suuid =~ /<cwd>([^<]+)<\/cwd>/) && ($cwd = $1);
+                ($suuid =~ /<user>([^<]+)<\/user>/) && ($username = $1);
                 if ($Opt{'output-format'} eq 'postgres') {
                     print(
                         join("\t",
                             $uuid,
                             safe_sql($host),
                             safe_sql($cwd),
+                            safe_sql($username),
                             safe_sql($suuid),
                         ) . "\n",
                     );
