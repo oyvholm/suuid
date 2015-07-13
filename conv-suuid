@@ -87,11 +87,11 @@ sub main {
                 my $username = '';
                 my $tty = '';
                 my $txt = '';
-                ($suuid =~ s/<host>([^<]+)<\/host>//) && ($host = $1);
-                ($suuid =~ s/<cwd>([^<]+)<\/cwd>//) && ($cwd = $1);
-                ($suuid =~ s/<user>([^<]+)<\/user>//) && ($username = $1);
-                ($suuid =~ s/<tty>([^<]+)<\/tty>//) && ($tty = $1);
-                ($suuid =~ s/<txt>(.+)<\/txt>//) && ($txt = $1);
+                ($suuid =~ s/\s*<host>([^<]+)<\/host>\s*/ /) && ($host = $1);
+                ($suuid =~ s/\s*<cwd>([^<]+)<\/cwd>\s*/ /) && ($cwd = $1);
+                ($suuid =~ s/\s*<user>([^<]+)<\/user>\s*/ /) && ($username = $1);
+                ($suuid =~ s/\s*<tty>([^<]+)<\/tty>\s*/ /) && ($tty = $1);
+                ($suuid =~ s/\s*<txt>(.+)<\/txt>\s*/ /) && ($txt = $1);
                 msg(3, "Left in suuid: '$suuid'");
                 if ($Opt{'output-format'} eq 'postgres') {
                     print(
