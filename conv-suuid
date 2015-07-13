@@ -63,11 +63,11 @@ sub main {
         print(
             "CREATE TABLE uuids (\n" .
             "    u uuid,\n" .
-            "    txt varchar,\n" .
             "    host varchar,\n" .
             "    cwd varchar,\n" .
             "    username varchar,\n" .
             "    tty varchar,\n" .
+            "    txt varchar,\n" .
             "    s xml\n" .
             ");\n"
         );

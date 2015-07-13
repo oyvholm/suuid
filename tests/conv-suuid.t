@@ -159,11 +159,11 @@ END
         <<END,
 CREATE TABLE uuids (
     u uuid,
-    txt varchar,
     host varchar,
     cwd varchar,
     username varchar,
     tty varchar,
+    txt varchar,
     s xml
 );
 COPY uuids (u, host, cwd, username, tty, s) FROM stdin;
