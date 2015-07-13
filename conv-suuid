@@ -63,6 +63,7 @@ sub main {
         print(
             "CREATE TABLE uuids (\n" .
             "    u uuid,\n" .
+            "    tag varchar[],\n" .
             "    host varchar,\n" .
             "    cwd varchar,\n" .
             "    username varchar,\n" .
@@ -74,7 +75,7 @@ sub main {
     }
 
     if ($Opt{'output-format'} eq 'postgres') {
-        print("COPY uuids (u, host, cwd, username, tty, txt, s) FROM stdin;\n");
+        print("COPY uuids (u, tag, host, cwd, username, tty, txt, s) FROM stdin;\n");
     }
     while (my $line = <>) {
         chomp($line);
@@ -87,6 +88,8 @@ sub main {
                 my $username = '';
                 my $tty = '';
                 my $txt = '';
+                my @tag = ();
+                ($suuid =~ s/\s*<tag>([^<]+)<\/tag>\s*/ /) && (push(@tag, $1));
                 ($suuid =~ s/\s*<host>([^<]+)<\/host>\s*/ /) && ($host = $1);
                 ($suuid =~ s/\s*<cwd>([^<]+)<\/cwd>\s*/ /) && ($cwd = $1);
                 ($suuid =~ s/\s*<user>([^<]+)<\/user>\s*/ /) && ($username = $1);
@@ -97,6 +100,7 @@ sub main {
                     print(
                         join("\t",
                             $uuid,
+                            "{'" . join("', '", @tag) . "'}",
                             safe_sql($host),
                             safe_sql($cwd),
                             safe_sql($username),
