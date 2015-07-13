@@ -4,7 +4,7 @@
 # conv-suuid
 # File ID: 39647b28-1261-11e5-9dd0-000df06acc56
 #
-# [Description]
+# Convert suuid .xml to other formats.
 #
 # Character set: UTF-8
 # ©opyleft 2015– Øyvind A. Holm <sunny@sunbase.org>
@@ -21,6 +21,8 @@ local $| = 1;
 our %Opt = (
 
     'help' => 0,
+    'output-format' => 'xml',
+    'pg-table' => 0,
     'quiet' => 0,
     'verbose' => 0,
     'version' => 0,
@@ -35,6 +37,8 @@ Getopt::Long::Configure('bundling');
 GetOptions(
 
     'help|h' => \$Opt{'help'},
+    'output-format|o=s' => \$Opt{'output-format'},
+    'pg-table' => \$Opt{'pg-table'},
     'quiet|q+' => \$Opt{'quiet'},
     'verbose|v+' => \$Opt{'verbose'},
     'version' => \$Opt{'version'},
@@ -55,15 +59,69 @@ sub main {
     my %Opt = @_;
     my $Retval = 0;
 
+    if ($Opt{'pg-table'}) {
+        print(
+            "CREATE TABLE uuids (\n" .
+            "    u uuid,\n" .
+            "    txt varchar,\n" .
+            "    host varchar,\n" .
+            "    cwd varchar,\n" .
+            "    username varchar,\n" .
+            "    tty varchar,\n" .
+            "    s xml\n" .
+            ");\n"
+        );
+    }
+
+    if ($Opt{'output-format'} eq 'postgres') {
+        print("COPY uuids (u, host, s) FROM stdin;\n");
+    }
     while (my $line = <>) {
-        if ($line =~ /^\s*<suuid t="2\d\d\d-\d\d-\d\dT\d\d:\d\d.*Z.*<\/suuid>$/) {
-            print($line);
+        if ($line =~ /^\s*(<suuid t="2\d\d\d-\d\d-\d\dT\d\d:\d\d.*Z.*<\/suuid>)$/) {
+            my $suuid = $1;
+            if ($suuid =~ /^<suuid t="(2\d\d\d-\d\d-\d\dT.+?Z).*?" u="(.*?)">/) {
+                my ($date, $uuid) = ($1, $2);
+                my $host = '';
+                ($suuid =~ /<host>([^<]+)<\/host>/) && ($host = $1);
+                if ($Opt{'output-format'} eq 'postgres') {
+                    print(
+                        join("\t",
+                            $uuid,
+                            safe_sql($host),
+                            safe_sql($suuid),
+                        ) . "\n",
+                    );
+                } elsif ($Opt{'output-format'} eq 'xml') {
+                    print($line);
+                } else {
+                    warn("$progname: $Opt{'output-format'}: Unknown output format\n");
+                    $Retval = 1;
+                    last;
+                }
+            } else {
+                msg(0, "Did not find '$suuid'");
+            }
         }
+    }
+    if ($Opt{'output-format'} eq 'postgres') {
+        print("\\.\n");
     }
 
     return($Retval);
     # }}}
 } # main()
+
+sub safe_sql {
+    # {{{
+    my $Text = shift;
+    $Text =~ s/\\/\\\\/g;
+    $Text =~ s/'/''/g;
+    $Text =~ s/\n/\\n/g;
+    $Text =~ s/\r/\\r/g;
+    $Text =~ s/\t/\\t/g;
+    return($Text);
+    # }}}
+} # safe_sql()
 
 sub print_version {
     # Print program version {{{
@@ -88,8 +146,15 @@ Options:
 
   -h, --help
     Show this help.
+  -o X, --output-format X
+    Use X as output format. Currently supported:
+      - postgres
+      - xml
+        This is the standard format it's been using for years.
   -q, --quiet
     Be more quiet. Can be repeated to increase silence.
+  --pg-table
+    Output Postgres commands for creating the necessary tables.
   -v, --verbose
     Increase level of verbosity. Can be repeated.
   --version
