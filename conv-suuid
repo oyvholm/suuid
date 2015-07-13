@@ -100,9 +100,7 @@ sub main {
                     print(
                         join("\t",
                             $uuid,
-                            # FIXME: The following should maybe print \N 
-                            # instead of {''}.
-                            "{'" . join("', '", @tag) . "'}",
+                            scalar(@tag) ? ("{'" . join("', '", @tag) . "'}") : '\N',
                             safe_sql($host),
                             safe_sql($cwd),
                             safe_sql($username),
