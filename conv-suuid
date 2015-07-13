@@ -92,6 +92,7 @@ sub main {
                 ($suuid =~ s/<user>([^<]+)<\/user>//) && ($username = $1);
                 ($suuid =~ s/<tty>([^<]+)<\/tty>//) && ($tty = $1);
                 ($suuid =~ s/<txt>(.+)<\/txt>//) && ($txt = $1);
+                msg(3, "Left in suuid: '$suuid'");
                 if ($Opt{'output-format'} eq 'postgres') {
                     print(
                         join("\t",
