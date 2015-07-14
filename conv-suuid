@@ -101,7 +101,7 @@ sub main {
                     print(
                         join("\t",
                             $uuid,
-                            scalar(@tag) ? ("{'" . join("', '", @tag) . "'}") : '\N',
+                            scalar(@tag) ? ("{'" . join("','", @tag) . "'}") : '\N',
                             safe_sql($host, 1),
                             safe_sql($cwd, 1),
                             safe_sql($username, 1),
