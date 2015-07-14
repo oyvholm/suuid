@@ -257,6 +257,7 @@ END
 } # main()
 
 sub gen_output {
+    # Generate output similar to what's in the test files {{{
     my ($file, $format) = @_;
     my $retval = '';
     if ($file eq 'test') {
@@ -264,6 +265,7 @@ sub gen_output {
             $retval = join("\n",
                 "COPY uuids (t, u, tag, host, cwd, username, tty, sess, txt, s) FROM stdin;",
                 join("\t",
+                    # Postgres import {{{
                     "2015-06-14T02:34:41.5608070Z",
                     "e8f90906-123d-11e5-81a8-000df06acc56",
                     "{'std'}",
@@ -274,6 +276,7 @@ sub gen_output {
                     "{'xterm/f923e8fc-11e6-11e5-913a-000df06acc56','logging/09733f50-11e7-11e5-a1ac-000df06acc56','0bb564f0-11e7-11e5-bc0c-000df06acc56'}",
                     "std -l python suuids-to-postgres.py",
                     join(' ',
+                        # Entry #1 from test.xml {{{
                         "<suuid t=\"2015-06-14T02:34:41.5608070Z\" u=\"e8f90906-123d-11e5-81a8-000df06acc56\">",
                             "<tag>std</tag>",
                             "<txt>std -l python suuids-to-postgres.py</txt>",
@@ -285,9 +288,12 @@ sub gen_output {
                             "<sess desc=\"logging\">09733f50-11e7-11e5-a1ac-000df06acc56</sess>",
                             "<sess>0bb564f0-11e7-11e5-bc0c-000df06acc56</sess>",
                         "</suuid>",
+                        # }}}
                     ),
+                    # }}}
                 ),
                 join("\t",
+                    # Postgres import {{{
                     "2015-06-14T02:51:50.4477750Z",
                     "4e3cba36-1240-11e5-ab4e-000df06acc56",
                     "{'ti','another'}",
@@ -298,6 +304,7 @@ sub gen_output {
                     "{'xterm/f923e8fc-11e6-11e5-913a-000df06acc56','logging/09733f50-11e7-11e5-a1ac-000df06acc56','0bb564f0-11e7-11e5-bc0c-000df06acc56'}",
                     "Yo mainn.",
                     join(' ',
+                        # Entry #2 from test.xml {{{
                         "<suuid t=\"2015-06-14T02:51:50.4477750Z\" u=\"4e3cba36-1240-11e5-ab4e-000df06acc56\">",
                             "<tag>ti</tag>",
                             "<tag>another</tag>",
@@ -310,9 +317,12 @@ sub gen_output {
                             "<sess desc=\"logging\">09733f50-11e7-11e5-a1ac-000df06acc56</sess>",
                             "<sess>0bb564f0-11e7-11e5-bc0c-000df06acc56</sess>",
                         "</suuid>",
+                        # }}}
                     ),
+                    # }}}
                 ),
                 join("\t",
+                    # Postgres import {{{
                     "2015-06-21T10:49:19.2036620Z",
                     "2b1e350c-1803-11e5-9c66-000df06acc56",
                     "\\N",
@@ -323,6 +333,7 @@ sub gen_output {
                     "{'xterm/edcbd7d8-16ca-11e5-9739-000df06acc56','logging/03a706ae-16cb-11e5-becb-000df06acc56','screen/088f9e56-16cb-11e5-a56c-000df06acc56'}",
                     "Weird characters: \\\\ '' ; &lt; &gt; \"",
                     join(' ',
+                        # Entry #3 from test.xml {{{
                         "<suuid t=\"2015-06-21T10:49:19.2036620Z\" u=\"2b1e350c-1803-11e5-9c66-000df06acc56\">",
                             "<txt>Weird characters: \\\\ '' ; &lt; &gt; \"</txt>",
                             "<host>bellmann</host>",
@@ -333,9 +344,12 @@ sub gen_output {
                             "<sess desc=\"logging\">03a706ae-16cb-11e5-becb-000df06acc56</sess>",
                             "<sess desc=\"screen\">088f9e56-16cb-11e5-a56c-000df06acc56</sess>",
                         "</suuid>",
+                        # }}}
                     ),
+                    # }}}
                 ),
                 join("\t",
+                    # Postgres import {{{
                     "2015-07-14T02:07:50.9817960Z",
                     "2162ae68-29cd-11e5-aa3e-000df06acc56",
                     "\\N",
@@ -346,6 +360,7 @@ sub gen_output {
                     "\\N",
                     "\\N",
                     "<suuid t=\"2015-07-14T02:07:50.9817960Z\" u=\"2162ae68-29cd-11e5-aa3e-000df06acc56\"> </suuid>"
+                    # }}}
                 ),
                 '\\.',
                 '',
@@ -353,6 +368,7 @@ sub gen_output {
         }
     }
     return($retval);
+    # }}}
 } # gen_output()
 
 sub testcmd {
