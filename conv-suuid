@@ -102,12 +102,12 @@ sub main {
                         join("\t",
                             $uuid,
                             scalar(@tag) ? ("{'" . join("', '", @tag) . "'}") : '\N',
-                            safe_sql($host),
-                            safe_sql($cwd),
-                            safe_sql($username),
-                            safe_sql($tty),
-                            safe_sql($txt),
-                            safe_sql($line),
+                            safe_sql($host, 1),
+                            safe_sql($cwd, 1),
+                            safe_sql($username, 1),
+                            safe_sql($tty, 1),
+                            safe_sql($txt, 1),
+                            safe_sql($line, 1),
                         ) . "\n",
                     );
                 } elsif ($Opt{'output-format'} eq 'xml') {
@@ -132,12 +132,13 @@ sub main {
 
 sub safe_sql {
     # {{{
-    my $Text = shift;
+    my ($Text, $use_null) = @_;
     $Text =~ s/\\/\\\\/g;
     $Text =~ s/'/''/g;
     $Text =~ s/\n/\\n/g;
     $Text =~ s/\r/\\r/g;
     $Text =~ s/\t/\\t/g;
+    $use_null && !length($Text) && ($Text = '\N');
     return($Text);
     # }}}
 } # safe_sql()
