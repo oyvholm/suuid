@@ -89,13 +89,14 @@ sub main {
                 my $tty = '';
                 my $txt = '';
                 my @tag = ();
-                ($suuid =~ s/\s*<tag>([^<]+)<\/tag>\s*/ /) && (push(@tag, $1));
+                $suuid =~ s/\s*<tag>([^<]+)<\/tag>\s*/(push(@tag, $1), ' ')/ge;
                 ($suuid =~ s/\s*<host>([^<]+)<\/host>\s*/ /) && ($host = $1);
                 ($suuid =~ s/\s*<cwd>([^<]+)<\/cwd>\s*/ /) && ($cwd = $1);
                 ($suuid =~ s/\s*<user>([^<]+)<\/user>\s*/ /) && ($username = $1);
                 ($suuid =~ s/\s*<tty>([^<]+)<\/tty>\s*/ /) && ($tty = $1);
                 ($suuid =~ s/\s*<txt>(.+)<\/txt>\s*/ /) && ($txt = $1);
                 msg(3, "Left in suuid: '$suuid'");
+                msg(3, "tag: '" . join('|', @tag) . "'");
                 if ($Opt{'output-format'} eq 'postgres') {
                     print(
                         join("\t",
