@@ -87,67 +87,63 @@ sub main {
         chomp($line);
         if ($line =~ /^\s*(<suuid t="2\d\d\d-\d\d-\d\dT\d\d:\d\d.*Z.*<\/suuid>)$/) {
             my $suuid = $1;
-            if ($suuid =~ /^<suuid t="(2\d\d\d-\d\d-\d\dT.+?Z).*?" u="(.*?)">/) {
-                my $uuid = '';
-                my $date = '';
-                my $host = '';
-                my $cwd = '';
-                my $username = '';
-                my $tty = '';
-                my $txt = '';
-                my @tag = ();
-                my @sess = ();
-                ($suuid =~ s/\s*<suuid t="(2\d\d\d-\d\d-\d\dT.+?Z).*?" u="(.*?)">\s*/ /) && (($date, $uuid) = ($1, $2));
-                $suuid =~ s!</suuid>!!;
-                $suuid =~ s/\s*<tag>([^<]+)<\/tag>\s*/(push(@tag, $1), ' ')/ge;
-                ($suuid =~ s/\s*<host>([^<]+)<\/host>\s*/ /) && ($host = $1);
-                ($suuid =~ s/\s*<cwd>([^<]+)<\/cwd>\s*/ /) && ($cwd = $1);
-                ($suuid =~ s/\s*<user>([^<]+)<\/user>\s*/ /) && ($username = $1);
-                ($suuid =~ s/\s*<tty>([^<]+)<\/tty>\s*/ /) && ($tty = $1);
-                ($suuid =~ s/\s*<txt>(.+)<\/txt>\s*/ /) && ($txt = $1);
-                $suuid =~ s{
+            my $uuid = '';
+            my $date = '';
+            my $host = '';
+            my $cwd = '';
+            my $username = '';
+            my $tty = '';
+            my $txt = '';
+            my @tag = ();
+            my @sess = ();
+            ($suuid =~ s/\s*<suuid t="(2\d\d\d-\d\d-\d\dT.+?Z).*?" u="(.*?)">\s*/ /) && (($date, $uuid) = ($1, $2));
+            $suuid =~ s!</suuid>!!;
+            $suuid =~ s/\s*<tag>([^<]+)<\/tag>\s*/(push(@tag, $1), ' ')/ge;
+            ($suuid =~ s/\s*<host>([^<]+)<\/host>\s*/ /) && ($host = $1);
+            ($suuid =~ s/\s*<cwd>([^<]+)<\/cwd>\s*/ /) && ($cwd = $1);
+            ($suuid =~ s/\s*<user>([^<]+)<\/user>\s*/ /) && ($username = $1);
+            ($suuid =~ s/\s*<tty>([^<]+)<\/tty>\s*/ /) && ($tty = $1);
+            ($suuid =~ s/\s*<txt>(.+)<\/txt>\s*/ /) && ($txt = $1);
+            $suuid =~ s{
+                \s*
+                <sess
                     \s*
-                    <sess
-                        \s*
-                        desc="([^"]+)"
-                        .*?
-                    >($Templ)</sess>
-                    \s*
-                }{
-                    (
-                        push(@sess, "$1/$2"),
-                        msg(4, "push '$1/$2' to sess"),
-                        ' ',
-                    )
-                }egx;
-                $suuid =~ s/^\s+//;
-                $suuid =~ s/\s+$//;
-                $suuid =~ s/>\s+</> </g;
-                msg(3, "Left in suuid: '$suuid'");
-                msg(3, "tag: '" . join('|', @tag) . "'");
-                if ($Opt{'output-format'} eq 'postgres') {
-                    print(
-                        join("\t",
-                            $uuid,
-                            scalar(@tag) ? ("{'" . join("','", @tag) . "'}") : '\N',
-                            safe_sql($host, 1),
-                            safe_sql($cwd, 1),
-                            safe_sql($username, 1),
-                            safe_sql($tty, 1),
-                            scalar(@sess) ? ("{'" . join("','", @sess) . "'}") : '\N',
-                            safe_sql($txt, 1),
-                            safe_sql($line, 1),
-                        ) . "\n",
-                    );
-                } elsif ($Opt{'output-format'} eq 'xml') {
-                    print("$line\n");
-                } else {
-                    warn("$progname: $Opt{'output-format'}: Unknown output format\n");
-                    $Retval = 1;
-                    last;
-                }
+                    desc="([^"]+)"
+                    .*?
+                >($Templ)</sess>
+                \s*
+            }{
+                (
+                    push(@sess, "$1/$2"),
+                    msg(4, "push '$1/$2' to sess"),
+                    ' ',
+                )
+            }egx;
+            $suuid =~ s/^\s+//;
+            $suuid =~ s/\s+$//;
+            $suuid =~ s/>\s+</> </g;
+            msg(3, "Left in suuid: '$suuid'");
+            msg(3, "tag: '" . join('|', @tag) . "'");
+            if ($Opt{'output-format'} eq 'postgres') {
+                print(
+                    join("\t",
+                        $uuid,
+                        scalar(@tag) ? ("{'" . join("','", @tag) . "'}") : '\N',
+                        safe_sql($host, 1),
+                        safe_sql($cwd, 1),
+                        safe_sql($username, 1),
+                        safe_sql($tty, 1),
+                        scalar(@sess) ? ("{'" . join("','", @sess) . "'}") : '\N',
+                        safe_sql($txt, 1),
+                        safe_sql($line, 1),
+                    ) . "\n",
+                );
+            } elsif ($Opt{'output-format'} eq 'xml') {
+                print("$line\n");
             } else {
-                msg(0, "Did not find '$suuid'");
+                warn("$progname: $Opt{'output-format'}: Unknown output format\n");
+                $Retval = 1;
+                last;
             }
         }
     }
