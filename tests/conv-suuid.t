@@ -144,7 +144,7 @@ END
 
     # }}}
     testcmd("../$CMD --output-format postgres --verbose -vv test.xml", # {{{
-        gen_output('test', 'postgres'),
+        gen_output('test', 'postgres', 'copy-to-uuids-from-stdin'),
         <<END,
 conv-suuid: Left in suuid: ''
 conv-suuid: tag: 'std'
@@ -161,7 +161,7 @@ END
 
     # }}}
     testcmd("../$CMD --pg-table --output-format postgres test.xml", # {{{
-        gen_output('test', 'postgres', 'pg-table'),
+        gen_output('test', 'postgres', 'copy-to-uuids-from-stdin pg-table'),
         '',
         0,
         'Output Postgres tables and format',
@@ -180,12 +180,7 @@ END
 
     # }}}
     testcmd("psql -d $tmpdb -c \"COPY (SELECT * FROM uuids) TO STDOUT;\"", # {{{
-        <<END,
-2015-06-14 02:34:41.560807\te8f90906-123d-11e5-81a8-000df06acc56\t{'std'}\tbellmann\t/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres\tsunny\t/dev/pts/4\t{'xterm/f923e8fc-11e6-11e5-913a-000df06acc56','logging/09733f50-11e7-11e5-a1ac-000df06acc56','0bb564f0-11e7-11e5-bc0c-000df06acc56'}\tstd -l python suuids-to-postgres.py\t<suuid t="2015-06-14T02:34:41.5608070Z" u="e8f90906-123d-11e5-81a8-000df06acc56"> <tag>std</tag> <txt>std -l python suuids-to-postgres.py</txt> <host>bellmann</host> <cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres</cwd> <user>sunny</user> <tty>/dev/pts/4</tty> <sess desc="xterm">f923e8fc-11e6-11e5-913a-000df06acc56</sess> <sess desc="logging">09733f50-11e7-11e5-a1ac-000df06acc56</sess> <sess>0bb564f0-11e7-11e5-bc0c-000df06acc56</sess> </suuid>
-2015-06-14 02:51:50.447775\t4e3cba36-1240-11e5-ab4e-000df06acc56\t{'ti','another'}\tbellmann\t/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres\tsunny\t/dev/pts/13\t{'xterm/f923e8fc-11e6-11e5-913a-000df06acc56','logging/09733f50-11e7-11e5-a1ac-000df06acc56','0bb564f0-11e7-11e5-bc0c-000df06acc56'}\tYo mainn.\t<suuid t="2015-06-14T02:51:50.4477750Z" u="4e3cba36-1240-11e5-ab4e-000df06acc56"> <tag>ti</tag> <tag>another</tag> <txt>Yo mainn.</txt> <host>bellmann</host> <cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres</cwd> <user>sunny</user> <tty>/dev/pts/13</tty> <sess desc="xterm">f923e8fc-11e6-11e5-913a-000df06acc56</sess> <sess desc="logging">09733f50-11e7-11e5-a1ac-000df06acc56</sess> <sess>0bb564f0-11e7-11e5-bc0c-000df06acc56</sess> </suuid>
-2015-06-21 10:49:19.203662\t2b1e350c-1803-11e5-9c66-000df06acc56\t\\N\tbellmann\t/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/tests\tsunny\t/dev/pts/15\t{'xterm/edcbd7d8-16ca-11e5-9739-000df06acc56','logging/03a706ae-16cb-11e5-becb-000df06acc56','screen/088f9e56-16cb-11e5-a56c-000df06acc56'}\tWeird characters: \\\\ '' ; &lt; &gt; "\t<suuid t="2015-06-21T10:49:19.2036620Z" u="2b1e350c-1803-11e5-9c66-000df06acc56"> <txt>Weird characters: \\\\ '' ; &lt; &gt; "</txt> <host>bellmann</host> <cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/tests</cwd> <user>sunny</user> <tty>/dev/pts/15</tty> <sess desc="xterm">edcbd7d8-16ca-11e5-9739-000df06acc56</sess> <sess desc="logging">03a706ae-16cb-11e5-becb-000df06acc56</sess> <sess desc="screen">088f9e56-16cb-11e5-a56c-000df06acc56</sess> </suuid>
-2015-07-14 02:07:50.981796\t2162ae68-29cd-11e5-aa3e-000df06acc56\t\\N\t\\N\t\\N\t\\N\t\\N\t\\N\t\\N\t<suuid t="2015-07-14T02:07:50.9817960Z" u="2162ae68-29cd-11e5-aa3e-000df06acc56"> </suuid>
-END
+        gen_output('test', 'postgres', ''),
         '',
         0,
         "Check contents of database",
@@ -240,6 +235,7 @@ END
 sub gen_output {
     # Generate output similar to what's in the test files {{{
     my ($file, $format, $flags) = @_;
+    my $fl_copy_to_uuids = 0;
     my $retval = '';
     if ($flags =~ /pg-table/) {
         $retval .= <<END;
@@ -257,13 +253,16 @@ CREATE TABLE uuids (
 );
 END
     }
+    if ($flags =~ /copy-to-uuids-from-stdin/) {
+        $retval .= "COPY uuids (t, u, tag, host, cwd, username, tty, sess, txt, s) FROM stdin;\n";
+        $fl_copy_to_uuids = 1;
+    }
     if ($file eq 'test') {
         if ($format eq 'postgres') {
             $retval .= join("\n",
-                "COPY uuids (t, u, tag, host, cwd, username, tty, sess, txt, s) FROM stdin;",
                 join("\t",
                     # Postgres import {{{
-                    "2015-06-14T02:34:41.5608070Z",
+                    $fl_copy_to_uuids ? "2015-06-14T02:34:41.5608070Z" : "2015-06-14 02:34:41.560807",
                     "e8f90906-123d-11e5-81a8-000df06acc56",
                     "{'std'}",
                     "bellmann",
@@ -291,7 +290,7 @@ END
                 ),
                 join("\t",
                     # Postgres import {{{
-                    "2015-06-14T02:51:50.4477750Z",
+                    $fl_copy_to_uuids ? "2015-06-14T02:51:50.4477750Z" : "2015-06-14 02:51:50.447775",
                     "4e3cba36-1240-11e5-ab4e-000df06acc56",
                     "{'ti','another'}",
                     "bellmann",
@@ -320,7 +319,7 @@ END
                 ),
                 join("\t",
                     # Postgres import {{{
-                    "2015-06-21T10:49:19.2036620Z",
+                    $fl_copy_to_uuids ? "2015-06-21T10:49:19.2036620Z" : "2015-06-21 10:49:19.203662",
                     "2b1e350c-1803-11e5-9c66-000df06acc56",
                     "\\N",
                     "bellmann",
@@ -347,7 +346,7 @@ END
                 ),
                 join("\t",
                     # Postgres import {{{
-                    "2015-07-14T02:07:50.9817960Z",
+                    $fl_copy_to_uuids ? "2015-07-14T02:07:50.9817960Z" : "2015-07-14 02:07:50.981796",
                     "2162ae68-29cd-11e5-aa3e-000df06acc56",
                     "\\N",
                     "\\N",
@@ -359,9 +358,11 @@ END
                     "<suuid t=\"2015-07-14T02:07:50.9817960Z\" u=\"2162ae68-29cd-11e5-aa3e-000df06acc56\"> </suuid>"
                     # }}}
                 ),
-                '\\.',
                 '',
             );
+            if ($fl_copy_to_uuids) {
+                $retval .= "\\.\n";
+            }
         }
     }
     return($retval);
