@@ -59,6 +59,11 @@ sub main {
     my %Opt = @_;
     my $Retval = 0;
 
+    my $Lh = "[0-9a-fA-F]";
+    my $Templ = "$Lh\{8}-$Lh\{4}-$Lh\{4}-$Lh\{4}-$Lh\{12}";
+    my $v1_templ = "$Lh\{8}-$Lh\{4}-1$Lh\{3}-$Lh\{4}-$Lh\{12}";
+    my $v1rand_templ = "$Lh\{8}-$Lh\{4}-1$Lh\{3}-$Lh\{4}-$Lh\[37bf]$Lh\{10}";
+
     if ($Opt{'pg-table'}) {
         print(
             "CREATE TABLE uuids (\n" .
@@ -68,6 +73,7 @@ sub main {
             "    cwd varchar,\n" .
             "    username varchar,\n" .
             "    tty varchar,\n" .
+            "    sess varchar[],\n" .
             "    txt varchar,\n" .
             "    s xml\n" .
             ");\n"
@@ -75,7 +81,7 @@ sub main {
     }
 
     if ($Opt{'output-format'} eq 'postgres') {
-        print("COPY uuids (u, tag, host, cwd, username, tty, txt, s) FROM stdin;\n");
+        print("COPY uuids (u, tag, host, cwd, username, tty, sess, txt, s) FROM stdin;\n");
     }
     while (my $line = <>) {
         chomp($line);
@@ -89,12 +95,29 @@ sub main {
                 my $tty = '';
                 my $txt = '';
                 my @tag = ();
+                my @sess = ();
                 $suuid =~ s/\s*<tag>([^<]+)<\/tag>\s*/(push(@tag, $1), ' ')/ge;
                 ($suuid =~ s/\s*<host>([^<]+)<\/host>\s*/ /) && ($host = $1);
                 ($suuid =~ s/\s*<cwd>([^<]+)<\/cwd>\s*/ /) && ($cwd = $1);
                 ($suuid =~ s/\s*<user>([^<]+)<\/user>\s*/ /) && ($username = $1);
                 ($suuid =~ s/\s*<tty>([^<]+)<\/tty>\s*/ /) && ($tty = $1);
                 ($suuid =~ s/\s*<txt>(.+)<\/txt>\s*/ /) && ($txt = $1);
+                $suuid =~ s{
+                    \s*
+                    <sess
+                        \s*
+                        desc="([^"]+)"
+                        .*?
+                    >($Templ)</sess>
+                    \s*
+                }{
+                    (
+                        push(@sess, "$1/$2"),
+                        msg(4, "push '$1/$2' to sess"),
+                        ' ',
+                    )
+                }egx;
+                $suuid =~ s/>\s+</> </g;
                 msg(3, "Left in suuid: '$suuid'");
                 msg(3, "tag: '" . join('|', @tag) . "'");
                 if ($Opt{'output-format'} eq 'postgres') {
@@ -106,6 +129,7 @@ sub main {
                             safe_sql($cwd, 1),
                             safe_sql($username, 1),
                             safe_sql($tty, 1),
+                            scalar(@sess) ? ("{'" . join("','", @sess) . "'}") : '\N',
                             safe_sql($txt, 1),
                             safe_sql($line, 1),
                         ) . "\n",
