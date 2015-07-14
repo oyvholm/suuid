@@ -285,7 +285,11 @@ sub xml_output {
         "<suuid t=\"2015-07-14T02:07:50.9817960Z\" u=\"2162ae68-29cd-11e5-aa3e-000df06acc56\"> </suuid>",
     );
     if ($file eq 'test') {
-        $retval = $xml_test[$line - 1]; # I, as a stupid human, count from 1
+        if ($line eq '*') {
+            $retval = join("\n", @xml_test) . "\n";
+        } else {
+            $retval = $xml_test[$line - 1]; # I, as a stupid human, count from 1
+        }
     }
 
     return($retval);
