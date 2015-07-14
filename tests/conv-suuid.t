@@ -234,7 +234,7 @@ END
 
 sub xml_output {
     # {{{
-    my ($file, $line) = @_;
+    my ($file, $line, $flags) = @_;
     my $retval = '';
     my @xml_test = (
         join(' ',
@@ -331,7 +331,7 @@ END
                     "/dev/pts/4",
                     "{'xterm/f923e8fc-11e6-11e5-913a-000df06acc56','logging/09733f50-11e7-11e5-a1ac-000df06acc56','0bb564f0-11e7-11e5-bc0c-000df06acc56'}",
                     "std -l python suuids-to-postgres.py",
-                    xml_output('test', 1),
+                    xml_output('test', 1, ''),
                     # }}}
                 ),
                 join("\t",
@@ -345,7 +345,7 @@ END
                     "/dev/pts/13",
                     "{'xterm/f923e8fc-11e6-11e5-913a-000df06acc56','logging/09733f50-11e7-11e5-a1ac-000df06acc56','0bb564f0-11e7-11e5-bc0c-000df06acc56'}",
                     "Yo mainn.",
-                    xml_output('test', 2),
+                    xml_output('test', 2, ''),
                     # }}}
                 ),
                 join("\t",
@@ -359,7 +359,7 @@ END
                     "/dev/pts/15",
                     "{'xterm/edcbd7d8-16ca-11e5-9739-000df06acc56','logging/03a706ae-16cb-11e5-becb-000df06acc56','screen/088f9e56-16cb-11e5-a56c-000df06acc56'}",
                     "Weird characters: \\\\ '' ; &lt; &gt; \"",
-                    xml_output('test', 3),
+                    xml_output('test', 3, ''),
                     # }}}
                 ),
                 join("\t",
@@ -373,7 +373,7 @@ END
                     "\\N",
                     "\\N",
                     "\\N",
-                    xml_output('test', 4),
+                    xml_output('test', 4, ''),
                     # }}}
                 ),
                 '',
