@@ -67,6 +67,7 @@ sub main {
     if ($Opt{'pg-table'}) {
         print(
             "CREATE TABLE uuids (\n" .
+            "    t timestamp,\n" .
             "    u uuid,\n" .
             "    tag varchar[],\n" .
             "    host varchar,\n" .
@@ -81,7 +82,7 @@ sub main {
     }
 
     if ($Opt{'output-format'} eq 'postgres') {
-        print("COPY uuids (u, tag, host, cwd, username, tty, sess, txt, s) FROM stdin;\n");
+        print("COPY uuids (t, u, tag, host, cwd, username, tty, sess, txt, s) FROM stdin;\n");
     }
     while (my $line = <>) {
         chomp($line);
@@ -127,6 +128,7 @@ sub main {
             if ($Opt{'output-format'} eq 'postgres') {
                 print(
                     join("\t",
+                        $date,
                         $uuid,
                         scalar(@tag) ? ("{'" . join("','", @tag) . "'}") : '\N',
                         safe_sql($host, 1),
