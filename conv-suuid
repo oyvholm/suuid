@@ -109,14 +109,20 @@ sub main {
                 \s*
                 <sess
                     \s*
-                    desc="([^"]+)"
+                    (desc="[^"]+")?
                     .*?
                 >($Templ)</sess>
                 \s*
             }{
+                my ($l_desc, $l_uuid) = ($1, $2);
+                if (defined($l_desc) && $l_desc =~ /desc="(.+?)"/) {
+                    $l_desc = "$1/";
+                } else {
+                    $l_desc = '';
+                }
                 (
-                    push(@sess, "$1/$2"),
-                    msg(4, "push '$1/$2' to sess"),
+                    push(@sess, "$l_desc$l_uuid"),
+                    msg(4, "push '$l_desc$l_uuid' to sess"),
                     ' ',
                 )
             }egx;
