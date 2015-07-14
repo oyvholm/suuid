@@ -232,6 +232,36 @@ END
     # }}}
 } # main()
 
+sub xml_output {
+    # {{{
+    my ($file, $line) = @_;
+    my $retval = '';
+    my @xml_test = (
+        'position 0 not used',
+        join(' ',
+            # Entry #1 from test.xml {{{
+            "<suuid t=\"2015-06-14T02:34:41.5608070Z\" u=\"e8f90906-123d-11e5-81a8-000df06acc56\">",
+                "<tag>std</tag>",
+                "<txt>std -l python suuids-to-postgres.py</txt>",
+                "<host>bellmann</host>",
+                "<cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres</cwd>",
+                "<user>sunny</user>",
+                "<tty>/dev/pts/4</tty>",
+                "<sess desc=\"xterm\">f923e8fc-11e6-11e5-913a-000df06acc56</sess>",
+                "<sess desc=\"logging\">09733f50-11e7-11e5-a1ac-000df06acc56</sess>",
+                "<sess>0bb564f0-11e7-11e5-bc0c-000df06acc56</sess>",
+            "</suuid>",
+            # }}}
+        ),
+    );
+    if ($file eq 'test') {
+        $retval = $xml_test[$line];
+    }
+
+    return($retval);
+    # }}}
+} # xml_output()
+
 sub gen_output {
     # Generate output similar to what's in the test files {{{
     my ($file, $format, $flags) = @_;
@@ -271,21 +301,7 @@ END
                     "/dev/pts/4",
                     "{'xterm/f923e8fc-11e6-11e5-913a-000df06acc56','logging/09733f50-11e7-11e5-a1ac-000df06acc56','0bb564f0-11e7-11e5-bc0c-000df06acc56'}",
                     "std -l python suuids-to-postgres.py",
-                    join(' ',
-                        # Entry #1 from test.xml {{{
-                        "<suuid t=\"2015-06-14T02:34:41.5608070Z\" u=\"e8f90906-123d-11e5-81a8-000df06acc56\">",
-                            "<tag>std</tag>",
-                            "<txt>std -l python suuids-to-postgres.py</txt>",
-                            "<host>bellmann</host>",
-                            "<cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres</cwd>",
-                            "<user>sunny</user>",
-                            "<tty>/dev/pts/4</tty>",
-                            "<sess desc=\"xterm\">f923e8fc-11e6-11e5-913a-000df06acc56</sess>",
-                            "<sess desc=\"logging\">09733f50-11e7-11e5-a1ac-000df06acc56</sess>",
-                            "<sess>0bb564f0-11e7-11e5-bc0c-000df06acc56</sess>",
-                        "</suuid>",
-                        # }}}
-                    ),
+                    xml_output('test', 1),
                     # }}}
                 ),
                 join("\t",
