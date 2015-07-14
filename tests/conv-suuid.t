@@ -153,13 +153,13 @@ e8f90906-123d-11e5-81a8-000df06acc56\t{'std'}\tbellmann\t/home/sunny/src/git/.er
 \\.
 END
         <<END,
-conv-suuid: Left in suuid: '<suuid t="2015-06-14T02:34:41.5608070Z" u="e8f90906-123d-11e5-81a8-000df06acc56"> </suuid>'
+conv-suuid: Left in suuid: ''
 conv-suuid: tag: 'std'
-conv-suuid: Left in suuid: '<suuid t="2015-06-14T02:51:50.4477750Z" u="4e3cba36-1240-11e5-ab4e-000df06acc56"> </suuid>'
+conv-suuid: Left in suuid: ''
 conv-suuid: tag: 'ti|another'
-conv-suuid: Left in suuid: '<suuid t="2015-06-21T10:49:19.2036620Z" u="2b1e350c-1803-11e5-9c66-000df06acc56"> </suuid>'
+conv-suuid: Left in suuid: ''
 conv-suuid: tag: ''
-conv-suuid: Left in suuid: '<suuid t="2015-07-14T02:07:50.9817960Z" u="2162ae68-29cd-11e5-aa3e-000df06acc56"> </suuid>'
+conv-suuid: Left in suuid: ''
 conv-suuid: tag: ''
 END
         0,

@@ -88,7 +88,8 @@ sub main {
         if ($line =~ /^\s*(<suuid t="2\d\d\d-\d\d-\d\dT\d\d:\d\d.*Z.*<\/suuid>)$/) {
             my $suuid = $1;
             if ($suuid =~ /^<suuid t="(2\d\d\d-\d\d-\d\dT.+?Z).*?" u="(.*?)">/) {
-                my ($date, $uuid) = ($1, $2);
+                my $uuid = '';
+                my $date = '';
                 my $host = '';
                 my $cwd = '';
                 my $username = '';
@@ -96,6 +97,8 @@ sub main {
                 my $txt = '';
                 my @tag = ();
                 my @sess = ();
+                ($suuid =~ s/\s*<suuid t="(2\d\d\d-\d\d-\d\dT.+?Z).*?" u="(.*?)">\s*/ /) && (($date, $uuid) = ($1, $2));
+                $suuid =~ s!</suuid>!!;
                 $suuid =~ s/\s*<tag>([^<]+)<\/tag>\s*/(push(@tag, $1), ' ')/ge;
                 ($suuid =~ s/\s*<host>([^<]+)<\/host>\s*/ /) && ($host = $1);
                 ($suuid =~ s/\s*<cwd>([^<]+)<\/cwd>\s*/ /) && ($cwd = $1);
@@ -117,6 +120,8 @@ sub main {
                         ' ',
                     )
                 }egx;
+                $suuid =~ s/^\s+//;
+                $suuid =~ s/\s+$//;
                 $suuid =~ s/>\s+</> </g;
                 msg(3, "Left in suuid: '$suuid'");
                 msg(3, "tag: '" . join('|', @tag) . "'");
