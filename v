@@ -162,7 +162,7 @@ for my $Curr (@Files) {
                 "%s" . # File ID, the first UUID in the file
                 " <old>%s</old>" .
                 " <new>%s</new>" .
-                " <oldgitsum>%s</oldgitsum> " .
+                " <oldgitsum>%s</oldgitsum>" .
                 " <newgitsum>%s</newgitsum>" .
                 " <oldmdate>%s</oldmdate>" .
                 " <newmdate>%s</newmdate>" .
