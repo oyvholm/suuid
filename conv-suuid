@@ -99,12 +99,12 @@ sub main {
             my @sess = ();
             ($suuid =~ s/\s*<suuid t="(2\d\d\d-\d\d-\d\dT.+?Z).*?" u="(.*?)">\s*/ /) && (($date, $uuid) = ($1, $2));
             $suuid =~ s!</suuid>!!;
+            ($suuid =~ s/\s*<txt>(.+)<\/txt>\s*/ /) && ($txt = $1);
             $suuid =~ s/\s*<tag>([^<]+)<\/tag>\s*/(push(@tag, $1), ' ')/ge;
             ($suuid =~ s/\s*<host>([^<]+)<\/host>\s*/ /) && ($host = $1);
             ($suuid =~ s/\s*<cwd>([^<]+)<\/cwd>\s*/ /) && ($cwd = $1);
             ($suuid =~ s/\s*<user>([^<]+)<\/user>\s*/ /) && ($username = $1);
             ($suuid =~ s/\s*<tty>([^<]+)<\/tty>\s*/ /) && ($tty = $1);
-            ($suuid =~ s/\s*<txt>(.+)<\/txt>\s*/ /) && ($txt = $1);
             $suuid =~ s{
                 \s*
                 <sess
