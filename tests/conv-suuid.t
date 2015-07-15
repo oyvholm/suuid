@@ -118,12 +118,7 @@ END
 
     ok(chdir("conv-suuid-files"), "chdir conv-suuid-files");
     testcmd("../$CMD test.xml", # {{{
-        <<'END',
-<suuid t="2015-06-14T02:34:41.5608070Z" u="e8f90906-123d-11e5-81a8-000df06acc56"> <tag>std</tag> <txt>std -l python suuids-to-postgres.py</txt> <host>bellmann</host> <cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres</cwd> <user>sunny</user> <tty>/dev/pts/4</tty> <sess desc="xterm">f923e8fc-11e6-11e5-913a-000df06acc56</sess> <sess desc="logging">09733f50-11e7-11e5-a1ac-000df06acc56</sess> <sess>0bb564f0-11e7-11e5-bc0c-000df06acc56</sess> </suuid>
-<suuid t="2015-06-14T02:51:50.4477750Z" u="4e3cba36-1240-11e5-ab4e-000df06acc56"> <tag>ti</tag> <tag>another</tag> <txt>Yo mainn.</txt> <host>bellmann</host> <cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres</cwd> <user>sunny</user> <tty>/dev/pts/13</tty> <sess desc="xterm">f923e8fc-11e6-11e5-913a-000df06acc56</sess> <sess desc="logging">09733f50-11e7-11e5-a1ac-000df06acc56</sess> <sess>0bb564f0-11e7-11e5-bc0c-000df06acc56</sess> </suuid>
-<suuid t="2015-06-21T10:49:19.2036620Z" u="2b1e350c-1803-11e5-9c66-000df06acc56"> <txt>Weird characters: \ ' ; &lt; &gt; "</txt> <host>bellmann</host> <cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/tests</cwd> <user>sunny</user> <tty>/dev/pts/15</tty> <sess desc="xterm">edcbd7d8-16ca-11e5-9739-000df06acc56</sess> <sess desc="logging">03a706ae-16cb-11e5-becb-000df06acc56</sess> <sess desc="screen">088f9e56-16cb-11e5-a56c-000df06acc56</sess> </suuid>
-<suuid t="2015-07-14T02:07:50.9817960Z" u="2162ae68-29cd-11e5-aa3e-000df06acc56"> </suuid>
-END
+        xml_output('test', '*', ''),
         '',
         0,
         'Read test.xml',
@@ -131,12 +126,7 @@ END
 
     # }}}
     testcmd("../$CMD -o xml test.xml", # {{{
-        <<'END',
-<suuid t="2015-06-14T02:34:41.5608070Z" u="e8f90906-123d-11e5-81a8-000df06acc56"> <tag>std</tag> <txt>std -l python suuids-to-postgres.py</txt> <host>bellmann</host> <cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres</cwd> <user>sunny</user> <tty>/dev/pts/4</tty> <sess desc="xterm">f923e8fc-11e6-11e5-913a-000df06acc56</sess> <sess desc="logging">09733f50-11e7-11e5-a1ac-000df06acc56</sess> <sess>0bb564f0-11e7-11e5-bc0c-000df06acc56</sess> </suuid>
-<suuid t="2015-06-14T02:51:50.4477750Z" u="4e3cba36-1240-11e5-ab4e-000df06acc56"> <tag>ti</tag> <tag>another</tag> <txt>Yo mainn.</txt> <host>bellmann</host> <cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres</cwd> <user>sunny</user> <tty>/dev/pts/13</tty> <sess desc="xterm">f923e8fc-11e6-11e5-913a-000df06acc56</sess> <sess desc="logging">09733f50-11e7-11e5-a1ac-000df06acc56</sess> <sess>0bb564f0-11e7-11e5-bc0c-000df06acc56</sess> </suuid>
-<suuid t="2015-06-21T10:49:19.2036620Z" u="2b1e350c-1803-11e5-9c66-000df06acc56"> <txt>Weird characters: \ ' ; &lt; &gt; "</txt> <host>bellmann</host> <cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/tests</cwd> <user>sunny</user> <tty>/dev/pts/15</tty> <sess desc="xterm">edcbd7d8-16ca-11e5-9739-000df06acc56</sess> <sess desc="logging">03a706ae-16cb-11e5-becb-000df06acc56</sess> <sess desc="screen">088f9e56-16cb-11e5-a56c-000df06acc56</sess> </suuid>
-<suuid t="2015-07-14T02:07:50.9817960Z" u="2162ae68-29cd-11e5-aa3e-000df06acc56"> </suuid>
-END
+        xml_output('test', '*', ''),
         '',
         0,
         'Output XML format',
@@ -144,14 +134,7 @@ END
 
     # }}}
     testcmd("../$CMD --output-format postgres --verbose -vv test.xml", # {{{
-        <<END,
-COPY uuids (t, u, tag, host, cwd, username, tty, sess, txt, s) FROM stdin;
-2015-06-14T02:34:41.5608070Z\te8f90906-123d-11e5-81a8-000df06acc56\t{'std'}\tbellmann\t/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres\tsunny\t/dev/pts/4\t{'xterm/f923e8fc-11e6-11e5-913a-000df06acc56','logging/09733f50-11e7-11e5-a1ac-000df06acc56','0bb564f0-11e7-11e5-bc0c-000df06acc56'}\tstd -l python suuids-to-postgres.py\t<suuid t="2015-06-14T02:34:41.5608070Z" u="e8f90906-123d-11e5-81a8-000df06acc56"> <tag>std</tag> <txt>std -l python suuids-to-postgres.py</txt> <host>bellmann</host> <cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres</cwd> <user>sunny</user> <tty>/dev/pts/4</tty> <sess desc="xterm">f923e8fc-11e6-11e5-913a-000df06acc56</sess> <sess desc="logging">09733f50-11e7-11e5-a1ac-000df06acc56</sess> <sess>0bb564f0-11e7-11e5-bc0c-000df06acc56</sess> </suuid>
-2015-06-14T02:51:50.4477750Z\t4e3cba36-1240-11e5-ab4e-000df06acc56\t{'ti','another'}\tbellmann\t/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres\tsunny\t/dev/pts/13\t{'xterm/f923e8fc-11e6-11e5-913a-000df06acc56','logging/09733f50-11e7-11e5-a1ac-000df06acc56','0bb564f0-11e7-11e5-bc0c-000df06acc56'}\tYo mainn.\t<suuid t="2015-06-14T02:51:50.4477750Z" u="4e3cba36-1240-11e5-ab4e-000df06acc56"> <tag>ti</tag> <tag>another</tag> <txt>Yo mainn.</txt> <host>bellmann</host> <cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres</cwd> <user>sunny</user> <tty>/dev/pts/13</tty> <sess desc="xterm">f923e8fc-11e6-11e5-913a-000df06acc56</sess> <sess desc="logging">09733f50-11e7-11e5-a1ac-000df06acc56</sess> <sess>0bb564f0-11e7-11e5-bc0c-000df06acc56</sess> </suuid>
-2015-06-21T10:49:19.2036620Z\t2b1e350c-1803-11e5-9c66-000df06acc56\t\\N\tbellmann\t/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/tests\tsunny\t/dev/pts/15\t{'xterm/edcbd7d8-16ca-11e5-9739-000df06acc56','logging/03a706ae-16cb-11e5-becb-000df06acc56','screen/088f9e56-16cb-11e5-a56c-000df06acc56'}\tWeird characters: \\\\ '' ; &lt; &gt; "\t<suuid t="2015-06-21T10:49:19.2036620Z" u="2b1e350c-1803-11e5-9c66-000df06acc56"> <txt>Weird characters: \\\\ '' ; &lt; &gt; "</txt> <host>bellmann</host> <cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/tests</cwd> <user>sunny</user> <tty>/dev/pts/15</tty> <sess desc="xterm">edcbd7d8-16ca-11e5-9739-000df06acc56</sess> <sess desc="logging">03a706ae-16cb-11e5-becb-000df06acc56</sess> <sess desc="screen">088f9e56-16cb-11e5-a56c-000df06acc56</sess> </suuid>
-2015-07-14T02:07:50.9817960Z\t2162ae68-29cd-11e5-aa3e-000df06acc56\t\\N\t\\N\t\\N\t\\N\t\\N\t\\N\t\\N\t<suuid t="2015-07-14T02:07:50.9817960Z" u="2162ae68-29cd-11e5-aa3e-000df06acc56"> </suuid>
-\\.
-END
+        gen_output('test', 'postgres', 'copy-to-uuids-from-stdin'),
         <<END,
 conv-suuid: Left in suuid: ''
 conv-suuid: tag: 'std'
@@ -168,26 +151,7 @@ END
 
     # }}}
     testcmd("../$CMD --pg-table --output-format postgres test.xml", # {{{
-        <<END,
-CREATE TABLE uuids (
-    t timestamp,
-    u uuid,
-    tag varchar[],
-    host varchar,
-    cwd varchar,
-    username varchar,
-    tty varchar,
-    sess varchar[],
-    txt varchar,
-    s xml
-);
-COPY uuids (t, u, tag, host, cwd, username, tty, sess, txt, s) FROM stdin;
-2015-06-14T02:34:41.5608070Z\te8f90906-123d-11e5-81a8-000df06acc56\t{'std'}\tbellmann\t/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres\tsunny\t/dev/pts/4\t{'xterm/f923e8fc-11e6-11e5-913a-000df06acc56','logging/09733f50-11e7-11e5-a1ac-000df06acc56','0bb564f0-11e7-11e5-bc0c-000df06acc56'}\tstd -l python suuids-to-postgres.py\t<suuid t="2015-06-14T02:34:41.5608070Z" u="e8f90906-123d-11e5-81a8-000df06acc56"> <tag>std</tag> <txt>std -l python suuids-to-postgres.py</txt> <host>bellmann</host> <cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres</cwd> <user>sunny</user> <tty>/dev/pts/4</tty> <sess desc="xterm">f923e8fc-11e6-11e5-913a-000df06acc56</sess> <sess desc="logging">09733f50-11e7-11e5-a1ac-000df06acc56</sess> <sess>0bb564f0-11e7-11e5-bc0c-000df06acc56</sess> </suuid>
-2015-06-14T02:51:50.4477750Z\t4e3cba36-1240-11e5-ab4e-000df06acc56\t{'ti','another'}\tbellmann\t/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres\tsunny\t/dev/pts/13\t{'xterm/f923e8fc-11e6-11e5-913a-000df06acc56','logging/09733f50-11e7-11e5-a1ac-000df06acc56','0bb564f0-11e7-11e5-bc0c-000df06acc56'}\tYo mainn.\t<suuid t="2015-06-14T02:51:50.4477750Z" u="4e3cba36-1240-11e5-ab4e-000df06acc56"> <tag>ti</tag> <tag>another</tag> <txt>Yo mainn.</txt> <host>bellmann</host> <cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres</cwd> <user>sunny</user> <tty>/dev/pts/13</tty> <sess desc="xterm">f923e8fc-11e6-11e5-913a-000df06acc56</sess> <sess desc="logging">09733f50-11e7-11e5-a1ac-000df06acc56</sess> <sess>0bb564f0-11e7-11e5-bc0c-000df06acc56</sess> </suuid>
-2015-06-21T10:49:19.2036620Z\t2b1e350c-1803-11e5-9c66-000df06acc56\t\\N\tbellmann\t/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/tests\tsunny\t/dev/pts/15\t{'xterm/edcbd7d8-16ca-11e5-9739-000df06acc56','logging/03a706ae-16cb-11e5-becb-000df06acc56','screen/088f9e56-16cb-11e5-a56c-000df06acc56'}\tWeird characters: \\\\ '' ; &lt; &gt; "\t<suuid t="2015-06-21T10:49:19.2036620Z" u="2b1e350c-1803-11e5-9c66-000df06acc56"> <txt>Weird characters: \\\\ '' ; &lt; &gt; "</txt> <host>bellmann</host> <cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/tests</cwd> <user>sunny</user> <tty>/dev/pts/15</tty> <sess desc="xterm">edcbd7d8-16ca-11e5-9739-000df06acc56</sess> <sess desc="logging">03a706ae-16cb-11e5-becb-000df06acc56</sess> <sess desc="screen">088f9e56-16cb-11e5-a56c-000df06acc56</sess> </suuid>
-2015-07-14T02:07:50.9817960Z\t2162ae68-29cd-11e5-aa3e-000df06acc56\t\\N\t\\N\t\\N\t\\N\t\\N\t\\N\t\\N\t<suuid t="2015-07-14T02:07:50.9817960Z" u="2162ae68-29cd-11e5-aa3e-000df06acc56"> </suuid>
-\\.
-END
+        gen_output('test', 'postgres', 'copy-to-uuids-from-stdin pg-table'),
         '',
         0,
         'Output Postgres tables and format',
@@ -206,12 +170,7 @@ END
 
     # }}}
     testcmd("psql -d $tmpdb -c \"COPY (SELECT * FROM uuids) TO STDOUT;\"", # {{{
-        <<END,
-2015-06-14 02:34:41.560807\te8f90906-123d-11e5-81a8-000df06acc56\t{'std'}\tbellmann\t/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres\tsunny\t/dev/pts/4\t{'xterm/f923e8fc-11e6-11e5-913a-000df06acc56','logging/09733f50-11e7-11e5-a1ac-000df06acc56','0bb564f0-11e7-11e5-bc0c-000df06acc56'}\tstd -l python suuids-to-postgres.py\t<suuid t="2015-06-14T02:34:41.5608070Z" u="e8f90906-123d-11e5-81a8-000df06acc56"> <tag>std</tag> <txt>std -l python suuids-to-postgres.py</txt> <host>bellmann</host> <cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres</cwd> <user>sunny</user> <tty>/dev/pts/4</tty> <sess desc="xterm">f923e8fc-11e6-11e5-913a-000df06acc56</sess> <sess desc="logging">09733f50-11e7-11e5-a1ac-000df06acc56</sess> <sess>0bb564f0-11e7-11e5-bc0c-000df06acc56</sess> </suuid>
-2015-06-14 02:51:50.447775\t4e3cba36-1240-11e5-ab4e-000df06acc56\t{'ti','another'}\tbellmann\t/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres\tsunny\t/dev/pts/13\t{'xterm/f923e8fc-11e6-11e5-913a-000df06acc56','logging/09733f50-11e7-11e5-a1ac-000df06acc56','0bb564f0-11e7-11e5-bc0c-000df06acc56'}\tYo mainn.\t<suuid t="2015-06-14T02:51:50.4477750Z" u="4e3cba36-1240-11e5-ab4e-000df06acc56"> <tag>ti</tag> <tag>another</tag> <txt>Yo mainn.</txt> <host>bellmann</host> <cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres</cwd> <user>sunny</user> <tty>/dev/pts/13</tty> <sess desc="xterm">f923e8fc-11e6-11e5-913a-000df06acc56</sess> <sess desc="logging">09733f50-11e7-11e5-a1ac-000df06acc56</sess> <sess>0bb564f0-11e7-11e5-bc0c-000df06acc56</sess> </suuid>
-2015-06-21 10:49:19.203662\t2b1e350c-1803-11e5-9c66-000df06acc56\t\\N\tbellmann\t/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/tests\tsunny\t/dev/pts/15\t{'xterm/edcbd7d8-16ca-11e5-9739-000df06acc56','logging/03a706ae-16cb-11e5-becb-000df06acc56','screen/088f9e56-16cb-11e5-a56c-000df06acc56'}\tWeird characters: \\\\ '' ; &lt; &gt; "\t<suuid t="2015-06-21T10:49:19.2036620Z" u="2b1e350c-1803-11e5-9c66-000df06acc56"> <txt>Weird characters: \\\\ '' ; &lt; &gt; "</txt> <host>bellmann</host> <cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/tests</cwd> <user>sunny</user> <tty>/dev/pts/15</tty> <sess desc="xterm">edcbd7d8-16ca-11e5-9739-000df06acc56</sess> <sess desc="logging">03a706ae-16cb-11e5-becb-000df06acc56</sess> <sess desc="screen">088f9e56-16cb-11e5-a56c-000df06acc56</sess> </suuid>
-2015-07-14 02:07:50.981796\t2162ae68-29cd-11e5-aa3e-000df06acc56\t\\N\t\\N\t\\N\t\\N\t\\N\t\\N\t\\N\t<suuid t="2015-07-14T02:07:50.9817960Z" u="2162ae68-29cd-11e5-aa3e-000df06acc56"> </suuid>
-END
+        gen_output('test', 'postgres', ''),
         '',
         0,
         "Check contents of database",
@@ -227,11 +186,8 @@ END
 
     # }}}
     testcmd("psql -d $tmpdb -c \"COPY (SELECT * FROM uuids) TO STDOUT;\"", # {{{
+        gen_output('test', 'postgres', '') .
         <<END,
-2015-06-14 02:34:41.560807\te8f90906-123d-11e5-81a8-000df06acc56\t{'std'}\tbellmann\t/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres\tsunny\t/dev/pts/4\t{'xterm/f923e8fc-11e6-11e5-913a-000df06acc56','logging/09733f50-11e7-11e5-a1ac-000df06acc56','0bb564f0-11e7-11e5-bc0c-000df06acc56'}\tstd -l python suuids-to-postgres.py\t<suuid t="2015-06-14T02:34:41.5608070Z" u="e8f90906-123d-11e5-81a8-000df06acc56"> <tag>std</tag> <txt>std -l python suuids-to-postgres.py</txt> <host>bellmann</host> <cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres</cwd> <user>sunny</user> <tty>/dev/pts/4</tty> <sess desc="xterm">f923e8fc-11e6-11e5-913a-000df06acc56</sess> <sess desc="logging">09733f50-11e7-11e5-a1ac-000df06acc56</sess> <sess>0bb564f0-11e7-11e5-bc0c-000df06acc56</sess> </suuid>
-2015-06-14 02:51:50.447775\t4e3cba36-1240-11e5-ab4e-000df06acc56\t{'ti','another'}\tbellmann\t/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres\tsunny\t/dev/pts/13\t{'xterm/f923e8fc-11e6-11e5-913a-000df06acc56','logging/09733f50-11e7-11e5-a1ac-000df06acc56','0bb564f0-11e7-11e5-bc0c-000df06acc56'}\tYo mainn.\t<suuid t="2015-06-14T02:51:50.4477750Z" u="4e3cba36-1240-11e5-ab4e-000df06acc56"> <tag>ti</tag> <tag>another</tag> <txt>Yo mainn.</txt> <host>bellmann</host> <cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres</cwd> <user>sunny</user> <tty>/dev/pts/13</tty> <sess desc="xterm">f923e8fc-11e6-11e5-913a-000df06acc56</sess> <sess desc="logging">09733f50-11e7-11e5-a1ac-000df06acc56</sess> <sess>0bb564f0-11e7-11e5-bc0c-000df06acc56</sess> </suuid>
-2015-06-21 10:49:19.203662\t2b1e350c-1803-11e5-9c66-000df06acc56\t\\N\tbellmann\t/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/tests\tsunny\t/dev/pts/15\t{'xterm/edcbd7d8-16ca-11e5-9739-000df06acc56','logging/03a706ae-16cb-11e5-becb-000df06acc56','screen/088f9e56-16cb-11e5-a56c-000df06acc56'}\tWeird characters: \\\\ '' ; &lt; &gt; "\t<suuid t="2015-06-21T10:49:19.2036620Z" u="2b1e350c-1803-11e5-9c66-000df06acc56"> <txt>Weird characters: \\\\ '' ; &lt; &gt; "</txt> <host>bellmann</host> <cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/tests</cwd> <user>sunny</user> <tty>/dev/pts/15</tty> <sess desc="xterm">edcbd7d8-16ca-11e5-9739-000df06acc56</sess> <sess desc="logging">03a706ae-16cb-11e5-becb-000df06acc56</sess> <sess desc="screen">088f9e56-16cb-11e5-a56c-000df06acc56</sess> </suuid>
-2015-07-14 02:07:50.981796\t2162ae68-29cd-11e5-aa3e-000df06acc56\t\\N\t\\N\t\\N\t\\N\t\\N\t\\N\t\\N\t<suuid t="2015-07-14T02:07:50.9817960Z" u="2162ae68-29cd-11e5-aa3e-000df06acc56"> </suuid>
 2015-07-08 13:18:42.52731\tdab29b0c-2573-11e5-ae4f-000df06acc56\t{'c_stpl'}\tbellmann\t/home/sunny\tsunny\t/dev/pts/15\t{'xterm/01829b90-2571-11e5-82ee-000df06acc56','logging/105891b0-2571-11e5-bfe5-000df06acc56','screen/12e3d0ac-2571-11e5-810c-000df06acc56'}\tstpl /tmp/stpl.tmp\t<suuid t="2015-07-08T13:18:42.5273100Z" u="dab29b0c-2573-11e5-ae4f-000df06acc56"> <tag>c_stpl</tag> <txt>stpl /tmp/stpl.tmp</txt> <host>bellmann</host> <cwd>/home/sunny</cwd> <user>sunny</user> <tty>/dev/pts/15</tty> <sess desc="xterm">01829b90-2571-11e5-82ee-000df06acc56</sess> <sess desc="logging">105891b0-2571-11e5-bfe5-000df06acc56</sess> <sess desc="screen">12e3d0ac-2571-11e5-810c-000df06acc56</sess> </suuid>
 2015-07-08 13:25:54.51638\tdc2ee818-2574-11e5-b355-000df06acc56\t{'c_v_begin'}\tbellmann\t/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev\tsunny\t/dev/pts/5\t{'xterm/01829b90-2571-11e5-82ee-000df06acc56','logging/105891b0-2571-11e5-bfe5-000df06acc56','screen/12e3d0ac-2571-11e5-810c-000df06acc56'}\t <c_v w="begin"> <cmdline>README.md</cmdline> <file> <name>README.md</name> <fileid>a8487d1c-1c4f-11e5-b5a1-398b4cddfd2b</fileid> <smsum>6b30f51d1b3906db3301c7a3d865f6cc1d6ab801-42ad87640ec84b0d3bf971e9bca17576-11342</smsum> <gitsum>f335a485d4214aab544688cb636e399ea1648526</gitsum> <mdate>2015-06-29T21:49:06Z</mdate> </file> </c_v> \t<suuid t="2015-07-08T13:25:54.5163800Z" u="dc2ee818-2574-11e5-b355-000df06acc56"> <tag>c_v_begin</tag> <txt> <c_v w="begin"> <cmdline>README.md</cmdline> <file> <name>README.md</name> <fileid>a8487d1c-1c4f-11e5-b5a1-398b4cddfd2b</fileid> <smsum>6b30f51d1b3906db3301c7a3d865f6cc1d6ab801-42ad87640ec84b0d3bf971e9bca17576-11342</smsum> <gitsum>f335a485d4214aab544688cb636e399ea1648526</gitsum> <mdate>2015-06-29T21:49:06Z</mdate> </file> </c_v> </txt> <host>bellmann</host> <cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev</cwd> <user>sunny</user> <tty>/dev/pts/5</tty> <sess desc="xterm">01829b90-2571-11e5-82ee-000df06acc56</sess> <sess desc="logging">105891b0-2571-11e5-bfe5-000df06acc56</sess> <sess desc="screen">12e3d0ac-2571-11e5-810c-000df06acc56</sess> </suuid>
 2015-07-08 13:56:23.309865\t1e3aa59a-2579-11e5-b682-000df06acc56\t{'c_v_end'}\tbellmann\t/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev\tsunny\t/dev/pts/5\t{'xterm/01829b90-2571-11e5-82ee-000df06acc56','logging/105891b0-2571-11e5-bfe5-000df06acc56','screen/12e3d0ac-2571-11e5-810c-000df06acc56'}\t <c_v w="end"> <finished>dc2ee818-2574-11e5-b355-000df06acc56</finished> <changed> <file> <name>README.md</name> <fileid>a8487d1c-1c4f-11e5-b5a1-398b4cddfd2b</fileid> <old>6b30f51d1b3906db3301c7a3d865f6cc1d6ab801-42ad87640ec84b0d3bf971e9bca17576-11342</old> <new>3fa0a88448bb13c7176b7081edb022b7cad3832f-d2fcd61a0bcd95f5aeaba5210050e960-12414</new> <oldgitsum>f335a485d4214aab544688cb636e399ea1648526</oldgitsum>  <newgitsum>c2f0209bef68b6f73cbb55f87639d3fb57d2592c</newgitsum> <oldmdate>2015-06-29T21:49:06Z</oldmdate> <newmdate>2015-07-08T13:56:21Z</newmdate> </file> </changed> </c_v> \t<suuid t="2015-07-08T13:56:23.3098650Z" u="1e3aa59a-2579-11e5-b682-000df06acc56"> <tag>c_v_end</tag> <txt> <c_v w="end"> <finished>dc2ee818-2574-11e5-b355-000df06acc56</finished> <changed> <file> <name>README.md</name> <fileid>a8487d1c-1c4f-11e5-b5a1-398b4cddfd2b</fileid> <old>6b30f51d1b3906db3301c7a3d865f6cc1d6ab801-42ad87640ec84b0d3bf971e9bca17576-11342</old> <new>3fa0a88448bb13c7176b7081edb022b7cad3832f-d2fcd61a0bcd95f5aeaba5210050e960-12414</new> <oldgitsum>f335a485d4214aab544688cb636e399ea1648526</oldgitsum>  <newgitsum>c2f0209bef68b6f73cbb55f87639d3fb57d2592c</newgitsum> <oldmdate>2015-06-29T21:49:06Z</oldmdate> <newmdate>2015-07-08T13:56:21Z</newmdate> </file> </changed> </c_v> </txt> <host>bellmann</host> <cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev</cwd> <user>sunny</user> <tty>/dev/pts/5</tty> <sess desc="xterm">01829b90-2571-11e5-82ee-000df06acc56</sess> <sess desc="logging">105891b0-2571-11e5-bfe5-000df06acc56</sess> <sess desc="screen">12e3d0ac-2571-11e5-810c-000df06acc56</sess> </suuid>
@@ -262,6 +218,165 @@ END
     diag('Testing finished.');
     # }}}
 } # main()
+
+sub xml_output {
+    # {{{
+    my ($file, $line, $flags) = @_;
+    my $retval = '';
+    my @xml_test = (
+        join(' ',
+            # Entry #1 from test.xml {{{
+            "<suuid t=\"2015-06-14T02:34:41.5608070Z\" u=\"e8f90906-123d-11e5-81a8-000df06acc56\">",
+                "<tag>std</tag>",
+                "<txt>std -l python suuids-to-postgres.py</txt>",
+                "<host>bellmann</host>",
+                "<cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres</cwd>",
+                "<user>sunny</user>",
+                "<tty>/dev/pts/4</tty>",
+                "<sess desc=\"xterm\">f923e8fc-11e6-11e5-913a-000df06acc56</sess>",
+                "<sess desc=\"logging\">09733f50-11e7-11e5-a1ac-000df06acc56</sess>",
+                "<sess>0bb564f0-11e7-11e5-bc0c-000df06acc56</sess>",
+            "</suuid>",
+            # }}}
+        ),
+        join(' ',
+            # Entry #2 from test.xml {{{
+            "<suuid t=\"2015-06-14T02:51:50.4477750Z\" u=\"4e3cba36-1240-11e5-ab4e-000df06acc56\">",
+                "<tag>ti</tag>",
+                "<tag>another</tag>",
+                "<txt>Yo mainn.</txt>",
+                "<host>bellmann</host>",
+                "<cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres</cwd>",
+                "<user>sunny</user>",
+                "<tty>/dev/pts/13</tty>",
+                "<sess desc=\"xterm\">f923e8fc-11e6-11e5-913a-000df06acc56</sess>",
+                "<sess desc=\"logging\">09733f50-11e7-11e5-a1ac-000df06acc56</sess>",
+                "<sess>0bb564f0-11e7-11e5-bc0c-000df06acc56</sess>",
+            "</suuid>",
+            # }}}
+        ),
+        join(' ',
+            # Entry #3 from test.xml {{{
+            "<suuid t=\"2015-06-21T10:49:19.2036620Z\" u=\"2b1e350c-1803-11e5-9c66-000df06acc56\">",
+                "<txt>Weird</txt>",
+                "<host>bellmann</host>",
+                "<cwd>/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/tests</cwd>",
+                "<user>sunny</user>",
+                "<tty>/dev/pts/15</tty>",
+                "<sess desc=\"xterm\">edcbd7d8-16ca-11e5-9739-000df06acc56</sess>",
+                "<sess desc=\"logging\">03a706ae-16cb-11e5-becb-000df06acc56</sess>",
+                "<sess desc=\"screen\">088f9e56-16cb-11e5-a56c-000df06acc56</sess>",
+            "</suuid>",
+            # }}}
+        ),
+        "<suuid t=\"2015-07-14T02:07:50.9817960Z\" u=\"2162ae68-29cd-11e5-aa3e-000df06acc56\"> </suuid>",
+    );
+    if ($file eq 'test') {
+        if ($line eq '*') {
+            $retval = join("\n", @xml_test) . "\n";
+        } else {
+            $retval = $xml_test[$line - 1]; # I, as a stupid human, count from 1
+        }
+    }
+
+    return($retval);
+    # }}}
+} # xml_output()
+
+sub gen_output {
+    # Generate output similar to what's in the test files {{{
+    my ($file, $format, $flags) = @_;
+    my $fl_copy_to_uuids = 0;
+    my $retval = '';
+    if ($flags =~ /pg-table/) {
+        $retval .= <<END;
+CREATE TABLE uuids (
+    t timestamp,
+    u uuid,
+    tag varchar[],
+    host varchar,
+    cwd varchar,
+    username varchar,
+    tty varchar,
+    sess varchar[],
+    txt varchar,
+    s xml
+);
+END
+    }
+    if ($flags =~ /copy-to-uuids-from-stdin/) {
+        $retval .= "COPY uuids (t, u, tag, host, cwd, username, tty, sess, txt, s) FROM stdin;\n";
+        $fl_copy_to_uuids = 1;
+    }
+    if ($file eq 'test') {
+        if ($format eq 'postgres') {
+            $retval .= join("\n",
+                join("\t",
+                    # Postgres import {{{
+                    $fl_copy_to_uuids ? "2015-06-14T02:34:41.5608070Z" : "2015-06-14 02:34:41.560807",
+                    "e8f90906-123d-11e5-81a8-000df06acc56",
+                    "{'std'}",
+                    "bellmann",
+                    "/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres",
+                    "sunny",
+                    "/dev/pts/4",
+                    "{'xterm/f923e8fc-11e6-11e5-913a-000df06acc56','logging/09733f50-11e7-11e5-a1ac-000df06acc56','0bb564f0-11e7-11e5-bc0c-000df06acc56'}",
+                    "std -l python suuids-to-postgres.py",
+                    xml_output('test', 1, ''),
+                    # }}}
+                ),
+                join("\t",
+                    # Postgres import {{{
+                    $fl_copy_to_uuids ? "2015-06-14T02:51:50.4477750Z" : "2015-06-14 02:51:50.447775",
+                    "4e3cba36-1240-11e5-ab4e-000df06acc56",
+                    "{'ti','another'}",
+                    "bellmann",
+                    "/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/postgres",
+                    "sunny",
+                    "/dev/pts/13",
+                    "{'xterm/f923e8fc-11e6-11e5-913a-000df06acc56','logging/09733f50-11e7-11e5-a1ac-000df06acc56','0bb564f0-11e7-11e5-bc0c-000df06acc56'}",
+                    "Yo mainn.",
+                    xml_output('test', 2, ''),
+                    # }}}
+                ),
+                join("\t",
+                    # Postgres import {{{
+                    $fl_copy_to_uuids ? "2015-06-21T10:49:19.2036620Z" : "2015-06-21 10:49:19.203662",
+                    "2b1e350c-1803-11e5-9c66-000df06acc56",
+                    "\\N",
+                    "bellmann",
+                    "/home/sunny/src/git/.er_ikke_i_bellmann/utils.dev/Git/suuid/tests",
+                    "sunny",
+                    "/dev/pts/15",
+                    "{'xterm/edcbd7d8-16ca-11e5-9739-000df06acc56','logging/03a706ae-16cb-11e5-becb-000df06acc56','screen/088f9e56-16cb-11e5-a56c-000df06acc56'}",
+                    "Weird",
+                    xml_output('test', 3, ''),
+                    # }}}
+                ),
+                join("\t",
+                    # Postgres import {{{
+                    $fl_copy_to_uuids ? "2015-07-14T02:07:50.9817960Z" : "2015-07-14 02:07:50.981796",
+                    "2162ae68-29cd-11e5-aa3e-000df06acc56",
+                    "\\N",
+                    "\\N",
+                    "\\N",
+                    "\\N",
+                    "\\N",
+                    "\\N",
+                    "\\N",
+                    xml_output('test', 4, ''),
+                    # }}}
+                ),
+                '',
+            );
+            if ($fl_copy_to_uuids) {
+                $retval .= "\\.\n";
+            }
+        }
+    }
+    return($retval);
+    # }}}
+} # gen_output()
 
 sub testcmd {
     # {{{
