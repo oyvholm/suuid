@@ -26,6 +26,7 @@ use Getopt::Long;
 local $| = 1;
 
 our $CMD = '../wi --test-simul';
+our $CMD_ONLY = '../wi';
 
 our %Opt = (
 
@@ -430,6 +431,29 @@ f = 'JKL'
 END
         0,
         'More -I, -i, -a and -o combinations, some succeeding -i and -I',
+    );
+
+    # }}}
+    diag('Test --sql option...');
+    testcmd("$CMD --sql abc -i def g h i", # {{{
+        '',
+        "wi: Cannot mix --sql and --test-simul\n",
+        1,
+        'Can\'t mix --sql and --test-simul',
+    );
+
+    # }}}
+    testcmd("$CMD_ONLY --sql abc -i def g h i", # {{{
+        "COPY (SELECT s FROM uuids WHERE " .
+            "s::varchar LIKE '%abc%' OR " .
+            "s::varchar ILIKE '%def%' OR " .
+            "s::varchar ILIKE '%g%' OR " .
+            "s::varchar ILIKE '%h%' OR " .
+            "s::varchar ILIKE '%i%'" .
+        ") TO STDOUT;\n",
+        '',
+        0,
+        '--sql sends generated SQL to stdout',
     );
 
     # }}}

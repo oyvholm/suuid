@@ -26,6 +26,15 @@ if test "$1" = "--test-simul"; then
     test_simul=1
     shift
 fi
+unset opt_sql
+if test "$1" = "--sql"; then
+    opt_sql=1
+    shift
+fi
+if test -n "$test_simul" -a -n "$opt_sql"; then
+    echo $progname: Cannot mix --sql and --test-simul >&2
+    exit 1
+fi
 
 if test "$1" = "-h" -o "$1" = "--help"; then
     cat <<END
@@ -38,6 +47,9 @@ Options:
 
     -h, --help
         Show this help.
+    --sql
+        Send generated SQL to stdout instead of performing a search. 
+        Must be the first command line argument.
     --test-simul
         If this is specified as first argument, don't actually do 
         anything. This will only send diagnostic messages to stderr. 
@@ -145,9 +157,9 @@ test -z "$search_str" && {
 
 sql_str="COPY (SELECT s FROM uuids WHERE$search_str) TO STDOUT;"
 
-if test -n "$test_simul"; then
-    # --test-simul is specified as $1, only output what would've been 
-    # done
+if test -n "$test_simul" -o -n "$opt_sql"; then
+    # --test-simul or --sql is specified as $1, only output what 
+    # would've been done
     echo "$sql_str"
 else
     echo "$sql_str" | psql -X -q suuids | sort -u | less
