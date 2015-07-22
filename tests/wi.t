@@ -433,6 +433,109 @@ END
     );
 
     # }}}
+    diag('Test -u...');
+    testcmd("$CMD -u 0886454e-3021-11e5-a047-fefdb24f8e10", # {{{
+        "COPY (SELECT s FROM uuids WHERE u = '0886454e-3021-11e5-a047-fefdb24f8e10') TO STDOUT;\n",
+        <<END,
+f = '-u'
+f = '0886454e-3021-11e5-a047-fefdb24f8e10'
+END
+        0,
+        'Go into UUID mode with -u',
+    );
+
+    # }}}
+    testcmd("$CMD -u 0886454e-3021-11e5-a047-fefdb24f8e10 abc -i def -a -I ghi", # {{{
+        "COPY (SELECT s FROM uuids WHERE " .
+            "u = '0886454e-3021-11e5-a047-fefdb24f8e10' OR " .
+            "s::varchar LIKE '%abc%' OR " .
+            "s::varchar ILIKE '%def%' AND " .
+            "s::varchar LIKE '%ghi%'" .
+        ") TO STDOUT;\n",
+        <<END,
+f = '-u'
+f = '0886454e-3021-11e5-a047-fefdb24f8e10'
+f = 'abc'
+f = '-i'
+f = 'def'
+f = '-a'
+f = '-I'
+f = 'ghi'
+END
+        0,
+        '-u with additional args which are not uuids',
+    );
+
+    # }}}
+    diag('-u and stdin...');
+    testcmd("echo jeppec3a1814-2feb-11e5-a5f7-bd3e22fb78992345234553ed5c0a-cbf4-4878-91ae-9dc97431793daaa | $CMD -u", # {{{
+        "COPY (SELECT s FROM uuids WHERE u = 'ec3a1814-2feb-11e5-a5f7-bd3e22fb7899' OR u = '53ed5c0a-cbf4-4878-91ae-9dc97431793d') TO STDOUT;\n",
+        <<END,
+f = '-u'
+f = 'ec3a1814-2feb-11e5-a5f7-bd3e22fb7899'
+f = '53ed5c0a-cbf4-4878-91ae-9dc97431793d'
+END
+        0,
+        'A single -u returns only the original suuid entry for all UUIDs from stdin',
+    );
+
+    # }}}
+    testcmd("echo jeppec3a1814-2feb-11e5-a5f7-bd3e22fb78992345234553ed5c0a-cbf4-4878-91ae-9dc97431793daaa | $CMD -a -u", # {{{
+        "COPY (SELECT s FROM uuids WHERE u = 'ec3a1814-2feb-11e5-a5f7-bd3e22fb7899' AND u = '53ed5c0a-cbf4-4878-91ae-9dc97431793d') TO STDOUT;\n",
+        <<END,
+f = '-a'
+f = '-u'
+f = 'ec3a1814-2feb-11e5-a5f7-bd3e22fb7899'
+f = '53ed5c0a-cbf4-4878-91ae-9dc97431793d'
+END
+        0,
+        '-a and -u, read from stdin',
+    );
+
+    # }}}
+    testcmd("echo jeppec3a1814-2feb-11e5-a5f7-bd3e22fb78992345234553ed5c0a-cbf4-4878-91ae-9dc97431793daaa | $CMD -a abc -i def -u", # {{{
+        "COPY (SELECT s FROM uuids WHERE " .
+            "s::varchar LIKE '%abc%' AND " .
+            "s::varchar ILIKE '%def%' AND " .
+            "u = 'ec3a1814-2feb-11e5-a5f7-bd3e22fb7899' AND " .
+            "u = '53ed5c0a-cbf4-4878-91ae-9dc97431793d'" .
+        ") TO STDOUT;\n",
+        <<END,
+f = '-a'
+f = 'abc'
+f = '-i'
+f = 'def'
+f = '-u'
+f = 'ec3a1814-2feb-11e5-a5f7-bd3e22fb7899'
+f = '53ed5c0a-cbf4-4878-91ae-9dc97431793d'
+END
+        0,
+        '-a, -i and -u, read from stdin',
+    );
+
+    # }}}
+    testcmd("$CMD c0de4e76-302a-11e5-907c-fefdb24f8e10 abc -u c2421e3c-302a-11e5-b410-fefdb24f8e10 -U a c3c56df4-302a-11e5-ac4e-fefdb24f8e10", # {{{
+        "COPY (SELECT s FROM uuids WHERE " .
+            "s::varchar LIKE '%c0de4e76-302a-11e5-907c-fefdb24f8e10%' OR " .
+            "s::varchar LIKE '%abc%' OR " .
+            "u = 'c2421e3c-302a-11e5-b410-fefdb24f8e10' OR " .
+            "s::varchar LIKE '%a%' OR " .
+            "s::varchar LIKE '%c3c56df4-302a-11e5-ac4e-fefdb24f8e10%'" .
+        ") TO STDOUT;\n",
+        <<END,
+f = 'c0de4e76-302a-11e5-907c-fefdb24f8e10'
+f = 'abc'
+f = '-u'
+f = 'c2421e3c-302a-11e5-b410-fefdb24f8e10'
+f = '-U'
+f = 'a'
+f = 'c3c56df4-302a-11e5-ac4e-fefdb24f8e10'
+END
+        0,
+        '-u and -U with uuids and non-uuid args too',
+    );
+
+    # }}}
 
     todo_section:
     ;

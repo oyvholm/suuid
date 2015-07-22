@@ -14,6 +14,13 @@ msg() {
     echo $* >&2
 }
 
+is_uuid() {
+    local x="[[:xdigit:]]"
+    echo "$1" | grep -q -E "^$x{8}-$x{4}-$x{4}-$x{4}-$x{12}\$" &&
+        echo 1 ||
+        echo 0
+}
+
 unset test_simul
 if test "$1" = "--test-simul"; then
     test_simul=1
@@ -47,6 +54,11 @@ will find 'abc', 'ABC' and 'AbC', etc).
 -I switches case sensitivity ON for all following patterns, this is the 
 default.
 
+-u interprets all following UUIDs to be searched for in the 'u' column 
+in the database. This increases the speed if only the initial suuid 
+entry is interesting. -U goes back to matching the string against the 
+whole entry.
+
 For example:
 
     abc -o def
@@ -71,6 +83,8 @@ For example:
     ABC -a -i def -I ghi -o jkl
         Find (uppercase abc) AND (both-case def) AND (lowercase ghi) OR 
         (lowercase jkl).
+    -u c0e9f45e-3022-11e5-a8c8-fefdb24f8e10 abc
+        Find (the above UUID in column 'u') OR (lower-case abc).
 
 END
     exit 0
@@ -97,6 +111,9 @@ for f in "$@" $stdin; do
         (-I)
             like_str=LIKE
             ;;
+        (-U)
+            unset next_is_uuid
+            ;;
         (-a)
             andor=AND
             ;;
@@ -106,9 +123,16 @@ for f in "$@" $stdin; do
         (-o)
             andor=OR
             ;;
+        (-u)
+            next_is_uuid="1"
+            ;;
         (*)
             test -n "$add_str" && or_str="$andor "
-            search_str="$search_str ${or_str}s::varchar $like_str '%$f%'"
+            if test "$next_is_uuid" = "1" -a "$(is_uuid "$f")" = "1"; then
+                search_str="$search_str ${or_str}u = '$f'"
+            else
+                search_str="$search_str ${or_str}s::varchar $like_str '%$f%'"
+            fi
             add_str="1"
             ;;
     esac
