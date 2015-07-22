@@ -176,7 +176,6 @@ END
         <<END,
 f = 'abc'
 f = '-o'
-andor set to OR
 f = 'def'
 END
         0,
@@ -188,7 +187,6 @@ END
         "COPY (SELECT s FROM uuids WHERE s::varchar LIKE '%abc%' AND s::varchar LIKE '%def%') TO STDOUT;\n",
         <<END,
 f = '-a'
-andor set to AND
 f = 'abc'
 f = 'def'
 END
@@ -202,7 +200,6 @@ END
         <<END,
 f = 'abc'
 f = '-a'
-andor set to AND
 f = 'def'
 END
         0,
@@ -215,10 +212,8 @@ END
         <<END,
 f = 'abc'
 f = '-a'
-andor set to AND
 f = 'def'
 f = '-o'
-andor set to OR
 f = 'ghi'
 END
         0,
@@ -231,14 +226,10 @@ END
         <<END,
 f = 'abc'
 f = '-o'
-andor set to OR
 f = '-a'
-andor set to AND
 f = 'def'
 f = '-a'
-andor set to AND
 f = '-o'
-andor set to OR
 f = 'ghi'
 END
         0,
@@ -259,12 +250,10 @@ END
 f = 'abc'
 f = 'def'
 f = '-a'
-andor set to AND
 f = 'ghi'
 f = 'jkl'
 f = 'mno'
 f = '-o'
-andor set to OR
 f = 'pqr'
 END
         0,
@@ -316,12 +305,10 @@ END
         <<END,
 f = 'abc'
 f = '-a'
-andor set to AND
 f = 'def'
 f = '-i'
 f = 'ghi'
 f = '-o'
-andor set to OR
 f = 'jkl'
 END
         0,
@@ -369,13 +356,11 @@ f = 'abc'
 f = '-I'
 f = 'def'
 f = '-a'
-andor set to AND
 f = 'ghi'
 f = '-i'
 f = 'JkL'
 f = 'mno'
 f = '-o'
-andor set to OR
 f = '-i'
 f = 'pqr'
 f = '-I'
@@ -396,7 +381,6 @@ END
         <<END,
 f = 'ABC'
 f = '-a'
-andor set to AND
 f = '-i'
 f = 'def'
 f = '-I'
@@ -404,7 +388,6 @@ f = '-i'
 f = '-I'
 f = 'ghi'
 f = '-o'
-andor set to OR
 f = 'JKL'
 END
         0,

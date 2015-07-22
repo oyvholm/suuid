@@ -99,14 +99,12 @@ for f in "$@" $stdin; do
             like_str=LIKE
             ;;
         (-a)
-            test -n "$test_simul" && msg andor set to AND
             andor=AND
             ;;
         (-i)
             like_str=ILIKE
             ;;
         (-o)
-            test -n "$test_simul" && msg andor set to OR
             andor=OR
             ;;
         (*)
