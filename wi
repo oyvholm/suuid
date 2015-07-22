@@ -129,5 +129,5 @@ if test -n "$test_simul"; then
     # done
     echo "$sql_str"
 else
-    echo "$sql_str" | psql suuids | sort -u | less
+    echo "$sql_str" | psql -X -q suuids | sort -u | less
 fi
