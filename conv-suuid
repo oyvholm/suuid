@@ -22,6 +22,7 @@ our %Opt = (
 
     'help' => 0,
     'output-format' => 'xml',
+    'pg-index' => 0,
     'pg-table' => 0,
     'quiet' => 0,
     'verbose' => 0,
@@ -38,6 +39,7 @@ GetOptions(
 
     'help|h' => \$Opt{'help'},
     'output-format|o=s' => \$Opt{'output-format'},
+    'pg-index' => \$Opt{'pg-index'},
     'pg-table' => \$Opt{'pg-table'},
     'quiet|q+' => \$Opt{'quiet'},
     'verbose|v+' => \$Opt{'verbose'},
@@ -157,6 +159,12 @@ sub main {
     }
     if ($Opt{'output-format'} eq 'postgres') {
         print("\\.\n");
+        if ($Opt{'pg-index'}) {
+            print(<<END);
+CREATE INDEX idx_uuids_u ON uuids (u);
+CREATE INDEX idx_uuids_t ON uuids (t);
+END
+        }
     }
 
     return($Retval);
@@ -206,6 +214,8 @@ Options:
         This is the standard format it's been using for years.
   -q, --quiet
     Be more quiet. Can be repeated to increase silence.
+  --pg-index
+    Generate SQL for creating the database indexes.
   --pg-table
     Output Postgres commands for creating the necessary tables.
   -v, --verbose
