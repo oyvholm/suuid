@@ -86,7 +86,7 @@ search_str=
 stdin=
 andor=OR
 
-if test -z "$1"; then
+if test ! -t 0; then
     stdin="`finduuid -u`"
 fi
 
