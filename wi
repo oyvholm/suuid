@@ -59,7 +59,6 @@ For example:
         abc AND def
     abc def -a ghi jkl -o mno
         abc OR def AND ghi AND jkl OR mno
-
     abc -i def
        Searches for 'abc' OR all variants of 'def', i.e., 'DEF' and 
        'DeF' are also found.
@@ -93,7 +92,7 @@ fi
 unset add_str
 like_str=LIKE
 for f in "$@" $stdin; do
-    test -n "$test_simul" && msg f = \'$f\'
+    test -n "$test_simul" && msg "f = '$f'"
     case "$f" in
         (-I)
             like_str=LIKE
