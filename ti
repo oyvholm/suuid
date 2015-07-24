@@ -5,6 +5,27 @@
 # Terminal Identification – for å identifisere skjermhøyde etc ved 
 # logging.
 
+progname=ti
+VERSION=0.0.0
+
+if test "$1" = "-h" -o "$1" = "--help"; then
+    cat <<END
+
+Options:
+
+  -h, --help
+    Show this help.
+  --version
+    Show version information.
+
+END
+    exit 0
+fi
+if test "$1" = "--version"; then
+    echo $progname $VERSION
+    exit 0
+fi
+
 [ -z "$*" ] || suuid -t ti -c "$*" || { echo ti: suuid error >&2; exit 1; }
 LC_ALL=C stty -a | grep speed
 echo -n "`date -Iseconds` "
