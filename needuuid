@@ -30,6 +30,7 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s#^.*/(.*?)$#$1#;
+our $VERSION = '0.0.0';
 
 my $rcs_id = '$Id$';
 my $id_date = $rcs_id;
@@ -63,9 +64,7 @@ if ($Line =~ /^([[:xdigit:]]{8}-[[:xdigit:]]{4}-1[[:xdigit:]]{3}-[89ab][[:xdigit
 
 sub print_version {
     # Print program version {{{
-    for (@main::version_array) {
-        print("$_\n");
-    }
+    print("$progname $VERSION\n");
     exit(0);
     # }}}
 } # print_version()
@@ -74,9 +73,11 @@ sub usage {
     # Send the help message to stdout {{{
     my $Retval = shift;
 
+    if ($Opt{'verbose'}) {
+        print("\n");
+        print_version();
+    }
     print(<<END);
-
-$rcs_id
 
 Demand UUID in input stream, or else return 1.
 
