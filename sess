@@ -90,7 +90,10 @@ sub main {
     my @Cmd = @ARGV;
 
     # Check that a command was specified on the command line
-    scalar(@Cmd) || die("$progname: No command specified. Use -h for help.\n");
+    if (!scalar(@Cmd)) {
+        warn("$progname: No command specified. Use -h for help.\n");
+        return(1);
+    }
 
     # $begin_cmd is the actual suuid command with custom XML written to 
     # the log file

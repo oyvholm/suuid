@@ -135,7 +135,7 @@ END
     testcmd("$CMD", # {{{
         '',
         "sess: No command specified. Use -h for help.\n",
-        2,
+        1,
         'Invoked with no arguments',
     );
 
