@@ -28,6 +28,7 @@ my $env_dir = defined($ENV{$suuid_env})
 
 our %Std = (
 
+    'dbname' => "suuids",
     'editor' => "vi",
     'logdir' => $env_dir,
     'rcfile' => "$ENV{'HOME'}/.suuidrc",
@@ -39,6 +40,7 @@ our %Opt = (
 
     'comment' => "",
     'count' => 1,
+    'dbname' => $Std{'dbname'},
     'debug' => 0,
     'help' => 0,
     'logdir' => $Std{'logdir'},
@@ -61,6 +63,7 @@ GetOptions(
 
     'comment|c=s' => \$Opt{'comment'},
     'count|n=i' => \$Opt{'count'},
+    'dbname|d=s' => \$Opt{'dbname'},
     'debug' => \$Opt{'debug'},
     'help|h' => \$Opt{'help'},
     'logdir|l=s' => \$Opt{'logdir'},
@@ -250,6 +253,15 @@ sub main {
                     }
                 } else {
                     die("$progname: $Logfile: Cannot seek to position $filepos: $!\n");
+                }
+                # FIXME: The psql thing below is experimental at the 
+                # moment. It works, but there's no guarantee that it 
+                # goes into a database, for example if it doesn't exist. 
+                # The XML files are still the place where the important 
+                # data is stored.
+                if (open(PsqlFP, "| conv-suuid -o postgres | psql -X -q -d $Opt{'dbname'} 2>/dev/null")) {
+                    print(PsqlFP $out_str);
+                    close(PsqlFP);
                 }
             }
 
@@ -517,6 +529,8 @@ Options:
     defined, \$EDITOR is read, if not defined, "$Std{'editor'}" is 
     called. Sorry, emacs, but vi(m) rules the street and exists 
     everywhere.
+  -d X, --dbname X
+    Use Postgres database X. Default: '$Std{'dbname'}'.
   -h, --help
     Show this help.
   -l x, --logdir x

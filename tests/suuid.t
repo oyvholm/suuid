@@ -106,6 +106,10 @@ END
 
 =cut
 
+    # FIXME: Add tests for -d/--dbname. Have to think about how the 
+    # whole database access thing should be dealed with first. Not 
+    # everybody is superuser in their own Postgres database.
+
     test_standard_options();
     test_test_functions();
     test_suuid_executable();
