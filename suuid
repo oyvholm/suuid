@@ -254,7 +254,12 @@ sub main {
                 } else {
                     die("$progname: $Logfile: Cannot seek to position $filepos: $!\n");
                 }
-                if (open(PsqlFP, "| conv-suuid -o postgres | psql -X -q -d $Opt{'dbname'}")) {
+                # FIXME: The psql thing below is experimental at the 
+                # moment. It works, but there's no guarantee that it 
+                # goes into a database, for example if it doesn't exist. 
+                # The XML files are still the place where the important 
+                # data is stored.
+                if (open(PsqlFP, "| conv-suuid -o postgres | psql -X -q -d $Opt{'dbname'} 2>/dev/null")) {
                     print(PsqlFP $out_str);
                     close(PsqlFP);
                 }
