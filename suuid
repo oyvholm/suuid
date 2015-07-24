@@ -28,6 +28,7 @@ my $env_dir = defined($ENV{$suuid_env})
 
 our %Std = (
 
+    'dbname' => "suuids",
     'editor' => "vi",
     'logdir' => $env_dir,
     'rcfile' => "$ENV{'HOME'}/.suuidrc",
@@ -250,6 +251,10 @@ sub main {
                     }
                 } else {
                     die("$progname: $Logfile: Cannot seek to position $filepos: $!\n");
+                }
+                if (open(PsqlFP, "| conv-suuid -o postgres | psql -X -q -d $Std{'dbname'}")) {
+                    print(PsqlFP $out_str);
+                    close(PsqlFP);
                 }
             }
 
