@@ -115,6 +115,78 @@ END
     );
 
     # }}}
+    testcmd("echo nope | $CMD", # {{{
+        '',
+        '',
+        1,
+        'No UUID found in stdin',
+    );
+
+    # }}}
+    testcmd("echo nouuid | $CMD", # {{{
+        '',
+        '',
+        0,
+        'The line contains \'nouuid\', accept that',
+    );
+
+    # }}}
+    testcmd("echo ohyes45a97d24-31ac-11e5-9044-000df06acc56indeed | $CMD", # {{{
+        '',
+        '',
+        1,
+        'UUID from stdin isn\'t at beginning of line',
+    );
+
+    # }}}
+    testcmd("echo 45a97d24-31ac-11e5-9044-000df06acc56indeed | $CMD", # {{{
+        '',
+        '',
+        1,
+        'UUID is at start of line from stdin, but there\'s more rubbish before EOL',
+    );
+
+    # }}}
+    testcmd("echo 45a97d24-31ac-11e5-9044-000df06acc56 | $CMD", # {{{
+        '',
+        '',
+        0,
+        'Nothing else but UUID on the line from stdin, it returns 0',
+    );
+
+    # }}}
+    testcmd("echo 05497597-332f-466f-8071-76c354c41051 | $CMD", # {{{
+        '',
+        '',
+        1,
+        'UUID v4 is not accepted',
+    );
+
+    # }}}
+    testcmd("$CMD needuuid-files/yep", # {{{
+        '',
+        '',
+        0,
+        'Found UUID in file',
+    );
+
+    # }}}
+    testcmd("$CMD needuuid-files/nope", # {{{
+        '',
+        '',
+        1,
+        'No UUID in file',
+    );
+
+    # }}}
+    testcmd("$CMD needuuid-files/withrandom.bin", # {{{
+        '',
+        '',
+        1,
+        'UUID is hidden inside binary file',
+    );
+
+    # }}}
 
     todo_section:
     ;
