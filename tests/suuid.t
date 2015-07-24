@@ -76,6 +76,9 @@ my $xml_header = join("",
     '<suuids>\n',
 );
 
+my $tmpdbname = "tmp-suuid-t-" . time . "-" . $$ . "-" . substr(rand, 2, 8);
+msg(1, "tmpdbname = '$tmpdbname'");
+
 exit(main(%Opt));
 
 sub main {
@@ -110,9 +113,30 @@ END
     # whole database access thing should be dealed with first. Not 
     # everybody is superuser in their own Postgres database.
 
+    # FIXME: Have to find a standard way of initialising the database.
+    testcmd("createdb \"$tmpdbname\"",
+        '',
+        '',
+        0,
+        'Create database',
+    );
+    testcmd("conv-suuid --pg-table </dev/null | psql -X -d \"$tmpdbname\"",
+        "CREATE TABLE\n",
+        '',
+        0,
+        'Create database tables',
+    );
+
     test_standard_options();
     test_test_functions();
     test_suuid_executable();
+
+    testcmd("dropdb \"$tmpdbname\"",
+        '',
+        '',
+        0,
+        'Drop database',
+    );
 
     todo_section:
     ;
