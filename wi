@@ -164,6 +164,7 @@ if test -n "$test_simul" -o -n "$opt_sql"; then
 else
     echo "$sql_str" |
     psql -X -q suuids |
+    perl -pe 's/\\\\/\\/g; s/\x27\x27/\x27/g;' |
     sort -u |
     less
 fi
