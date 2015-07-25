@@ -141,7 +141,7 @@ END
 
 sub testcmd {
     # {{{
-    my ($Cmd, $Exp_stdout, $Exp_stderr, $Exp_retval, $Desc) = @_;
+    my ($Cmd, $Exp_stdout, $Exp_stderr, $Exp_retval, $Desc, $Input) = @_;
     my $stderr_cmd = '';
     my $deb_str = $Opt{'debug'} ? ' --debug' : '';
     my $Txt = join('',
@@ -155,7 +155,17 @@ sub testcmd {
     if (defined($Exp_stderr) && !length($deb_str)) {
         $stderr_cmd = " 2>$TMP_STDERR";
     }
-    is(`$Cmd$deb_str$stderr_cmd`, "$Exp_stdout", "$Txt (stdout)");
+    if (defined($Input)) {
+        my $tmp_input = 'sortuuid-stdin.tmp';
+        open(my $tmpinpfp, ">$tmp_input") or
+            return("$tmp_input: Cannot create file: $!");
+        print($tmpinpfp $Input);
+        close($tmpinpfp);
+        is(`$Cmd$deb_str$stderr_cmd <$tmp_input`, "$Exp_stdout", "$Txt (stdout)");
+        unlink($tmp_input);
+    } else {
+        is(`$Cmd$deb_str$stderr_cmd`, "$Exp_stdout", "$Txt (stdout)");
+    }
     my $ret_val = $?;
     if (defined($Exp_stderr)) {
         if (!length($deb_str)) {
