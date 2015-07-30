@@ -135,6 +135,10 @@ END
     my $uuid_tmpfile = glob("tmpuuids/*");
     ok(-f $uuid_tmpfile, "uuid file exists");
 
+    diag("Cleaning up...");
+    ok(unlink($uuid_tmpfile), "Remove [uuid_tmpfile]");
+    ok(rmdir("tmpuuids"), 'rmdir tmpuuids');
+
     todo_section:
     ;
 
@@ -150,9 +154,6 @@ END
         # TODO tests }}}
     }
 
-    diag("Cleaning up...");
-    ok(unlink($uuid_tmpfile), "Remove [uuid_tmpfile]");
-    ok(rmdir("tmpuuids"), 'rmdir tmpuuids');
     diag('Testing finished.');
     # }}}
 } # main()
