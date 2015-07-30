@@ -331,6 +331,26 @@ sub test_suuid_executable {
     );
 
     # }}}
+    likecmd("seq 1 20000 | $CMD -l $Outdir -c -", # {{{
+        "/^$v1_templ\n\$/s",
+        '/^$/',
+        0,
+        "Read long text from stdin, 108894 chars",
+    );
+
+    # }}}
+    like(file_data($Outfile), # {{{
+        s_top(
+             s_suuid() .
+             s_suuid() .
+             s_suuid(
+                'txt' => '1\\\\n2\\\\n3\\\\n[\d\\\\n]+19998\\\\n19999\\\\n20000',
+             ),
+        ),
+        "Monster entry was added to the log file",
+    );
+
+    # }}}
     ok(unlink($Outfile), "Delete $Outfile");
     testcmd("$CMD --rcfile rcfile-inv-uuidcmd -l $Outdir", # {{{
         '',
