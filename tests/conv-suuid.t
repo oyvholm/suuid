@@ -178,9 +178,12 @@ END
     diag('Testing Postgres database...');
     my $tmpdb = "tmp-$$-" . substr(rand, 2, 8);
     testcmd("createdb $tmpdb", '', '', 0, "Create test database");
-    testcmd("../$CMD --pg-table -o postgres test.xml | psql -X -d $tmpdb", # {{{
-        "CREATE TABLE\n",
-        '',
+    likecmd("../$CMD --pg-table -o postgres test.xml | psql -X -d $tmpdb", # {{{
+        '/^' .
+            'CREATE TABLE\n' .
+            '(COPY 4\n)?' .
+            '$/',
+        '/^$/',
         0,
         'Import test data into database',
     );
@@ -195,7 +198,9 @@ END
 
     # }}}
     likecmd("../$CMD --pg-table -o postgres test2.xml | psql -X -d $tmpdb", # {{{
-        '/^$/',
+        '/^' .
+            '(COPY 3\n)?' .
+            '$/',
         '/^ERROR:  relation "uuids" already exists\n$/',
         0,
         'Import more data into db, table already exists',
