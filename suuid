@@ -259,9 +259,11 @@ sub main {
                 # goes into a database, for example if it doesn't exist. 
                 # The XML files are still the place where the important 
                 # data is stored.
-                if (open(PsqlFP, "| conv-suuid -o postgres | psql -X -q -d $Opt{'dbname'}")) {
-                    print(PsqlFP $out_str);
-                    close(PsqlFP);
+                if ($rc{'use-postgres'}) {
+                    if (open(PsqlFP, "| conv-suuid -o postgres | psql -X -q -d $Opt{'dbname'}")) {
+                        print(PsqlFP $out_str);
+                        close(PsqlFP);
+                    }
                 }
             }
 
@@ -439,6 +441,8 @@ sub read_rcfile {
                 $Line =~ s/^\s*(.*?)\s*$/$1/;
                 if ($Line =~ /^hostname\s*=\s*(\S+)/) {
                     $Retval{'hostname'} = $1;
+                } elsif ($Line =~ /^use-postgres\s*=\s*(.+)\s*$/) {
+                    $Retval{'use-postgres'} = $1;
                 } elsif ($Line =~ /^uuidcmd\s*=\s*(.+)\s*$/) {
                     $Retval{'uuidcmd'} = $1;
                 }
@@ -579,6 +583,9 @@ program, the value is logged if it is an UUID.
 A different hostname can be specified in the environment variable 
 \$SUUID_HOSTNAME, or in the file $Std{'rcfile'} with the format 
 "hostname = xxx".
+
+To also store the entries in a Postgres database, add "use-postgres = 1" 
+to $Std{'rcfile'} .
 
 END
     exit($Retval);
