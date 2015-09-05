@@ -1,0 +1,7 @@
+'user' needs this to use suuid with Postgres:
+
+GRANT INSERT ON new TO user;
+GRANT SELECT ON new TO user;
+GRANT SELECT ON uuids TO user;
+GRANT INSERT ON uuids TO user;
+GRANT DELETE ON new TO user;
