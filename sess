@@ -1,13 +1,14 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 #=======================================================================
 # sess
 # File ID: a7bbac50-fb83-11dd-947c-000475e441b9
+#
 # Log execution of a specific program
 #
 # Character set: UTF-8
 # ©opyleft 2009– Øyvind A. Holm <sunny@sunbase.org>
-# License: GNU General Public License version 3 or later, see end of 
+# License: GNU General Public License version 2 or later, see end of 
 # file for legal stuff.
 #=======================================================================
 
@@ -21,12 +22,9 @@ local $| = 1;
 
 $SIG{'TERM'} = 'handle_signal';
 
-our $Debug = 0;
-
 our %Opt = (
 
     'comment' => "",
-    'debug' => 0,
     'description' => "",
     'help' => 0,
     'quiet' => 0,
@@ -38,13 +36,12 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s/^.*\/(.*?)$/$1/;
-our $VERSION = '0.00';
+our $VERSION = '0.0.0';
 
 Getopt::Long::Configure('bundling');
 GetOptions(
 
     'comment|c=s' => \$Opt{'comment'},
-    'debug' => \$Opt{'debug'},
     'description|d=s' => \$Opt{'description'},
     'help|h' => \$Opt{'help'},
     'quiet|q+' => \$Opt{'quiet'},
@@ -54,7 +51,6 @@ GetOptions(
 
 ) || die("$progname: Option error. Use -h for help.\n");
 
-$Opt{'debug'} && ($Debug = 1);
 # FIXME: Duplicated in ./suuid
 my $legal_descchars = join('',
     '\x2d-\x2e', # -.
@@ -79,11 +75,11 @@ my $begin_time;
 my $end_time;
 my $retval;
 
-exit(main(%Opt));
+exit(main());
 
 sub main {
     # {{{
-    my %Opt = @_;
+    my $Retval = 0;
     my $Lh = "[0-9a-fA-F]";
     my $v1_templ = "$Lh\{8}-$Lh\{4}-1$Lh\{3}-$Lh\{4}-$Lh\{12}";
 
@@ -156,6 +152,7 @@ sub main {
     # Finish up by writing the end entry to the log file and then exit
     write_end_entry();
     return($retval);
+    return($Retval);
     # }}}
 } # main()
 
@@ -239,7 +236,7 @@ sub suuid_xml {
 
 sub print_version {
     # Print program version {{{
-    print("$progname v$VERSION\n");
+    print("$progname $VERSION\n");
     return;
     # }}}
 } # print_version()
@@ -273,15 +270,13 @@ Options:
   -h, --help
     Show this help.
   -q, --quiet
-    Use less output. Can be repeated. -qq = totally quiet.
+    Be more quiet. Can be repeated to increase silence.
   -t X, --tag X
     Use X as tag (category). Several tags are separated by comma.
   -v, --verbose
     Increase level of verbosity. Can be repeated.
   --version
     Print version information.
-  --debug
-    Print debugging messages.
 
 END
     exit($Retval);
@@ -352,19 +347,6 @@ sub msg {
     # }}}
 } # msg()
 
-sub D {
-    # Print a debugging message {{{
-    $Debug || return;
-    my @call_info = caller;
-    chomp(my $Txt = shift);
-    my $File = $call_info[1];
-    $File =~ s#\\#/#g;
-    $File =~ s#^.*/(.*?)$#$1#;
-    print(STDERR "$File:$call_info[2] $$ $Txt\n");
-    return('');
-    # }}}
-} # D()
-
 __END__
 
 # Plain Old Documentation (POD) {{{
@@ -391,6 +373,10 @@ __END__
 
 Print a brief help summary.
 
+=item B<-q>, B<--quiet>
+
+Be more quiet. Can be repeated to increase silence.
+
 =item B<-v>, B<--verbose>
 
 Increase level of verbosity. Can be repeated.
@@ -398,10 +384,6 @@ Increase level of verbosity. Can be repeated.
 =item B<--version>
 
 Print version information.
-
-=item B<--debug>
-
-Print debugging messages.
 
 =back
 
@@ -420,9 +402,9 @@ This is free software; see the file F<COPYING> for legalese stuff.
 
 =head1 LICENCE
 
-This program is free software: you can redistribute it and/or modify it 
+This program is free software; you can redistribute it and/or modify it 
 under the terms of the GNU General Public License as published by the 
-Free Software Foundation, either version 3 of the License, or (at your 
+Free Software Foundation; either version 2 of the License, or (at your 
 option) any later version.
 
 This program is distributed in the hope that it will be useful, but 

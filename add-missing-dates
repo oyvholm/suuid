@@ -1,13 +1,14 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 #=======================================================================
 # add-missing-dates
 # File ID: c1887594-7766-11e0-b24b-6fbd5c06de00
+#
 # Insert missing t="" values
 #
 # Character set: UTF-8
 # ©opyleft 2011– Øyvind A. Holm <sunny@sunbase.org>
-# License: GNU General Public License version 3 or later, see end of 
+# License: GNU General Public License version 2 or later, see end of 
 # file for legal stuff.
 #=======================================================================
 
@@ -18,12 +19,10 @@ use bigint;
 
 local $| = 1;
 
-our $Debug = 0;
-
 our %Opt = (
 
-    'debug' => 0,
     'help' => 0,
+    'quiet' => 0,
     'verbose' => 0,
     'version' => 0,
 
@@ -31,19 +30,19 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s/^.*\/(.*?)$/$1/;
-our $VERSION = '0.00';
+our $VERSION = '0.0.0';
 
 Getopt::Long::Configure('bundling');
 GetOptions(
 
-    'debug' => \$Opt{'debug'},
     'help|h' => \$Opt{'help'},
+    'quiet|q+' => \$Opt{'quiet'},
     'verbose|v+' => \$Opt{'verbose'},
     'version' => \$Opt{'version'},
 
 ) || die("$progname: Option error. Use -h for help.\n");
 
-$Opt{'debug'} && ($Debug = 1);
+$Opt{'verbose'} -= $Opt{'quiet'};
 $Opt{'help'} && usage(0);
 if ($Opt{'version'}) {
     print_version();
@@ -53,17 +52,27 @@ if ($Opt{'version'}) {
 my $Lh = "[0-9a-fA-F]";
 my $v1_templ = "$Lh\{8}-$Lh\{4}-1$Lh\{3}-$Lh\{4}-$Lh\{12}";
 
-while (<>) {
-    my $line = $_;
-    if ($line =~ /^<suuid u="($v1_templ)"(.*)$/) {
-        my ($uuid, $rest) = ($1, $2);
-        printf("<suuid t=\"%s\" u=\"%s\"%s\n",
-            uuid_time2($uuid), $uuid, $rest
-        );
-    } else {
-        print($line);
+exit(main());
+
+sub main {
+    # {{{
+    my $Retval = 0;
+
+    while (<>) {
+        my $line = $_;
+        if ($line =~ /^<suuid u="($v1_templ)"(.*)$/) {
+            my ($uuid, $rest) = ($1, $2);
+            printf("<suuid t=\"%s\" u=\"%s\"%s\n",
+                uuid_time2($uuid), $uuid, $rest
+            );
+        } else {
+            print($line);
+        }
     }
-}
+
+    return($Retval);
+    # }}}
+} # main()
 
 sub uuid_time2 {
     # {{{
@@ -131,7 +140,7 @@ sub bighex {
 
 sub print_version {
     # Print program version {{{
-    print("$progname v$VERSION\n");
+    print("$progname $VERSION\n");
     return;
     # }}}
 } # print_version()
@@ -152,12 +161,12 @@ Options:
 
   -h, --help
     Show this help.
+  -q, --quiet
+    Be more quiet. Can be repeated to increase silence.
   -v, --verbose
     Increase level of verbosity. Can be repeated.
   --version
     Print version information.
-  --debug
-    Print debugging messages.
 
 END
     exit($Retval);
@@ -174,19 +183,6 @@ sub msg {
     return;
     # }}}
 } # msg()
-
-sub D {
-    # Print a debugging message {{{
-    $Debug || return;
-    my @call_info = caller;
-    chomp(my $Txt = shift);
-    my $File = $call_info[1];
-    $File =~ s#\\#/#g;
-    $File =~ s#^.*/(.*?)$#$1#;
-    print(STDERR "$File:$call_info[2] $$ $Txt\n");
-    return('');
-    # }}}
-} # D()
 
 __END__
 
@@ -214,6 +210,10 @@ __END__
 
 Print a brief help summary.
 
+=item B<-q>, B<--quiet>
+
+Be more quiet. Can be repeated to increase silence.
+
 =item B<-v>, B<--verbose>
 
 Increase level of verbosity. Can be repeated.
@@ -221,10 +221,6 @@ Increase level of verbosity. Can be repeated.
 =item B<--version>
 
 Print version information.
-
-=item B<--debug>
-
-Print debugging messages.
 
 =back
 
@@ -243,9 +239,9 @@ This is free software; see the file F<COPYING> for legalese stuff.
 
 =head1 LICENCE
 
-This program is free software: you can redistribute it and/or modify it 
+This program is free software; you can redistribute it and/or modify it 
 under the terms of the GNU General Public License as published by the 
-Free Software Foundation, either version 3 of the License, or (at your 
+Free Software Foundation; either version 2 of the License, or (at your 
 option) any later version.
 
 This program is distributed in the hope that it will be useful, but 
