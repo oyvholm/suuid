@@ -1,13 +1,14 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 #=======================================================================
 # sess.t
 # File ID: b9f9e134-fb83-11dd-b202-000475e441b9
+#
 # Test suite for sess(1).
 #
 # Character set: UTF-8
 # ©opyleft 2009– Øyvind A. Holm <sunny@sunbase.org>
-# License: GNU General Public License version 3 or later, see end of 
+# License: GNU General Public License version 2 or later, see end of 
 # file for legal stuff.
 #=======================================================================
 
@@ -15,19 +16,20 @@ use strict;
 use warnings;
 
 BEGIN {
+    # push(@INC, "$ENV{'HOME'}/bin/STDlibdirDTS");
     use Test::More qw{no_plan};
+    # use_ok() goes here
 }
 
 use Getopt::Long;
 
 local $| = 1;
 
-our $Debug = 0;
+our $CMD = 'STDexecDTS';
 
 our %Opt = (
 
     'all' => 0,
-    'debug' => 0,
     'help' => 0,
     'todo' => 0,
     'verbose' => 0,
@@ -37,13 +39,14 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s/^.*\/(.*?)$/$1/;
-our $VERSION = '0.00';
+our $VERSION = '0.0.0';
+
+my %descriptions = ();
 
 Getopt::Long::Configure('bundling');
 GetOptions(
 
     'all|a' => \$Opt{'all'},
-    'debug' => \$Opt{'debug'},
     'help|h' => \$Opt{'help'},
     'todo|t' => \$Opt{'todo'},
     'verbose|v+' => \$Opt{'verbose'},
@@ -51,18 +54,16 @@ GetOptions(
 
 ) || die("$progname: Option error. Use -h for help.\n");
 
-$Opt{'debug'} && ($Debug = 1);
 $Opt{'help'} && usage(0);
 if ($Opt{'version'}) {
     print_version();
     exit(0);
 }
 
-exit(main(%Opt));
+exit(main());
 
 sub main {
     # {{{
-    my %Opt = @_;
     my $Retval = 0;
     my $logdir = "logdir";
     my $CMD = "SUUID_LOGDIR=$logdir ../sess";
@@ -80,7 +81,7 @@ sub main {
 
     testcmd("$CMD command", # {{{
         <<'END',
-[expected stdin]
+[expected stdout]
 END
         '',
         0,
@@ -102,16 +103,16 @@ END
     # }}}
     diag('Testing -v (--verbose) option...');
     likecmd("$CMD -hv", # {{{
-        '/^\n\S+ v\d\.\d\d\n/s',
+        '/^\n\S+ \d+\.\d+\.\d+(\+git)?\n/s',
         '/^$/',
         0,
-        'Option --version with -h returns version number and help screen',
+        'Option -v with -h returns version number and help screen',
     );
 
     # }}}
     diag('Testing --version option...');
     likecmd("$CMD --version", # {{{
-        '/^\S+ v\d\.\d\d\n/',
+        '/^\S+ \d+\.\d+\.\d+(\+git)?\n/',
         '/^$/',
         0,
         'Option --version returns version number',
@@ -214,8 +215,9 @@ END
 sub testcmd {
     # {{{
     my ($Cmd, $Exp_stdout, $Exp_stderr, $Exp_retval, $Desc) = @_;
+    defined($descriptions{$Desc}) && BAIL_OUT("testcmd(): '$Desc' description is used twice");
+    $descriptions{$Desc} = 1;
     my $stderr_cmd = '';
-    my $deb_str = $Opt{'debug'} ? ' --debug' : '';
     my $Txt = join('',
         "\"$Cmd\"",
         defined($Desc)
@@ -223,30 +225,30 @@ sub testcmd {
             : ''
     );
     my $TMP_STDERR = 'sess-stderr.tmp';
+    my $retval = 1;
 
-    if (defined($Exp_stderr) && !length($deb_str)) {
+    if (defined($Exp_stderr)) {
         $stderr_cmd = " 2>$TMP_STDERR";
     }
-    is(`$Cmd$deb_str$stderr_cmd`, "$Exp_stdout", "$Txt (stdout)");
+    $retval &= is(`$Cmd$stderr_cmd`, $Exp_stdout, "$Txt (stdout)");
     my $ret_val = $?;
     if (defined($Exp_stderr)) {
-        if (!length($deb_str)) {
-            is(file_data($TMP_STDERR), $Exp_stderr, "$Txt (stderr)");
-            unlink($TMP_STDERR);
-        }
+        $retval &= is(file_data($TMP_STDERR), $Exp_stderr, "$Txt (stderr)");
+        unlink($TMP_STDERR);
     } else {
         diag("Warning: stderr not defined for '$Txt'");
     }
-    is($ret_val >> 8, $Exp_retval, "$Txt (retval)");
-    return;
+    $retval &= is($ret_val >> 8, $Exp_retval, "$Txt (retval)");
+    return($retval);
     # }}}
 } # testcmd()
 
 sub likecmd {
     # {{{
     my ($Cmd, $Exp_stdout, $Exp_stderr, $Exp_retval, $Desc) = @_;
+    defined($descriptions{$Desc}) && BAIL_OUT("likecmd(): '$Desc' description is used twice");
+    $descriptions{$Desc} = 1;
     my $stderr_cmd = '';
-    my $deb_str = $Opt{'debug'} ? ' --debug' : '';
     my $Txt = join('',
         "\"$Cmd\"",
         defined($Desc)
@@ -254,22 +256,21 @@ sub likecmd {
             : ''
     );
     my $TMP_STDERR = 'sess-stderr.tmp';
+    my $retval = 1;
 
-    if (defined($Exp_stderr) && !length($deb_str)) {
+    if (defined($Exp_stderr)) {
         $stderr_cmd = " 2>$TMP_STDERR";
     }
-    like(`$Cmd$deb_str$stderr_cmd`, "$Exp_stdout", "$Txt (stdout)");
+    $retval &= like(`$Cmd$stderr_cmd`, $Exp_stdout, "$Txt (stdout)");
     my $ret_val = $?;
     if (defined($Exp_stderr)) {
-        if (!length($deb_str)) {
-            like(file_data($TMP_STDERR), "$Exp_stderr", "$Txt (stderr)");
-            unlink($TMP_STDERR);
-        }
+        $retval &= like(file_data($TMP_STDERR), $Exp_stderr, "$Txt (stderr)");
+        unlink($TMP_STDERR);
     } else {
         diag("Warning: stderr not defined for '$Txt'");
     }
-    is($ret_val >> 8, $Exp_retval, "$Txt (retval)");
-    return;
+    $retval &= is($ret_val >> 8, $Exp_retval, "$Txt (retval)");
+    return($retval);
     # }}}
 } # likecmd()
 
@@ -290,7 +291,7 @@ sub file_data {
 
 sub print_version {
     # Print program version {{{
-    print("$progname v$VERSION\n");
+    print("$progname $VERSION\n");
     return;
     # }}}
 } # print_version()
@@ -321,8 +322,6 @@ Options:
     Increase level of verbosity. Can be repeated.
   --version
     Print version information.
-  --debug
-    Print debugging messages.
 
 END
     exit($Retval);
@@ -382,10 +381,6 @@ Increase level of verbosity. Can be repeated.
 
 Print version information.
 
-=item B<--debug>
-
-Print debugging messages.
-
 =back
 
 =head1 AUTHOR
@@ -399,9 +394,9 @@ This is free software; see the file F<COPYING> for legalese stuff.
 
 =head1 LICENCE
 
-This program is free software: you can redistribute it and/or modify it 
+This program is free software; you can redistribute it and/or modify it 
 under the terms of the GNU General Public License as published by the 
-Free Software Foundation, either version 3 of the License, or (at your 
+Free Software Foundation; either version 2 of the License, or (at your 
 option) any later version.
 
 This program is distributed in the hope that it will be useful, but 

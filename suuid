@@ -1,13 +1,14 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 #=======================================================================
 # suuid
 # File ID: 04c64336-f744-11dd-bddd-000475e441b9
+#
 # Generate and store UUID with optional comment in a log file.
 #
 # Character set: UTF-8
 # ©opyleft 2008– Øyvind A. Holm <sunny@sunbase.org>
-# License: GNU General Public License version 3 or later, see end of 
+# License: GNU General Public License version 2 or later, see end of 
 # file for legal stuff.
 #=======================================================================
 
@@ -18,8 +19,6 @@ use Getopt::Long;
 use bigint;
 
 local $| = 1;
-
-our $Debug = 0;
 
 my $suuid_env = "SUUID_LOGDIR";
 my $env_dir = defined($ENV{$suuid_env})
@@ -41,12 +40,12 @@ our %Opt = (
     'comment' => "",
     'count' => 1,
     'dbname' => $Std{'dbname'},
-    'debug' => 0,
     'help' => 0,
     'logdir' => $Std{'logdir'},
     'random-mac' => 0,
     'raw' => 0,
     'rcfile' => $Std{'rcfile'},
+    'quiet' => 0,
     'tag' => "",
     'verbose' => 0,
     'version' => 0,
@@ -56,7 +55,7 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s/^.*\/(.*?)$/$1/;
-our $VERSION = '0.00';
+our $VERSION = '0.0.0';
 
 Getopt::Long::Configure('bundling');
 GetOptions(
@@ -64,9 +63,9 @@ GetOptions(
     'comment|c=s' => \$Opt{'comment'},
     'count|n=i' => \$Opt{'count'},
     'dbname|d=s' => \$Opt{'dbname'},
-    'debug' => \$Opt{'debug'},
     'help|h' => \$Opt{'help'},
     'logdir|l=s' => \$Opt{'logdir'},
+    'quiet|q+' => \$Opt{'quiet'},
     'random-mac|m' => \$Opt{'random-mac'},
     'raw' => \$Opt{'raw'},
     'rcfile=s' => \$Opt{'rcfile'},
@@ -77,8 +76,8 @@ GetOptions(
 
 ) || die("$progname: Option error. Use -h for help.\n");
 
-$Opt{'debug'} && ($Debug = 1);
-D("\@INC = '" . join("', '", @INC) . "'");
+$Opt{'verbose'} -= $Opt{'quiet'};
+msg(2, "\@INC = '" . join("', '", @INC) . "'");
 $Opt{'help'} && usage(0);
 if ($Opt{'version'}) {
     print_version();
@@ -95,11 +94,10 @@ my $Cmd = defined($rc{'uuidcmd'})
     ? $rc{'uuidcmd'}
     : "uuidgen -t";
 
-exit(main(%Opt));
+exit(main());
 
 sub main {
     # {{{
-    my %Opt = @_;
     my $Retval = 0;
     my $Host = host_id();
 
@@ -110,7 +108,7 @@ sub main {
 
     my $Comment = length($Opt{'comment'}) ? $Opt{'comment'} : "";
     my $cmd_editor = $ENV{'SUUID_EDITOR'} || $ENV{'EDITOR'} || $Std{'editor'};
-    D("cmd_editor = '$cmd_editor'");
+    msg(2, "cmd_editor = '$cmd_editor'");
 
     if ($Comment eq "-") {
         $Comment = "";
@@ -185,14 +183,14 @@ sub main {
             }
             my $filepos = tell(LogFP);
             my $check_end_tag = <LogFP>;
-            D("check_end_tag = '$check_end_tag'");
+            msg(2, "check_end_tag = '$check_end_tag'");
             defined($check_end_tag) || ($check_end_tag = "");
 
             # If the end tag was read correctly, truncate log file 
             # there, otherwise just add new entries to the end.
 
             if ($check_end_tag eq "</suuids>\n") {
-                D("check_end_tag is OK");
+                msg(2, "check_end_tag is OK");
                 truncate(LogFP, $filepos) || die("$progname: $Logfile: Cannot truncate() to size $filepos: $!\n");
             } else {
                 warn("$progname: $Logfile: Unknown end line, adding to end of file\n");
@@ -248,7 +246,7 @@ sub main {
                         $Opt{'whereto'} =~ /[ao]/ && print("$uuid\n");
                         $Opt{'whereto'} =~ /[ae]/ && print(STDERR "$uuid\n");
                     } else {
-                        D("check_str = '$check_str', out_str = '$out_str'");
+                        msg(2, "check_str = '$check_str', out_str = '$out_str'");
                         die("$progname: $Logfile: Unable to write to file: $!\n");
                     }
                 } else {
@@ -325,7 +323,7 @@ sub uuid_hex_date {
     # 000475e441b9 10-15 node (24-35)
     # }}}
     my $Retval = "$time_hi$time_mid$time_low";
-    # D("uuid_hex_date('$uuid') returns '$Retval'");
+    # msg(2, "uuid_hex_date('$uuid') returns '$Retval'");
     return($Retval);
     # }}}
 } # uuid_hex_date()
@@ -473,7 +471,7 @@ sub host_id {
             $Retval =~ s/^.*-([[:xdigit:]]+)$/$1/;
         }
     }
-    D("host_id() returns '$Retval'");
+    msg(2, "host_id() returns '$Retval'");
     return($Retval);
     # }}}
 } # host_id()
@@ -505,7 +503,7 @@ sub sec_to_string {
 
 sub print_version {
     # Print program version {{{
-    print("$progname v$VERSION\n");
+    print("$progname $VERSION\n");
     return;
     # }}}
 } # print_version()
@@ -548,6 +546,8 @@ Options:
     Don’t use the hardware MAC address, generate a random address field.
   -n x, --count x
     Print and store x UUIDs.
+  -q, --quiet
+    Be more quiet. Can be repeated to increase silence.
   --raw
     Don’t convert <txt> element to XML. When using this option, it is 
     expected that the value of the -c/--comment option is valid XML, 
@@ -574,8 +574,6 @@ Options:
       n
         Don’t output anything.
     Default: "$Std{'whereto'}"
-  --debug
-    Print debugging messages.
 
 If the \$SESS_UUID environment variable is defined by sess(1) or another 
 program, the value is logged if it is an UUID.
@@ -603,19 +601,6 @@ sub msg {
     # }}}
 } # msg()
 
-sub D {
-    # Print a debugging message {{{
-    $Debug || return;
-    my @call_info = caller;
-    chomp(my $Txt = shift);
-    my $File = $call_info[1];
-    $File =~ s#\\#/#g;
-    $File =~ s#^.*/(.*?)$#$1#;
-    print(STDERR "$File:$call_info[2] $$ $Txt\n");
-    return('');
-    # }}}
-} # D()
-
 __END__
 
 # Plain Old Documentation (POD) {{{
@@ -642,6 +627,10 @@ __END__
 
 Print a brief help summary.
 
+=item B<-q>, B<--quiet>
+
+Be more quiet. Can be repeated to increase silence.
+
 =item B<-v>, B<--verbose>
 
 Increase level of verbosity. Can be repeated.
@@ -649,10 +638,6 @@ Increase level of verbosity. Can be repeated.
 =item B<--version>
 
 Print version information.
-
-=item B<--debug>
-
-Print debugging messages.
 
 =back
 
@@ -671,9 +656,9 @@ This is free software; see the file F<COPYING> for legalese stuff.
 
 =head1 LICENCE
 
-This program is free software: you can redistribute it and/or modify it 
+This program is free software; you can redistribute it and/or modify it 
 under the terms of the GNU General Public License as published by the 
-Free Software Foundation, either version 3 of the License, or (at your 
+Free Software Foundation; either version 2 of the License, or (at your 
 option) any later version.
 
 This program is distributed in the hope that it will be useful, but 

@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 
 #=======================================================================
 # sortuuid
 # File ID: d8ba490a-fa1c-11dd-827e-000475e441b9
+#
 # Sort lines based on first UUID found on each line.
 #
 # Character set: UTF-8
@@ -12,17 +13,16 @@
 #=======================================================================
 
 use strict;
+use warnings;
 use Getopt::Long;
 
-$| = 1;
-
-our $Debug = 0;
+local $| = 1;
 
 our %Opt = (
 
     'all' => 0,
-    'debug' => 0,
     'help' => 0,
+    'quiet' => 0,
     'verbose' => 0,
     'version' => 0,
 
@@ -30,54 +30,64 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s/^.*\/(.*?)$/$1/;
-our $VERSION = "0.00";
+our $VERSION = '0.0.0';
 
-Getopt::Long::Configure("bundling");
+Getopt::Long::Configure('bundling');
 GetOptions(
 
-    "all|a" => \$Opt{'all'},
-    "debug" => \$Opt{'debug'},
-    "help|h" => \$Opt{'help'},
-    "verbose|v+" => \$Opt{'verbose'},
-    "version" => \$Opt{'version'},
+    'all|a' => \$Opt{'all'},
+    'help|h' => \$Opt{'help'},
+    'quiet|q+' => \$Opt{'quiet'},
+    'verbose|v+' => \$Opt{'verbose'},
+    'version' => \$Opt{'version'},
 
 ) || die("$progname: Option error. Use -h for help.\n");
 
-$Opt{'debug'} && ($Debug = 1);
+$Opt{'verbose'} -= $Opt{'quiet'};
 $Opt{'help'} && usage(0);
 if ($Opt{'version'}) {
     print_version();
     exit(0);
 }
 
-my $Lh = "[0-9a-fA-F]";
-my $Templ = "$Lh\{8}-$Lh\{4}-$Lh\{4}-$Lh\{4}-$Lh\{12}";
-my $v1_templ = "$Lh\{8}-$Lh\{4}-1$Lh\{3}-$Lh\{4}-$Lh\{12}";
+exit(main());
 
-my @uuid_lines = ();
-my @other_lines = ();
+sub main {
+    # {{{
+    my $Retval = 0;
 
-while (my $Line = <>) {
-    if ($Line =~ /^.*?($v1_templ)/) {
-        push(@uuid_lines, $Line);
-    } else {
-        $Opt{'all'} && push(@other_lines, $Line);
+    my $Lh = "[0-9a-fA-F]";
+    my $Templ = "$Lh\{8}-$Lh\{4}-$Lh\{4}-$Lh\{4}-$Lh\{12}";
+    my $v1_templ = "$Lh\{8}-$Lh\{4}-1$Lh\{3}-$Lh\{4}-$Lh\{12}";
+
+    my @uuid_lines = ();
+    my @other_lines = ();
+
+    while (my $Line = <>) {
+        if ($Line =~ /^.*?($v1_templ)/) {
+            push(@uuid_lines, $Line);
+        } else {
+            $Opt{'all'} && push(@other_lines, $Line);
+        }
     }
-}
 
-my @tmp_arr = ();
-for my $Curr (@uuid_lines) {
-    if ($Curr =~ /^.*?($v1_templ)/) {
-        my $uuid = $1;
-        push(@tmp_arr, uuid_hex_date($uuid) . "-$Curr");
+    my @tmp_arr = ();
+    for my $Curr (@uuid_lines) {
+        if ($Curr =~ /^.*?($v1_templ)/) {
+            my $uuid = $1;
+            push(@tmp_arr, uuid_hex_date($uuid) . "-$Curr");
+        }
     }
-}
-for my $Curr (sort @tmp_arr) {
-    $Curr =~ s/^[0-9a-f]+-//;
-    print($Curr);
-}
+    for my $Curr (sort @tmp_arr) {
+        $Curr =~ s/^[0-9a-f]+-//;
+        print($Curr);
+    }
 
-$Opt{'all'} && print(join("", @other_lines));
+    $Opt{'all'} && print(join("", @other_lines));
+
+    return($Retval);
+    # }}}
+} # main()
 
 sub uuid_hex_date {
     # {{{
@@ -102,14 +112,15 @@ sub uuid_hex_date {
     # 000475e441b9 10-15 node (24-35)
     # }}}
     my $Retval = "$time_hi$time_mid$time_low";
-    D("uuid_hex_date('$uuid') returns '$Retval'");
+    msg(2, "uuid_hex_date('$uuid') returns '$Retval'");
     return($Retval);
     # }}}
 } # uuid_hex_date()
 
 sub print_version {
     # Print program version {{{
-    print("$progname v$VERSION\n");
+    print("$progname $VERSION\n");
+    return;
     # }}}
 } # print_version()
 
@@ -121,7 +132,7 @@ sub usage {
         print("\n");
         print_version();
     }
-    print(<<END);
+    print(<<"END");
 
 Usage: $progname [options] [file [files [...]]]
 
@@ -134,12 +145,12 @@ Options:
     listed unsorted after all the lines with time UUIDs.
   -h, --help
     Show this help.
+  -q, --quiet
+    Be more quiet. Can be repeated to increase silence.
   -v, --verbose
     Increase level of verbosity. Can be repeated.
   --version
     Print version information.
-  --debug
-    Print debugging messages.
 
 END
     exit($Retval);
@@ -153,21 +164,9 @@ sub msg {
     if ($Opt{'verbose'} >= $verbose_level) {
         print(STDERR "$progname: $Txt\n");
     }
+    return;
     # }}}
 } # msg()
-
-sub D {
-    # Print a debugging message {{{
-    $Debug || return;
-    my @call_info = caller;
-    chomp(my $Txt = shift);
-    my $File = $call_info[1];
-    $File =~ s#\\#/#g;
-    $File =~ s#^.*/(.*?)$#$1#;
-    print(STDERR "$File:$call_info[2] $$ $Txt\n");
-    return("");
-    # }}}
-} # D()
 
 __END__
 
@@ -195,6 +194,10 @@ __END__
 
 Print a brief help summary.
 
+=item B<-q>, B<--quiet>
+
+Be more quiet. Can be repeated to increase silence.
+
 =item B<-v>, B<--verbose>
 
 Increase level of verbosity. Can be repeated.
@@ -202,10 +205,6 @@ Increase level of verbosity. Can be repeated.
 =item B<--version>
 
 Print version information.
-
-=item B<--debug>
-
-Print debugging messages.
 
 =back
 
@@ -224,9 +223,9 @@ This is free software; see the file F<COPYING> for legalese stuff.
 
 =head1 LICENCE
 
-This program is free software: you can redistribute it and/or modify it 
+This program is free software; you can redistribute it and/or modify it 
 under the terms of the GNU General Public License as published by the 
-Free Software Foundation, either version 2 of the License, or (at your 
+Free Software Foundation; either version 2 of the License, or (at your 
 option) any later version.
 
 This program is distributed in the hope that it will be useful, but 

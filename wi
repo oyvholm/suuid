@@ -3,23 +3,15 @@
 #=======================================================================
 # wi
 # File ID: afcf3af0-27a5-11e1-b643-4b2592583869
+#
 # [Description]
+#
+# Author: Øyvind A. Holm <sunny@sunbase.org>
 # License: GNU General Public License version 2 or later.
 #=======================================================================
 
 progname=wi
-version=0.0.1
-
-msg() {
-    echo $* >&2
-}
-
-is_uuid() {
-    local x="[[:xdigit:]]"
-    echo "$1" | grep -q -E "^$x{8}-$x{4}-$x{4}-$x{4}-$x{12}\$" &&
-        echo 1 ||
-        echo 0
-}
+VERSION=0.0.1
 
 unset test_simul
 if test "$1" = "--test-simul"; then
@@ -36,6 +28,11 @@ if test -n "$test_simul" -a -n "$opt_sql"; then
     exit 1
 fi
 
+if test "$1" = "--version"; then
+    echo $progname $VERSION
+    exit 0
+fi
+
 if test "$1" = "-h" -o "$1" = "--help"; then
     cat <<END
 
@@ -45,17 +42,17 @@ Syntax: $progname [options] [search expression]
 
 Options:
 
-    -h, --help
-        Show this help.
-    --sql
-        Send generated SQL to stdout instead of performing a search. 
-        Must be the first command line argument.
-    --test-simul
-        If this is specified as first argument, don't actually do 
-        anything. This will only send diagnostic messages to stderr. 
-        Used by 'wi.t'.
-    --version
-        Display program version.
+  -h, --help
+    Show this help.
+  --sql
+    Send generated SQL to stdout instead of performing a search. 
+    Must be the first command line argument.
+  --test-simul
+    If this is specified as first argument, don't actually do 
+    anything. This will only send diagnostic messages to stderr. 
+    Used by 'wi.t'.
+  --version
+    Print version information.
 
 "-a" and "-o" can be used as modifiers to the search. "-a" is replaced 
 by "AND" and "-o" is replaced with OR.
@@ -102,10 +99,16 @@ END
     exit 0
 fi
 
-if test "$1" = "--version"; then
-    echo $progname v$version
-    exit 0
-fi
+msg() {
+    echo $* >&2
+}
+
+is_uuid() {
+    local x="[[:xdigit:]]"
+    echo "$1" | grep -q -E "^$x{8}-$x{4}-$x{4}-$x{4}-$x{12}\$" &&
+        echo 1 ||
+        echo 0
+}
 
 search_str=
 stdin=
