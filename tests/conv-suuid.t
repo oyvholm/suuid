@@ -58,6 +58,8 @@ if ($Opt{'version'}) {
     exit(0);
 }
 
+my $tmpdb = "tmp-$$-" . substr(rand, 2, 8);
+
 exit(main(%Opt));
 
 sub main {
@@ -176,7 +178,6 @@ END
 
     # }}}
     diag('Testing Postgres database...');
-    my $tmpdb = "tmp-$$-" . substr(rand, 2, 8);
     testcmd("createdb $tmpdb", '', '', 0, "Create test database");
     likecmd("../$CMD --pg-table -o postgres test.xml | psql -X -d $tmpdb", # {{{
         '/^' .
@@ -416,6 +417,7 @@ sub testcmd {
             ? " - $Desc"
             : ''
     );
+    $Txt =~ s/$tmpdb/[tmpdb]/g;
     my $TMP_STDERR = 'conv-suuid-stderr.tmp';
 
     if (defined($Exp_stderr)) {
@@ -444,6 +446,7 @@ sub likecmd {
             ? " - $Desc"
             : ''
     );
+    $Txt =~ s/$tmpdb/[tmpdb]/g;
     my $TMP_STDERR = 'conv-suuid-stderr.tmp';
 
     if (defined($Exp_stderr)) {

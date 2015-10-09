@@ -76,6 +76,7 @@ my $xml_header = join("",
     '<suuids>\n',
 );
 
+my $Outdir = "tmp-suuid-t-$$-" . substr(rand, 2, 8);
 my $tmpdbname = "tmp-suuid-t-" . time . "-" . $$ . "-" . substr(rand, 2, 8);
 msg(1, "tmpdbname = '$tmpdbname'");
 
@@ -287,7 +288,6 @@ sub test_test_functions {
 
 sub test_suuid_executable {
     # {{{
-    my $Outdir = "tmp-suuid-t-$$-" . substr(rand, 2, 8);
     if (-e $Outdir) {
         die("$progname: $Outdir: WTF?? Directory element already exists.");
     }
@@ -351,7 +351,7 @@ sub test_suuid_executable {
     );
 
     # }}}
-    ok(unlink($Outfile), "Delete $Outfile");
+    ok(unlink($Outfile), "Delete [Outfile]");
     testcmd("$CMD --rcfile rcfile-inv-uuidcmd -l $Outdir", # {{{
         '',
         "suuid: '': Generated UUID is not in the expected format\n",
@@ -384,7 +384,7 @@ sub test_suuid_executable {
     );
 
     # }}}
-    ok(unlink($Outfile), "Delete $Outfile");
+    ok(unlink($Outfile), "Delete [Outfile]");
     diag("Read the SUUID_HOSTNAME environment variable...");
     likecmd("SUUID_HOSTNAME=urk13579kru $CMD -l $Outdir", # {{{
         "/^$v1_templ\n\$/s",
@@ -404,7 +404,7 @@ sub test_suuid_executable {
     );
 
     # }}}
-    ok(unlink("$Outdir/urk13579kru.xml"), "Delete $Outdir/urk13579kru.xml");
+    ok(unlink("$Outdir/urk13579kru.xml"), "Delete [Outdir]/urk13579kru.xml");
     diag("Testing -m (--random-mac) option...");
     likecmd("$CMD -m -l $Outdir", # {{{
         "/^$v1rand_templ\\n\$/s",
@@ -422,7 +422,7 @@ sub test_suuid_executable {
     );
 
     # }}}
-    ok(unlink($Outfile), "Delete $Outfile");
+    ok(unlink($Outfile), "Delete [Outfile]");
     diag("Testing --raw option...");
     likecmd("$CMD --raw -c '<dingle><dangle>bær</dangle></dingle>' -l $Outdir", # {{{
         "/^$v1_templ\\n\$/s",
@@ -439,7 +439,7 @@ sub test_suuid_executable {
         "Log contents after --raw is OK",
     );
     # }}}
-    ok(unlink($Outfile), "Delete $Outfile");
+    ok(unlink($Outfile), "Delete [Outfile]");
     diag("Testing --rcfile option...");
     likecmd("$CMD --rcfile rcfile1 -l $Outdir", # {{{
         "/^$v1_templ\\n\$/s",
@@ -457,7 +457,7 @@ sub test_suuid_executable {
     );
 
     # }}}
-    ok(unlink("$Outdir/altrc1.xml"), "Delete $Outdir/altrc1.xml");
+    ok(unlink("$Outdir/altrc1.xml"), "Delete [Outdir]/altrc1.xml");
     ok(!-e 'nosuchrc', "'nosuchrc' doesn't exist");
     likecmd("$CMD --rcfile nosuchrc -l $Outdir", # {{{
         "/^$v1_templ\\n\$/s",
@@ -467,7 +467,7 @@ sub test_suuid_executable {
     );
 
     # }}}
-    ok(unlink($host_outfile), "Delete $host_outfile");
+    ok(unlink($host_outfile), "Delete [host_outfile]");
     diag("Testing -t (--tag) option...");
     likecmd("$CMD -t snaddertag -l $Outdir", # {{{
         "/^$v1_templ\n\$/s",
@@ -493,7 +493,7 @@ sub test_suuid_executable {
     );
 
     # }}}
-    ok(unlink($Outfile), "Delete $Outfile");
+    ok(unlink($Outfile), "Delete [Outfile]");
     test_suuid_comment($Outdir, $Outfile);
     diag("Testing -n (--count) option...");
     likecmd("$CMD -n 5 -c \"Great test\" -t testeri -l $Outdir", # {{{
@@ -517,7 +517,7 @@ sub test_suuid_executable {
     # }}}
     diag("Check for randomness in the MAC address field...");
     cmp_ok(unique_macs($Outfile), '==', 1, 'MAC adresses does not change');
-    ok(unlink($Outfile), "Delete $Outfile");
+    ok(unlink($Outfile), "Delete [Outfile]");
     likecmd("$CMD -m -n 5 -l $Outdir", # {{{
         "/^($v1_templ\n){5}\$/s",
         '/^$/',
@@ -568,7 +568,7 @@ sub test_suuid_executable {
     );
 
     # }}}
-    ok(unlink($Outfile), "Delete $Outfile");
+    ok(unlink($Outfile), "Delete [Outfile]");
     test_suuid_environment($Outdir, $Outfile);
     diag("Test behaviour when unable to write to the log file...");
     likecmd("$CMD -l $Outdir", # {{{
@@ -580,18 +580,18 @@ sub test_suuid_executable {
 
     # }}}
     my @stat_array = stat($Outfile);
-    ok(chmod(0444, $Outfile), "Make $Outfile read-only");
+    ok(chmod(0444, $Outfile), "Make [Outfile] read-only");
     likecmd("$CMD -l $Outdir", # {{{
         '/^$/s',
         "/^$cmdprogname: $Outfile: Cannot open file for append: .*\$/s",
         13,
         "Unable to write to the log file",
     );
-    ok(chmod($stat_array[2], $Outfile), "Make $Outfile writable again");
+    ok(chmod($stat_array[2], $Outfile), "Make [Outfile] writable again");
 
     # }}}
-    ok(unlink($Outfile), "Delete $Outfile");
-    ok(rmdir($Outdir), "rmdir $Outdir");
+    ok(unlink($Outfile), "Delete [Outfile]");
+    ok(rmdir($Outdir), "rmdir [Outdir]");
     return;
     # }}}
 } # test_suuid_executable()
@@ -656,7 +656,7 @@ sub test_suuid_comment {
     );
 
     # }}}
-    ok(unlink($Outfile), "Delete $Outfile");
+    ok(unlink($Outfile), "Delete [Outfile]");
     return;
     # }}}
 } # test_suuid_comment()
@@ -684,7 +684,7 @@ sub test_suuid_environment {
     );
 
     # }}}
-    ok(unlink($Outfile), "Delete $Outfile");
+    ok(unlink($Outfile), "Delete [Outfile]");
     likecmd("SESS_UUID=ssh-agent/da700fd8-43eb-11e2-889a-0016d364066c, $CMD -l $Outdir", # {{{
         "/^$v1_templ\n\$/s",
         '/^$/',
@@ -725,7 +725,7 @@ sub test_suuid_environment {
     );
 
     # }}}
-    ok(unlink($Outfile), "Delete $Outfile");
+    ok(unlink($Outfile), "Delete [Outfile]");
     likecmd("SESS_UUID=ssh-agent/da700fd8-43eb-11e2-889a-0016d364066c $CMD -l $Outdir", # {{{
         "/^$v1_templ\n\$/s",
         '/^$/',
@@ -744,7 +744,7 @@ sub test_suuid_environment {
     );
 
     # }}}
-    ok(unlink($Outfile), "Delete $Outfile");
+    ok(unlink($Outfile), "Delete [Outfile]");
     likecmd("SESS_UUID=/da700fd8-43eb-11e2-889a-0016d364066c $CMD -l $Outdir", # {{{
         "/^$v1_templ\n\$/s",
         '/^$/',
@@ -763,7 +763,7 @@ sub test_suuid_environment {
     );
 
     # }}}
-    ok(unlink($Outfile), "Delete $Outfile");
+    ok(unlink($Outfile), "Delete [Outfile]");
     likecmd("SESS_UUID=ee5db39a-43f7-11e2-a975-0016d364066c,/da700fd8-43eb-11e2-889a-0016d364066c $CMD -l $Outdir", # {{{
         "/^$v1_templ\n\$/s",
         '/^$/',
@@ -782,7 +782,7 @@ sub test_suuid_environment {
     );
 
     # }}}
-    ok(unlink($Outfile), "Delete $Outfile");
+    ok(unlink($Outfile), "Delete [Outfile]");
     likecmd("SESS_UUID=ee5db39a-43f7-11e2-a975-0016d364066cda700fd8-43eb-11e2-889a-0016d364066c $CMD -l $Outdir", # {{{
         "/^$v1_templ\n\$/s",
         '/^$/',
@@ -801,7 +801,7 @@ sub test_suuid_environment {
     );
 
     # }}}
-    ok(unlink($Outfile), "Delete $Outfile");
+    ok(unlink($Outfile), "Delete [Outfile]");
     likecmd("SESS_UUID=da700fd8-43eb-11e2-889a-0016d364066cabcee5db39a-43f7-11e2-a975-0016d364066c $CMD -l $Outdir", # {{{
         "/^$v1_templ\n\$/s",
         '/^$/',
@@ -820,7 +820,7 @@ sub test_suuid_environment {
     );
 
     # }}}
-    ok(unlink($Outfile), "Delete $Outfile");
+    ok(unlink($Outfile), "Delete [Outfile]");
     likecmd("SESS_UUID=da700fd8-43eb-11e2-889a-0016d364066cabc/ee5db39a-43f7-11e2-a975-0016d364066c $CMD -l $Outdir", # {{{
         "/^$v1_templ\n\$/s",
         '/^$/',
@@ -839,7 +839,7 @@ sub test_suuid_environment {
     );
 
     # }}}
-    ok(unlink($Outfile), "Delete $Outfile");
+    ok(unlink($Outfile), "Delete [Outfile]");
     likecmd("SESS_UUID=" . "da700fd8-43eb-11e2-889a-0016d364066c" . "ee5db39a-43f7-11e2-a975-0016d364066c" . "abc" . " $CMD -l $Outdir", # {{{
         "/^$v1_templ\n\$/s",
         '/^$/',
@@ -860,7 +860,7 @@ sub test_suuid_environment {
     );
 
     # }}}
-    ok(unlink($Outfile), "Delete $Outfile");
+    ok(unlink($Outfile), "Delete [Outfile]");
     likecmd("SESS_UUID=" . "da700fd8-43eb-11e2-889a-0016d364066c" . ",,ee5db39a-43f7-11e2-a975-0016d364066c" . " $CMD -l $Outdir", # {{{
         "/^$v1_templ\n\$/s",
         '/^$/',
@@ -881,7 +881,7 @@ sub test_suuid_environment {
     );
 
     # }}}
-    ok(unlink($Outfile), "Delete $Outfile");
+    ok(unlink($Outfile), "Delete [Outfile]");
     likecmd("SESS_UUID='" . ",,,,," . "abc/da700fd8-43eb-11e2-889a-0016d364066c" . ",,,,,,,,,," . "def/ee5db39a-43f7-11e2-a975-0016d364066c" . ",,%..¤¤¤%¤,,,'" . " $CMD -l $Outdir", # {{{
         "/^$v1_templ\n\$/s",
         '/^$/',
@@ -902,7 +902,7 @@ sub test_suuid_environment {
     );
 
     # }}}
-    ok(unlink($Outfile), "Delete $Outfile");
+    ok(unlink($Outfile), "Delete [Outfile]");
     likecmd("SESS_UUID=" . "da700fd8-43eb-11e2-889a-0016d364066c" . "def/ee5db39a-43f7-11e2-a975-0016d364066c" . " $CMD -l $Outdir", # {{{
         "/^$v1_templ\n\$/s",
         '/^$/',
@@ -923,7 +923,7 @@ sub test_suuid_environment {
     );
 
     # }}}
-    ok(unlink($Outfile), "Delete $Outfile");
+    ok(unlink($Outfile), "Delete [Outfile]");
     likecmd("SESS_UUID=5f650dac-4404-11e2-8e0e-0016d364066c5f660e28-4404-11e2-808e-0016d364066c5f66ef14-4404-11e2-8b45-0016d364066c5f67e266-4404-11e2-a6f8-0016d364066c $CMD -l $Outdir", # {{{
         "/^$v1_templ\n\$/s",
         '/^$/',
@@ -945,7 +945,7 @@ sub test_suuid_environment {
     );
 
     # }}}
-    ok(unlink($Outfile), "Delete $Outfile");
+    ok(unlink($Outfile), "Delete [Outfile]");
     likecmd("SESS_UUID=5f650dac-4404-11e2-8e0e-0016d364066cabc5f660e28-4404-11e2-808e-0016d364066c5f66ef14-4404-11e2-8b45-0016d364066c,nmap/5f67e266-4404-11e2-a6f8-0016d364066c $CMD -l $Outdir", # {{{
         "/^$v1_templ\n\$/s",
         '/^$/',
@@ -967,7 +967,7 @@ sub test_suuid_environment {
     );
 
     # }}}
-    ok(unlink($Outfile), "Delete $Outfile");
+    ok(unlink($Outfile), "Delete [Outfile]");
     likecmd("SESS_UUID=ssh-agent/fea9315a-43d6-11e2-8294-0016d364066c,logging/febfd0f4-43d6-11e2-9117-0016d364066c,screen/0e144c10-43d7-11e2-9833-0016d364066c,ti/152d8f16-4409-11e2-be17-0016d364066c, $CMD -l $Outdir", # {{{
         "/^$v1_templ\n\$/s",
         '/^$/',
@@ -989,7 +989,7 @@ sub test_suuid_environment {
     );
 
     # }}}
-    ok(unlink($Outfile), "Delete $Outfile");
+    ok(unlink($Outfile), "Delete [Outfile]");
     return;
     # }}}
 } # test_suuid_environment()
@@ -1142,6 +1142,8 @@ sub testcmd {
             ? " - $Desc"
             : ''
     );
+    $Txt =~ s/$Outdir/[Outdir]/g;
+    $Txt =~ s/$tmpdbname/[tmpdbname]/g;
     my $TMP_STDERR = 'suuid-stderr.tmp';
 
     if (defined($Exp_stderr) && !length($deb_str)) {
@@ -1173,6 +1175,8 @@ sub likecmd {
             ? " - $Desc"
             : ''
     );
+    $Txt =~ s/$Outdir/[Outdir]/g;
+    $Txt =~ s/$tmpdbname/[tmpdbname]/g;
     my $TMP_STDERR = 'suuid-stderr.tmp';
 
     if (defined($Exp_stderr) && !length($deb_str)) {
