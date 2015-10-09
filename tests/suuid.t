@@ -304,7 +304,7 @@ sub test_suuid_executable {
     );
 
     # }}}
-    my $Outfile = glob("$Outdir/*");
+    my $Outfile = glob("$Outdir/*.xml");
     like($Outfile, "/^$Outdir\\/\\S+\.xml\$/", "Filename of logfile OK");
     like(file_data($Outfile), # {{{
         s_top(
@@ -360,7 +360,7 @@ sub test_suuid_executable {
     );
 
     # }}}
-    my $host_outfile = glob("$Outdir/*");
+    my $host_outfile = glob("$Outdir/*.xml");
     like(file_data($host_outfile), # {{{
         s_top(''),
         "suuid file is empty",
