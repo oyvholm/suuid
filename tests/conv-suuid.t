@@ -166,6 +166,11 @@ END
     likecmd("../$CMD --pg-table -o postgres test.xml | psql -X -d $tmpdb", # {{{
         '/^' .
             'CREATE TABLE\n' .
+            'SELECT 0\n' .
+            'SELECT 0\n' .
+            'CREATE FUNCTION\n' .
+            'CREATE TRIGGER\n' .
+            'CREATE INDEX\n' .
             'CREATE INDEX\n' .
             'CREATE INDEX\n' .
             '(COPY 4\n)?' .
@@ -186,12 +191,17 @@ END
     # }}}
     likecmd("../$CMD --pg-table -o postgres test2.xml | psql -X -d $tmpdb", # {{{
         '/^' .
+            'CREATE FUNCTION\n' .
             '(COPY 3\n)?' .
-            '$/',
+        '$/',
         '/^' .
             'ERROR:  relation "uuids" already exists\n' .
+            'ERROR:  relation "new" already exists\n' .
+            'ERROR:  relation "new_rej" already exists\n' .
+            'ERROR:  trigger "trg_insert_new" for relation "new" already exists\n' .
             'ERROR:  relation "idx_uuids_u" already exists\n' .
             'ERROR:  relation "idx_uuids_t" already exists\n' .
+            'ERROR:  relation "idx_new_u" already exists\n' .
             '$/',
         0,
         'Import more data into db, table already exists',
@@ -315,12 +325,44 @@ CREATE TABLE uuids (
     txt varchar,
     s xml
 );
+CREATE TABLE new AS
+    SELECT * FROM uuids LIMIT 0;
+CREATE TABLE new_rej AS
+    SELECT * FROM uuids LIMIT 0;
+
+CREATE OR REPLACE FUNCTION loop_new() RETURNS trigger AS \$\$
+DECLARE
+    curr_id uuid;
+BEGIN
+    LOOP
+        curr_id = (SELECT u FROM new LIMIT 1);
+        IF curr_id IS NOT NULL THEN
+            IF (SELECT u FROM uuids WHERE u = curr_id LIMIT 1) IS NOT NULL THEN
+                INSERT INTO new_rej SELECT * FROM new WHERE u = curr_id;
+            ELSE
+                INSERT INTO uuids SELECT * FROM new WHERE u = curr_id;
+            END IF;
+            DELETE FROM new WHERE u = curr_id;
+        ELSE
+            EXIT;
+        END IF;
+    END LOOP;
+    RETURN NULL;
+END;
+\$\$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_insert_new AFTER INSERT
+    ON new
+    EXECUTE PROCEDURE loop_new();
+
 CREATE INDEX idx_uuids_u ON uuids (u);
 CREATE INDEX idx_uuids_t ON uuids (t);
+CREATE INDEX idx_new_u ON new (u);
+
 END
     }
     if ($flags =~ /copy-to-uuids-from-stdin/) {
-        $retval .= "COPY uuids (t, u, tag, host, cwd, username, tty, sess, txt, s) FROM stdin;\n";
+        $retval .= "COPY new (t, u, tag, host, cwd, username, tty, sess, txt, s) FROM stdin;\n";
         $fl_copy_to_uuids = 1;
     }
     if ($file eq 'test') {

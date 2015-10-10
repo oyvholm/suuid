@@ -124,6 +124,11 @@ END
     testcmd("../conv-suuid --pg-table </dev/null | psql -X -d \"$tmpdbname\"",
         <<END,
 CREATE TABLE
+SELECT 0
+SELECT 0
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE INDEX
 CREATE INDEX
 CREATE INDEX
 END
