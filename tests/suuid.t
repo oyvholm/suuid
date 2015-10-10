@@ -122,7 +122,11 @@ END
         'Create database',
     );
     testcmd("../conv-suuid --pg-table </dev/null | psql -X -d \"$tmpdbname\"",
-        "CREATE TABLE\n",
+        <<END,
+CREATE TABLE
+CREATE INDEX
+CREATE INDEX
+END
         '',
         0,
         'Create database tables',

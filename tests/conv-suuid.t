@@ -161,28 +161,13 @@ END
     );
 
     # }}}
-    diag('Test --pg-index option...');
-    testcmd("../$CMD --pg-index -o postgres test.xml", # {{{
-        gen_output('test', 'postgres', 'copy-to-uuids-from-stdin pg-index'),
-        '',
-        0,
-        'Output create index',
-    );
-
-    # }}}
-    testcmd("../$CMD --pg-table --pg-index --output-format postgres test.xml", # {{{
-        gen_output('test', 'postgres', 'copy-to-uuids-from-stdin pg-index pg-table'),
-        '',
-        0,
-        'Output Postgres tables and index',
-    );
-
-    # }}}
     diag('Testing Postgres database...');
     testcmd("createdb $tmpdb", '', '', 0, "Create test database");
     likecmd("../$CMD --pg-table -o postgres test.xml | psql -X -d $tmpdb", # {{{
         '/^' .
             'CREATE TABLE\n' .
+            'CREATE INDEX\n' .
+            'CREATE INDEX\n' .
             '(COPY 4\n)?' .
             '$/',
         '/^$/',
@@ -203,7 +188,11 @@ END
         '/^' .
             '(COPY 3\n)?' .
             '$/',
-        '/^ERROR:  relation "uuids" already exists\n$/',
+        '/^' .
+            'ERROR:  relation "uuids" already exists\n' .
+            'ERROR:  relation "idx_uuids_u" already exists\n' .
+            'ERROR:  relation "idx_uuids_t" already exists\n' .
+            '$/',
         0,
         'Import more data into db, table already exists',
     );
@@ -326,6 +315,8 @@ CREATE TABLE uuids (
     txt varchar,
     s xml
 );
+CREATE INDEX idx_uuids_u ON uuids (u);
+CREATE INDEX idx_uuids_t ON uuids (t);
 END
     }
     if ($flags =~ /copy-to-uuids-from-stdin/) {
@@ -395,12 +386,6 @@ END
             );
             if ($fl_copy_to_uuids) {
                 $retval .= "\\.\n";
-            }
-            if ($flags =~ /pg-index/) {
-                $retval .= <<END;
-CREATE INDEX idx_uuids_u ON uuids (u);
-CREATE INDEX idx_uuids_t ON uuids (t);
-END
             }
         }
     }
