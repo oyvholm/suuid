@@ -89,7 +89,7 @@ sub main {
             } else {
                 $chk_swap = ".$curr_arg.swp";
             }
-            D("\$chk_swap = '$chk_swap'");
+            msg(2, "\$chk_swap = '$chk_swap'");
 
             if (-e $chk_swap) {
                 die("$progname: $curr_arg: Swap file $chk_swap exists, seems as the file is being edited already\n");
