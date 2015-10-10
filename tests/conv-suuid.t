@@ -221,7 +221,7 @@ END
     );
 
     # }}}
-    likecmd("dropdb $tmpdb", '/^$/', '/^$/', 0, "Delete test database");
+    testcmd("dropdb $tmpdb", '', '', 0, "Delete test database");
 
     todo_section:
     ;

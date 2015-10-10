@@ -569,9 +569,9 @@ sub test_suuid_executable {
     );
 
     # }}}
-    likecmd("$CMD -w n -l $Outdir", # {{{
-        '/^$/s',
-        '/^$/s',
+    testcmd("$CMD -w n -l $Outdir", # {{{
+        '',
+        '',
         0,
         "Output goes nowhere",
     );
