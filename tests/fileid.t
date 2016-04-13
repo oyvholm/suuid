@@ -121,11 +121,35 @@ END
     # }}}
     ok(mkdir("tmpuuids"), 'mkdir tmpuuids');
     diag("Testing -t/--type option...");
+    likecmd("SUUID_LOGDIR=tmpuuids $CMD -t erlang kadusei", # {{{
+        "/^% File ID: $Templ\\n\$/",
+        '/^$/',
+        0,
+        "--type erlang returns Erlang comment",
+    );
+
+    # }}}
+    likecmd("SUUID_LOGDIR=tmpuuids $CMD -t latex jawohl", # {{{
+        "/^% File ID: $Templ\\n\$/",
+        '/^$/',
+        0,
+        "--type latex returns LaTeX comment",
+    );
+
+    # }}}
     likecmd("SUUID_LOGDIR=tmpuuids $CMD -t perl ohyes", # {{{
         "/^# File ID: $Templ\\n\$/",
         '/^$/',
         0,
         "--type perl returns Perl comment",
+    );
+
+    # }}}
+    likecmd("SUUID_LOGDIR=tmpuuids $CMD -t tex indeed", # {{{
+        "/^% File ID: $Templ\\n\$/",
+        '/^$/',
+        0,
+        "--type tex returns TeX comment",
     );
 
     # }}}
