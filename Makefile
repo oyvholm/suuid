@@ -12,4 +12,5 @@ test:
 	cd tests && make
 
 clean:
+	rm -fv synced.sqlite.20*.bck
 	cd tests && make clean
