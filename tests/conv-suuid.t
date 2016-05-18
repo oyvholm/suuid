@@ -40,7 +40,7 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s/^.*\/(.*?)$/$1/;
-our $VERSION = '0.1.1';
+our $VERSION = '0.1.2';
 
 my %descriptions = ();
 
@@ -184,7 +184,7 @@ END
     );
 
     # }}}
-    testcmd("psql -d $tmpdb -c \"COPY (SELECT * FROM uuids) TO STDOUT;\"", # {{{
+    testcmd("psql -X -d $tmpdb -c \"COPY (SELECT * FROM uuids) TO STDOUT;\"", # {{{
         gen_output('test', 'postgres', ''),
         '',
         0,
@@ -211,7 +211,7 @@ END
     );
 
     # }}}
-    testcmd("psql -d $tmpdb -c \"COPY (SELECT * FROM uuids) TO STDOUT;\"", # {{{
+    testcmd("psql -X -d $tmpdb -c \"COPY (SELECT * FROM uuids) TO STDOUT;\"", # {{{
         gen_output('test', 'postgres', '') .
         <<END,
 2015-07-08 13:18:42.52731\tdab29b0c-2573-11e5-ae4f-000df06acc56\t{'c_stpl'}\tbellmann\t/home/sunny\tsunny\t/dev/pts/15\t{'xterm/01829b90-2571-11e5-82ee-000df06acc56','logging/105891b0-2571-11e5-bfe5-000df06acc56','screen/12e3d0ac-2571-11e5-810c-000df06acc56'}\tstpl /tmp/stpl.tmp\t<suuid t="2015-07-08T13:18:42.5273100Z" u="dab29b0c-2573-11e5-ae4f-000df06acc56"> <tag>c_stpl</tag> <txt>stpl /tmp/stpl.tmp</txt> <host>bellmann</host> <cwd>/home/sunny</cwd> <user>sunny</user> <tty>/dev/pts/15</tty> <sess desc="xterm">01829b90-2571-11e5-82ee-000df06acc56</sess> <sess desc="logging">105891b0-2571-11e5-bfe5-000df06acc56</sess> <sess desc="screen">12e3d0ac-2571-11e5-810c-000df06acc56</sess> </suuid>
