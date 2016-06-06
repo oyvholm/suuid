@@ -8,9 +8,11 @@
 # License: GNU General Public License version 2 or later.
 #=======================================================================
 
+.PHONY: test
 test:
 	cd tests && make
 
+.PHONY: test
 clean:
 	rm -fv synced.sqlite.20*.bck
 	cd tests && make clean
