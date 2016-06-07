@@ -28,6 +28,8 @@
 #include "suuid.h"
 #include "version.h"
 
+#define LOGDIR_MAXLEN 4096
+
 /*
  * Function prototypes
  */
@@ -52,6 +54,7 @@ int main(int argc, char *argv[])
 {
 	int c,
 		retval = EXIT_OK;
+	char opt_logdir[LOGDIR_MAXLEN + 1];
 
 	progname = argv[0];
 
@@ -76,7 +79,7 @@ int main(int argc, char *argv[])
 		 *
 		 */
 
-		c = getopt_long (argc, argv, "hlV",
+		c = getopt_long (argc, argv, "hl:V",
 			long_options, &option_index);
 
 		if (c == -1)
@@ -105,15 +108,15 @@ int main(int argc, char *argv[])
 			fprintf(stddebug, "\n");
 #endif /* if 0 */
 			break;
-
 		case 'h' :
 			usage(EXIT_OK);
 			break;
-
+		case 'l' :
+			strncpy(opt_logdir, optarg, LOGDIR_MAXLEN);
+			break;
 		case 'V' :
 			print_version();
 			return(EXIT_OK);
-
 		default :
 			debpr1("getopt_long() returned "
 			       "character code %d\n", c);
@@ -122,6 +125,7 @@ int main(int argc, char *argv[])
 	}
 
 	debpr1("debugging is set to level %d\n", debug);
+	debpr1("opt_logdir = \"%s\"\n", opt_logdir);
 
 	if (debug && optind < argc) {
 		int t;
