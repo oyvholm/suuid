@@ -225,6 +225,13 @@ void usage(int retval)
 			"    Show this help.\n"
 			"  --license\n"
 			"    Print the software license\n"
+			"  -l x, --logdir x\n"
+			"    Store log files in directory x.\n"
+			"    If the SUUID_LOGDIR environment variable is "
+			"defined, that value is\n"
+			"    used. Otherwise the value \"$HOME/uuids\" is "
+			"used.\n"
+			"    Current default: /home/sunny/uuids\n"
 			"  -v, --verbose\n"
 			"    Increase level of verbosity. Can be repeated.\n"
 			"  --version\n"
@@ -257,6 +264,9 @@ char *generate_uuid(void)
 
 void create_logfile(char *name)
 {
+	char *xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+	char *xml_doctype = "<!DOCTYPE suuids SYSTEM \"dtd/suuids.dtd\">";
+
 	if (access(name, F_OK) != -1)
 		return;
 	else {
@@ -267,6 +277,9 @@ void create_logfile(char *name)
 				        "aborting\n", progname, name);
 			exit(1);
 		}
+		fprintf(fp, "%s\n%s\n<suuids>\n</suuids>\n",
+			xml_header, xml_doctype);
+		fclose(fp);
 	}
 } /* create_logfile() */
 
