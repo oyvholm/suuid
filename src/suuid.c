@@ -301,7 +301,7 @@ void create_logfile(char *name)
 char *uuid_date(char *uuid)
 {
 	/* fixme */
-	static char retval[30] = "2000-01-01T00:00:00.0000000Z";
+	static char retval[32] = "2000-01-01T00:00:00.0000000Z";
 	return(retval);
 } /* uuid_date() */
 
