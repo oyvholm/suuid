@@ -293,10 +293,8 @@ void create_logfile(char *name)
 	else {
 		FILE *fp;
 		fp = fopen(name, "a");
-		if (fp == NULL) {
+		if (fp == NULL)
 			err(1, "%s: Could not create log file", name);
-			exit(1);
-		}
 		fprintf(fp, "%s\n%s\n<suuids>\n</suuids>\n",
 			xml_header, xml_doctype);
 		fclose(fp);
