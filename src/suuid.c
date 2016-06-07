@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <getopt.h>
 
 #include "suuid.h"
@@ -34,6 +35,7 @@
  * Function prototypes
  */
 
+void create_logfile(char *);
 char *generate_uuid(void);
 void print_license(void);
 void print_version(void);
@@ -137,6 +139,7 @@ int main(int argc, char *argv[])
 		fprintf(stddebug, "\n");
 	}
 
+	create_logfile(strcat(opt_logdir, "/bellmann.xml"));
 	printf("%s\n", generate_uuid());
 
 	/*
@@ -235,7 +238,8 @@ void usage(int retval)
 	exit(retval);
 } /* usage() */
 
-char *generate_uuid(void) {
+char *generate_uuid(void)
+{
 	static char uuid[38];
 	FILE *fp;
 	/* FIXME: Generate it properly */
@@ -250,5 +254,20 @@ char *generate_uuid(void) {
 	pclose(fp);
 	return(uuid);
 } /* generate_uuid() */
+
+void create_logfile(char *name)
+{
+	if (access(name, F_OK) != -1)
+		return;
+	else {
+		FILE *fp;
+		fp = fopen(name, "a");
+		if (fp == NULL) {
+			fprintf(stderr, "%s: %s: Could not create log file, "
+				        "aborting\n", progname, name);
+			exit(1);
+		}
+	}
+} /* create_logfile() */
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w fenc=UTF-8 : */
