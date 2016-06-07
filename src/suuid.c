@@ -37,9 +37,11 @@
 
 void create_logfile(char *);
 char *generate_uuid(void);
+char *get_hostname(void);
 void print_license(void);
 void print_version(void);
 void usage(int);
+char *uuid_date(char *);
 
 /*
  * Global variables
@@ -262,6 +264,12 @@ char *generate_uuid(void)
 	return(uuid);
 } /* generate_uuid() */
 
+char *get_hostname(void)
+{
+	static char retval[256] = "bellmann"; /* fixme */
+	return(retval);
+} /* get_hostname() */
+
 void create_logfile(char *name)
 {
 	char *xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
@@ -282,5 +290,11 @@ void create_logfile(char *name)
 		fclose(fp);
 	}
 } /* create_logfile() */
+
+char *uuid_date(char *uuid)
+{
+	static char retval[30] = "2000-01-01T00:00:00.0000000Z";
+	return(retval);
+} /* uuid_date() */
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w fenc=UTF-8 : */
