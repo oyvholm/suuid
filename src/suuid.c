@@ -20,6 +20,7 @@
  *
  */
 
+#include <err.h>
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -293,8 +294,7 @@ void create_logfile(char *name)
 		FILE *fp;
 		fp = fopen(name, "a");
 		if (fp == NULL) {
-			fprintf(stderr, "%s: %s: Could not create log file, "
-				        "aborting\n", progname, name);
+			err(1, "%s: Could not create log file", name);
 			exit(1);
 		}
 		fprintf(fp, "%s\n%s\n<suuids>\n</suuids>\n",
