@@ -19,6 +19,7 @@ suuid.o: suuid.c suuid.h version.h Makefile
 .PHONY: clean
 clean:
 	rm -fv $(EXEC) $(OBJS) *~ core core.$(EXEC)
+	cd t && $(MAKE) clean
 
 .PHONY: edit
 edit:
