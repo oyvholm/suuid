@@ -137,6 +137,7 @@ int main(int argc, char *argv[])
 
 	debpr1("debugging is set to level %d\n", debug);
 	debpr1("opt_logdir = \"%s\"\n", opt_logdir);
+	debpr1("hostname = %s\n", get_hostname());
 
 	if (debug && optind < argc) {
 		int t;
@@ -273,7 +274,11 @@ char *generate_uuid(void)
 
 char *get_hostname(void)
 {
-	static char retval[256] = "bellmann"; /* fixme */
+	static char retval[256];
+	if (gethostname(retval, 255) == -1) {
+		perror("Could not get hostname");
+		return(NULL);
+	}
 	return(retval);
 } /* get_hostname() */
 
