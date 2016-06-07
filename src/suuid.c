@@ -61,6 +61,7 @@ int main(int argc, char *argv[])
 			{  "debug", 0, 0,   0},
 			{   "help", 0, 0, 'h'},
 			{"license", 0, 0,   0},
+			{ "logdir", 1, 0, 'l'},
 			{"version", 0, 0, 'V'},
 			{        0, 0, 0,   0}
 		};
@@ -75,7 +76,7 @@ int main(int argc, char *argv[])
 		 *
 		 */
 
-		c = getopt_long (argc, argv, "hV",
+		c = getopt_long (argc, argv, "hlV",
 			long_options, &option_index);
 
 		if (c == -1)
@@ -95,7 +96,7 @@ int main(int argc, char *argv[])
 				return(EXIT_OK);
 			}
 
-#if 0
+#if 1
 			fprintf(stddebug, "option %s",
 				long_options[option_index].name);
 			if (optarg)
