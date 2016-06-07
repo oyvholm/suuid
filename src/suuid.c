@@ -35,6 +35,12 @@
  * Function prototypes
  */
 
+struct Entry {
+	char *uuid;
+	char *date;
+	char *txt;
+};
+
 void create_logfile(char *);
 char *generate_uuid(void);
 char *get_hostname(void);
@@ -42,6 +48,7 @@ void print_license(void);
 void print_version(void);
 void usage(int);
 char *uuid_date(char *);
+char *xml_entry(struct Entry);
 
 /*
  * Global variables
@@ -49,12 +56,6 @@ char *uuid_date(char *);
 
 char *progname;
 int  debug = 0;
-
-struct Entry {
-	char *uuid;
-	char *date;
-	char *txt;
-};
 
 /*
  * main()
