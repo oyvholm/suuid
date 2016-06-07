@@ -50,6 +50,12 @@ char *uuid_date(char *);
 char *progname;
 int  debug = 0;
 
+struct Entry {
+	char *uuid;
+	char *date;
+	char *txt;
+};
+
 /*
  * main()
  */
@@ -293,8 +299,16 @@ void create_logfile(char *name)
 
 char *uuid_date(char *uuid)
 {
+	/* fixme */
 	static char retval[30] = "2000-01-01T00:00:00.0000000Z";
 	return(retval);
 } /* uuid_date() */
+
+char *xml_entry(struct Entry entry)
+{
+	/* fixme */
+	static char retval[] = "<suuid t=\"2016-06-07T04:18:40.9460630Z\" u=\"ea3beb96-2c66-11e6-aa54-02010e0a6634\"> <tag>ti</tag> <txt>Jepp</txt> <host>bellmann</host> <cwd>/home/sunny/uuids</cwd> <user>sunny</user> <tty>/dev/pts/7</tty> <sess desc=\"xterm\">8a390a22-2c2e-11e6-8ffb-02010e0a6634</sess> <sess desc=\"logging\">9ad18242-2c2e-11e6-b1f8-02010e0a6634</sess> <sess desc=\"screen\">9c4257a0-2c2e-11e6-b724-02010e0a6634</sess> </suuid>";
+	return(retval);
+} /* xml_entry() */
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w fenc=UTF-8 : */
