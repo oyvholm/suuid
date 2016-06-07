@@ -6,7 +6,7 @@
 OBJS = suuid.o
 CC = gcc
 LD = gcc
-CCFLAGS = -Wall -O2 -c -g -ansi
+CCFLAGS = -Wall -O2 -c -g
 LDFLAGS = -Wall
 EXEC = suuid
 

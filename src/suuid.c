@@ -32,6 +32,7 @@
  * Function prototypes
  */
 
+char *generate_uuid(void);
 void print_license(void);
 void print_version(void);
 void usage(int);
@@ -131,6 +132,8 @@ int main(int argc, char *argv[])
 		fprintf(stddebug, "\n");
 	}
 
+	printf("%s\n", generate_uuid());
+
 	/*
 	 * Code goes here
 	 */
@@ -226,5 +229,21 @@ void usage(int retval)
 
 	exit(retval);
 } /* usage() */
+
+char *generate_uuid(void) {
+	static char uuid[38];
+	FILE *fp;
+	/* FIXME: Generate it properly */
+	fp = popen("/usr/bin/uuid", "r");
+	if (fp == NULL) {
+		fprintf(stderr, "%s: Could not exec /usr/bin/uuid", progname);
+		return(NULL);
+	}
+	if (fgets(uuid, 37, fp) == NULL)
+		fprintf(stderr, "%s: fgets() error", progname);
+	uuid[36] = '\0';
+	pclose(fp);
+	return(uuid);
+} /* generate_uuid() */
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w fenc=UTF-8 : */
