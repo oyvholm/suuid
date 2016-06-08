@@ -279,6 +279,10 @@ int add_to_logfile(char *fname, struct Entry *entry)
 			err(1, "%s: Cannot seek to position %lu",
 				fname, filepos);
 	}
+	if (fputs(xml_entry(*entry), fp) <= 0) {
+		warn("fputs()");
+		retval = -1;
+	}
 	fclose(fp);
 	return(retval);
 } /* add_to_logfile() */
