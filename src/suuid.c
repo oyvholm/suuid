@@ -257,9 +257,15 @@ void usage(int retval)
 	exit(retval);
 } /* usage() */
 
-int add_to_logfile(char *file, struct Entry *entry)
+int add_to_logfile(char *fname, struct Entry *entry)
 {
 	int retval = 0;
+	FILE *fp;
+	/* todo: Add file locking */
+	fp = fopen(fname, "r+");
+	if (fp == NULL)
+		err(1, "%s: Could not create log file", fname);
+	fclose(fp);
 	return(retval);
 } /* add_to_logfile() */
 
