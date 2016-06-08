@@ -65,8 +65,8 @@ int  debug = 0;
 
 int main(int argc, char *argv[])
 {
-	int c,
-		retval = EXIT_OK;
+	int c;
+	int retval = EXIT_OK;
 	char opt_logdir[LOGDIR_MAXLEN + 1];
 
 	progname = argv[0];
