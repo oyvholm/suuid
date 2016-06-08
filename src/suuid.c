@@ -261,10 +261,24 @@ int add_to_logfile(char *fname, struct Entry *entry)
 {
 	int retval = 0;
 	FILE *fp;
+	char check_line[12];
+	long filepos;
 	/* todo: Add file locking */
 	fp = fopen(fname, "r+");
 	if (fp == NULL)
 		err(1, "%s: Could not open file for read+write", fname);
+	fseek(fp, -10, SEEK_END);
+	filepos = ftell(fp);
+	if (filepos == -1)
+		err(1, "%s: Cannot read file position", fname);
+	if (strcmp(fgets(check_line, 10, fp), "</suuid>\n")) {
+		fprintf(stderr, "%s: %s: Unknown end line, adding to "
+				"end of file\n", progname, fname);
+	} else {
+		if (fseek(fp, 0, SEEK_SET) == -1)
+			err(1, "%s: Cannot seek to position %lu",
+				fname, filepos);
+	}
 	fclose(fp);
 	return(retval);
 } /* add_to_logfile() */
