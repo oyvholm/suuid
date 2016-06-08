@@ -264,7 +264,7 @@ int add_to_logfile(char *fname, struct Entry *entry)
 	/* todo: Add file locking */
 	fp = fopen(fname, "r+");
 	if (fp == NULL)
-		err(1, "%s: Could not create log file", fname);
+		err(1, "%s: Could not open file for read+write", fname);
 	fclose(fp);
 	return(retval);
 } /* add_to_logfile() */
