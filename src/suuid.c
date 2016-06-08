@@ -42,6 +42,7 @@ struct Entry {
 	char *txt;
 };
 
+int add_to_logfile(char *, struct Entry *);
 void create_logfile(char *);
 char *generate_uuid(void);
 char *get_hostname(void);
@@ -256,6 +257,12 @@ void usage(int retval)
 	exit(retval);
 } /* usage() */
 
+int add_to_logfile(char *file, struct Entry *entry)
+{
+	int retval = 0;
+	return(retval);
+} /* add_to_logfile() */
+
 char *generate_uuid(void)
 {
 	static char uuid[38];
@@ -289,7 +296,7 @@ void create_logfile(char *name)
 	char *xml_doctype = "<!DOCTYPE suuids SYSTEM \"dtd/suuids.dtd\">";
 
 	if (access(name, F_OK) != -1)
-		return;
+		return; /* File already exists */
 	else {
 		FILE *fp;
 		fp = fopen(name, "a");
