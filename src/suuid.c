@@ -72,7 +72,9 @@ int main(int argc, char *argv[])
 	int c;
 	int retval = EXIT_OK;
 	char opt_logdir[LOGDIR_MAXLEN + 1];
+	char *logfile;
 	struct Entry entry;
+	size_t fname_length; /* Total length of logfile name */
 
 	progname = argv[0];
 
@@ -165,8 +167,20 @@ int main(int argc, char *argv[])
 		fprintf(stddebug, "\n");
 	}
 
-	create_logfile(strcat(opt_logdir, "/bellmann.xml"));
+	fname_length = strlen(opt_logdir) +
+		       strlen("/") +
+		       strlen(entry.host) +
+		       strlen(".xml") +
+		       1;
+	logfile = malloc(fname_length + 1);
+	if (logfile == NULL)
+		err(1, "Could not allocate %lu bytes for logfile filename",
+			fname_length + 1);
+	snprintf(logfile, fname_length, "%s/%s.xml", opt_logdir, entry.host);
+	debpr1("logfile = \"%s\"\n", logfile);
+	create_logfile(logfile);
 	printf("%s\n", generate_uuid());
+	free(logfile);
 	free(entry.cwd);
 
 	/*
