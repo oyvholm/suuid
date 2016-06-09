@@ -150,6 +150,7 @@ int main(int argc, char *argv[])
 	debpr1("opt_logdir = \"%s\"\n", opt_logdir);
 	entry.host = get_hostname();
 	debpr1("entry.host = \"%s\"\n", entry.host);
+	/* fixme: realloc if it's too big */
 	entry.cwd = malloc(PATH_MAX + 1);
 	if (entry.cwd == NULL)
 		err(1, "Could not allocate %u bytes", PATH_MAX);
@@ -176,16 +177,13 @@ int main(int argc, char *argv[])
 	if (logfile == NULL)
 		err(1, "Could not allocate %lu bytes for logfile filename",
 			fname_length + 1);
+	/* fixme: Remove slash hardcoding */
 	snprintf(logfile, fname_length, "%s/%s.xml", opt_logdir, entry.host);
 	debpr1("logfile = \"%s\"\n", logfile);
 	create_logfile(logfile);
 	printf("%s\n", generate_uuid());
 	free(logfile);
 	free(entry.cwd);
-
-	/*
-	 * Code goes here
-	 */
 
 	/*
 	if (optind < argc) {
@@ -196,8 +194,6 @@ int main(int argc, char *argv[])
 	} else
 		retval |= process_file("-");
 	*/
-
-	/* ...and stops here */
 
 	debpr1("Returning from main() with value %d\n", retval);
 
