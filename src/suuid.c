@@ -22,6 +22,7 @@
 
 #include <err.h>
 #include <getopt.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -37,9 +38,12 @@
  */
 
 struct Entry {
-	char *uuid;
 	char *date;
+	char *uuid;
 	char *txt;
+	char *host;
+	char *cwd;
+	char *user;
 };
 
 int add_to_logfile(char *, struct Entry *);
@@ -68,6 +72,7 @@ int main(int argc, char *argv[])
 	int c;
 	int retval = EXIT_OK;
 	char opt_logdir[LOGDIR_MAXLEN + 1];
+	struct Entry entry;
 
 	progname = argv[0];
 
@@ -141,7 +146,14 @@ int main(int argc, char *argv[])
 
 	debpr1("debugging is set to level %d\n", debug);
 	debpr1("opt_logdir = \"%s\"\n", opt_logdir);
-	debpr1("hostname = %s\n", get_hostname());
+	entry.host = get_hostname();
+	debpr1("entry.host = \"%s\"\n", entry.host);
+	entry.cwd = malloc(PATH_MAX + 1);
+	if (entry.cwd == NULL)
+		err(1, "Could not allocate %u bytes", PATH_MAX);
+	if (getcwd(entry.cwd, PATH_MAX) == NULL)
+		err(0, "Cannot get current directory");
+	debpr1("entry.cwd = \"%s\"\n", entry.cwd);
 
 	if (debug && optind < argc) {
 		int t;
@@ -155,6 +167,7 @@ int main(int argc, char *argv[])
 
 	create_logfile(strcat(opt_logdir, "/bellmann.xml"));
 	printf("%s\n", generate_uuid());
+	free(entry.cwd);
 
 	/*
 	 * Code goes here
