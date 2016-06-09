@@ -321,11 +321,16 @@ char *generate_uuid(void)
 
 char *get_hostname(void)
 {
-	static char retval[256];
-	if (gethostname(retval, 255) == -1) {
+	static char buf[256];
+	char *retval = buf;
+	if (gethostname(buf, 255) == -1) {
 		perror("Could not get hostname");
 		return(NULL);
 	}
+#if FAKE_HOST
+	retval = "fake"; /* Use "fake" as hostname to avoid conflicts
+			    with files created by the Perl version */
+#endif
 	return(retval);
 } /* get_hostname() */
 
