@@ -152,12 +152,9 @@ int main(int argc, char *argv[])
 	debpr1("opt_logdir = \"%s\"\n", opt_logdir);
 	entry.host = get_hostname();
 	debpr1("entry.host = \"%s\"\n", entry.host);
-	/* fixme: realloc if it's too big */
-	entry.cwd = malloc(PATH_MAX + 1);
+	entry.cwd = getpath();
 	if (entry.cwd == NULL)
-		err(1, "Could not allocate %u bytes", PATH_MAX);
-	if (getcwd(entry.cwd, PATH_MAX) == NULL)
-		err(0, "Cannot get current directory");
+		err(0, "Could not get current directory");
 	debpr1("entry.cwd = \"%s\"\n", entry.cwd);
 
 	if (debug && optind < argc) {
@@ -352,16 +349,12 @@ char *getpath(void)
 	char *p;
 	size_t blksize = 1024;
 	size_t size = blksize;
-	fprintf(stderr, "errno = '%d' at start\n", errno);
 	retval = malloc(size);
 	if (retval == NULL) {
 		perror("getpath(): malloc() fail");
 		return NULL;
 	}
-	fprintf(stderr, "errno = '%d' at line %u\n", errno, __LINE__);
 	for (p = getcwd(retval, size); p == NULL; ) {
-		perror("getcwd() fail");
-		fprintf(stderr, "size = '%lu'\n", size);
 		size += blksize;
 		retval = realloc(retval, size);
 		if (retval == NULL) {
@@ -378,8 +371,6 @@ char *getpath(void)
 			free(retval);
 			return(NULL);
 		}
-		perror("after getcwd");
-		fprintf(stderr, "errno = '%d'\n", errno);
 	}
 	return retval;
 }
