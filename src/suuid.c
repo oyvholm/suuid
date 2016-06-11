@@ -21,6 +21,7 @@
  */
 
 #include <err.h>
+#include <errno.h>
 #include <getopt.h>
 #include <limits.h>
 #include <stdio.h>
@@ -50,6 +51,7 @@ int add_to_logfile(char *, struct Entry *);
 void create_logfile(char *);
 char *generate_uuid(void);
 char *get_hostname(void);
+char *getpath(void);
 void print_license(void);
 void print_version(void);
 void usage(int);
@@ -343,6 +345,44 @@ char *get_hostname(void)
 #endif
 	return(retval);
 } /* get_hostname() */
+
+char *getpath(void)
+{
+	char *retval;
+	char *p;
+	size_t blksize = 1024;
+	size_t size = blksize;
+	fprintf(stderr, "errno = '%d' at start\n", errno);
+	retval = malloc(size);
+	if (retval == NULL) {
+		perror("getpath(): malloc() fail");
+		return NULL;
+	}
+	fprintf(stderr, "errno = '%d' at line %u\n", errno, __LINE__);
+	for (p = getcwd(retval, size); p == NULL; ) {
+		perror("getcwd() fail");
+		fprintf(stderr, "size = '%lu'\n", size);
+		size += blksize;
+		retval = realloc(retval, size);
+		if (retval == NULL) {
+			perror("getpath(): realloc() fail");
+			return NULL;
+		}
+		p = getcwd(retval, size);
+		if (p == NULL && errno != ERANGE) {
+			/* Avoid infinite loop in case there's another 
+			 * getcwd() problem that's not fixable by just 
+			 * allocating more memory.
+			 */
+			perror("getcwd()");
+			free(retval);
+			return(NULL);
+		}
+		perror("after getcwd");
+		fprintf(stderr, "errno = '%d'\n", errno);
+	}
+	return retval;
+}
 
 void create_logfile(char *name)
 {
