@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
 	debpr1("Returning from main() with value %d\n", retval);
 
 	return(retval);
-} /* main() */
+}
 
 /*
  * print_license() - Display the program license
@@ -229,7 +229,7 @@ void print_license(void)
 		"the Free Software Foundation, Inc., \n"
 		"59 Temple Place, Suite 330, Boston, MA  02111-1307  USA\n"
 	);
-} /* print_license() */
+}
 
 /*
  * print_version() - Print version information on stdout
@@ -238,7 +238,7 @@ void print_license(void)
 void  print_version(void)
 {
 	fprintf(stdout, "%s %s\n", progname, VERSION);
-} /* print_version() */
+}
 
 /*
  * usage() - Prints a help screen
@@ -279,7 +279,7 @@ void usage(int retval)
 	}
 
 	exit(retval);
-} /* usage() */
+}
 
 int add_to_logfile(char *fname, struct Entry *entry)
 {
@@ -309,7 +309,7 @@ int add_to_logfile(char *fname, struct Entry *entry)
 	}
 	fclose(fp);
 	return(retval);
-} /* add_to_logfile() */
+}
 
 char *generate_uuid(void)
 {
@@ -326,7 +326,7 @@ char *generate_uuid(void)
 	uuid[36] = '\0';
 	pclose(fp);
 	return(uuid);
-} /* generate_uuid() */
+}
 
 char *get_hostname(void)
 {
@@ -341,7 +341,7 @@ char *get_hostname(void)
 			    with files created by the Perl version */
 #endif
 	return(retval);
-} /* get_hostname() */
+}
 
 char *getpath(void)
 {
@@ -391,14 +391,14 @@ void create_logfile(char *name)
 			xml_header, xml_doctype);
 		fclose(fp);
 	}
-} /* create_logfile() */
+}
 
 char *uuid_date(char *uuid)
 {
 	/* fixme */
 	static char retval[32] = "2000-01-01T00:00:00.0000000Z";
 	return(retval);
-} /* uuid_date() */
+}
 
 char *xml_entry(struct Entry entry)
 {
@@ -418,6 +418,6 @@ char *xml_entry(struct Entry entry)
 		"</sess> "
 		"</suuid>";
 	return(retval);
-} /* xml_entry() */
+}
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w fenc=UTF-8 : */
