@@ -421,22 +421,30 @@ char *xml_entry(struct Entry *entry)
 {
 	static char buf[65536]; /* fixme: Temporary */
 	struct Entry e;
+	char *retval;
 
 	msg(3, "Entering xml_entry()\n");
 	init_xml_entry(&e);
 	msg(3, "xml_entry(): After init_xml_entry()\n");
 
+	msg(3, "xml_entry(): entry.date = '%s'\n", entry->date);
+	msg(3, "xml_entry(): entry.uuid = '%s'\n", entry->uuid);
+	msg(3, "xml_entry(): entry.tag = '%s'\n",  entry->tag);
+	msg(3, "xml_entry(): entry.txt = '%s'\n",  entry->txt);
+	msg(3, "xml_entry(): entry.host = '%s'\n", entry->host);
+	msg(3, "xml_entry(): entry.cwd = '%s'\n",  entry->cwd);
+	msg(3, "xml_entry(): entry.user = '%s'\n", entry->user);
+	msg(3, "xml_entry(): entry.sess = '%s'\n", entry->sess);
+
 	snprintf(buf, 65535, /* fixme: length */
-		"<suuid>"
-			"%s" /* date */
-			"%s" /* uuid */
+		"<suuid%s%s>" /* date, uuid */
 			"%s" /* tag */
 			"%s" /* txt */
 			"%s" /* host */
 			"%s" /* cwd */
 			"%s" /* user */
 			"%s" /* sess */
-		"</suuid",
+		"</suuid>",
 
 		(e.date == NULL) ? "" : e.date,
 		(e.uuid == NULL) ? "" : e.uuid,
@@ -448,8 +456,8 @@ char *xml_entry(struct Entry *entry)
 		(e.sess == NULL) ? "" : e.sess);
 	msg(3, "xml_entry(): After snprintf()\n");
 
-	/* fixme: Return value */
-	static char retval[] = "<suuid t=\"2016-06-07T04:18:40.9460630Z\" "
+#if 0
+	static char fake[] = "<suuid t=\"2016-06-07T04:18:40.9460630Z\" "
 		"u=\"ea3beb96-2c66-11e6-aa54-02010e0a6634\"> "
 		"<tag>ti</tag> "
 		"<txt>Jepp</txt> "
@@ -463,6 +471,9 @@ char *xml_entry(struct Entry *entry)
 		"<sess desc=\"screen\">9c4257a0-2c2e-11e6-b724-02010e0a6634"
 		"</sess> "
 		"</suuid>";
+#endif
+	retval = buf;
+	msg(3, "xml_entry() returns '%s'\n", retval);
 	return retval;
 }
 
