@@ -18,8 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _suuid_H
-#define _suuid_H
+#ifndef _SUUID_H
+#define _SUUID_H
 
 /*
  * Defines
@@ -115,6 +115,6 @@ extern char *xml_entry(struct Entry *);
 extern char *progname;
 extern struct Options opt;
 
-#endif /* ifndef _suuid_H */
+#endif /* ifndef _SUUID_H */
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w fenc=UTF-8 : */
