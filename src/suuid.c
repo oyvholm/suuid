@@ -66,140 +66,6 @@ char *progname;
 int  debug = 0;
 
 /*
- * main()
- */
-
-int main(int argc, char *argv[])
-{
-	int c;
-	int retval = EXIT_OK;
-	char opt_logdir[LOGDIR_MAXLEN + 1];
-	char *logfile;
-	struct Entry entry;
-	size_t fname_length; /* Total length of logfile name */
-
-	progname = argv[0];
-
-	strncpy(opt_logdir, getenv("SUUID_LOGDIR"), LOGDIR_MAXLEN);
-
-	while (1) {
-		int option_index = 0;
-		static struct option long_options[] = {
-			{  "debug", 0, 0,   0},
-			{   "help", 0, 0, 'h'},
-			{"license", 0, 0,   0},
-			{ "logdir", 1, 0, 'l'},
-			{"version", 0, 0, 'V'},
-			{        0, 0, 0,   0}
-		};
-
-		/*
-		 * long_options:
-		 *
-		 * 1. const char  *name;
-		 * 2. int         has_arg;
-		 * 3. int         *flag;
-		 * 4. int         val;
-		 *
-		 */
-
-		c = getopt_long (argc, argv, "hl:V",
-			long_options, &option_index);
-
-		if (c == -1)
-			break;
-
-		switch (c) {
-		case 0 :
-			if (!strcmp(long_options[option_index].name,
-			    "debug"))
-				debug = 1;
-
-			else if (!strcmp(
-				 long_options[option_index].name,
-				 "license")
-			) {
-				print_license();
-				return(EXIT_OK);
-			}
-
-#if 1
-			fprintf(stddebug, "option %s",
-				long_options[option_index].name);
-			if (optarg)
-				fprintf(stddebug, " with arg %s",
-					optarg);
-			fprintf(stddebug, "\n");
-#endif /* if 0 */
-			break;
-		case 'h' :
-			usage(EXIT_OK);
-			break;
-		case 'l' :
-			strncpy(opt_logdir, optarg, LOGDIR_MAXLEN);
-			break;
-		case 'V' :
-			print_version();
-			return(EXIT_OK);
-		default :
-			debpr1("getopt_long() returned "
-			       "character code %d\n", c);
-			break;
-		}
-	}
-
-	debpr1("debugging is set to level %d\n", debug);
-	debpr1("opt_logdir = \"%s\"\n", opt_logdir);
-	entry.host = get_hostname();
-	debpr1("entry.host = \"%s\"\n", entry.host);
-	entry.cwd = getpath();
-	if (entry.cwd == NULL)
-		err(0, "Could not get current directory");
-	debpr1("entry.cwd = \"%s\"\n", entry.cwd);
-
-	if (debug && optind < argc) {
-		int t;
-
-		debpr0("non-option args: ");
-		for (t = optind; t < argc; t++)
-			fprintf(stddebug, "%s ", argv[t]);
-
-		fprintf(stddebug, "\n");
-	}
-
-	fname_length = strlen(opt_logdir) +
-		       strlen("/") +
-		       strlen(entry.host) +
-		       strlen(".xml") +
-		       1;
-	logfile = malloc(fname_length + 1);
-	if (logfile == NULL)
-		err(1, "Could not allocate %lu bytes for logfile filename",
-			fname_length + 1);
-	/* fixme: Remove slash hardcoding */
-	snprintf(logfile, fname_length, "%s/%s.xml", opt_logdir, entry.host);
-	debpr1("logfile = \"%s\"\n", logfile);
-	create_logfile(logfile);
-	printf("%s\n", generate_uuid());
-	free(logfile);
-	free(entry.cwd);
-
-	/*
-	if (optind < argc) {
-		int  t;
-
-		for (t = optind; t < argc; t++)
-			retval |= process_file(argv[t]);
-	} else
-		retval |= process_file("-");
-	*/
-
-	debpr1("Returning from main() with value %d\n", retval);
-
-	return(retval);
-}
-
-/*
  * print_license() - Display the program license
  */
 
@@ -417,6 +283,140 @@ char *xml_entry(struct Entry entry)
 		"<sess desc=\"screen\">9c4257a0-2c2e-11e6-b724-02010e0a6634"
 		"</sess> "
 		"</suuid>";
+	return(retval);
+}
+
+/*
+ * main()
+ */
+
+int main(int argc, char *argv[])
+{
+	int c;
+	int retval = EXIT_OK;
+	char opt_logdir[LOGDIR_MAXLEN + 1];
+	char *logfile;
+	struct Entry entry;
+	size_t fname_length; /* Total length of logfile name */
+
+	progname = argv[0];
+
+	strncpy(opt_logdir, getenv("SUUID_LOGDIR"), LOGDIR_MAXLEN);
+
+	while (1) {
+		int option_index = 0;
+		static struct option long_options[] = {
+			{  "debug", 0, 0,   0},
+			{   "help", 0, 0, 'h'},
+			{"license", 0, 0,   0},
+			{ "logdir", 1, 0, 'l'},
+			{"version", 0, 0, 'V'},
+			{        0, 0, 0,   0}
+		};
+
+		/*
+		 * long_options:
+		 *
+		 * 1. const char  *name;
+		 * 2. int         has_arg;
+		 * 3. int         *flag;
+		 * 4. int         val;
+		 *
+		 */
+
+		c = getopt_long (argc, argv, "hl:V",
+			long_options, &option_index);
+
+		if (c == -1)
+			break;
+
+		switch (c) {
+		case 0 :
+			if (!strcmp(long_options[option_index].name,
+			    "debug"))
+				debug = 1;
+
+			else if (!strcmp(
+				 long_options[option_index].name,
+				 "license")
+			) {
+				print_license();
+				return(EXIT_OK);
+			}
+
+#if 1
+			fprintf(stddebug, "option %s",
+				long_options[option_index].name);
+			if (optarg)
+				fprintf(stddebug, " with arg %s",
+					optarg);
+			fprintf(stddebug, "\n");
+#endif /* if 0 */
+			break;
+		case 'h' :
+			usage(EXIT_OK);
+			break;
+		case 'l' :
+			strncpy(opt_logdir, optarg, LOGDIR_MAXLEN);
+			break;
+		case 'V' :
+			print_version();
+			return(EXIT_OK);
+		default :
+			debpr1("getopt_long() returned "
+			       "character code %d\n", c);
+			break;
+		}
+	}
+
+	debpr1("debugging is set to level %d\n", debug);
+	debpr1("opt_logdir = \"%s\"\n", opt_logdir);
+	entry.host = get_hostname();
+	debpr1("entry.host = \"%s\"\n", entry.host);
+	entry.cwd = getpath();
+	if (entry.cwd == NULL)
+		err(0, "Could not get current directory");
+	debpr1("entry.cwd = \"%s\"\n", entry.cwd);
+
+	if (debug && optind < argc) {
+		int t;
+
+		debpr0("non-option args: ");
+		for (t = optind; t < argc; t++)
+			fprintf(stddebug, "%s ", argv[t]);
+
+		fprintf(stddebug, "\n");
+	}
+
+	fname_length = strlen(opt_logdir) +
+		       strlen("/") +
+		       strlen(entry.host) +
+		       strlen(".xml") +
+		       1;
+	logfile = malloc(fname_length + 1);
+	if (logfile == NULL)
+		err(1, "Could not allocate %lu bytes for logfile filename",
+			fname_length + 1);
+	/* fixme: Remove slash hardcoding */
+	snprintf(logfile, fname_length, "%s/%s.xml", opt_logdir, entry.host);
+	debpr1("logfile = \"%s\"\n", logfile);
+	create_logfile(logfile);
+	printf("%s\n", generate_uuid());
+	free(logfile);
+	free(entry.cwd);
+
+	/*
+	if (optind < argc) {
+		int  t;
+
+		for (t = optind; t < argc; t++)
+			retval |= process_file(argv[t]);
+	} else
+		retval |= process_file("-");
+	*/
+
+	debpr1("Returning from main() with value %d\n", retval);
+
 	return(retval);
 }
 
