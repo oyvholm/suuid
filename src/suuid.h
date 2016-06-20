@@ -81,6 +81,13 @@ struct Entry {
 	char *user;
 	char *sess;
 };
+struct Options {
+	int help;
+	int license;
+	char *logdir;
+	int verbose;
+	int version;
+};
 
 /*
  * Function prototypes

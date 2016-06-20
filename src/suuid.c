@@ -27,13 +27,7 @@
  */
 
 char *progname;
-struct Options {
-	int help;
-	int license;
-	char *logdir;
-	int verbose;
-	int version;
-} opt;
+struct Options opt;
 
 /*
  * msg() - Print a message prefixed with "[progname]: " to stddebug if 
@@ -234,56 +228,6 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 }
 
 /*
- * add_to_logfile() - Add the contents of *entry to the XML file fname.
- */
-
-int add_to_logfile(char *fname, struct Entry *entry)
-{
-	int retval = EXIT_OK;
-	FILE *fp;
-	char check_line[12];
-	long filepos;
-	int i;
-	/* todo: Add file locking */
-	fp = fopen(fname, "r+");
-	if (fp == NULL)
-		err(1, "%s: Could not open file for read+write", fname);
-	fseek(fp, -10, SEEK_END);
-	filepos = ftell(fp);
-	msg(3, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
-	if (filepos == -1)
-		err(1, "%s: Cannot read file position", fname);
-	msg(3, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
-	if (strcmp(fgets(check_line, 10, fp), "</suuids>")) {
-		msg(3, "add_to_logfile(): check_line = '%s'", check_line);
-		fprintf(stderr, "%s: %s: Unknown end line, adding to "
-				"end of file\n", progname, fname);
-	} else {
-		msg(3, "add_to_logfile(): Seems as check_line is ok, "
-		       "it is '%s'", check_line);
-		if (fseek(fp, filepos, SEEK_SET) == -1)
-			err(1, "%s: Cannot seek to position %lu",
-				fname, filepos);
-	}
-	msg(3, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
-	if (fputs(xml_entry(entry), fp) <= 0) {
-		warn("fputs()");
-		retval = -1;
-	}
-	msg(3, "Before end tag is written");
-	fprintf(fp, "\n</suuids>\n");
-	fclose(fp);
-	msg(3, "add_to_logfile(): fp is closed");
-	if (opt.verbose > 2) {
-		i = system("(echo; echo; cat /home/sunny/uuids/fake.xml; "
-			   "echo; echo) >&2");
-		i = i; /* Get rid of gcc warning */
-	}
-	msg(3, "add_to_logfile() returns %d", retval);
-	return retval;
-}
-
-/*
  * generate_uuid()
  */
 
@@ -358,30 +302,6 @@ char *getpath(void)
 		}
 	}
 	return retval;
-}
-
-/*
- * create_logfile() - Create logfile with initial XML structure if it 
- * doesn't exist already.
- */
-
-void create_logfile(char *name)
-{
-	char *xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-	char *xml_doctype = "<!DOCTYPE suuids SYSTEM \"dtd/suuids.dtd\">";
-
-	msg(3, "Entering create_logfile(\"%s\")", name);
-	if (access(name, F_OK) != -1)
-		return; /* File already exists */
-	else {
-		FILE *fp;
-		fp = fopen(name, "a");
-		if (fp == NULL)
-			err(1, "%s: Could not create log file", name);
-		fprintf(fp, "%s\n%s\n<suuids>\n</suuids>\n",
-			xml_header, xml_doctype);
-		fclose(fp);
-	}
 }
 
 /*

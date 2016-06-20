@@ -3,7 +3,7 @@
 # File ID: 27e0d738-2b93-11e6-8668-02010e0a6634
 # Author: Øyvind A. Holm <sunny@sunbase.org>
 
-OBJS = suuid.o
+OBJS = logfile.o suuid.o
 CC = gcc
 LD = gcc
 CCFLAGS = -Wall -O2 -c -g
@@ -16,6 +16,9 @@ $(EXEC): $(OBJS)
 suuid.o: suuid.c suuid.h version.h Makefile
 	$(CC) $(CCFLAGS) suuid.c
 
+logfile.o: logfile.c suuid.h version.h Makefile
+	$(CC) $(CCFLAGS) logfile.c
+
 .PHONY: clean
 clean:
 	rm -fv $(EXEC) $(OBJS) *~ core core.$(EXEC)
@@ -23,7 +26,7 @@ clean:
 
 .PHONY: edit
 edit: tags
-	$(EDITOR) suuid.c suuid.h version.h Makefile
+	$(EDITOR) *.c *.h Makefile
 
 tags: suuid.c suuid.h version.h
 	ctags suuid.c suuid.h version.h
