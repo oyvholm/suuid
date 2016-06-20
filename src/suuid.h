@@ -50,6 +50,8 @@
 #define in_range(a,b,c)  ((a) >= (b) && (a) <= (c) ? TRUE : FALSE)
 #define myerror(a)       { fprintf(stderr, "%s: ", progname); perror(a); }
 
+#include "version.h"
+
 /*
  * Standard header files
  */

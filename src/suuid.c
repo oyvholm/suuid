@@ -19,7 +19,6 @@
  */
 
 #include "suuid.h"
-#include "version.h"
 
 #define LOGDIR_MAXLEN 4096
 
