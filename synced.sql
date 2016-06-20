@@ -22,7 +22,7 @@ CREATE TABLE synced (
 INSERT INTO "synced" VALUES('conv-suuid','Lib/std/perl','273d6f5b1b1e7eb6c8553cd2cb3b176c5678ac7c','2016-05-17 14:10:28');
 INSERT INTO "synced" VALUES('src/COPYING','Lib/std/COPYING','17bc73d79f068dfaf2655db1090f6b9206734555','2016-06-06 03:02:53');
 INSERT INTO "synced" VALUES('src/Makefile','Lib/std/c/Makefile','17bc73d79f068dfaf2655db1090f6b9206734555','2016-06-06 03:02:51');
-INSERT INTO "synced" VALUES('src/suuid.c','Lib/std/c/std.c','c85ee84e6b1a6f62d2450834296f5a6fdfa64cea','2016-06-20 01:36:31');
+INSERT INTO "synced" VALUES('src/suuid.c','Lib/std/c/std.c','fada5066444b5de65957daab452e25671f5e1c12','2016-06-20 23:27:08');
 INSERT INTO "synced" VALUES('src/suuid.h','Lib/std/c/std.h','c85ee84e6b1a6f62d2450834296f5a6fdfa64cea','2016-06-20 01:36:31');
 INSERT INTO "synced" VALUES('src/version.h','Lib/std/c/version.h','c85ee84e6b1a6f62d2450834296f5a6fdfa64cea','2016-06-20 01:36:31');
 INSERT INTO "synced" VALUES('suuid','Lib/std/perl','273d6f5b1b1e7eb6c8553cd2cb3b176c5678ac7c','2016-05-17 14:10:28');

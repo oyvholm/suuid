@@ -51,6 +51,7 @@ int msg(int verbose, const char *format, ...)
 		va_start(ap, format);
 		retval = fprintf(stddebug, "%s: ", progname);
 		retval += vfprintf(stddebug, format, ap);
+		fputc('\n', stddebug);
 		va_end(ap);
 	}
 	return retval;
@@ -173,7 +174,7 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 		break;
 	default:
 		msg(2, "getopt_long() returned "
-		       "character code %d\n", c);
+		       "character code %d", c);
 		retval = EXIT_ERROR;
 		break;
 	}
@@ -229,7 +230,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 					   c, &long_options[option_index]);
 	}
 
-	msg(3, "parse_options() returns %d\n", retval);
+	msg(3, "parse_options() returns %d", retval);
 	return retval;
 }
 
@@ -250,36 +251,36 @@ int add_to_logfile(char *fname, struct Entry *entry)
 		err(1, "%s: Could not open file for read+write", fname);
 	fseek(fp, -10, SEEK_END);
 	filepos = ftell(fp);
-	msg(3, "ftell(fp) at line %u is %lu\n", __LINE__, ftell(fp));
+	msg(3, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
 	if (filepos == -1)
 		err(1, "%s: Cannot read file position", fname);
-	msg(3, "ftell(fp) at line %u is %lu\n", __LINE__, ftell(fp));
+	msg(3, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
 	if (strcmp(fgets(check_line, 10, fp), "</suuids>")) {
-		msg(3, "add_to_logfile(): check_line = '%s'\n", check_line);
+		msg(3, "add_to_logfile(): check_line = '%s'", check_line);
 		fprintf(stderr, "%s: %s: Unknown end line, adding to "
 				"end of file\n", progname, fname);
 	} else {
 		msg(3, "add_to_logfile(): Seems as check_line is ok, "
-		       "it is '%s'\n", check_line);
+		       "it is '%s'", check_line);
 		if (fseek(fp, filepos, SEEK_SET) == -1)
 			err(1, "%s: Cannot seek to position %lu",
 				fname, filepos);
 	}
-	msg(3, "ftell(fp) at line %u is %lu\n", __LINE__, ftell(fp));
+	msg(3, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
 	if (fputs(xml_entry(entry), fp) <= 0) {
 		warn("fputs()");
 		retval = -1;
 	}
-	msg(3, "Before end tag is written\n");
+	msg(3, "Before end tag is written");
 	fprintf(fp, "\n</suuids>\n");
 	fclose(fp);
-	msg(3, "add_to_logfile(): fp is closed\n");
+	msg(3, "add_to_logfile(): fp is closed");
 	if (opt.verbose > 2) {
 		i = system("(echo; echo; cat /home/sunny/uuids/fake.xml; "
 			   "echo; echo) >&2");
 		i = i; /* Get rid of gcc warning */
 	}
-	msg(3, "add_to_logfile() returns %d\n", retval);
+	msg(3, "add_to_logfile() returns %d", retval);
 	return retval;
 }
 
@@ -320,7 +321,7 @@ char *get_hostname(void)
 	retval = "fake"; /* Use "fake" as hostname to avoid conflicts
 			    with files created by the Perl version */
 #endif
-	msg(3, "get_hostname() returns '%s'\n", retval);
+	msg(3, "get_hostname() returns '%s'", retval);
 	return retval;
 }
 
@@ -370,7 +371,7 @@ void create_logfile(char *name)
 	char *xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 	char *xml_doctype = "<!DOCTYPE suuids SYSTEM \"dtd/suuids.dtd\">";
 
-	msg(3, "Entering create_logfile(\"%s\")\n", name);
+	msg(3, "Entering create_logfile(\"%s\")", name);
 	if (access(name, F_OK) != -1)
 		return; /* File already exists */
 	else {
@@ -424,12 +425,12 @@ char *allocate_entry(char *elem, char *src)
 {
 	char *retval;
 	size_t size = 0;
-	msg(3, "Entering allocate_entry(\"%s\", \"%s\")\n", elem, src);
+	msg(3, "Entering allocate_entry(\"%s\", \"%s\")", elem, src);
 	if (elem != NULL && src != NULL) {
 		size += strlen("<") + strlen(elem) + strlen(">") +
 			strlen(src) +
 			strlen("<") + strlen(elem) + strlen("/> ") + 1;
-		msg(3, "allocate_entry(): size = %lu\n", size);
+		msg(3, "allocate_entry(): size = %lu", size);
 		retval = malloc(size + 1);
 		if (retval == NULL)
 			perror("allocate_entry(): Cannot allocate memory");
@@ -438,7 +439,7 @@ char *allocate_entry(char *elem, char *src)
 					       elem, src, elem);
 	} else
 		retval = NULL;
-	msg(3, "allocate_entry() returns '%s'\n", retval);
+	msg(3, "allocate_entry() returns '%s'", retval);
 	return retval;
 }
 
@@ -451,20 +452,20 @@ char *alloc_attr(char *attr, char *data)
 {
 	char *retval = NULL;
 	int size;
-	msg(3, "Entering alloc_attr(\"%s\", \"%s\")\n", attr, data);
+	msg(3, "Entering alloc_attr(\"%s\", \"%s\")", attr, data);
 	size = strlen(" ") +
 	       strlen(attr) +
 	       strlen("=\"") +
 	       strlen(data) +
 	       strlen("\"") +
 	       1;
-	msg(3, "data size = %lu\n", size);
+	msg(3, "data size = %lu", size);
 	retval = malloc(size + 1);
 	if (retval == NULL)
 		perror("alloc_attr(): Cannot allocate memory");
 	else
 		snprintf(retval, size, " %s=\"%s\"", attr, data);
-	msg(3, "alloc_attr() returns \"%s\"\n", retval);
+	msg(3, "alloc_attr() returns \"%s\"", retval);
 	return retval;
 }
 
@@ -479,21 +480,21 @@ char *xml_entry(struct Entry *entry)
 	struct Entry e;
 	char *retval;
 
-	msg(3, "Entering xml_entry()\n");
+	msg(3, "Entering xml_entry()");
 	init_xml_entry(&e);
-	msg(3, "xml_entry(): After init_xml_entry()\n");
+	msg(3, "xml_entry(): After init_xml_entry()");
 
-	msg(3, "xml_entry(): entry->date = '%s'\n", entry->date);
-	msg(3, "xml_entry(): entry->uuid = '%s'\n", entry->uuid);
-	msg(3, "xml_entry(): entry->tag = '%s'\n",  entry->tag);
-	msg(3, "xml_entry(): entry->txt = '%s'\n",  entry->txt);
-	msg(3, "xml_entry(): entry->host = '%s'\n", entry->host);
-	msg(3, "xml_entry(): entry->cwd = '%s'\n",  entry->cwd);
-	msg(3, "xml_entry(): entry->user = '%s'\n", entry->user);
-	msg(3, "xml_entry(): entry->sess = '%s'\n", entry->sess);
+	msg(3, "xml_entry(): entry->date = '%s'", entry->date);
+	msg(3, "xml_entry(): entry->uuid = '%s'", entry->uuid);
+	msg(3, "xml_entry(): entry->tag = '%s'",  entry->tag);
+	msg(3, "xml_entry(): entry->txt = '%s'",  entry->txt);
+	msg(3, "xml_entry(): entry->host = '%s'", entry->host);
+	msg(3, "xml_entry(): entry->cwd = '%s'",  entry->cwd);
+	msg(3, "xml_entry(): entry->user = '%s'", entry->user);
+	msg(3, "xml_entry(): entry->sess = '%s'", entry->sess);
 
 	if (entry->uuid == NULL) {
-		msg(2, "xml_entry(): uuid is NULL\n");
+		msg(2, "xml_entry(): uuid is NULL");
 		return NULL;
 	} else
 		e.uuid = alloc_attr("u", entry->uuid);
@@ -523,7 +524,7 @@ char *xml_entry(struct Entry *entry)
 		(e.cwd == NULL) ? "" : e.cwd,
 		(e.user == NULL) ? "" : e.user,
 		(e.sess == NULL) ? "" : e.sess);
-	msg(3, "xml_entry(): After snprintf()\n");
+	msg(3, "xml_entry(): After snprintf()");
 #if 0
 	static char fake[] = "<suuid t=\"2016-06-07T04:18:40.9460630Z\" "
 		"u=\"ea3beb96-2c66-11e6-aa54-02010e0a6634\"> "
@@ -541,7 +542,7 @@ char *xml_entry(struct Entry *entry)
 		"</suuid>";
 #endif
 	retval = buf;
-	msg(3, "xml_entry() returns '%s'\n", retval);
+	msg(3, "xml_entry() returns '%s'", retval);
 	return retval;
 }
 
@@ -561,13 +562,13 @@ int main(int argc, char *argv[])
 	progname = argv[0];
 
 	retval = parse_options(&opt, argc, argv);
-	msg(3, "retval after parse_options(): %d\n", retval);
+	msg(3, "retval after parse_options(): %d", retval);
 	if (retval != EXIT_OK) {
 		fprintf(stderr, "%s: Option error\n", progname);
 		return EXIT_ERROR;
 	}
 
-	msg(2, "Using verbose level %d\n", opt.verbose);
+	msg(2, "Using verbose level %d", opt.verbose);
 
 	if (opt.help) {
 		usage(EXIT_OK);
@@ -586,22 +587,22 @@ int main(int argc, char *argv[])
 
 	strncpy(opt_logdir, getenv("SUUID_LOGDIR"), LOGDIR_MAXLEN);
 
-	msg(2, "opt.logdir = '%s'\n", opt.logdir);
+	msg(2, "opt.logdir = '%s'", opt.logdir);
 	if (opt.logdir != NULL) {
 		strncpy(opt_logdir, opt.logdir, LOGDIR_MAXLEN);
-		msg(2, "opt_logdir = \"%s\"\n", opt_logdir);
+		msg(2, "opt_logdir = \"%s\"", opt_logdir);
 	}
 
 	init_xml_entry(&entry);
 	entry.uuid = generate_uuid();
 	entry.date = uuid_date(entry.uuid);
 	entry.host = get_hostname();
-	msg(2, "entry.host = \"%s\"\n", entry.host);
+	msg(2, "entry.host = \"%s\"", entry.host);
 
 	entry.cwd = getpath();
 	if (entry.cwd == NULL)
 		err(0, "Could not get current directory");
-	msg(2, "entry.cwd = \"%s\"\n", entry.cwd);
+	msg(2, "entry.cwd = \"%s\"", entry.cwd);
 
 	fname_length = strlen(opt_logdir) +
 		       strlen("/") +
@@ -614,7 +615,7 @@ int main(int argc, char *argv[])
 			fname_length + 1);
 	/* fixme: Remove slash hardcoding */
 	snprintf(logfile, fname_length, "%s/%s.xml", opt_logdir, entry.host);
-	msg(2, "logfile = \"%s\"\n", logfile);
+	msg(2, "logfile = \"%s\"", logfile);
 	create_logfile(logfile);
 	if (opt.verbose > 2) {
 		i = system("(echo; echo After create_logfile:; "
@@ -631,10 +632,10 @@ int main(int argc, char *argv[])
 		int t;
 
 		for (t = optind; t < argc; t++)
-			msg(2, "Non-option arg: %s\n", argv[t]);
+			msg(2, "Non-option arg: %s", argv[t]);
 	}
 
-	msg(2, "Returning from main() with value %d\n", retval);
+	msg(2, "Returning from main() with value %d", retval);
 	return retval;
 }
 
