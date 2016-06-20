@@ -22,5 +22,8 @@ clean:
 	cd t && $(MAKE) clean
 
 .PHONY: edit
-edit:
+edit: tags
 	$(EDITOR) suuid.c suuid.h version.h Makefile
+
+tags: suuid.c suuid.h version.h
+	ctags suuid.c suuid.h version.h
