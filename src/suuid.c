@@ -277,7 +277,7 @@ int add_to_logfile(char *fname, struct Entry *entry)
 			   "echo; echo) >&2");
 		i = i; /* Get rid of gcc warning */
 	}
-	return(retval);
+	return retval;
 }
 
 /*
@@ -292,13 +292,13 @@ char *generate_uuid(void)
 	fp = popen("/usr/bin/uuid", "r");
 	if (fp == NULL) {
 		fprintf(stderr, "%s: Could not exec /usr/bin/uuid", progname);
-		return(NULL);
+		return NULL;
 	}
 	if (fgets(uuid, 37, fp) == NULL)
 		fprintf(stderr, "%s: fgets() error", progname);
 	uuid[36] = '\0';
 	pclose(fp);
-	return(uuid);
+	return uuid;
 }
 
 /*
@@ -311,14 +311,14 @@ char *get_hostname(void)
 	char *retval = buf;
 	if (gethostname(buf, 255) == -1) {
 		perror("Could not get hostname");
-		return(NULL);
+		return NULL;
 	}
 #if FAKE_HOST
 	retval = "fake"; /* Use "fake" as hostname to avoid conflicts
 			    with files created by the Perl version */
 #endif
 	msg(3, "get_hostname() returns '%s'\n", retval);
-	return(retval);
+	return retval;
 }
 
 /*
@@ -351,7 +351,7 @@ char *getpath(void)
 			 */
 			perror("getcwd()");
 			free(retval);
-			return(NULL);
+			return NULL;
 		}
 	}
 	return retval;
@@ -390,7 +390,7 @@ char *uuid_date(char *uuid)
 {
 	/* fixme */
 	static char retval[32] = "2000-01-01T00:00:00.0000000Z";
-	return(retval);
+	return retval;
 }
 
 /*
@@ -414,7 +414,7 @@ char *xml_entry(struct Entry entry)
 		"<sess desc=\"screen\">9c4257a0-2c2e-11e6-b724-02010e0a6634"
 		"</sess> "
 		"</suuid>";
-	return(retval);
+	return retval;
 }
 
 /*
