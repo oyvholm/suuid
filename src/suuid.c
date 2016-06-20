@@ -266,17 +266,20 @@ int add_to_logfile(char *fname, struct Entry *entry)
 				fname, filepos);
 	}
 	msg(3, "ftell(fp) at line %u is %lu\n", __LINE__, ftell(fp));
-	if (fputs(xml_entry(*entry), fp) <= 0) {
+	if (fputs(xml_entry(entry), fp) <= 0) {
 		warn("fputs()");
 		retval = -1;
 	}
+	msg(3, "Before end tag is written\n");
 	fprintf(fp, "\n</suuids>\n");
 	fclose(fp);
+	msg(3, "add_to_logfile(): fp is closed\n");
 	if (opt.verbose > 2) {
 		i = system("(echo; echo; cat /home/sunny/uuids/fake.xml; "
 			   "echo; echo) >&2");
 		i = i; /* Get rid of gcc warning */
 	}
+	msg(3, "add_to_logfile() returns %d\n", retval);
 	return retval;
 }
 
@@ -394,12 +397,58 @@ char *uuid_date(char *uuid)
 }
 
 /*
+ * init_xml_entry() - Initialise Entry struct at memory position e with 
+ * initial values.
+ */
+
+void init_xml_entry(struct Entry *e)
+{
+	e->date = NULL;
+	e->uuid = NULL;
+	e->tag = NULL;
+	e->txt = NULL;
+	e->host = NULL;
+	e->cwd = NULL;
+	e->user = NULL;
+	e->sess = NULL;
+}
+
+/*
  * xml_entry()
  */
 
-char *xml_entry(struct Entry entry)
+char *xml_entry(struct Entry *entry)
 {
-	/* fixme */
+	static char buf[65536]; /* fixme: Temporary */
+	struct Entry e;
+
+	msg(3, "Entering xml_entry()\n");
+	init_xml_entry(&e);
+	msg(3, "xml_entry(): After init_xml_entry()\n");
+
+	snprintf(buf, 65535, /* fixme: length */
+		"<suuid>"
+			"%s" /* date */
+			"%s" /* uuid */
+			"%s" /* tag */
+			"%s" /* txt */
+			"%s" /* host */
+			"%s" /* cwd */
+			"%s" /* user */
+			"%s" /* sess */
+		"</suuid",
+
+		(e.date == NULL) ? "" : e.date,
+		(e.uuid == NULL) ? "" : e.uuid,
+		(e.tag == NULL) ? "" : e.tag,
+		(e.txt == NULL) ? "" : e.txt,
+		(e.host == NULL) ? "" : e.host,
+		(e.cwd == NULL) ? "" : e.cwd,
+		(e.user == NULL) ? "" : e.user,
+		(e.sess == NULL) ? "" : e.sess);
+	msg(3, "xml_entry(): After snprintf()\n");
+
+	/* fixme: Return value */
 	static char retval[] = "<suuid t=\"2016-06-07T04:18:40.9460630Z\" "
 		"u=\"ea3beb96-2c66-11e6-aa54-02010e0a6634\"> "
 		"<tag>ti</tag> "

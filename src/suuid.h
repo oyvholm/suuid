@@ -72,10 +72,12 @@ typedef unsigned char bool;
 struct Entry {
 	char *date;
 	char *uuid;
+	char *tag;
 	char *txt;
 	char *host;
 	char *cwd;
 	char *user;
+	char *sess;
 };
 
 /*
@@ -92,7 +94,8 @@ extern char *generate_uuid(void);
 extern char *get_hostname(void);
 extern char *getpath(void);
 extern char *uuid_date(char *);
-extern char *xml_entry(struct Entry);
+extern void init_xml_entry(struct Entry *);
+extern char *xml_entry(struct Entry *);
 
 /*
  * Global variables
