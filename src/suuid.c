@@ -263,6 +263,10 @@ int add_to_logfile(char *fname, struct Entry *entry)
 	return(retval);
 }
 
+/*
+ * generate_uuid()
+ */
+
 char *generate_uuid(void)
 {
 	static char uuid[38];
