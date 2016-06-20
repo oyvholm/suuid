@@ -414,6 +414,29 @@ void init_xml_entry(struct Entry *e)
 }
 
 /*
+ * allocate_entry()
+ *   elem: char * to name of XML element
+ *   src: char * to data source
+ */
+
+char *allocate_entry(char *elem, char *src)
+{
+	char *retval;
+	size_t size = 0;
+	msg(3, "Entering allocate_entry(\"%s\")\n", elem);
+	if (elem != NULL && elem != NULL) {
+		size += strlen("<") + strlen(elem) + strlen(">") +
+			strlen(src) +
+			strlen("<") + strlen(elem) + strlen("/> ");
+	}
+	msg(3, "allocate_entry(): size = %lu\n", size);
+	retval = malloc(size + 1);
+	snprintf(retval, size, "<%s>%s</%s> ", elem, src, elem);
+	msg(3, "allocate_entry() returns '%s'\n", retval);
+	return retval;
+}
+
+/*
  * xml_entry()
  */
 
@@ -436,6 +459,7 @@ char *xml_entry(struct Entry *entry)
 	msg(3, "xml_entry(): entry->user = '%s'\n", entry->user);
 	msg(3, "xml_entry(): entry->sess = '%s'\n", entry->sess);
 
+	e.host = allocate_entry("host", entry->host);
 	snprintf(buf, 65535, /* fixme: length */
 		"<suuid%s%s>" /* date, uuid */
 			"%s" /* tag */
@@ -445,7 +469,6 @@ char *xml_entry(struct Entry *entry)
 			"%s" /* user */
 			"%s" /* sess */
 		"</suuid>",
-
 		(e.date == NULL) ? "" : e.date,
 		(e.uuid == NULL) ? "" : e.uuid,
 		(e.tag == NULL) ? "" : e.tag,
@@ -455,7 +478,6 @@ char *xml_entry(struct Entry *entry)
 		(e.user == NULL) ? "" : e.user,
 		(e.sess == NULL) ? "" : e.sess);
 	msg(3, "xml_entry(): After snprintf()\n");
-
 #if 0
 	static char fake[] = "<suuid t=\"2016-06-07T04:18:40.9460630Z\" "
 		"u=\"ea3beb96-2c66-11e6-aa54-02010e0a6634\"> "

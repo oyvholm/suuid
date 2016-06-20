@@ -95,6 +95,7 @@ extern char *get_hostname(void);
 extern char *getpath(void);
 extern char *uuid_date(char *);
 extern void init_xml_entry(struct Entry *);
+extern char *allocate_entry(char *, char *);
 extern char *xml_entry(struct Entry *);
 
 /*
