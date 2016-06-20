@@ -467,16 +467,19 @@ char *xml_entry(struct Entry *entry)
 	msg(3, "xml_entry(): entry->sess = '%s'\n", entry->sess);
 
 	if (entry->date != NULL) {
-		size = strlen(" t=\"") + strlen(entry->date) + strlen("\"");
+		size = strlen(" t=\"") +
+		       strlen(entry->date) +
+		       strlen("\"") +
+		       1;
 		msg(3, "date size = %lu\n", size);
 		e.date = malloc(size + 1);
 		if (e.date == NULL)
 			perror("xml_entry(): Cannot allocate memory");
 		else
 			snprintf(e.date, size, " t=\"%s\"", entry->date);
+		msg(3, "e.date = '%s'\n", e.date);
 	}
 
-	e.tag = allocate_entry("tag", entry->tag); /* fixme: tags → arrays */
 	e.txt = allocate_entry("txt", entry->txt);
 	e.host = allocate_entry("host", entry->host);
 	e.cwd = allocate_entry("cwd", entry->cwd);
