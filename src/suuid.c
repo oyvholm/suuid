@@ -428,7 +428,7 @@ char *allocate_entry(char *elem, char *src)
 	if (elem != NULL && src != NULL) {
 		size += strlen("<") + strlen(elem) + strlen(">") +
 			strlen(src) +
-			strlen("<") + strlen(elem) + strlen("/> ");
+			strlen("<") + strlen(elem) + strlen("/> ") + 1;
 		msg(3, "allocate_entry(): size = %lu\n", size);
 		retval = malloc(size + 1);
 		if (retval == NULL)
@@ -443,7 +443,34 @@ char *allocate_entry(char *elem, char *src)
 }
 
 /*
- * xml_entry()
+ * alloc_attr() - Return pointer to string with XML attribute. Returns 
+ * NULL on error.
+ */
+
+char *alloc_attr(char *attr, char *data)
+{
+	char *retval = NULL;
+	int size;
+	msg(3, "Entering alloc_attr(\"%s\", \"%s\")\n", attr, data);
+	size = strlen(" ") +
+	       strlen(attr) +
+	       strlen("=\"") +
+	       strlen(data) +
+	       strlen("\"") +
+	       1;
+	msg(3, "data size = %lu\n", size);
+	retval = malloc(size + 1);
+	if (retval == NULL)
+		perror("alloc_attr(): Cannot allocate memory");
+	else
+		snprintf(retval, size, " %s=\"%s\"", attr, data);
+	msg(3, "alloc_attr() returns \"%s\"\n", retval);
+	return retval;
+}
+
+/*
+ * xml_entry() - Return pointer to string with one XML entry extracted 
+ * from the entry struct, or NULL if error.
  */
 
 char *xml_entry(struct Entry *entry)
@@ -451,7 +478,6 @@ char *xml_entry(struct Entry *entry)
 	static char buf[65536]; /* fixme: Temporary */
 	struct Entry e;
 	char *retval;
-	int size;
 
 	msg(3, "Entering xml_entry()\n");
 	init_xml_entry(&e);
@@ -466,19 +492,14 @@ char *xml_entry(struct Entry *entry)
 	msg(3, "xml_entry(): entry->user = '%s'\n", entry->user);
 	msg(3, "xml_entry(): entry->sess = '%s'\n", entry->sess);
 
-	if (entry->date != NULL) {
-		size = strlen(" t=\"") +
-		       strlen(entry->date) +
-		       strlen("\"") +
-		       1;
-		msg(3, "date size = %lu\n", size);
-		e.date = malloc(size + 1);
-		if (e.date == NULL)
-			perror("xml_entry(): Cannot allocate memory");
-		else
-			snprintf(e.date, size, " t=\"%s\"", entry->date);
-		msg(3, "e.date = '%s'\n", e.date);
-	}
+	if (entry->uuid == NULL) {
+		msg(2, "xml_entry(): uuid is NULL\n");
+		return NULL;
+	} else
+		e.uuid = alloc_attr("u", entry->uuid);
+
+	if (entry->date != NULL)
+		e.date = alloc_attr("t", entry->date);
 
 	e.txt = allocate_entry("txt", entry->txt);
 	e.host = allocate_entry("host", entry->host);
@@ -486,7 +507,7 @@ char *xml_entry(struct Entry *entry)
 	e.user = allocate_entry("user", entry->user);
 
 	snprintf(buf, 65535, /* fixme: length */
-		"<suuid%s%s>" /* date, uuid */
+		"<suuid%s%s> " /* date, uuid */
 			"%s" /* tag */
 			"%s" /* txt */
 			"%s" /* host */

@@ -96,6 +96,7 @@ extern char *getpath(void);
 extern char *uuid_date(char *);
 extern void init_xml_entry(struct Entry *);
 extern char *allocate_entry(char *, char *);
+extern char *alloc_attr(char *, char *);
 extern char *xml_entry(struct Entry *);
 
 /*
