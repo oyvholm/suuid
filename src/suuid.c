@@ -239,6 +239,7 @@ int add_to_logfile(char *fname, struct Entry *entry)
 	FILE *fp;
 	char check_line[12];
 	long filepos;
+	int i;
 	/* todo: Add file locking */
 	fp = fopen(fname, "r+");
 	if (fp == NULL)
@@ -264,7 +265,11 @@ int add_to_logfile(char *fname, struct Entry *entry)
 	}
 	fprintf(fp, "\n</suuids>\n");
 	fclose(fp);
-	/* system("echo; echo; cat /home/sunny/uuids/fake.xml; echo; echo"); */
+	if (opt.verbose > 2) {
+		i = system("(echo; echo; cat /home/sunny/uuids/fake.xml; "
+			   "echo; echo) >&2");
+		i = i; /* Get rid of gcc warning */
+	}
 	return(retval);
 }
 
@@ -394,6 +399,7 @@ int main(int argc, char *argv[])
 	char *logfile;
 	struct Entry entry;
 	size_t fname_length; /* Total length of logfile name */
+	int i;
 
 	progname = argv[0];
 
@@ -450,6 +456,12 @@ int main(int argc, char *argv[])
 	snprintf(logfile, fname_length, "%s/%s.xml", opt_logdir, entry.host);
 	msg(2, "logfile = \"%s\"\n", logfile);
 	create_logfile(logfile);
+	if (opt.verbose > 2) {
+		i = system("(echo; echo After create_logfile:; "
+			   "cat /home/sunny/uuids/fake.xml; "
+			   "echo; echo) >&2");
+		i = i; /* Get rid of gcc warning */
+	}
 	entry.uuid = generate_uuid();
 	add_to_logfile(logfile, &entry);
 	puts(entry.uuid);
