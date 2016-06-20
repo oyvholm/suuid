@@ -193,6 +193,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 
 	dest->help = 0;
 	dest->license = 0;
+	dest->logdir = NULL;
 	dest->verbose = 0;
 	dest->version = 0;
 
@@ -411,8 +412,9 @@ int main(int argc, char *argv[])
 
 	strncpy(opt_logdir, getenv("SUUID_LOGDIR"), LOGDIR_MAXLEN);
 
-	if (strlen(opt.logdir)) {
-		strncpy(opt_logdir, optarg, LOGDIR_MAXLEN);
+	msg(2, "opt.logdir = '%s'\n", opt.logdir);
+	if (opt.logdir != NULL) {
+		strncpy(opt_logdir, opt.logdir, LOGDIR_MAXLEN);
 		msg(2, "opt_logdir = \"%s\"\n", opt_logdir);
 	}
 
