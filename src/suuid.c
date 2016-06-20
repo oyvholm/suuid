@@ -427,14 +427,14 @@ char *xml_entry(struct Entry *entry)
 	init_xml_entry(&e);
 	msg(3, "xml_entry(): After init_xml_entry()\n");
 
-	msg(3, "xml_entry(): entry.date = '%s'\n", entry->date);
-	msg(3, "xml_entry(): entry.uuid = '%s'\n", entry->uuid);
-	msg(3, "xml_entry(): entry.tag = '%s'\n",  entry->tag);
-	msg(3, "xml_entry(): entry.txt = '%s'\n",  entry->txt);
-	msg(3, "xml_entry(): entry.host = '%s'\n", entry->host);
-	msg(3, "xml_entry(): entry.cwd = '%s'\n",  entry->cwd);
-	msg(3, "xml_entry(): entry.user = '%s'\n", entry->user);
-	msg(3, "xml_entry(): entry.sess = '%s'\n", entry->sess);
+	msg(3, "xml_entry(): entry->date = '%s'\n", entry->date);
+	msg(3, "xml_entry(): entry->uuid = '%s'\n", entry->uuid);
+	msg(3, "xml_entry(): entry->tag = '%s'\n",  entry->tag);
+	msg(3, "xml_entry(): entry->txt = '%s'\n",  entry->txt);
+	msg(3, "xml_entry(): entry->host = '%s'\n", entry->host);
+	msg(3, "xml_entry(): entry->cwd = '%s'\n",  entry->cwd);
+	msg(3, "xml_entry(): entry->user = '%s'\n", entry->user);
+	msg(3, "xml_entry(): entry->sess = '%s'\n", entry->sess);
 
 	snprintf(buf, 65535, /* fixme: length */
 		"<suuid%s%s>" /* date, uuid */
