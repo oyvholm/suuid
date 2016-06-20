@@ -1,4 +1,3 @@
-
 /*
  * suuid.c
  * File ID: 285082a4-2b93-11e6-90fb-02010e0a6634
@@ -17,17 +16,7 @@
  *
  * You should have received a copy of the GNU General Public License 
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
-
-#include <err.h>
-#include <errno.h>
-#include <getopt.h>
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 
 #include "suuid.h"
 #include "version.h"
@@ -35,35 +24,37 @@
 #define LOGDIR_MAXLEN 4096
 
 /*
- * Function prototypes
- */
-
-struct Entry {
-	char *date;
-	char *uuid;
-	char *txt;
-	char *host;
-	char *cwd;
-	char *user;
-};
-
-int add_to_logfile(char *, struct Entry *);
-void create_logfile(char *);
-char *generate_uuid(void);
-char *get_hostname(void);
-char *getpath(void);
-void print_license(void);
-void print_version(void);
-void usage(int);
-char *uuid_date(char *);
-char *xml_entry(struct Entry);
-
-/*
  * Global variables
  */
 
 char *progname;
-int  debug = 0;
+struct Options {
+	int help;
+	int license;
+	char *logdir;
+	int verbose;
+	int version;
+} opt;
+
+/*
+ * msg() - Print a message prefixed with "[progname]: " to stddebug if 
+ * opt.verbose is equal or higher than the first argument. The rest of 
+ * the arguments are delivered to vfprintf().
+ * Returns the number of characters written.
+ */
+
+int msg(int verbose, const char *format, ...)
+{
+	va_list ap;
+	int retval = 0;
+	if (opt.verbose >= verbose) {
+		va_start(ap, format);
+		retval = fprintf(stddebug, "%s: ", progname);
+		retval += vfprintf(stddebug, format, ap);
+		va_end(ap);
+	}
+	return retval;
+}
 
 /*
  * print_license() - Display the program license
@@ -71,39 +62,35 @@ int  debug = 0;
 
 void print_license(void)
 {
-	fprintf(stdout,
-		"(C)opyleft 2016- Øyvind A. Holm <sunny@sunbase.org>\n"
-		"\n"
-		"This program is free software; you can redistribute it "
-		"and/or modify it \n"
-		"under the terms of the GNU General Public License as "
-		"published by the \n"
-		"Free Software Foundation; either version 2 of the License, "
-		"or (at your \n"
-		"option) any later version.\n"
-		"\n"
-		"This program is distributed in the hope that it will be "
-		"useful, but \n"
-		"WITHOUT ANY WARRANTY; without even the implied warranty of \n"
-		"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  "
-		"See the GNU \n"
-		"General Public License for more details.\n"
-		"\n"
-		"You should have received a copy of "
-		"the GNU General Public License along \n"
-		"with this program; if not, write to "
-		"the Free Software Foundation, Inc., \n"
-		"59 Temple Place, Suite 330, Boston, MA  02111-1307  USA\n"
-	);
+	puts("(C)opyleft STDyearDTS- Øyvind A. Holm <sunny@sunbase.org>");
+	puts("");
+	puts("This program is free software; you can redistribute it "
+	     "and/or modify it \n"
+	     "under the terms of the GNU General Public License as "
+	     "published by the \n"
+	     "Free Software Foundation; either version 2 of the License, "
+	     "or (at your \n"
+	     "option) any later version.");
+	puts("");
+	puts("This program is distributed in the hope that it will be "
+	     "useful, but \n"
+	     "WITHOUT ANY WARRANTY; without even the implied warranty of \n"
+	     "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.");
+	puts("See the GNU General Public License for more details.");
+	puts("");
+	puts("You should have received a copy of "
+	     "the GNU General Public License along \n"
+	     "with this program. If not, see "
+	     "<http://www.gnu.org/licenses/>.");
 }
 
 /*
  * print_version() - Print version information on stdout
  */
 
-void  print_version(void)
+void print_version(void)
 {
-	fprintf(stdout, "%s %s\n", progname, VERSION);
+	printf("%s %s\n", progname, VERSION);
 }
 
 /*
@@ -116,35 +103,133 @@ void usage(int retval)
 		fprintf(stderr, "\nType \"%s --help\" for help screen. "
 			"Returning with value %d.\n", progname, retval);
 	else {
-		fprintf(stdout, "\n");
-		print_version();
-		fprintf(stdout,
-			"Usage: %s [options] [file [files [...]]]\n"
-			"\n"
-			"Options:\n"
-			"\n"
-			"  -h, --help\n"
-			"    Show this help.\n"
-			"  --license\n"
-			"    Print the software license\n"
-			"  -l x, --logdir x\n"
-			"    Store log files in directory x.\n"
-			"    If the SUUID_LOGDIR environment variable is "
-			"defined, that value is\n"
-			"    used. Otherwise the value \"$HOME/uuids\" is "
-			"used.\n"
-			"    Current default: /home/sunny/uuids\n"
-			"  -v, --verbose\n"
-			"    Increase level of verbosity. Can be repeated.\n"
-			"  --version\n"
-			"    Print version information.\n"
-			"  --debug\n"
-			"    Print debugging messages.\n"
-			"\n", progname
-		);
+		puts("");
+		if (opt.verbose >= 1) {
+			print_version();
+			puts("");
+		}
+		printf("Usage: %s [options] [file [files [...]]]\n", progname);
+		puts("");
+		puts("Options:");
+		puts("");
+		puts("  -h, --help\n"
+		     "    Show this help.");
+		puts("  --license\n"
+		     "    Print the software license");
+		puts("  -l x, --logdir x\n"
+		     "    Store log files in directory x.\n"
+		     "    If the SUUID_LOGDIR environment variable is "
+		     "defined, that value is\n"
+		     "    used. Otherwise the value \"$HOME/uuids\" is "
+		     "used.\n"
+		     "    Current default: /home/sunny/uuids");
+		puts("  -q, --quiet\n"
+		     "    Be more quiet. "
+		     "Can be repeated to increase silence.");
+		puts("  -v, --verbose\n"
+		     "    Increase level of verbosity. Can be repeated.");
+		puts("  --version\n"
+		     "    Print version information.");
+		puts("");
+	}
+}
+
+/*
+ * choose_opt_action() - Decide what to do when option c is found. Store 
+ * changes in dest. opts is the struct with the definitions for the long 
+ * options.
+ * Return EXIT_OK if ok, EXIT_ERROR if c is unknown or anything fails.
+ */
+
+int choose_opt_action(struct Options *dest, int c, struct option *opts)
+{
+	int retval = EXIT_OK;
+
+	switch (c) {
+	case 0:
+		if (!strcmp(opts->name, "license")) {
+			dest->license = 1;
+		} else if (!strcmp(opts->name, "version")) {
+			dest->version = 1;
+		}
+		break;
+	case 'h':
+		dest->help = 1;
+		break;
+	case 'l':
+		dest->logdir = malloc(strlen(optarg) + 1);
+		if (dest->logdir == NULL) {
+			perror("choose_opt_action(): malloc() error");
+			retval = EXIT_ERROR;
+		} else {
+			strncpy(dest->logdir, optarg, strlen(optarg));
+		}
+		break;
+	case 'q':
+		dest->verbose--;
+		break;
+	case 'v':
+		dest->verbose++;
+		break;
+	default:
+		msg(2, "getopt_long() returned "
+		       "character code %d\n", c);
+		retval = EXIT_ERROR;
+		break;
 	}
 
-	exit(retval);
+	return retval;
+}
+
+/*
+ * parse_options() - Parse command line options.
+ * Returns EXIT_OK if ok, EXIT_ERROR if error.
+ */
+
+int parse_options(struct Options *dest, int argc, char *argv[])
+{
+	int retval = EXIT_OK;
+	int c;
+
+	dest->help = 0;
+	dest->license = 0;
+	dest->verbose = 0;
+	dest->version = 0;
+
+	while (retval == EXIT_OK) {
+		int option_index = 0;
+		static struct option long_options[] = {
+			{"help", no_argument, 0, 'h'},
+			{"license", no_argument, 0, 0},
+			{"logdir", required_argument, 0, 'l'},
+			{"quiet", no_argument, 0, 'q'},
+			{"verbose", no_argument, 0, 'v'},
+			{"version", no_argument, 0, 0},
+			{0, 0, 0, 0}
+		};
+
+		/*
+		 * long_options:
+		 *
+		 * 1. const char  *name;
+		 * 2. int         has_arg;
+		 * 3. int         *flag;
+		 * 4. int         val;
+		 *
+		 */
+
+		c = getopt_long(argc, argv, "hl:qv", long_options,
+				&option_index);
+
+		if (c == -1)
+			break;
+
+		retval = choose_opt_action(dest,
+					   c, &long_options[option_index]);
+	}
+
+	msg(3, "parse_options() returns %d\n", retval);
+	return retval;
 }
 
 int add_to_logfile(char *fname, struct Entry *entry)
@@ -292,7 +377,6 @@ char *xml_entry(struct Entry entry)
 
 int main(int argc, char *argv[])
 {
-	int c;
 	int retval = EXIT_OK;
 	char opt_logdir[LOGDIR_MAXLEN + 1];
 	char *logfile;
@@ -301,92 +385,44 @@ int main(int argc, char *argv[])
 
 	progname = argv[0];
 
-	strncpy(opt_logdir, getenv("SUUID_LOGDIR"), LOGDIR_MAXLEN);
-
-	while (1) {
-		int option_index = 0;
-		static struct option long_options[] = {
-			{  "debug", 0, 0,   0},
-			{   "help", 0, 0, 'h'},
-			{"license", 0, 0,   0},
-			{ "logdir", 1, 0, 'l'},
-			{"version", 0, 0, 'V'},
-			{        0, 0, 0,   0}
-		};
-
-		/*
-		 * long_options:
-		 *
-		 * 1. const char  *name;
-		 * 2. int         has_arg;
-		 * 3. int         *flag;
-		 * 4. int         val;
-		 *
-		 */
-
-		c = getopt_long (argc, argv, "hl:V",
-			long_options, &option_index);
-
-		if (c == -1)
-			break;
-
-		switch (c) {
-		case 0 :
-			if (!strcmp(long_options[option_index].name,
-			    "debug"))
-				debug = 1;
-
-			else if (!strcmp(
-				 long_options[option_index].name,
-				 "license")
-			) {
-				print_license();
-				return(EXIT_OK);
-			}
-
-#if 1
-			fprintf(stddebug, "option %s",
-				long_options[option_index].name);
-			if (optarg)
-				fprintf(stddebug, " with arg %s",
-					optarg);
-			fprintf(stddebug, "\n");
-#endif /* if 0 */
-			break;
-		case 'h' :
-			usage(EXIT_OK);
-			break;
-		case 'l' :
-			strncpy(opt_logdir, optarg, LOGDIR_MAXLEN);
-			break;
-		case 'V' :
-			print_version();
-			return(EXIT_OK);
-		default :
-			debpr1("getopt_long() returned "
-			       "character code %d\n", c);
-			break;
-		}
+	retval = parse_options(&opt, argc, argv);
+	msg(3, "retval after parse_options(): %d\n", retval);
+	if (retval != EXIT_OK) {
+		fprintf(stderr, "%s: Option error\n", progname);
+		return EXIT_ERROR;
 	}
 
-	debpr1("debugging is set to level %d\n", debug);
-	debpr1("opt_logdir = \"%s\"\n", opt_logdir);
+	msg(2, "Using verbose level %d\n", opt.verbose);
+
+	if (opt.help) {
+		usage(EXIT_OK);
+		return EXIT_OK;
+	}
+
+	if (opt.version) {
+		print_version();
+		return EXIT_OK;
+	}
+
+	if (opt.license) {
+		print_license();
+		return EXIT_OK;
+	}
+
+	strncpy(opt_logdir, getenv("SUUID_LOGDIR"), LOGDIR_MAXLEN);
+
+	if (strlen(opt.logdir)) {
+		strncpy(opt_logdir, optarg, LOGDIR_MAXLEN);
+		msg(2, "opt_logdir = \"%s\"\n", opt_logdir);
+	}
+
 	entry.host = get_hostname();
-	debpr1("entry.host = \"%s\"\n", entry.host);
+	msg(2, "entry.host = \"%s\"\n", entry.host);
+
 	entry.cwd = getpath();
 	if (entry.cwd == NULL)
 		err(0, "Could not get current directory");
-	debpr1("entry.cwd = \"%s\"\n", entry.cwd);
-
-	if (debug && optind < argc) {
-		int t;
-
-		debpr0("non-option args: ");
-		for (t = optind; t < argc; t++)
-			fprintf(stddebug, "%s ", argv[t]);
-
-		fprintf(stddebug, "\n");
-	}
+	msg(2, "entry.cwd = \"%s\"\n", entry.cwd);
 
 	fname_length = strlen(opt_logdir) +
 		       strlen("/") +
@@ -399,25 +435,21 @@ int main(int argc, char *argv[])
 			fname_length + 1);
 	/* fixme: Remove slash hardcoding */
 	snprintf(logfile, fname_length, "%s/%s.xml", opt_logdir, entry.host);
-	debpr1("logfile = \"%s\"\n", logfile);
+	msg(2, "logfile = \"%s\"\n", logfile);
 	create_logfile(logfile);
 	printf("%s\n", generate_uuid());
 	free(logfile);
 	free(entry.cwd);
 
-	/*
 	if (optind < argc) {
-		int  t;
+		int t;
 
 		for (t = optind; t < argc; t++)
-			retval |= process_file(argv[t]);
-	} else
-		retval |= process_file("-");
-	*/
+			msg(2, "Non-option arg: %s\n", argv[t]);
+	}
 
-	debpr1("Returning from main() with value %d\n", retval);
-
-	return(retval);
+	msg(2, "Returning from main() with value %d\n", retval);
+	return retval;
 }
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w fenc=UTF-8 : */

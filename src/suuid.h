@@ -1,6 +1,5 @@
-
 /*
- * Main header file
+ * suuid.h
  * File ID: 289a8d22-2b93-11e6-879f-02010e0a6634
  *
  * (C)opyleft 2016- Øyvind A. Holm <sunny@sunbase.org>
@@ -37,12 +36,12 @@
 #define stddebug  stderr
 
 #ifdef C_ASSERT
-#  ifdef NDEBUG
-#    undef NDEBUG
-#  endif            /* ifdef NDEBUG        */
-#else               /* ifdef C_ASSERT      */
-#  define NDEBUG  1
-#endif              /* ifdef C_ASSERT else */
+#ifdef NDEBUG
+#undef NDEBUG
+#endif /* ifdef NDEBUG        */
+#else /* ifdef C_ASSERT      */
+#define NDEBUG  1
+#endif /* ifdef C_ASSERT else */
 
 /*
  * Macros
@@ -51,41 +50,56 @@
 #define in_range(a,b,c)  ((a) >= (b) && (a) <= (c) ? TRUE : FALSE)
 #define myerror(a)       { fprintf(stderr, "%s: ", progname); perror(a); }
 
-#define debpr0(a)              if (debug) { fprintf(stddebug, \
-	"%s: debug: ", progname); fprintf(stddebug, (a)); }
-#define debpr1(a,b)            if (debug) { fprintf(stddebug, \
-	"%s: debug: ", progname); fprintf(stddebug, (a),(b)); }
-#define debpr2(a,b,c)          if (debug) { fprintf(stddebug, \
-	"%s: debug: ", progname); fprintf(stddebug, (a),(b),(c)); }
-#define debpr3(a,b,c,d)        if (debug) { fprintf(stddebug, \
-	"%s: debug: ", progname); fprintf(stddebug, (a),(b),(c),(d)); }
-#define debpr4(a,b,c,d,e)      if (debug) { fprintf(stddebug, \
-	"%s: debug: ", progname); fprintf(stddebug, (a),(b),(c),(d),(e)); }
-#define debpr5(a,b,c,d,e,f)    if (debug) { fprintf(stddebug, \
-	"%s: debug: ", progname); fprintf(stddebug, (a),(b),(c),(d),(e),(f)); }
-#define debpr6(a,b,c,d,e,f,g)  if (debug) { fprintf(stddebug, \
-	"%s: debug: ", progname); fprintf(stddebug, \
-	(a),(b),(c),(d),(e),(f),(g)); }
+/*
+ * Standard header files
+ */
+
+#include <err.h>
+#include <errno.h>
+#include <getopt.h>
+#include <limits.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 /*
  * Typedefs
  */
 
 typedef unsigned char bool;
+struct Entry {
+	char *date;
+	char *uuid;
+	char *txt;
+	char *host;
+	char *cwd;
+	char *user;
+};
 
 /*
  * Function prototypes
  */
 
+extern int msg(int, const char *, ...);
+extern void print_license(void);
 extern void print_version(void);
 extern void usage(int);
+extern int add_to_logfile(char *, struct Entry *);
+extern void create_logfile(char *);
+extern char *generate_uuid(void);
+extern char *get_hostname(void);
+extern char *getpath(void);
+extern char *uuid_date(char *);
+extern char *xml_entry(struct Entry);
 
 /*
  * Global variables
  */
 
 extern char *progname;
-extern int  debug;
+extern struct Options opt;
 
 #endif /* ifndef _suuid_H */
 
