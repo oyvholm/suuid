@@ -414,24 +414,26 @@ void init_xml_entry(struct Entry *e)
 }
 
 /*
- * allocate_entry()
+ * allocate_entry() - Allocate space and write the XML element to it.
  *   elem: char * to name of XML element
  *   src: char * to data source
+ * Returns char * to allocated area, or NULL if error.
  */
 
 char *allocate_entry(char *elem, char *src)
 {
 	char *retval;
 	size_t size = 0;
-	msg(3, "Entering allocate_entry(\"%s\")\n", elem);
-	if (elem != NULL && elem != NULL) {
+	msg(3, "Entering allocate_entry(\"%s\", \"%s\")\n", elem, src);
+	if (elem != NULL && src != NULL) {
 		size += strlen("<") + strlen(elem) + strlen(">") +
 			strlen(src) +
 			strlen("<") + strlen(elem) + strlen("/> ");
-	}
-	msg(3, "allocate_entry(): size = %lu\n", size);
-	retval = malloc(size + 1);
-	snprintf(retval, size, "<%s>%s</%s> ", elem, src, elem);
+		msg(3, "allocate_entry(): size = %lu\n", size);
+		retval = malloc(size + 1);
+		snprintf(retval, size, "<%s>%s</%s> ", elem, src, elem);
+	} else
+		retval = NULL;
 	msg(3, "allocate_entry() returns '%s'\n", retval);
 	return retval;
 }
@@ -445,6 +447,7 @@ char *xml_entry(struct Entry *entry)
 	static char buf[65536]; /* fixme: Temporary */
 	struct Entry e;
 	char *retval;
+	int size;
 
 	msg(3, "Entering xml_entry()\n");
 	init_xml_entry(&e);
@@ -459,7 +462,18 @@ char *xml_entry(struct Entry *entry)
 	msg(3, "xml_entry(): entry->user = '%s'\n", entry->user);
 	msg(3, "xml_entry(): entry->sess = '%s'\n", entry->sess);
 
+	if (entry->date != NULL) {
+		size = strlen(" t=\"") + strlen(entry->date) + strlen("\"");
+		msg(3, "date size = %lu\n", size);
+		e.date = malloc(size + 1);
+	}
+
+	e.tag = allocate_entry("tag", entry->tag); /* fixme: tags → arrays */
+	e.txt = allocate_entry("txt", entry->txt);
 	e.host = allocate_entry("host", entry->host);
+	e.cwd = allocate_entry("cwd", entry->cwd);
+	e.user = allocate_entry("user", entry->user);
+
 	snprintf(buf, 65535, /* fixme: length */
 		"<suuid%s%s>" /* date, uuid */
 			"%s" /* tag */
@@ -546,6 +560,9 @@ int main(int argc, char *argv[])
 		msg(2, "opt_logdir = \"%s\"\n", opt_logdir);
 	}
 
+	init_xml_entry(&entry);
+	entry.uuid = generate_uuid();
+	entry.date = uuid_date(entry.uuid);
 	entry.host = get_hostname();
 	msg(2, "entry.host = \"%s\"\n", entry.host);
 
@@ -573,7 +590,6 @@ int main(int argc, char *argv[])
 			   "echo; echo) >&2");
 		i = i; /* Get rid of gcc warning */
 	}
-	entry.uuid = generate_uuid();
 	add_to_logfile(logfile, &entry);
 	puts(entry.uuid);
 	free(logfile);
