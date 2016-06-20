@@ -431,7 +431,11 @@ char *allocate_entry(char *elem, char *src)
 			strlen("<") + strlen(elem) + strlen("/> ");
 		msg(3, "allocate_entry(): size = %lu\n", size);
 		retval = malloc(size + 1);
-		snprintf(retval, size, "<%s>%s</%s> ", elem, src, elem);
+		if (retval == NULL)
+			perror("allocate_entry(): Cannot allocate memory");
+		else
+			snprintf(retval, size, "<%s>%s</%s> ",
+					       elem, src, elem);
 	} else
 		retval = NULL;
 	msg(3, "allocate_entry() returns '%s'\n", retval);
@@ -466,6 +470,10 @@ char *xml_entry(struct Entry *entry)
 		size = strlen(" t=\"") + strlen(entry->date) + strlen("\"");
 		msg(3, "date size = %lu\n", size);
 		e.date = malloc(size + 1);
+		if (e.date == NULL)
+			perror("xml_entry(): Cannot allocate memory");
+		else
+			snprintf(e.date, size, " t=\"%s\"", entry->date);
 	}
 
 	e.tag = allocate_entry("tag", entry->tag); /* fixme: tags → arrays */
