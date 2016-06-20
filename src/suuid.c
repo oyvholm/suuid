@@ -235,7 +235,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 
 int add_to_logfile(char *fname, struct Entry *entry)
 {
-	int retval = 0;
+	int retval = EXIT_OK;
 	FILE *fp;
 	char check_line[12];
 	long filepos;
@@ -247,10 +247,13 @@ int add_to_logfile(char *fname, struct Entry *entry)
 	filepos = ftell(fp);
 	if (filepos == -1)
 		err(1, "%s: Cannot read file position", fname);
-	if (strcmp(fgets(check_line, 10, fp), "</suuid>\n")) {
+	if (strcmp(fgets(check_line, 10, fp), "</suuids>")) {
+		msg(3, "add_to_logfile(): check_line = '%s'\n", check_line);
 		fprintf(stderr, "%s: %s: Unknown end line, adding to "
 				"end of file\n", progname, fname);
 	} else {
+		msg(3, "add_to_logfile(): Seems as check_line is ok, "
+		       "it is '%s'\n", check_line);
 		if (fseek(fp, 0, SEEK_SET) == -1)
 			err(1, "%s: Cannot seek to position %lu",
 				fname, filepos);
@@ -259,7 +262,9 @@ int add_to_logfile(char *fname, struct Entry *entry)
 		warn("fputs()");
 		retval = -1;
 	}
+	fprintf(fp, "\n</suuids>\n");
 	fclose(fp);
+	/* system("echo; echo; cat /home/sunny/uuids/fake.xml; echo; echo"); */
 	return(retval);
 }
 
@@ -296,6 +301,7 @@ char *get_hostname(void)
 	retval = "fake"; /* Use "fake" as hostname to avoid conflicts
 			    with files created by the Perl version */
 #endif
+	msg(3, "get_hostname() returns '%s'\n", retval);
 	return(retval);
 }
 
@@ -336,6 +342,7 @@ void create_logfile(char *name)
 	char *xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 	char *xml_doctype = "<!DOCTYPE suuids SYSTEM \"dtd/suuids.dtd\">";
 
+	msg(3, "Entering create_logfile(\"%s\")\n", name);
 	if (access(name, F_OK) != -1)
 		return; /* File already exists */
 	else {
@@ -443,7 +450,9 @@ int main(int argc, char *argv[])
 	snprintf(logfile, fname_length, "%s/%s.xml", opt_logdir, entry.host);
 	msg(2, "logfile = \"%s\"\n", logfile);
 	create_logfile(logfile);
-	printf("%s\n", generate_uuid());
+	entry.uuid = generate_uuid();
+	add_to_logfile(logfile, &entry);
+	puts(entry.uuid);
 	free(logfile);
 	free(entry.cwd);
 
