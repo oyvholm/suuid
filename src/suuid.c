@@ -233,6 +233,10 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 	return retval;
 }
 
+/*
+ * add_to_logfile() - Add the contents of *entry to the XML file fname.
+ */
+
 int add_to_logfile(char *fname, struct Entry *entry)
 {
 	int retval = EXIT_OK;
@@ -294,6 +298,10 @@ char *generate_uuid(void)
 	return(uuid);
 }
 
+/*
+ * get_hostname()
+ */
+
 char *get_hostname(void)
 {
 	static char buf[256];
@@ -309,6 +317,10 @@ char *get_hostname(void)
 	msg(3, "get_hostname() returns '%s'\n", retval);
 	return(retval);
 }
+
+/*
+ * getpath()
+ */
 
 char *getpath(void)
 {
@@ -342,6 +354,11 @@ char *getpath(void)
 	return retval;
 }
 
+/*
+ * create_logfile() - Create logfile with initial XML structure if it 
+ * doesn't exist already.
+ */
+
 void create_logfile(char *name)
 {
 	char *xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
@@ -361,12 +378,21 @@ void create_logfile(char *name)
 	}
 }
 
+/*
+ * uuid_date() - Return pointer to string with ISO date generated from 
+ * UUID v1.
+ */
+
 char *uuid_date(char *uuid)
 {
 	/* fixme */
 	static char retval[32] = "2000-01-01T00:00:00.0000000Z";
 	return(retval);
 }
+
+/*
+ * xml_entry()
+ */
 
 char *xml_entry(struct Entry entry)
 {
