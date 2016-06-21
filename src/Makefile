@@ -3,6 +3,7 @@
 # Author: Øyvind A. Holm <sunny@sunbase.org>
 
 OBJS = logfile.o suuid.o uuid.o
+DEPS = suuid.h version.h Makefile
 CC = gcc
 LD = gcc
 CCFLAGS = -Wall -O2 -c -g
@@ -12,13 +13,13 @@ EXEC = suuid
 $(EXEC): $(OBJS)
 	$(LD) -o $(EXEC) $(LDFLAGS) $(OBJS)
 
-suuid.o: suuid.c suuid.h version.h Makefile
+suuid.o: suuid.c $(DEPS)
 	$(CC) $(CCFLAGS) suuid.c
 
-logfile.o: logfile.c suuid.h version.h Makefile
+logfile.o: logfile.c $(DEPS)
 	$(CC) $(CCFLAGS) logfile.c
 
-uuid.o: uuid.c suuid.h version.h Makefile
+uuid.o: uuid.c $(DEPS)
 	$(CC) $(CCFLAGS) uuid.c
 
 .PHONY: clean
