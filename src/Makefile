@@ -1,4 +1,3 @@
-
 # Makefile for suuid.c
 # File ID: 27e0d738-2b93-11e6-8668-02010e0a6634
 # Author: Øyvind A. Holm <sunny@sunbase.org>

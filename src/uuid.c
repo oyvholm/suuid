@@ -52,3 +52,5 @@ char *uuid_date(char *uuid)
 	static char retval[32] = "2000-01-01T00:00:00.0000000Z";
 	return retval;
 }
+
+/* vim: set ts=8 sw=8 sts=8 noet fo+=w fenc=UTF-8 : */
