@@ -302,6 +302,21 @@ char *get_username(void)
 }
 
 /*
+ * get_tty() - Return pointer to string with name of current tty.
+ */
+
+char *get_tty(void)
+{
+	char *retval;
+
+	retval = ttyname(STDIN_FILENO);
+	if (retval == NULL)
+		perror("Cannot get name of tty");
+	msg(3, "get_tty() returns \"%s\"", retval);
+	return retval;
+}
+
+/*
  * init_xml_entry() - Initialise Entry struct at memory position e with 
  * initial values.
  */
@@ -315,6 +330,7 @@ void init_xml_entry(struct Entry *e)
 	e->host = NULL;
 	e->cwd = NULL;
 	e->user = NULL;
+	e->tty = NULL;
 	e->sess = NULL;
 }
 
@@ -410,6 +426,7 @@ char *xml_entry(struct Entry *entry)
 	e.host = allocate_entry("host", entry->host);
 	e.cwd = allocate_entry("cwd", entry->cwd);
 	e.user = allocate_entry("user", entry->user);
+	e.tty = allocate_entry("tty", entry->tty);
 
 	snprintf(buf, 65535, /* fixme: length */
 		"<suuid%s%s> " /* date, uuid */
@@ -418,6 +435,7 @@ char *xml_entry(struct Entry *entry)
 			"%s" /* host */
 			"%s" /* cwd */
 			"%s" /* user */
+			"%s" /* tty */
 			"%s" /* sess */
 		"</suuid>",
 		(e.date == NULL) ? "" : e.date,
@@ -427,6 +445,7 @@ char *xml_entry(struct Entry *entry)
 		(e.host == NULL) ? "" : e.host,
 		(e.cwd == NULL) ? "" : e.cwd,
 		(e.user == NULL) ? "" : e.user,
+		(e.tty == NULL) ? "" : e.tty,
 		(e.sess == NULL) ? "" : e.sess);
 	msg(3, "xml_entry(): After snprintf()");
 #if 0
@@ -509,6 +528,7 @@ int main(int argc, char *argv[])
 	msg(2, "entry.cwd = \"%s\"", entry.cwd);
 
 	entry.user = get_username();
+	entry.tty = get_tty();
 
 	fname_length = strlen(opt_logdir) +
 		       strlen("/") +

@@ -80,6 +80,7 @@ struct Entry {
 	char *host;
 	char *cwd;
 	char *user;
+	char *tty;
 	char *sess;
 };
 struct Options {
@@ -108,6 +109,7 @@ extern int parse_options(struct Options *, int, char *[]);
 extern char *get_hostname(void);
 extern char *getpath(void);
 extern char *get_username(void);
+extern char *get_tty(void);
 extern void init_xml_entry(struct Entry *);
 extern char *allocate_entry(char *, char *);
 extern char *alloc_attr(char *, char *);
