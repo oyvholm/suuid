@@ -93,12 +93,17 @@ struct Options {
  * Function prototypes
  */
 
+/* logfile.c */
+extern int add_to_logfile(char *, struct Entry *);
+extern void create_logfile(char *);
+
+/* suuid.c */
 extern int msg(int, const char *, ...);
 extern void print_license(void);
 extern void print_version(void);
 extern void usage(int);
-extern int add_to_logfile(char *, struct Entry *);
-extern void create_logfile(char *);
+extern int choose_opt_action(struct Options *, int, struct option *);
+extern int parse_options(struct Options *, int, char *[]);
 extern char *generate_uuid(void);
 extern char *get_hostname(void);
 extern char *getpath(void);
