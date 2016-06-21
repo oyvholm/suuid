@@ -494,6 +494,8 @@ int main(int argc, char *argv[])
 	int i;
 
 	progname = argv[0];
+	progname = "suuid"; /* fixme: Temporary kludge to make it 
+			       compatible with the Perl version. */
 
 	retval = parse_options(&opt, argc, argv);
 	msg(3, "retval after parse_options(): %d", retval);
