@@ -20,8 +20,6 @@
 
 #include "suuid.h"
 
-#define LOGDIR_MAXLEN 4096
-
 /*
  * Global variables
  */
@@ -470,13 +468,52 @@ char *xml_entry(struct Entry *entry)
 }
 
 /*
+ * get_logdir() - Return pointer to string with location of the log 
+ * directory. Use the value of -l/--logdir if it's defined, otherwise 
+ * use the environment variable $SUUID_LOGDIR, otherwise use 
+ * "$HOME/uuids". If that also fails, return NULL.
+ */
+
+char *get_logdir()
+{
+	char *retval;
+	if (opt.logdir != NULL)
+		retval = opt.logdir;
+	else if (getenv("SUUID_LOGDIR") != NULL)
+		retval = getenv("SUUID_LOGDIR");
+	else {
+		if (getenv("HOME") == NULL) {
+			msg(3, "get_logdir(): HOME not found");
+			fprintf(stderr, "%s: $SUUID_LOGDIR and $HOME "
+					"environment variables "
+					"are not defined, cannot create "
+					"logdir path", progname);
+			return NULL;
+		} else {
+			int size = strlen(getenv("HOME")) +
+				   strlen("/uuids") + 1;
+			retval = malloc(size + 1);
+			if (retval == NULL) {
+				perror("get_logdir(): Cannot allocate "
+				       "memory");
+				return NULL;
+			}
+			snprintf(retval, size, "%s/uuids",
+					       getenv("HOME"));
+		}
+	}
+	msg(3, "get_logdir() returns \"%s\"", retval);
+	return retval;
+}
+
+/*
  * main()
  */
 
 int main(int argc, char *argv[])
 {
 	int retval = EXIT_OK;
-	char opt_logdir[LOGDIR_MAXLEN + 1];
+	char *logdir;
 	char *logfile;
 	struct Entry entry;
 	size_t fname_length; /* Total length of logfile name */
@@ -508,12 +545,12 @@ int main(int argc, char *argv[])
 		return EXIT_OK;
 	}
 
-	strncpy(opt_logdir, getenv("SUUID_LOGDIR"), LOGDIR_MAXLEN);
-
-	msg(2, "opt.logdir = '%s'", opt.logdir);
-	if (opt.logdir != NULL) {
-		strncpy(opt_logdir, opt.logdir, LOGDIR_MAXLEN);
-		msg(2, "opt_logdir = \"%s\"", opt_logdir);
+	logdir = get_logdir(&opt);
+	msg(3, "logdir = '%s'", logdir);
+	if (logdir == NULL) {
+		fprintf(stderr, "%s: Unable to find logdir location\n",
+				progname);
+		return(EXIT_ERROR);
 	}
 
 	init_xml_entry(&entry);
@@ -535,7 +572,7 @@ int main(int argc, char *argv[])
 	entry.user = get_username();
 	entry.tty = get_tty();
 
-	fname_length = strlen(opt_logdir) +
+	fname_length = strlen(logdir) +
 		       strlen("/") +
 		       strlen(entry.host) +
 		       strlen(".xml") +
@@ -545,7 +582,7 @@ int main(int argc, char *argv[])
 		err(1, "Could not allocate %lu bytes for logfile filename",
 			fname_length + 1);
 	/* fixme: Remove slash hardcoding */
-	snprintf(logfile, fname_length, "%s/%s.xml", opt_logdir, entry.host);
+	snprintf(logfile, fname_length, "%s/%s.xml", logdir, entry.host);
 	msg(2, "logfile = \"%s\"", logfile);
 	create_logfile(logfile);
 	if (opt.verbose > 2) {
