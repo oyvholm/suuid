@@ -3,7 +3,9 @@
 # Author: Øyvind A. Holm <sunny@sunbase.org>
 
 OBJS = logfile.o suuid.o uuid.o
-DEPS = suuid.h version.h Makefile
+CFILES = logfile.c suuid.c uuid.c
+HFILES = suuid.h version.h
+DEPS = $(HFILES) Makefile
 CC = gcc
 LD = gcc
 CCFLAGS = -Wall -O2 -c -g
@@ -31,5 +33,5 @@ clean:
 edit: tags
 	$(EDITOR) *.c *.h Makefile
 
-tags: suuid.c suuid.h version.h
-	ctags suuid.c suuid.h version.h
+tags: $(CFILES) $(HFILES)
+	ctags $(CFILES) $(HFILES)
