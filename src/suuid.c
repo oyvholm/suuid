@@ -104,7 +104,7 @@ void usage(int retval)
 		puts("");
 		puts("Options:");
 		puts("");
-		puts("-c x, --comment x\n"
+		puts("  -c x, --comment x\n"
 		     "    Store comment x in the log file.");
 		puts("  -h, --help\n"
 		     "    Show this help.");
