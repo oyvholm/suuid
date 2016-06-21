@@ -118,6 +118,8 @@ extern char *xml_entry(struct Entry *);
 /* uuid.c */
 extern char *generate_uuid(void);
 extern char *uuid_date(char *);
+extern int is_hex(char *, unsigned int);
+extern int valid_uuid(char *);
 
 /*
  * Global variables

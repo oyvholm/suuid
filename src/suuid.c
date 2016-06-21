@@ -518,6 +518,11 @@ int main(int argc, char *argv[])
 
 	init_xml_entry(&entry);
 	entry.uuid = generate_uuid();
+	if (!valid_uuid(entry.uuid)) {
+		fprintf(stderr, "%s: Got invalid UUID: \"%s\"",
+				progname, entry.uuid);
+		return(EXIT_ERROR);
+	}
 	entry.date = uuid_date(entry.uuid);
 	entry.host = get_hostname();
 	msg(2, "entry.host = \"%s\"", entry.host);

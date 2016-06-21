@@ -53,4 +53,50 @@ char *uuid_date(char *uuid)
 	return retval;
 }
 
+/*
+ * is_hex() - Check that len bytes at the location pointed to by p are 
+ * all legal lowercase hex chars. Return 1 if all characters are valid 
+ * hex, 0 if not.
+ */
+
+int is_hex(char *p, unsigned int len)
+{
+	int retval = 1;
+	int i;
+	for (i = 0; i < len; i++) {
+		char c = p[i];
+		if (!in_range(c, '0', '9') && !in_range(c, 'a', 'f'))
+			retval = 0;
+	}
+	return retval;
+}
+
+/*
+ * valid_uuid() - Check that the UUID pointed to by u is a valid UUID. 
+ * Return 1 if valid, 0 if not.
+ */
+
+int valid_uuid(char *u)
+{
+	int retval = 1;
+
+	if (strlen(u) != 36)
+		retval = 0;
+
+	/* Check that it only contains lowercase hex and dashes at the 
+	 * right places
+	 */
+	if (!is_hex(u, 8) || u[8] != '-' || !is_hex(u + 9, 4) ||
+	    u[13] != '-' || !is_hex(u + 14, 4) || u[18] != '-' ||
+	    !is_hex(u + 19, 4) || u[23] != '-' || !is_hex(u + 24, 12))
+		retval = 0;
+
+	/* At the moment only v1 UUIDs are allowed
+	 */
+	if (u[14] != '1')
+		retval = 0;
+
+	return retval;
+}
+
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w fenc=UTF-8 : */
