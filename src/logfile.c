@@ -133,4 +133,25 @@ void create_logfile(char *name)
 	}
 }
 
+/*
+ * valid_xml_chars() - Check that the string pointed to by s contains 
+ * valid UTF-8 and no control chars. Return 1 if ok, 0 if invalid.
+ */
+
+int valid_xml_chars(char *s)
+{
+	unsigned char *p = (unsigned char *)s;
+	if (utf8_check((unsigned char *)s) != NULL)
+		return 0;
+	while (*p) {
+		if (*p < ' ' && *p != '\n' && *p != '\r' && *p != '\t') 
+			return 0;
+		if (*p == 127)
+			return 0;
+		p++;
+	}
+
+	return 1;
+}
+
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w fenc=UTF-8 : */

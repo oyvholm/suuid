@@ -100,6 +100,7 @@ struct Options {
 extern char *get_logdir();
 extern int add_to_logfile(char *, struct Entry *);
 extern void create_logfile(char *);
+extern int valid_xml_chars(char *);
 
 /* suuid.c */
 extern int msg(int, const char *, ...);

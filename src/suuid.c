@@ -551,8 +551,7 @@ int main(int argc, char *argv[])
 	if (opt.comment != NULL)
 		entry.txt = opt.comment;
 
-	if (opt.comment != NULL &&
-	    utf8_check((unsigned char *)entry.txt) != NULL) {
+	if (opt.comment != NULL && !valid_xml_chars(entry.txt)) {
 		fprintf(stderr, "%s: Comment contains illegal characters or "
 				"is not valid UTF-8", progname);
 		return EXIT_ERROR;
