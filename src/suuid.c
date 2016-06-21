@@ -124,6 +124,20 @@ void usage(int retval)
 		     "    Increase level of verbosity. Can be repeated.");
 		puts("  --version\n"
 		     "    Print version information.");
+		puts("  -w x, --whereto x\n"
+		     "    x is a string which decides where the UUID will "
+		     "be written:\n"
+		     "      The string contains 'e' - stderr\n"
+		     "      The string contains 'o' - stdout\n"
+		     "    All other characters will be ignored. Examples:\n"
+		     "      e\n"
+		     "        Send to stderr.\n"
+		     "      eo\n"
+		     "        Send to both stdout and stderr.\n"
+		     "      a\n"
+		     "        Synonym for eo.\n"
+		     "      n\n"
+		     "        Don’t output anything.");
 		puts("");
 	}
 }
@@ -174,6 +188,13 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 	case 'v':
 		dest->verbose++;
 		break;
+	case 'w':
+		dest->whereto = strdup(optarg);
+		if (dest->whereto == NULL) {
+			perror("Cannot allocate memory for -w argument");
+			retval = EXIT_ERROR;
+		}
+		break;
 	default:
 		msg(2, "getopt_long() returned "
 		       "character code %d", c);
@@ -200,6 +221,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 	dest->logdir = NULL;
 	dest->verbose = 0;
 	dest->version = 0;
+	dest->whereto = NULL;
 
 	while (retval == EXIT_OK) {
 		int option_index = 0;
@@ -211,6 +233,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 			{"quiet", no_argument, 0, 'q'},
 			{"verbose", no_argument, 0, 'v'},
 			{"version", no_argument, 0, 0},
+			{"whereto", no_argument, 0, 'w'},
 			{0, 0, 0, 0}
 		};
 
@@ -224,7 +247,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 		 *
 		 */
 
-		c = getopt_long(argc, argv, "c:hl:qv", long_options,
+		c = getopt_long(argc, argv, "c:hl:qvw:", long_options,
 				&option_index);
 
 		if (c == -1)
@@ -571,7 +594,16 @@ int main(int argc, char *argv[])
 		i = i; /* Get rid of gcc warning */
 	}
 	add_to_logfile(logfile, &entry);
-	puts(entry.uuid);
+	if (opt.whereto == NULL)
+		puts(entry.uuid);
+	else {
+		if (strchr(opt.whereto, 'a') != NULL ||
+		    strchr(opt.whereto, 'o') != NULL)
+			fprintf(stdout, "%s\n", entry.uuid);
+		if (strchr(opt.whereto, 'a') != NULL ||
+		    strchr(opt.whereto, 'e') != NULL)
+			fprintf(stderr, "%s\n", entry.uuid);
+	}
 	free(logfile);
 	free(entry.cwd);
 

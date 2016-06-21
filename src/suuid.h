@@ -90,6 +90,7 @@ struct Options {
 	char *logdir;
 	int verbose;
 	int version;
+	char *whereto;
 };
 
 /*
