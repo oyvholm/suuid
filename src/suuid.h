@@ -84,6 +84,7 @@ struct Entry {
 	char *sess;
 };
 struct Options {
+	char *comment;
 	int help;
 	int license;
 	char *logdir;

@@ -104,6 +104,8 @@ void usage(int retval)
 		puts("");
 		puts("Options:");
 		puts("");
+		puts("-c x, --comment x\n"
+		     "    Store comment x in the log file.");
 		puts("  -h, --help\n"
 		     "    Show this help.");
 		puts("  --license\n"
@@ -145,6 +147,15 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 			dest->version = 1;
 		}
 		break;
+	case 'c':
+		dest->comment = malloc(strlen(optarg));
+		if (dest->comment == NULL) {
+			perror("choose_opt_action(): Cannot allocate "
+			       "memory for -c/--comment argument");
+			retval = EXIT_ERROR;
+		} else
+			strncpy(dest->comment, optarg, strlen(optarg));
+		break;
 	case 'h':
 		dest->help = 1;
 		break;
@@ -183,6 +194,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 	int retval = EXIT_OK;
 	int c;
 
+	dest->comment = NULL;
 	dest->help = 0;
 	dest->license = 0;
 	dest->logdir = NULL;
@@ -192,6 +204,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 	while (retval == EXIT_OK) {
 		int option_index = 0;
 		static struct option long_options[] = {
+			{"comment", required_argument, 0, 'c'},
 			{"help", no_argument, 0, 'h'},
 			{"license", no_argument, 0, 0},
 			{"logdir", required_argument, 0, 'l'},
@@ -211,7 +224,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 		 *
 		 */
 
-		c = getopt_long(argc, argv, "hl:qv", long_options,
+		c = getopt_long(argc, argv, "c:hl:qv", long_options,
 				&option_index);
 
 		if (c == -1)
@@ -532,6 +545,9 @@ int main(int argc, char *argv[])
 
 	entry.user = get_username();
 	entry.tty = get_tty();
+
+	if (opt.comment != NULL)
+		entry.txt = opt.comment;
 
 	fname_length = strlen(logdir) +
 		       strlen("/") +
