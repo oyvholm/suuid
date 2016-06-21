@@ -104,14 +104,16 @@ extern void print_version(void);
 extern void usage(int);
 extern int choose_opt_action(struct Options *, int, struct option *);
 extern int parse_options(struct Options *, int, char *[]);
-extern char *generate_uuid(void);
 extern char *get_hostname(void);
 extern char *getpath(void);
-extern char *uuid_date(char *);
 extern void init_xml_entry(struct Entry *);
 extern char *allocate_entry(char *, char *);
 extern char *alloc_attr(char *, char *);
 extern char *xml_entry(struct Entry *);
+
+/* uuid.c */
+extern char *generate_uuid(void);
+extern char *uuid_date(char *);
 
 /*
  * Global variables

@@ -228,27 +228,6 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 }
 
 /*
- * generate_uuid()
- */
-
-char *generate_uuid(void)
-{
-	static char uuid[38];
-	FILE *fp;
-	/* FIXME: Generate it properly */
-	fp = popen("/usr/bin/uuid", "r");
-	if (fp == NULL) {
-		fprintf(stderr, "%s: Could not exec /usr/bin/uuid", progname);
-		return NULL;
-	}
-	if (fgets(uuid, 37, fp) == NULL)
-		fprintf(stderr, "%s: fgets() error", progname);
-	uuid[36] = '\0';
-	pclose(fp);
-	return uuid;
-}
-
-/*
  * get_hostname()
  */
 
@@ -301,18 +280,6 @@ char *getpath(void)
 			return NULL;
 		}
 	}
-	return retval;
-}
-
-/*
- * uuid_date() - Return pointer to string with ISO date generated from 
- * UUID v1.
- */
-
-char *uuid_date(char *uuid)
-{
-	/* fixme */
-	static char retval[32] = "2000-01-01T00:00:00.0000000Z";
 	return retval;
 }
 
