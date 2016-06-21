@@ -551,6 +551,14 @@ int main(int argc, char *argv[])
 	if (opt.comment != NULL)
 		entry.txt = opt.comment;
 
+	if (opt.comment != NULL &&
+	    utf8_check((unsigned char *)entry.txt) != NULL) {
+		fprintf(stderr, "%s: Comment contains illegal characters or "
+				"is not valid UTF-8", progname);
+		return EXIT_ERROR;
+	}
+	msg(3, "After utf8_check()");
+
 	fname_length = strlen(logdir) +
 		       strlen("/") +
 		       strlen(entry.host) +

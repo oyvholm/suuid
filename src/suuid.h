@@ -117,6 +117,9 @@ extern char *allocate_entry(char *, char *);
 extern char *alloc_attr(char *, char *);
 extern char *xml_entry(struct Entry *);
 
+/* utf8.c */
+extern unsigned char *utf8_check(unsigned char *);
+
 /* uuid.c */
 extern char *generate_uuid(void);
 extern char *uuid_date(char *);

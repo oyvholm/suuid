@@ -2,8 +2,8 @@
 # File ID: 27e0d738-2b93-11e6-8668-02010e0a6634
 # Author: Øyvind A. Holm <sunny@sunbase.org>
 
-OBJS = logfile.o suuid.o uuid.o
-CFILES = logfile.c suuid.c uuid.c
+OBJS = logfile.o suuid.o utf8.o uuid.o
+CFILES = logfile.c suuid.c utf8.c uuid.c
 HFILES = suuid.h version.h
 DEPS = $(HFILES) Makefile
 CC = gcc
@@ -20,6 +20,9 @@ suuid.o: suuid.c $(DEPS)
 
 logfile.o: logfile.c $(DEPS)
 	$(CC) $(CCFLAGS) logfile.c
+
+utf8.o: utf8.c $(DEPS)
+	$(CC) $(CCFLAGS) utf8.c
 
 uuid.o: uuid.c $(DEPS)
 	$(CC) $(CCFLAGS) uuid.c
