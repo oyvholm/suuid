@@ -246,10 +246,8 @@ char *get_hostname(void)
 {
 	static char buf[256];
 	char *retval = buf;
-	if (gethostname(buf, 255) == -1) {
-		perror("Could not get hostname");
+	if (gethostname(buf, 255) == -1)
 		return NULL;
-	}
 #if FAKE_HOST
 	retval = "fake"; /* Use "fake" as hostname to avoid conflicts
 			    with files created by the Perl version */
@@ -303,10 +301,9 @@ char *get_username(void)
 	char *retval;
 	struct passwd *pw;
 	pw = getpwuid(getuid());
-	if (pw == NULL) {
-		perror("get_username(): cannot get username");
+	if (pw == NULL)
 		retval = NULL;
-	} else
+	else
 		retval = pw->pw_name;
 	msg(3, "get_username() returns \"%s\"", retval);
 	return retval;
@@ -321,8 +318,6 @@ char *get_tty(void)
 	char *retval;
 
 	retval = ttyname(STDIN_FILENO);
-	if (retval == NULL)
-		perror("Cannot get name of tty");
 	msg(3, "get_tty() returns \"%s\"", retval);
 	return retval;
 }
@@ -541,8 +536,6 @@ int main(int argc, char *argv[])
 	msg(2, "entry.host = \"%s\"", entry.host);
 
 	entry.cwd = getpath();
-	if (entry.cwd == NULL)
-		err(0, "Could not get current directory");
 	msg(2, "entry.cwd = \"%s\"", entry.cwd);
 
 	entry.user = get_username();
