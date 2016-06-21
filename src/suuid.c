@@ -162,24 +162,22 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 		}
 		break;
 	case 'c':
-		dest->comment = malloc(strlen(optarg));
+		dest->comment = strdup(optarg);
 		if (dest->comment == NULL) {
 			perror("choose_opt_action(): Cannot allocate "
 			       "memory for -c/--comment argument");
 			retval = EXIT_ERROR;
-		} else
-			strncpy(dest->comment, optarg, strlen(optarg));
+		}
 		break;
 	case 'h':
 		dest->help = 1;
 		break;
 	case 'l':
-		dest->logdir = malloc(strlen(optarg) + 1);
+		dest->logdir = strdup(optarg);
 		if (dest->logdir == NULL) {
-			perror("choose_opt_action(): malloc() error");
+			perror("choose_opt_action(): Cannot allocate "
+			       "memory for -l/--logdir argument");
 			retval = EXIT_ERROR;
-		} else {
-			strncpy(dest->logdir, optarg, strlen(optarg));
 		}
 		break;
 	case 'q':
