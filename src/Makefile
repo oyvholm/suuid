@@ -34,7 +34,7 @@ clean:
 
 .PHONY: edit
 edit: tags
-	$(EDITOR) *.c *.h Makefile
+	$(EDITOR) *.c *.h Makefile t/*.t
 
 tags: $(CFILES) $(HFILES)
 	ctags $(CFILES) $(HFILES)
