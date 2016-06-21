@@ -96,6 +96,7 @@ struct Options {
  */
 
 /* logfile.c */
+extern char *get_logdir();
 extern int add_to_logfile(char *, struct Entry *);
 extern void create_logfile(char *);
 
@@ -114,7 +115,6 @@ extern void init_xml_entry(struct Entry *);
 extern char *allocate_entry(char *, char *);
 extern char *alloc_attr(char *, char *);
 extern char *xml_entry(struct Entry *);
-extern char *get_logdir();
 
 /* uuid.c */
 extern char *generate_uuid(void);

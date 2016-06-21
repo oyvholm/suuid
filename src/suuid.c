@@ -468,45 +468,6 @@ char *xml_entry(struct Entry *entry)
 }
 
 /*
- * get_logdir() - Return pointer to string with location of the log 
- * directory. Use the value of -l/--logdir if it's defined, otherwise 
- * use the environment variable $SUUID_LOGDIR, otherwise use 
- * "$HOME/uuids". If that also fails, return NULL.
- */
-
-char *get_logdir()
-{
-	char *retval;
-	if (opt.logdir != NULL)
-		retval = opt.logdir;
-	else if (getenv("SUUID_LOGDIR") != NULL)
-		retval = getenv("SUUID_LOGDIR");
-	else {
-		if (getenv("HOME") == NULL) {
-			msg(3, "get_logdir(): HOME not found");
-			fprintf(stderr, "%s: $SUUID_LOGDIR and $HOME "
-					"environment variables "
-					"are not defined, cannot create "
-					"logdir path", progname);
-			return NULL;
-		} else {
-			int size = strlen(getenv("HOME")) +
-				   strlen("/uuids") + 1;
-			retval = malloc(size + 1);
-			if (retval == NULL) {
-				perror("get_logdir(): Cannot allocate "
-				       "memory");
-				return NULL;
-			}
-			snprintf(retval, size, "%s/uuids",
-					       getenv("HOME"));
-		}
-	}
-	msg(3, "get_logdir() returns \"%s\"", retval);
-	return retval;
-}
-
-/*
  * main()
  */
 
