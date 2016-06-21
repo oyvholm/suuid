@@ -284,6 +284,24 @@ char *getpath(void)
 }
 
 /*
+ * get_username() - Return pointer to string with login name.
+ */
+
+char *get_username(void)
+{
+	char *retval;
+	struct passwd *pw;
+	pw = getpwuid(getuid());
+	if (pw == NULL) {
+		perror("get_username(): cannot get username");
+		retval = NULL;
+	} else
+		retval = pw->pw_name;
+	msg(3, "get_username() returns \"%s\"", retval);
+	return retval;
+}
+
+/*
  * init_xml_entry() - Initialise Entry struct at memory position e with 
  * initial values.
  */
@@ -489,6 +507,8 @@ int main(int argc, char *argv[])
 	if (entry.cwd == NULL)
 		err(0, "Could not get current directory");
 	msg(2, "entry.cwd = \"%s\"", entry.cwd);
+
+	entry.user = get_username();
 
 	fname_length = strlen(opt_logdir) +
 		       strlen("/") +

@@ -60,6 +60,7 @@
 #include <errno.h>
 #include <getopt.h>
 #include <limits.h>
+#include <pwd.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -106,6 +107,7 @@ extern int choose_opt_action(struct Options *, int, struct option *);
 extern int parse_options(struct Options *, int, char *[]);
 extern char *get_hostname(void);
 extern char *getpath(void);
+extern char *get_username(void);
 extern void init_xml_entry(struct Entry *);
 extern char *allocate_entry(char *, char *);
 extern char *alloc_attr(char *, char *);
