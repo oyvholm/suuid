@@ -35,6 +35,9 @@
 
 #define stddebug  stderr
 
+#define ENV_LOGDIR "SUUID_LOGDIR" /* Optional environment variable with path to 
+				     log directory */
+
 #ifdef C_ASSERT
 #ifdef NDEBUG
 #undef NDEBUG
