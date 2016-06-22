@@ -97,7 +97,17 @@ struct Options {
  * Function prototypes
  */
 
+/* environ.c */
+extern char *get_hostname(void);
+extern char *getpath(void);
+extern char *get_username(void);
+extern char *get_tty(void);
+
 /* logfile.c */
+extern void init_xml_entry(struct Entry *);
+extern char *allocate_entry(char *, char *);
+extern char *alloc_attr(char *, char *);
+extern char *xml_entry(struct Entry *);
 extern char *get_logdir();
 extern int add_to_logfile(char *, struct Entry *);
 extern void create_logfile(char *);
@@ -110,14 +120,6 @@ extern void print_version(void);
 extern void usage(int);
 extern int choose_opt_action(struct Options *, int, struct option *);
 extern int parse_options(struct Options *, int, char *[]);
-extern char *get_hostname(void);
-extern char *getpath(void);
-extern char *get_username(void);
-extern char *get_tty(void);
-extern void init_xml_entry(struct Entry *);
-extern char *allocate_entry(char *, char *);
-extern char *alloc_attr(char *, char *);
-extern char *xml_entry(struct Entry *);
 
 /* utf8.c */
 extern unsigned char *utf8_check(unsigned char *);
