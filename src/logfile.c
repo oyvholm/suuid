@@ -297,7 +297,7 @@ int valid_xml_chars(char *s)
 	if (utf8_check((unsigned char *)s) != NULL)
 		return 0;
 	while (*p) {
-		if (*p < ' ' && *p != '\n' && *p != '\r' && *p != '\t') 
+		if (*p < ' ' && *p != '\n' && *p != '\r' && *p != '\t')
 			return 0;
 		if (*p == 127)
 			return 0;
