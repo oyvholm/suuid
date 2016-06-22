@@ -101,44 +101,44 @@ void usage(int retval)
 			puts("");
 		}
 		printf("Usage: %s [options] [file [files [...]]]\n", progname);
-		puts("");
-		puts("Options:");
-		puts("");
-		puts("  -c x, --comment x\n"
-		     "    Store comment x in the log file.");
-		puts("  -h, --help\n"
-		     "    Show this help.");
-		puts("  --license\n"
-		     "    Print the software license");
-		puts("  -l x, --logdir x\n"
-		     "    Store log files in directory x.\n"
-		     "    If the SUUID_LOGDIR environment variable is "
-		     "defined, that value is\n"
-		     "    used. Otherwise the value \"$HOME/uuids\" is "
-		     "used.\n"
-		     "    Current default: /home/sunny/uuids");
-		puts("  -q, --quiet\n"
-		     "    Be more quiet. "
-		     "Can be repeated to increase silence.");
-		puts("  -v, --verbose\n"
-		     "    Increase level of verbosity. Can be repeated.");
-		puts("  --version\n"
-		     "    Print version information.");
-		puts("  -w x, --whereto x\n"
-		     "    x is a string which decides where the UUID will "
-		     "be written:\n"
-		     "      The string contains 'e' - stderr\n"
-		     "      The string contains 'o' - stdout\n"
-		     "    All other characters will be ignored. Examples:\n"
-		     "      e\n"
-		     "        Send to stderr.\n"
-		     "      eo\n"
-		     "        Send to both stdout and stderr.\n"
-		     "      a\n"
-		     "        Synonym for eo.\n"
-		     "      n\n"
-		     "        Don’t output anything.");
-		puts("");
+		printf("\n");
+		printf("Options:\n");
+		printf("\n");
+		printf("  -c x, --comment x\n"
+		       "    Store comment x in the log file.\n");
+		printf("  -h, --help\n"
+		       "    Show this help.\n");
+		printf("  --license\n"
+		       "    Print the software license\n");
+		printf("  -l x, --logdir x\n"
+		       "    Store log files in directory x.\n"
+		       "    If the SUUID_LOGDIR environment variable is "
+		       "defined, that value is\n"
+		       "    used. Otherwise the value \"$HOME/uuids\" is "
+		       "used.\n"
+		       "    Current default: /home/sunny/uuids\n");
+		printf("  -q, --quiet\n"
+		       "    Be more quiet. "
+		       "Can be repeated to increase silence.\n");
+		printf("  -v, --verbose\n"
+		       "    Increase level of verbosity. Can be repeated.\n");
+		printf("  --version\n"
+		       "    Print version information.\n");
+		printf("  -w x, --whereto x\n"
+		       "    x is a string which decides where the UUID will "
+		       "be written:\n"
+		       "      The string contains 'e' - stderr\n"
+		       "      The string contains 'o' - stdout\n"
+		       "    All other characters will be ignored. Examples:\n"
+		       "      e\n"
+		       "        Send to stderr.\n"
+		       "      eo\n"
+		       "        Send to both stdout and stderr.\n"
+		       "      a\n"
+		       "        Synonym for eo.\n"
+		       "      n\n"
+		       "        Don’t output anything.\n");
+		printf("\n");
 	}
 }
 
