@@ -4,25 +4,25 @@
  *
  * (C)opyleft 2016- Øyvind A. Holm <sunny@sunbase.org>
  *
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 2 of the License, or (at 
- * your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it 
+ * under the terms of the GNU General Public License as published by the Free 
+ * Software Foundation; either version 2 of the License, or (at your option) 
+ * any later version.
  *
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for 
+ * more details.
  *
- * You should have received a copy of the GNU General Public License 
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with 
+ * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "suuid.h"
 
 /*
- * init_xml_entry() - Initialise Entry struct at memory position e with 
- * initial values.
+ * init_xml_entry() - Initialise Entry struct at memory position e with initial 
+ * values.
  */
 
 void init_xml_entry(struct Entry *e)
@@ -68,8 +68,8 @@ char *allocate_entry(char *elem, char *src)
 }
 
 /*
- * alloc_attr() - Return pointer to string with XML attribute. Returns 
- * NULL on error.
+ * alloc_attr() - Return pointer to string with XML attribute. Returns NULL on 
+ * error.
  */
 
 char *alloc_attr(char *attr, char *data)
@@ -94,8 +94,8 @@ char *alloc_attr(char *attr, char *data)
 }
 
 /*
- * xml_entry() - Return pointer to string with one XML entry extracted 
- * from the entry struct, or NULL if error.
+ * xml_entry() - Return pointer to string with one XML entry extracted from the 
+ * entry struct, or NULL if error.
  */
 
 char *xml_entry(struct Entry *entry)
@@ -174,10 +174,10 @@ char *xml_entry(struct Entry *entry)
 }
 
 /*
- * get_logdir() - Return pointer to string with location of the log 
- * directory. Use the value of -l/--logdir if it's defined, otherwise 
- * use the environment variable $SUUID_LOGDIR, otherwise use 
- * "$HOME/uuids". If that also fails, return NULL.
+ * get_logdir() - Return pointer to string with location of the log directory. 
+ * Use the value of -l/--logdir if it's defined, otherwise use the environment 
+ * variable $SUUID_LOGDIR, otherwise use "$HOME/uuids". If that also fails, 
+ * return NULL.
  */
 
 char *get_logdir()
@@ -263,8 +263,8 @@ int add_to_logfile(char *fname, struct Entry *entry)
 }
 
 /*
- * create_logfile() - Create logfile with initial XML structure if it 
- * doesn't exist already.
+ * create_logfile() - Create logfile with initial XML structure if it doesn't 
+ * exist already.
  */
 
 void create_logfile(char *name)
@@ -287,8 +287,8 @@ void create_logfile(char *name)
 }
 
 /*
- * valid_xml_chars() - Check that the string pointed to by s contains 
- * valid UTF-8 and no control chars. Return 1 if ok, 0 if invalid.
+ * valid_xml_chars() - Check that the string pointed to by s contains valid 
+ * UTF-8 and no control chars. Return 1 if ok, 0 if invalid.
  */
 
 int valid_xml_chars(char *s)

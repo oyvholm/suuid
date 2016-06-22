@@ -4,35 +4,35 @@
  *
  * (C)opyleft 2016- Øyvind A. Holm <sunny@sunbase.org>
  *
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 2 of the License, or (at 
- * your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it 
+ * under the terms of the GNU General Public License as published by the Free 
+ * Software Foundation; either version 2 of the License, or (at your option) 
+ * any later version.
  *
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for 
+ * more details.
  *
- * You should have received a copy of the GNU General Public License 
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with 
+ * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "suuid.h"
 
 /*
- * The utf8_check() function scans the '\0'-terminated string starting 
- * at s. It returns a pointer to the first byte of the first malformed 
- * or overlong UTF-8 sequence found, or NULL if the string contains only 
- * correct UTF-8. It also spots UTF-8 sequences that could cause trouble 
- * if converted to UTF-16, namely surrogate characters (U+D800..U+DFFF) 
- * and non-Unicode positions (U+FFFE..U+FFFF). This routine is very 
- * likely to find a malformed sequence if the input uses any other 
- * encoding than UTF-8. It therefore can be used as a very effective 
- * heuristic for distinguishing between UTF-8 and other encodings.
+ * The utf8_check() function scans the '\0'-terminated string starting at s. It 
+ * returns a pointer to the first byte of the first malformed or overlong UTF-8 
+ * sequence found, or NULL if the string contains only correct UTF-8. It also 
+ * spots UTF-8 sequences that could cause trouble if converted to UTF-16, 
+ * namely surrogate characters (U+D800..U+DFFF) and non-Unicode positions 
+ * (U+FFFE..U+FFFF). This routine is very likely to find a malformed sequence 
+ * if the input uses any other encoding than UTF-8. It therefore can be used as 
+ * a very effective heuristic for distinguishing between UTF-8 and other 
+ * encodings.
  *
- * I wrote this code mainly as a specification of functionality; there 
- * are no doubt performance optimizations possible for certain CPUs.
+ * I wrote this code mainly as a specification of functionality; there are no 
+ * doubt performance optimizations possible for certain CPUs.
  *
  * Markus Kuhn <http://www.cl.cam.ac.uk/~mgk25/> -- 2005-03-30
  * License: http://www.cl.cam.ac.uk/~mgk25/short-license.html

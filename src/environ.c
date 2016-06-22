@@ -4,18 +4,18 @@
  *
  * (C)opyleft 2016- Øyvind A. Holm <sunny@sunbase.org>
  *
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 2 of the License, or (at 
- * your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it 
+ * under the terms of the GNU General Public License as published by the Free 
+ * Software Foundation; either version 2 of the License, or (at your option) 
+ * any later version.
  *
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for 
+ * more details.
  *
- * You should have received a copy of the GNU General Public License 
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with 
+ * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "suuid.h"
@@ -62,9 +62,9 @@ char *getpath(void)
 		}
 		p = getcwd(retval, size);
 		if (p == NULL && errno != ERANGE) {
-			/* Avoid infinite loop in case there's another 
-			 * getcwd() problem that's not fixable by just 
-			 * allocating more memory.
+			/* Avoid infinite loop in case there's another getcwd() 
+			 * problem that's not fixable by just allocating more 
+			 * memory.
 			 */
 			perror("getcwd()");
 			free(retval);

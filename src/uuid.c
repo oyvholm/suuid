@@ -4,18 +4,18 @@
  *
  * (C)opyleft 2016- Øyvind A. Holm <sunny@sunbase.org>
  *
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 2 of the License, or (at 
- * your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it 
+ * under the terms of the GNU General Public License as published by the Free 
+ * Software Foundation; either version 2 of the License, or (at your option) 
+ * any later version.
  *
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for 
+ * more details.
  *
- * You should have received a copy of the GNU General Public License 
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with 
+ * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "suuid.h"
@@ -42,8 +42,7 @@ char *generate_uuid(void)
 }
 
 /*
- * uuid_date() - Return pointer to string with ISO date generated from 
- * UUID v1.
+ * uuid_date() - Return pointer to string with ISO date generated from UUID v1.
  */
 
 char *uuid_date(char *uuid)
@@ -54,9 +53,9 @@ char *uuid_date(char *uuid)
 }
 
 /*
- * is_hex() - Check that len bytes at the location pointed to by p are 
- * all legal lowercase hex chars. Return 1 if all characters are valid 
- * hex, 0 if not.
+ * is_hex() - Check that len bytes at the location pointed to by p are all 
+ * legal lowercase hex chars. Return 1 if all characters are valid hex, 0 if 
+ * not.
  */
 
 int is_hex(char *p, unsigned int len)
@@ -72,8 +71,8 @@ int is_hex(char *p, unsigned int len)
 }
 
 /*
- * valid_uuid() - Check that the UUID pointed to by u is a valid UUID. 
- * Return 1 if valid, 0 if not.
+ * valid_uuid() - Check that the UUID pointed to by u is a valid UUID. Return 1 
+ * if valid, 0 if not.
  */
 
 int valid_uuid(char *u)
@@ -83,8 +82,8 @@ int valid_uuid(char *u)
 	if (strlen(u) != 36)
 		retval = 0;
 
-	/* Check that it only contains lowercase hex and dashes at the 
-	 * right places
+	/* Check that it only contains lowercase hex and dashes at the right 
+	 * places
 	 */
 	if (!is_hex(u, 8) || u[8] != '-' || !is_hex(u + 9, 4) ||
 	    u[13] != '-' || !is_hex(u + 14, 4) || u[18] != '-' ||
