@@ -32,7 +32,7 @@ uuid.o: uuid.c $(DEPS)
 
 .PHONY: clean
 clean:
-	rm -fv $(EXEC) $(OBJS) *~ core core.$(EXEC)
+	rm -fv $(EXEC) $(OBJS) *~ core core.$(EXEC) tags
 	cd t && $(MAKE) clean
 
 .PHONY: edit
