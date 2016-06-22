@@ -20,4 +20,88 @@
 
 #include "suuid.h"
 
+/*
+ * get_hostname()
+ */
+
+char *get_hostname(void)
+{
+	static char buf[256];
+	char *retval = buf;
+	if (gethostname(buf, 255) == -1)
+		return NULL;
+#if FAKE_HOST
+	retval = "fake"; /* Use "fake" as hostname to avoid conflicts
+			    with files created by the Perl version */
+#endif
+	msg(3, "get_hostname() returns '%s'", retval);
+	return retval;
+}
+
+/*
+ * getpath()
+ */
+
+char *getpath(void)
+{
+	char *retval;
+	char *p;
+	size_t blksize = 1024;
+	size_t size = blksize;
+	retval = malloc(size);
+	if (retval == NULL) {
+		perror("getpath(): malloc() fail");
+		return NULL;
+	}
+	for (p = getcwd(retval, size); p == NULL; ) {
+		size += blksize;
+		retval = realloc(retval, size);
+		if (retval == NULL) {
+			perror("getpath(): realloc() fail");
+			return NULL;
+		}
+		p = getcwd(retval, size);
+		if (p == NULL && errno != ERANGE) {
+			/* Avoid infinite loop in case there's another 
+			 * getcwd() problem that's not fixable by just 
+			 * allocating more memory.
+			 */
+			perror("getcwd()");
+			free(retval);
+			return NULL;
+		}
+	}
+	return retval;
+}
+
+/*
+ * get_username() - Return pointer to string with login name.
+ */
+
+char *get_username(void)
+{
+	char *retval;
+	struct passwd *pw;
+	pw = getpwuid(getuid());
+	if (pw == NULL)
+		retval = NULL;
+	else
+		retval = pw->pw_name;
+	msg(3, "get_username() returns \"%s\"", retval);
+	return retval;
+}
+
+/*
+ * get_tty() - Return pointer to string with name of current tty.
+ */
+
+char *get_tty(void)
+{
+	char *retval;
+
+	retval = ttyname(STDIN_FILENO);
+	msg(3, "get_tty() returns \"%s\"", retval);
+	return retval;
+}
+
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w fenc=UTF-8 : */
