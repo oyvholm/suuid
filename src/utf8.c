@@ -68,7 +68,7 @@ unsigned char *utf8_check(unsigned char *s)
 			/* 11110XXX 10XXxxxx 10xxxxxx 10xxxxxx */
 			if ((s[1] & 0xc0) != 0x80 || (s[2] & 0xc0) != 0x80 ||
 			    (s[3] & 0xc0) != 0x80 || (s[0] == 0xf0 &&
-			    (s[1] & 0xf0) == 0x80) ||	/* overlong? */
+			    (s[1] & 0xf0) == 0x80) || /* overlong? */
 			    (s[0] == 0xf4 && s[1] > 0x8f) ||
 			    s[0] > 0xf4) /* > U+10FFFF? */
 				return s;

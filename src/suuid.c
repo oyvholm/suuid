@@ -93,7 +93,8 @@ void usage(int retval)
 {
 	if (retval != EXIT_OK)
 		fprintf(stderr, "\nType \"%s --help\" for help screen. "
-			"Returning with value %d.\n", progname, retval);
+		                "Returning with value %d.\n",
+		                progname, retval);
 	else {
 		puts("");
 		if (opt.verbose >= 1) {
@@ -246,13 +247,13 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 		 */
 
 		c = getopt_long(argc, argv, "c:hl:qvw:", long_options,
-				&option_index);
+		                &option_index);
 
 		if (c == -1)
 			break;
 
 		retval = choose_opt_action(dest,
-					   c, &long_options[option_index]);
+		                           c, &long_options[option_index]);
 	}
 
 	msg(3, "parse_options() returns %d", retval);
@@ -274,7 +275,7 @@ int main(int argc, char *argv[])
 
 	progname = argv[0];
 	progname = "suuid"; /* fixme: Temporary kludge to make it compatible 
-			       with the Perl version. */
+	                       with the Perl version. */
 
 	retval = parse_options(&opt, argc, argv);
 	msg(3, "retval after parse_options(): %d", retval);
@@ -304,7 +305,7 @@ int main(int argc, char *argv[])
 	msg(3, "logdir = '%s'", logdir);
 	if (logdir == NULL) {
 		fprintf(stderr, "%s: Unable to find logdir location\n",
-				progname);
+		                progname);
 		return(EXIT_ERROR);
 	}
 
@@ -312,7 +313,7 @@ int main(int argc, char *argv[])
 	entry.uuid = generate_uuid();
 	if (!valid_uuid(entry.uuid)) {
 		fprintf(stderr, "%s: Got invalid UUID: \"%s\"",
-				progname, entry.uuid);
+		                progname, entry.uuid);
 		return(EXIT_ERROR);
 	}
 	entry.date = uuid_date(entry.uuid);
@@ -330,28 +331,28 @@ int main(int argc, char *argv[])
 
 	if (opt.comment != NULL && !valid_xml_chars(entry.txt)) {
 		fprintf(stderr, "%s: Comment contains illegal characters or "
-				"is not valid UTF-8\n", progname);
+		                "is not valid UTF-8\n", progname);
 		return EXIT_ERROR;
 	}
 	msg(3, "After utf8_check()");
 
 	fname_length = strlen(logdir) +
-		       strlen("/") +
-		       strlen(entry.host) +
-		       strlen(".xml") +
-		       1;
+	               strlen("/") +
+	               strlen(entry.host) +
+	               strlen(".xml") +
+	               1;
 	logfile = malloc(fname_length + 1);
 	if (logfile == NULL)
 		err(1, "Could not allocate %lu bytes for logfile filename",
-			fname_length + 1);
+		       fname_length + 1);
 	/* fixme: Remove slash hardcoding */
 	snprintf(logfile, fname_length, "%s/%s.xml", logdir, entry.host);
 	msg(2, "logfile = \"%s\"", logfile);
 	create_logfile(logfile);
 	if (opt.verbose > 2) {
 		i = system("(echo; echo After create_logfile:; "
-			   "cat /home/sunny/uuids/fake.xml; "
-			   "echo; echo) >&2");
+		           "cat /home/sunny/uuids/fake.xml; "
+		           "echo; echo) >&2");
 		i = i; /* Get rid of gcc warning */
 	}
 	add_to_logfile(logfile, &entry);

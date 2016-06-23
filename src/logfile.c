@@ -52,15 +52,15 @@ char *allocate_entry(char *elem, char *src)
 	msg(3, "Entering allocate_entry(\"%s\", \"%s\")", elem, src);
 	if (elem != NULL && src != NULL) {
 		size += strlen("<") + strlen(elem) + strlen(">") +
-			strlen(src) +
-			strlen("<") + strlen(elem) + strlen("/> ") + 1;
+		        strlen(src) +
+		        strlen("<") + strlen(elem) + strlen("/> ") + 1;
 		msg(3, "allocate_entry(): size = %lu", size);
 		retval = malloc(size + 1);
 		if (retval == NULL)
 			perror("allocate_entry(): Cannot allocate memory");
 		else
 			snprintf(retval, size, "<%s>%s</%s> ",
-					       elem, src, elem);
+			                       elem, src, elem);
 	} else
 		retval = NULL;
 	msg(3, "allocate_entry() returns '%s'", retval);
@@ -133,40 +133,43 @@ char *xml_entry(struct Entry *entry)
 	e.tty = allocate_entry("tty", entry->tty);
 
 	snprintf(buf, 65535, /* fixme: length */
-		"<suuid%s%s> " /* date, uuid */
-			"%s" /* tag */
-			"%s" /* txt */
-			"%s" /* host */
-			"%s" /* cwd */
-			"%s" /* user */
-			"%s" /* tty */
-			"%s" /* sess */
-		"</suuid>",
-		(e.date == NULL) ? "" : e.date,
-		(e.uuid == NULL) ? "" : e.uuid,
-		(e.tag == NULL) ? "" : e.tag,
-		(e.txt == NULL) ? "" : e.txt,
-		(e.host == NULL) ? "" : e.host,
-		(e.cwd == NULL) ? "" : e.cwd,
-		(e.user == NULL) ? "" : e.user,
-		(e.tty == NULL) ? "" : e.tty,
-		(e.sess == NULL) ? "" : e.sess);
+	         "<suuid%s%s> " /* date, uuid */
+	         "%s" /* tag */
+	         "%s" /* txt */
+	         "%s" /* host */
+	         "%s" /* cwd */
+	         "%s" /* user */
+	         "%s" /* tty */
+	         "%s" /* sess */
+	         "</suuid>",
+	         (e.date == NULL) ? "" : e.date,
+	         (e.uuid == NULL) ? "" : e.uuid,
+	         (e.tag == NULL) ? "" : e.tag,
+	         (e.txt == NULL) ? "" : e.txt,
+	         (e.host == NULL) ? "" : e.host,
+	         (e.cwd == NULL) ? "" : e.cwd,
+	         (e.user == NULL) ? "" : e.user,
+	         (e.tty == NULL) ? "" : e.tty,
+	         (e.sess == NULL) ? "" : e.sess);
 	msg(3, "xml_entry(): After snprintf()");
 #if 0
 	static char fake[] = "<suuid t=\"2016-06-07T04:18:40.9460630Z\" "
-		"u=\"ea3beb96-2c66-11e6-aa54-02010e0a6634\"> "
-		"<tag>ti</tag> "
-		"<txt>Jepp</txt> "
-		"<host>bellmann</host> "
-		"<cwd>/home/sunny/uuids</cwd> "
-		"<user>sunny</user> <tty>/dev/pts/7</tty> "
-		"<sess desc=\"xterm\">8a390a22-2c2e-11e6-8ffb-02010e0a6634"
-		"</sess> "
-		"<sess desc=\"logging\">9ad18242-2c2e-11e6-b1f8-02010e0a6634"
-		"</sess> "
-		"<sess desc=\"screen\">9c4257a0-2c2e-11e6-b724-02010e0a6634"
-		"</sess> "
-		"</suuid>";
+	                     "u=\"ea3beb96-2c66-11e6-aa54-02010e0a6634\"> "
+	                     "<tag>ti</tag> "
+	                     "<txt>Jepp</txt> "
+	                     "<host>bellmann</host> "
+	                     "<cwd>/home/sunny/uuids</cwd> "
+	                     "<user>sunny</user> <tty>/dev/pts/7</tty> "
+	                     "<sess desc=\"xterm\">"
+	                     "8a390a22-2c2e-11e6-8ffb-02010e0a6634"
+	                     "</sess> "
+	                     "<sess desc=\"logging\">"
+	                     "9ad18242-2c2e-11e6-b1f8-02010e0a6634"
+	                     "</sess> "
+	                     "<sess desc=\"screen\">"
+	                     "9c4257a0-2c2e-11e6-b724-02010e0a6634"
+	                     "</sess> "
+	                     "</suuid>";
 #endif
 	retval = buf;
 	msg(3, "xml_entry() returns '%s'", retval);
@@ -191,13 +194,13 @@ char *get_logdir()
 		if (getenv("HOME") == NULL) {
 			msg(3, "get_logdir(): HOME not found");
 			fprintf(stderr, "%s: $%s and $HOME environment "
-					"variables are not defined, cannot "
-					"create logdir path",
-					progname, ENV_LOGDIR);
+			                "variables are not defined, cannot "
+			                "create logdir path",
+			                progname, ENV_LOGDIR);
 			return NULL;
 		} else {
 			int size = strlen(getenv("HOME")) +
-				   strlen("/uuids") + 1;
+			           strlen("/uuids") + 1;
 			retval = malloc(size + 1);
 			if (retval == NULL) {
 				perror("get_logdir(): Cannot allocate "
@@ -205,7 +208,7 @@ char *get_logdir()
 				return NULL;
 			}
 			snprintf(retval, size, "%s/uuids",
-					       getenv("HOME"));
+			                       getenv("HOME"));
 		}
 	}
 	msg(3, "get_logdir() returns \"%s\"", retval);
@@ -236,13 +239,13 @@ int add_to_logfile(char *fname, struct Entry *entry)
 	if (strcmp(fgets(check_line, 10, fp), "</suuids>")) {
 		msg(3, "add_to_logfile(): check_line = '%s'", check_line);
 		fprintf(stderr, "%s: %s: Unknown end line, adding to "
-				"end of file\n", progname, fname);
+		                "end of file\n", progname, fname);
 	} else {
 		msg(3, "add_to_logfile(): Seems as check_line is ok, "
 		       "it is '%s'", check_line);
 		if (fseek(fp, filepos, SEEK_SET) == -1)
 			err(1, "%s: Cannot seek to position %lu",
-				fname, filepos);
+			       fname, filepos);
 	}
 	msg(3, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
 	if (fputs(xml_entry(entry), fp) <= 0) {
@@ -255,7 +258,7 @@ int add_to_logfile(char *fname, struct Entry *entry)
 	msg(3, "add_to_logfile(): fp is closed");
 	if (opt.verbose > 2) {
 		i = system("(echo; echo; cat /home/sunny/uuids/fake.xml; "
-			   "echo; echo) >&2");
+		           "echo; echo) >&2");
 		i = i; /* Get rid of gcc warning */
 	}
 	msg(3, "add_to_logfile() returns %d", retval);

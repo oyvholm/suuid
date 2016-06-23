@@ -31,18 +31,18 @@
 #define EXIT_OK     0
 #define EXIT_ERROR  1
 
-#define FAKE_HOST 1
+#define FAKE_HOST  1
 
 #define stddebug  stderr
 
-#define ENV_LOGDIR "SUUID_LOGDIR" /* Optional environment variable with path to 
-				     log directory */
+#define ENV_LOGDIR  "SUUID_LOGDIR" /* Optional environment variable with path 
+                                      to log directory */
 
 #ifdef C_ASSERT
 #ifdef NDEBUG
 #undef NDEBUG
-#endif /* ifdef NDEBUG        */
-#else /* ifdef C_ASSERT      */
+#endif /* ifdef NDEBUG */
+#else /* ifdef C_ASSERT */
 #define NDEBUG  1
 #endif /* ifdef C_ASSERT else */
 
@@ -51,7 +51,7 @@
  */
 
 #define in_range(a,b,c)  ((a) >= (b) && (a) <= (c) ? TRUE : FALSE)
-#define myerror(a)       { fprintf(stderr, "%s: ", progname); perror(a); }
+#define myerror(a)  { fprintf(stderr, "%s: ", progname); perror(a); }
 
 #include "version.h"
 
