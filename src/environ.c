@@ -21,7 +21,8 @@
 #include "suuid.h"
 
 /*
- * get_hostname()
+ * get_hostname() - Return pointer to string with hostname of the computer, or 
+ * NULL if error.
  */
 
 char *get_hostname(void)
@@ -39,7 +40,8 @@ char *get_hostname(void)
 }
 
 /*
- * getpath()
+ * getpath() - Return pointer to string with full path to current directory, or 
+ * NULL if error. Use free() on the pointer when it's not needed anymore.
  */
 
 char *getpath(void)
@@ -75,7 +77,7 @@ char *getpath(void)
 }
 
 /*
- * get_username() - Return pointer to string with login name.
+ * get_username() - Return pointer to string with login name, or NULL if error.
  */
 
 char *get_username(void)
