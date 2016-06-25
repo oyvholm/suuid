@@ -37,6 +37,7 @@ char *get_hostname(void)
 	                    with files created by the Perl version */
 #endif
 	msg(3, "get_hostname() returns '%s'", retval);
+
 	return retval;
 }
 
@@ -75,6 +76,7 @@ char *getpath(void)
 			return NULL;
 		}
 	}
+
 	return retval;
 }
 
@@ -93,6 +95,7 @@ char *get_username(void)
 	else
 		retval = pw->pw_name;
 	msg(3, "get_username() returns \"%s\"", retval);
+
 	return retval;
 }
 
@@ -115,6 +118,7 @@ char *get_tty(void)
 		retval = "not a tty";
 
 	msg(3, "get_tty() returns \"%s\"", retval);
+
 	return retval;
 }
 

@@ -46,6 +46,7 @@ int msg(int verbose, const char *format, ...)
 		fputc('\n', stddebug);
 		va_end(ap);
 	}
+
 	return retval;
 }
 
@@ -258,6 +259,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 	}
 
 	msg(3, "parse_options() returns %d", retval);
+
 	return retval;
 }
 
@@ -398,6 +400,7 @@ int main(int argc, char *argv[])
 	}
 
 	msg(2, "Returning from main() with value %d", retval);
+
 	return retval;
 }
 

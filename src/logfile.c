@@ -71,6 +71,7 @@ char *allocate_entry(char *elem, char *src)
 	} else
 		retval = NULL;
 	msg(3, "allocate_entry() returns '%s'", retval);
+
 	return retval;
 }
 
@@ -255,6 +256,7 @@ char *xml_entry(struct Entry *entry)
 #endif
 	retval = buf;
 	msg(3, "xml_entry() returns '%s'", retval);
+
 	return retval;
 }
 
@@ -295,6 +297,7 @@ char *get_logdir()
 		}
 	}
 	msg(3, "get_logdir() returns \"%s\"", retval);
+
 	return retval;
 }
 
@@ -346,6 +349,7 @@ int add_to_logfile(char *fname, struct Entry *entry)
 		i = i; /* Get rid of gcc warning */
 	}
 	msg(3, "add_to_logfile() returns %d", retval);
+
 	return retval;
 }
 

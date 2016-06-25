@@ -53,6 +53,7 @@ char *read_from_fp(FILE *fp)
 			return NULL;
 		}
 	} while (!feof(fp));
+
 	return retval;
 }
 
