@@ -38,6 +38,7 @@ int msg(int verbose, const char *format, ...)
 {
 	va_list ap;
 	int retval = 0;
+
 	if (opt.verbose >= verbose) {
 		va_start(ap, format);
 		retval = fprintf(stddebug, "%s: ", progname);

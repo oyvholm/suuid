@@ -29,6 +29,7 @@ char *get_hostname(void)
 {
 	static char buf[256];
 	char *retval = buf;
+
 	if (gethostname(buf, 255) == -1)
 		return NULL;
 #if FAKE_HOST
@@ -50,6 +51,7 @@ char *getpath(void)
 	char *p;
 	size_t blksize = 1024;
 	size_t size = blksize;
+
 	retval = malloc(size);
 	if (retval == NULL) {
 		perror("getpath(): malloc() fail");
@@ -84,6 +86,7 @@ char *get_username(void)
 {
 	char *retval;
 	struct passwd *pw;
+
 	pw = getpwuid(getuid());
 	if (pw == NULL)
 		retval = NULL;

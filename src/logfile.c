@@ -55,6 +55,7 @@ char *allocate_entry(char *elem, char *src)
 {
 	char *retval;
 	size_t size = 0;
+
 	msg(4, "Entering allocate_entry(\"%s\", \"%s\")", elem, src);
 	if (elem != NULL && src != NULL) {
 		size += strlen("<") + strlen(elem) + strlen(">") +
@@ -155,6 +156,7 @@ char *alloc_attr(char *attr, char *data)
 {
 	char *retval = NULL;
 	int size;
+
 	msg(3, "Entering alloc_attr(\"%s\", \"%s\")", attr, data);
 	size = strlen(" ") +
 	       strlen(attr) +
@@ -266,6 +268,7 @@ char *xml_entry(struct Entry *entry)
 char *get_logdir()
 {
 	char *retval;
+
 	if (opt.logdir != NULL)
 		retval = opt.logdir;
 	else if (getenv(ENV_LOGDIR) != NULL)
@@ -306,6 +309,7 @@ int add_to_logfile(char *fname, struct Entry *entry)
 	char check_line[12];
 	long filepos;
 	int i;
+
 	/* todo: Add file locking */
 	fp = fopen(fname, "r+");
 	if (fp == NULL)
@@ -377,6 +381,7 @@ void create_logfile(char *name)
 int valid_xml_chars(char *s)
 {
 	unsigned char *p = (unsigned char *)s;
+
 	if (utf8_check((unsigned char *)s) != NULL)
 		return 0;
 	while (*p) {
