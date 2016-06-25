@@ -55,3 +55,5 @@ char *read_from_fp(FILE *fp)
 	} while (!feof(fp));
 	return retval;
 }
+
+/* vim: set ts=8 sw=8 sts=8 noet fo+=w fenc=UTF-8 : */
