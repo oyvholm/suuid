@@ -272,6 +272,7 @@ int main(int argc, char *argv[])
 	struct Entry entry;
 	size_t fname_length; /* Total length of logfile name */
 	int i;
+	bool did_read_from_stdin = FALSE;
 
 	progname = argv[0];
 	progname = "suuid"; /* fixme: Temporary kludge to make it compatible 
@@ -326,8 +327,19 @@ int main(int argc, char *argv[])
 	entry.user = get_username();
 	entry.tty = get_tty();
 
-	if (opt.comment != NULL)
-		entry.txt = opt.comment;
+	if (opt.comment) {
+		if (!strcmp(opt.comment, "-")) {
+			entry.txt = read_from_fp(stdin);
+			if (!entry.txt) {
+				fprintf(stderr,
+				        "%s: Could not read data from stdin\n",
+				        progname);
+				return EXIT_ERROR;
+			}
+			did_read_from_stdin = TRUE;
+		} else
+			entry.txt = opt.comment;
+	}
 
 	if (opt.comment != NULL && !valid_xml_chars(entry.txt)) {
 		fprintf(stderr, "%s: Comment contains illegal characters or "
@@ -367,6 +379,8 @@ int main(int argc, char *argv[])
 			fprintf(stderr, "%s\n", entry.uuid);
 	}
 	free(logfile);
+	if (did_read_from_stdin)
+		free(entry.txt);
 	free(entry.cwd);
 
 	if (optind < argc) {

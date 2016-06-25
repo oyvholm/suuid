@@ -106,6 +106,9 @@ extern char *getpath(void);
 extern char *get_username(void);
 extern char *get_tty(void);
 
+/* io.h */
+extern char *read_from_fp(FILE *);
+
 /* logfile.c */
 extern void init_xml_entry(struct Entry *);
 extern char *allocate_entry(char *, char *);

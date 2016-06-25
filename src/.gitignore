@@ -1,4 +1,5 @@
 /environ.o
+/io.o
 /logfile.o
 /suuid
 /suuid.o
