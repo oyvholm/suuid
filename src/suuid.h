@@ -112,6 +112,7 @@ extern char *read_from_fp(FILE *);
 /* logfile.c */
 extern void init_xml_entry(struct Entry *);
 extern char *allocate_entry(char *, char *);
+extern char *suuid_xml(char *);
 extern char *alloc_attr(char *, char *);
 extern char *xml_entry(struct Entry *);
 extern char *get_logdir();

@@ -20,6 +20,12 @@
 
 #include "suuid.h"
 
+size_t MAX_GROWTH = 5; /* When converting from plain text to the XML format 
+                        * used in the log file, the worst case is if the whole 
+                        * string contains only ampersands, then it will grow by 
+                        * a factor of five.
+                        */
+
 /*
  * init_xml_entry() - Initialise Entry struct at memory position e with initial 
  * values.
@@ -49,10 +55,10 @@ char *allocate_entry(char *elem, char *src)
 {
 	char *retval;
 	size_t size = 0;
-	msg(3, "Entering allocate_entry(\"%s\", \"%s\")", elem, src);
+	msg(4, "Entering allocate_entry(\"%s\", \"%s\")", elem, src);
 	if (elem != NULL && src != NULL) {
 		size += strlen("<") + strlen(elem) + strlen(">") +
-		        strlen(src) +
+		        strlen(src) * MAX_GROWTH +
 		        strlen("<") + strlen(elem) + strlen("/> ") + 1;
 		msg(3, "allocate_entry(): size = %lu", size);
 		retval = malloc(size + 1);
@@ -60,10 +66,83 @@ char *allocate_entry(char *elem, char *src)
 			perror("allocate_entry(): Cannot allocate memory");
 		else
 			snprintf(retval, size, "<%s>%s</%s> ",
-			                       elem, src, elem);
+			                       elem, suuid_xml(src), elem);
 	} else
 		retval = NULL;
 	msg(3, "allocate_entry() returns '%s'", retval);
+	return retval;
+}
+
+/*
+sub suuid_xml {
+    my ($Str, $skip_conv) = @_;
+    defined($skip_conv) || ($skip_conv = 0);
+    if (!$skip_conv) {
+        $Str =~ s/&/&amp;/gs;
+        $Str =~ s/</&lt;/gs;
+        $Str =~ s/>/&gt;/gs;
+        $Str =~ s/\\/\\\\/gs;
+        $Str =~ s/\n/\\n/gs;
+        $Str =~ s/\r/\\r/gs;
+        $Str =~ s/\t/\\t/gs;
+    }
+    return($Str);
+} # suuid_xml()
+*/
+
+char *suuid_xml(char *text)
+{
+	char *retval;
+	size_t size = strlen(text);
+	char *p, *destp;
+
+	retval = malloc(size * MAX_GROWTH + 1);
+	if (!retval) {
+		fprintf(stderr, "%s: Cannot allocate %lu bytes for XML\n",
+		                progname,
+		                size + MAX_GROWTH + 1);
+		return NULL;
+	}
+
+	destp = retval;
+	for (p = text; *p; p++) {
+		switch (*p) {
+		case '&':
+			strcpy(destp, "&amp;");
+			destp += 5;
+			break;
+		case '<':
+			strcpy(destp, "&lt;");
+			destp += 4;
+			break;
+		case '>':
+			strcpy(destp, "&gt;");
+			destp += 4;
+			break;
+		case '\\':
+			strcpy(destp, "\\\\");
+			destp += 2;
+			break;
+		case '\n':
+			strcpy(destp, "\\n");
+			destp += 2;
+			break;
+		case '\r':
+			strcpy(destp, "\\r");
+			destp += 2;
+			break;
+		case '\t':
+			strcpy(destp, "\\t");
+			destp += 2;
+			break;
+		default:
+			*destp = *p;
+			destp++;
+			break;
+		}
+	}
+	*destp = '\0';
+
 	return retval;
 }
 
@@ -100,7 +179,8 @@ char *alloc_attr(char *attr, char *data)
 
 char *xml_entry(struct Entry *entry)
 {
-	static char buf[65536]; /* fixme: Temporary */
+#define BUFSIZE  1000000 /* fixme: Temporary */
+	static char buf[BUFSIZE];
 	struct Entry e;
 	char *retval;
 
@@ -111,7 +191,7 @@ char *xml_entry(struct Entry *entry)
 	msg(3, "xml_entry(): entry->date = '%s'", entry->date);
 	msg(3, "xml_entry(): entry->uuid = '%s'", entry->uuid);
 	msg(3, "xml_entry(): entry->tag = '%s'",  entry->tag);
-	msg(3, "xml_entry(): entry->txt = '%s'",  entry->txt);
+	msg(4, "xml_entry(): entry->txt = '%s'",  entry->txt);
 	msg(3, "xml_entry(): entry->host = '%s'", entry->host);
 	msg(3, "xml_entry(): entry->cwd = '%s'",  entry->cwd);
 	msg(3, "xml_entry(): entry->user = '%s'", entry->user);
@@ -132,7 +212,7 @@ char *xml_entry(struct Entry *entry)
 	e.user = allocate_entry("user", entry->user);
 	e.tty = allocate_entry("tty", entry->tty);
 
-	snprintf(buf, 65535, /* fixme: length */
+	snprintf(buf, BUFSIZE, /* fixme: length */
 	         "<suuid%s%s> " /* date, uuid */
 	         "%s" /* tag */
 	         "%s" /* txt */

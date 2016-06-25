@@ -361,7 +361,7 @@ int main(int argc, char *argv[])
 	snprintf(logfile, fname_length, "%s/%s.xml", logdir, entry.host);
 	msg(2, "logfile = \"%s\"", logfile);
 	create_logfile(logfile);
-	if (opt.verbose > 2) {
+	if (opt.verbose >= 4) {
 		i = system("(echo; echo After create_logfile:; "
 		           "cat /home/sunny/uuids/fake.xml; "
 		           "echo; echo) >&2");
@@ -386,8 +386,14 @@ int main(int argc, char *argv[])
 	if (optind < argc) {
 		int t;
 
-		for (t = optind; t < argc; t++)
+		for (t = optind; t < argc; t++) {
 			msg(2, "Non-option arg: %s", argv[t]);
+#if 0
+			puts(suuid_xml(argv[t])); /* For testing, remove when 
+			                           * suuid_xml() is wonderful.
+			                           */
+#endif
+		}
 	}
 
 	msg(2, "Returning from main() with value %d", retval);
