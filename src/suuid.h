@@ -41,14 +41,6 @@
 #define ENV_LOGDIR  "SUUID_LOGDIR" /* Optional environment variable with path 
                                       to log directory */
 
-#ifdef C_ASSERT
-#ifdef NDEBUG
-#undef NDEBUG
-#endif /* ifdef NDEBUG */
-#else /* ifdef C_ASSERT */
-#define NDEBUG  1
-#endif /* ifdef C_ASSERT else */
-
 /*
  * Macros
  */
