@@ -25,6 +25,9 @@
  * Defines
  */
 
+#define VERSION       "0.0.0"
+#define RELEASE_DATE  "2016-00-00"
+
 #define FALSE  0
 #define TRUE   1
 
@@ -52,8 +55,6 @@
 
 #define in_range(a,b,c)  ((a) >= (b) && (a) <= (c) ? TRUE : FALSE)
 #define myerror(a)  { fprintf(stderr, "%s: ", progname); perror(a); }
-
-#include "version.h"
 
 /*
  * Standard header files

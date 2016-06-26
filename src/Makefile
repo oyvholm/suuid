@@ -4,7 +4,7 @@
 
 OBJS   = environ.o io.o logfile.o string.o suuid.o utf8.o uuid.o
 CFILES = environ.c io.c logfile.c string.c suuid.c utf8.c uuid.c
-HFILES = suuid.h version.h
+HFILES = suuid.h
 DEPS = $(HFILES) Makefile
 CC = gcc
 LD = gcc
