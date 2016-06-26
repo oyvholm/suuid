@@ -110,6 +110,7 @@ extern char *xml_entry(struct Entry *);
 extern char *get_logdir();
 extern int add_to_logfile(char *, struct Entry *);
 extern char *create_logfile(char *);
+extern char *set_up_logfile(struct Options *, char *);
 extern int valid_xml_chars(char *);
 
 /* string.c */

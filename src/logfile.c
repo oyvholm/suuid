@@ -377,6 +377,47 @@ char *create_logfile(char *name)
 }
 
 /*
+ * set_up_logfile() - Determine log file name and create an initial XML log 
+ * file if it doesn't exist.
+ * Return pointer to name of log file, or NULL if error.
+ */
+
+char *set_up_logfile(struct Options *opt, char *hostname)
+{
+	char *logdir, *logfile;
+	size_t fname_length; /* Total length of logfile name */
+
+	logdir = get_logdir(&opt);
+	msg(3, "logdir = '%s'", logdir);
+	if (!logdir) {
+		fprintf(stderr, "%s: Unable to find logdir location\n",
+		                progname);
+		return NULL;
+	}
+
+	fname_length = strlen(logdir) +
+	               strlen("/") +
+	               strlen(hostname) +
+	               strlen(".xml") +
+	               1;
+	logfile = malloc(fname_length + 1);
+	if (!logfile) {
+		myerror("Could not allocate %lu bytes for logfile filename",
+		       fname_length + 1);
+		return NULL;
+	}
+	/* fixme: Remove slash hardcoding */
+	snprintf(logfile, fname_length, "%s/%s.xml", logdir, hostname);
+	msg(2, "logfile = \"%s\"", logfile);
+	if (!create_logfile(logfile)) {
+		myerror("%s: Error when creating log file", logfile);
+		return NULL;
+	}
+
+	return logfile;
+}
+
+/*
  * valid_xml_chars() - Check that the string pointed to by s contains valid 
  * UTF-8 and no control chars. Return 1 if ok, 0 if invalid.
  */

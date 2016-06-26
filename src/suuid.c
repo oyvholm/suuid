@@ -313,6 +313,14 @@ int fill_entry_struct(struct Entry *entry, struct Options *opt)
 				return EXIT_ERROR;
 			}
 		}
+		if (!valid_xml_chars(entry->txt)) {
+			fprintf(stderr, "%s: Comment contains illegal "
+			                "characters or is not valid UTF-8\n",
+			                progname);
+			free(entry->txt);
+			entry->txt = NULL;
+			return EXIT_ERROR;
+		}
 
 		/* fixme: This is how it's done in the Perl version. I'm not 
 		 * sure if it's an ok thing to do, even though it looks nice in 
@@ -334,10 +342,8 @@ int fill_entry_struct(struct Entry *entry, struct Options *opt)
 int main(int argc, char *argv[])
 {
 	int retval = EXIT_OK;
-	char *logdir;
 	char *logfile;
 	struct Entry entry;
-	size_t fname_length; /* Total length of logfile name */
 	int i;
 
 	progname = argv[0];
@@ -368,17 +374,13 @@ int main(int argc, char *argv[])
 		return EXIT_OK;
 	}
 
-	if (fill_entry_struct(&entry, &opt) == EXIT_ERROR) {
-		myerror("fill_entry_struct() failed");
+	if (fill_entry_struct(&entry, &opt) == EXIT_ERROR)
 		return EXIT_ERROR;
-	}
 
-	logdir = get_logdir(&opt);
-	msg(3, "logdir = '%s'", logdir);
-	if (!logdir) {
-		fprintf(stderr, "%s: Unable to find logdir location\n",
-		                progname);
-		return(EXIT_ERROR);
+	logfile = set_up_logfile(&opt, entry.host);
+	if (!logfile) {
+		myerror("Could not initialise log file");
+		return EXIT_ERROR;
 	}
 
 	entry.uuid = generate_uuid();
@@ -389,31 +391,8 @@ int main(int argc, char *argv[])
 	}
 	entry.date = uuid_date(entry.uuid);
 
-	if (opt.comment && !valid_xml_chars(entry.txt)) {
-		fprintf(stderr, "%s: Comment contains illegal characters or "
-		                "is not valid UTF-8\n", progname);
-		return EXIT_ERROR;
-	}
 	msg(3, "After utf8_check()");
 
-	fname_length = strlen(logdir) +
-	               strlen("/") +
-	               strlen(entry.host) +
-	               strlen(".xml") +
-	               1;
-	logfile = malloc(fname_length + 1);
-	if (!logfile) {
-		myerror("Could not allocate %lu bytes for logfile filename",
-		       fname_length + 1);
-		return EXIT_ERROR;
-	}
-	/* fixme: Remove slash hardcoding */
-	snprintf(logfile, fname_length, "%s/%s.xml", logdir, entry.host);
-	msg(2, "logfile = \"%s\"", logfile);
-	if (!create_logfile(logfile)) {
-		myerror("%s: Error when creating log file", logfile);
-		return EXIT_ERROR;
-	}
 	if (opt.verbose >= 4) {
 		i = system("(echo; echo After create_logfile:; "
 		           "cat /home/sunny/uuids/fake.xml; "
