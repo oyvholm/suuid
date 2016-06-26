@@ -302,13 +302,17 @@ int add_to_logfile(char *fname, struct Entry *entry)
 
 	/* todo: Add file locking */
 	fp = fopen(fname, "r+");
-	if (!fp)
+	if (!fp) {
 		err(1, "%s: Could not open file for read+write", fname);
+		return EXIT_ERROR;
+	}
 	fseek(fp, -10, SEEK_END);
 	filepos = ftell(fp);
 	msg(3, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
-	if (filepos == -1)
+	if (filepos == -1) {
 		err(1, "%s: Cannot read file position", fname);
+		return EXIT_ERROR;
+	}
 	msg(3, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
 	if (strcmp(fgets(check_line, 10, fp), "</suuids>")) {
 		msg(3, "add_to_logfile(): check_line = '%s'", check_line);
@@ -317,9 +321,11 @@ int add_to_logfile(char *fname, struct Entry *entry)
 	} else {
 		msg(3, "add_to_logfile(): Seems as check_line is ok, "
 		       "it is '%s'", check_line);
-		if (fseek(fp, filepos, SEEK_SET) == -1)
+		if (fseek(fp, filepos, SEEK_SET) == -1) {
 			err(1, "%s: Cannot seek to position %lu",
 			       fname, filepos);
+			return EXIT_ERROR;
+		}
 	}
 	msg(3, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
 	if (fputs(xml_entry(entry), fp) <= 0) {
