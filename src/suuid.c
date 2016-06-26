@@ -379,7 +379,11 @@ int main(int argc, char *argv[])
 	/* fixme: Remove slash hardcoding */
 	snprintf(logfile, fname_length, "%s/%s.xml", logdir, entry.host);
 	msg(2, "logfile = \"%s\"", logfile);
-	create_logfile(logfile);
+	if (!create_logfile(logfile)) {
+		fprintf(stderr, "%s: %s: Error when creating log file\n",
+		                progname, logfile);
+		return EXIT_ERROR;
+	}
 	if (opt.verbose >= 4) {
 		i = system("(echo; echo After create_logfile:; "
 		           "cat /home/sunny/uuids/fake.xml; "

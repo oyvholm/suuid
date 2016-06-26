@@ -352,26 +352,30 @@ int add_to_logfile(char *fname, struct Entry *entry)
 
 /*
  * create_logfile() - Create logfile with initial XML structure if it doesn't 
- * exist already.
+ * exist already. On success, return pointer to string with file name, or NULL 
+ * if error.
  */
 
-void create_logfile(char *name)
+char *create_logfile(char *name)
 {
 	char *xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 	char *xml_doctype = "<!DOCTYPE suuids SYSTEM \"dtd/suuids.dtd\">";
 
 	msg(3, "Entering create_logfile(\"%s\")", name);
 	if (access(name, F_OK) != -1)
-		return; /* File already exists */
+		return name; /* File already exists */
 	else {
 		FILE *fp;
 		fp = fopen(name, "a");
-		if (!fp)
+		if (!fp) {
 			err(1, "%s: Could not create log file", name);
+			return NULL;
+		}
 		fprintf(fp, "%s\n%s\n<suuids>\n</suuids>\n",
 			xml_header, xml_doctype);
 		fclose(fp);
 	}
+	return name;
 }
 
 /*

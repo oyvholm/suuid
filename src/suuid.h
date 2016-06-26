@@ -111,7 +111,7 @@ extern char *alloc_attr(char *, char *);
 extern char *xml_entry(struct Entry *);
 extern char *get_logdir();
 extern int add_to_logfile(char *, struct Entry *);
-extern void create_logfile(char *);
+extern char *create_logfile(char *);
 extern int valid_xml_chars(char *);
 
 /* string.c */
