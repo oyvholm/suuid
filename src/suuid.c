@@ -50,6 +50,14 @@ int msg(int verbose, const char *format, ...)
 	return retval;
 }
 
+/*
+ * myerror() - Print an error message to stderr using this format:
+ *   a: b: c
+ * where a is the name of the program (progname), b is the output from the 
+ * printf-like string and optional arguments, and c is the error message from 
+ * errno.
+ */
+
 int myerror(const char *format, ...)
 {
 	va_list ap;
