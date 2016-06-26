@@ -285,6 +285,49 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 }
 
 /*
+ * fill_entry_struct() - Fill the entry struct with information from the opt 
+ * struct and the environment, like current directory, hostname, comment, etc.
+ * Returns EXIT_OK if no errors, EXIT_ERROR if errors.
+ */
+
+int fill_entry_struct(struct Entry *entry, struct Options *opt)
+{
+	init_xml_entry(entry);
+	entry->host = get_hostname();
+	entry->cwd = getpath();
+	entry->user = get_username();
+	entry->tty = get_tty();
+
+	if (opt->comment) {
+		if (!strcmp(opt->comment, "-")) {
+			entry->txt = read_from_fp(stdin);
+			if (!entry->txt) {
+				myerror("Could not read data from stdin");
+				return EXIT_ERROR;
+			}
+		} else {
+			entry->txt = strdup(opt->comment);
+			if (!entry->txt) {
+				myerror("%s: Cannot allocate memory for "
+				        "comment, strdup() failed");
+				return EXIT_ERROR;
+			}
+		}
+
+		/* fixme: This is how it's done in the Perl version. I'm not 
+		 * sure if it's an ok thing to do, even though it looks nice in 
+		 * the log files and has worked great for years. Maybe this 
+		 * behaviour should be changed when the C version passes all 
+		 * tests in suuid.t .
+		 */
+		trim_str_front(entry->txt);
+		trim_str_end(entry->txt);
+	}
+
+	return EXIT_OK;
+}
+
+/*
  * main()
  */
 
@@ -296,7 +339,6 @@ int main(int argc, char *argv[])
 	struct Entry entry;
 	size_t fname_length; /* Total length of logfile name */
 	int i;
-	bool did_read_from_stdin = FALSE;
 
 	progname = argv[0];
 	progname = "suuid"; /* fixme: Temporary kludge to make it compatible 
@@ -326,6 +368,11 @@ int main(int argc, char *argv[])
 		return EXIT_OK;
 	}
 
+	if (fill_entry_struct(&entry, &opt) == EXIT_ERROR) {
+		myerror("fill_entry_struct() failed");
+		return EXIT_ERROR;
+	}
+
 	logdir = get_logdir(&opt);
 	msg(3, "logdir = '%s'", logdir);
 	if (!logdir) {
@@ -334,7 +381,6 @@ int main(int argc, char *argv[])
 		return(EXIT_ERROR);
 	}
 
-	init_xml_entry(&entry);
 	entry.uuid = generate_uuid();
 	if (!valid_uuid(entry.uuid)) {
 		fprintf(stderr, "%s: Got invalid UUID: \"%s\"",
@@ -342,41 +388,6 @@ int main(int argc, char *argv[])
 		return(EXIT_ERROR);
 	}
 	entry.date = uuid_date(entry.uuid);
-	entry.host = get_hostname();
-	msg(2, "entry.host = \"%s\"", entry.host);
-
-	entry.cwd = getpath();
-	msg(2, "entry.cwd = \"%s\"", entry.cwd);
-
-	entry.user = get_username();
-	entry.tty = get_tty();
-
-	if (opt.comment) {
-		if (!strcmp(opt.comment, "-")) {
-			entry.txt = read_from_fp(stdin);
-			if (!entry.txt) {
-				myerror("Could not read data from stdin");
-				return EXIT_ERROR;
-			}
-			did_read_from_stdin = TRUE;
-		} else {
-			entry.txt = strdup(opt.comment);
-			if (!entry.txt) {
-				myerror("%s: Cannot allocate memory for "
-				        "comment, strdup() failed");
-				return EXIT_ERROR;
-			}
-		}
-
-		/* fixme: This is how it's done in the Perl version. I'm not 
-		 * sure if it's an ok thing to do, even though it looks nice in 
-		 * the log files and has worked great for years. Maybe this 
-		 * behaviour should be changed when the C version passes all 
-		 * tests in suuid.t .
-		 */
-		trim_str_front(entry.txt);
-		trim_str_end(entry.txt);
-	}
 
 	if (opt.comment && !valid_xml_chars(entry.txt)) {
 		fprintf(stderr, "%s: Comment contains illegal characters or "
@@ -422,8 +433,7 @@ int main(int argc, char *argv[])
 			fprintf(stderr, "%s\n", entry.uuid);
 	}
 	free(logfile);
-	if (did_read_from_stdin)
-		free(entry.txt);
+	free(entry.txt);
 	free(entry.cwd);
 
 	if (optind < argc) {
