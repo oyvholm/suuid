@@ -386,7 +386,11 @@ int main(int argc, char *argv[])
 		           "echo; echo) >&2");
 		i = i; /* Get rid of gcc warning */
 	}
-	add_to_logfile(logfile, &entry);
+	if (add_to_logfile(logfile, &entry) == EXIT_ERROR) {
+		fprintf(stderr, "%s: %s: Error when adding entry "
+		                "to log file\n", progname, logfile);
+		return(EXIT_ERROR);
+	}
 	if (!opt.whereto)
 		puts(entry.uuid);
 	else {
