@@ -332,9 +332,9 @@ int add_to_logfile(char *fname, struct Entry *entry)
 		}
 	}
 	msg(3, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
-	if (fputs(xml_entry(entry), fp) <= 0) {
+	if (fputs(xml_entry(entry), fp) < 0) {
 		warn("fputs()");
-		retval = -1;
+		retval = EXIT_ERROR;
 	}
 	msg(3, "Before end tag is written");
 	fprintf(fp, "\n</suuids>\n");
