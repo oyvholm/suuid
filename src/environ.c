@@ -27,10 +27,10 @@
 
 char *get_hostname(void)
 {
-	static char buf[256];
+	static char buf[HOST_NAME_MAX + 1];
 	char *retval = buf;
 
-	if (gethostname(buf, 255) == -1)
+	if (gethostname(buf, HOST_NAME_MAX) == -1)
 		return NULL;
 #if FAKE_HOST
 	retval = "fake"; /* Use "fake" as hostname to avoid conflicts
