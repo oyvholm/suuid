@@ -57,13 +57,13 @@ char *allocate_entry(char *elem, char *src)
 	size_t size = 0;
 
 	msg(4, "Entering allocate_entry(\"%s\", \"%s\")", elem, src);
-	if (elem != NULL && src != NULL) {
+	if (elem && src) {
 		size += strlen("<") + strlen(elem) + strlen(">") +
 		        strlen(src) * MAX_GROWTH +
 		        strlen("<") + strlen(elem) + strlen("/> ") + 1;
 		msg(3, "allocate_entry(): size = %lu", size);
 		retval = malloc(size + 1);
-		if (retval == NULL)
+		if (!retval)
 			perror("allocate_entry(): Cannot allocate memory");
 		else
 			snprintf(retval, size, "<%s>%s</%s> ",
@@ -154,7 +154,7 @@ char *alloc_attr(char *attr, char *data)
 	       1;
 	msg(3, "data size = %lu", size);
 	retval = malloc(size + 1);
-	if (retval == NULL)
+	if (!retval)
 		perror("alloc_attr(): Cannot allocate memory");
 	else
 		snprintf(retval, size, " %s=\"%s\"", attr, data);
@@ -187,13 +187,13 @@ char *xml_entry(struct Entry *entry)
 	msg(3, "xml_entry(): entry->user = '%s'", entry->user);
 	msg(3, "xml_entry(): entry->sess = '%s'", entry->sess);
 
-	if (entry->uuid == NULL) {
+	if (!entry->uuid) {
 		msg(2, "xml_entry(): uuid is NULL");
 		return NULL;
 	} else
 		e.uuid = alloc_attr("u", entry->uuid);
 
-	if (entry->date != NULL)
+	if (entry->date)
 		e.date = alloc_attr("t", entry->date);
 
 	e.txt = allocate_entry("txt", entry->txt);
@@ -212,15 +212,15 @@ char *xml_entry(struct Entry *entry)
 	         "%s" /* tty */
 	         "%s" /* sess */
 	         "</suuid>",
-	         (e.date == NULL) ? "" : e.date,
-	         (e.uuid == NULL) ? "" : e.uuid,
-	         (e.tag == NULL) ? "" : e.tag,
-	         (e.txt == NULL) ? "" : e.txt,
-	         (e.host == NULL) ? "" : e.host,
-	         (e.cwd == NULL) ? "" : e.cwd,
-	         (e.user == NULL) ? "" : e.user,
-	         (e.tty == NULL) ? "" : e.tty,
-	         (e.sess == NULL) ? "" : e.sess);
+	         (e.date) ? e.date : "",
+	         (e.uuid) ? e.uuid : "",
+	         (e.tag) ? e.tag : "",
+	         (e.txt) ? e.txt : "",
+	         (e.host) ? e.host : "",
+	         (e.cwd) ? e.cwd : "",
+	         (e.user) ? e.user : "",
+	         (e.tty) ? e.tty : "",
+	         (e.sess) ? e.sess : "");
 	msg(3, "xml_entry(): After snprintf()");
 #if 0
 	static char fake[] = "<suuid t=\"2016-06-07T04:18:40.9460630Z\" "
@@ -258,12 +258,12 @@ char *get_logdir()
 {
 	char *retval;
 
-	if (opt.logdir != NULL)
+	if (opt.logdir)
 		retval = opt.logdir;
-	else if (getenv(ENV_LOGDIR) != NULL)
+	else if (getenv(ENV_LOGDIR))
 		retval = getenv(ENV_LOGDIR);
 	else {
-		if (getenv("HOME") == NULL) {
+		if (!getenv("HOME")) {
 			msg(3, "get_logdir(): HOME not found");
 			fprintf(stderr, "%s: $%s and $HOME environment "
 			                "variables are not defined, cannot "
@@ -274,7 +274,7 @@ char *get_logdir()
 			int size = strlen(getenv("HOME")) +
 			           strlen("/uuids") + 1;
 			retval = malloc(size + 1);
-			if (retval == NULL) {
+			if (!retval) {
 				perror("get_logdir(): Cannot allocate "
 				       "memory");
 				return NULL;
@@ -302,7 +302,7 @@ int add_to_logfile(char *fname, struct Entry *entry)
 
 	/* todo: Add file locking */
 	fp = fopen(fname, "r+");
-	if (fp == NULL)
+	if (!fp)
 		err(1, "%s: Could not open file for read+write", fname);
 	fseek(fp, -10, SEEK_END);
 	filepos = ftell(fp);
@@ -356,7 +356,7 @@ void create_logfile(char *name)
 	else {
 		FILE *fp;
 		fp = fopen(name, "a");
-		if (fp == NULL)
+		if (!fp)
 			err(1, "%s: Could not create log file", name);
 		fprintf(fp, "%s\n%s\n<suuids>\n</suuids>\n",
 			xml_header, xml_doctype);
@@ -373,7 +373,7 @@ int valid_xml_chars(char *s)
 {
 	unsigned char *p = (unsigned char *)s;
 
-	if (utf8_check((unsigned char *)s) != NULL)
+	if (utf8_check((unsigned char *)s))
 		return 0;
 	while (*p) {
 		if (*p < ' ' && *p != '\n' && *p != '\r' && *p != '\t')

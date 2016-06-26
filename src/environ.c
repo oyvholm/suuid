@@ -54,19 +54,19 @@ char *getpath(void)
 	size_t size = blksize;
 
 	retval = malloc(size);
-	if (retval == NULL) {
+	if (!retval) {
 		perror("getpath(): malloc() fail");
 		return NULL;
 	}
-	for (p = getcwd(retval, size); p == NULL; ) {
+	for (p = getcwd(retval, size); !p; ) {
 		size += blksize;
 		retval = realloc(retval, size);
-		if (retval == NULL) {
+		if (!retval) {
 			perror("getpath(): realloc() fail");
 			return NULL;
 		}
 		p = getcwd(retval, size);
-		if (p == NULL && errno != ERANGE) {
+		if (!p && errno != ERANGE) {
 			/* Avoid infinite loop in case there's another getcwd() 
 			 * problem that's not fixable by just allocating more 
 			 * memory.
@@ -90,7 +90,7 @@ char *get_username(void)
 	struct passwd *pw;
 
 	pw = getpwuid(getuid());
-	if (pw == NULL)
+	if (!pw)
 		retval = NULL;
 	else
 		retval = pw->pw_name;

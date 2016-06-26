@@ -31,11 +31,11 @@ char *generate_uuid(void)
 
 	/* FIXME: Generate it properly */
 	fp = popen("/usr/bin/uuid", "r");
-	if (fp == NULL) {
+	if (!fp) {
 		fprintf(stderr, "%s: Could not exec /usr/bin/uuid", progname);
 		return NULL;
 	}
-	if (fgets(uuid, 37, fp) == NULL)
+	if (!fgets(uuid, 37, fp))
 		fprintf(stderr, "%s: fgets() error", progname);
 	uuid[36] = '\0';
 	pclose(fp);

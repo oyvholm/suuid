@@ -165,7 +165,7 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 		break;
 	case 'c':
 		dest->comment = strdup(optarg);
-		if (dest->comment == NULL) {
+		if (!dest->comment) {
 			perror("choose_opt_action(): Cannot allocate "
 			       "memory for -c/--comment argument");
 			retval = EXIT_ERROR;
@@ -176,7 +176,7 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 		break;
 	case 'l':
 		dest->logdir = strdup(optarg);
-		if (dest->logdir == NULL) {
+		if (!dest->logdir) {
 			perror("choose_opt_action(): Cannot allocate "
 			       "memory for -l/--logdir argument");
 			retval = EXIT_ERROR;
@@ -190,7 +190,7 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 		break;
 	case 'w':
 		dest->whereto = strdup(optarg);
-		if (dest->whereto == NULL) {
+		if (!dest->whereto) {
 			perror("Cannot allocate memory for -w argument");
 			retval = EXIT_ERROR;
 		}
@@ -306,7 +306,7 @@ int main(int argc, char *argv[])
 
 	logdir = get_logdir(&opt);
 	msg(3, "logdir = '%s'", logdir);
-	if (logdir == NULL) {
+	if (!logdir) {
 		fprintf(stderr, "%s: Unable to find logdir location\n",
 		                progname);
 		return(EXIT_ERROR);
@@ -360,7 +360,7 @@ int main(int argc, char *argv[])
 		trim_str_end(entry.txt);
 	}
 
-	if (opt.comment != NULL && !valid_xml_chars(entry.txt)) {
+	if (opt.comment && !valid_xml_chars(entry.txt)) {
 		fprintf(stderr, "%s: Comment contains illegal characters or "
 		                "is not valid UTF-8\n", progname);
 		return EXIT_ERROR;
@@ -373,7 +373,7 @@ int main(int argc, char *argv[])
 	               strlen(".xml") +
 	               1;
 	logfile = malloc(fname_length + 1);
-	if (logfile == NULL)
+	if (!logfile)
 		err(1, "Could not allocate %lu bytes for logfile filename",
 		       fname_length + 1);
 	/* fixme: Remove slash hardcoding */
@@ -387,14 +387,12 @@ int main(int argc, char *argv[])
 		i = i; /* Get rid of gcc warning */
 	}
 	add_to_logfile(logfile, &entry);
-	if (opt.whereto == NULL)
+	if (!opt.whereto)
 		puts(entry.uuid);
 	else {
-		if (strchr(opt.whereto, 'a') != NULL ||
-		    strchr(opt.whereto, 'o') != NULL)
+		if (strchr(opt.whereto, 'a') || strchr(opt.whereto, 'o'))
 			fprintf(stdout, "%s\n", entry.uuid);
-		if (strchr(opt.whereto, 'a') != NULL ||
-		    strchr(opt.whereto, 'e') != NULL)
+		if (strchr(opt.whereto, 'a') || strchr(opt.whereto, 'e'))
 			fprintf(stderr, "%s\n", entry.uuid);
 	}
 	free(logfile);
