@@ -50,8 +50,7 @@ char *getpath(void)
 {
 	char *retval;
 	char *p;
-	size_t blksize = 1024;
-	size_t size = blksize;
+	size_t size = BUFSIZ;
 
 	retval = malloc(size);
 	if (!retval) {
@@ -59,7 +58,7 @@ char *getpath(void)
 		return NULL;
 	}
 	for (p = getcwd(retval, size); !p; ) {
-		size += blksize;
+		size += BUFSIZ;
 		retval = realloc(retval, size);
 		if (!retval) {
 			perror("getpath(): realloc() fail");

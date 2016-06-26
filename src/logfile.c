@@ -169,8 +169,8 @@ char *alloc_attr(char *attr, char *data)
 
 char *xml_entry(struct Entry *entry)
 {
-#define BUFSIZE  1000000 /* fixme: Temporary */
-	static char buf[BUFSIZE];
+#define XML_BUFSIZE  1000000 /* fixme: Temporary */
+	static char buf[XML_BUFSIZE];
 	struct Entry e;
 	char *retval;
 
@@ -202,7 +202,7 @@ char *xml_entry(struct Entry *entry)
 	e.user = allocate_entry("user", entry->user);
 	e.tty = allocate_entry("tty", entry->tty);
 
-	snprintf(buf, BUFSIZE, /* fixme: length */
+	snprintf(buf, XML_BUFSIZE, /* fixme: length */
 	         "<suuid%s%s> " /* date, uuid */
 	         "%s" /* tag */
 	         "%s" /* txt */
