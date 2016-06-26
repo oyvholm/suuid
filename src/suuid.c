@@ -115,11 +115,10 @@ void usage(int retval)
 		       "    Print the software license\n");
 		printf("  -l x, --logdir x\n"
 		       "    Store log files in directory x.\n"
-		       "    If the SUUID_LOGDIR environment variable is "
-		       "defined, that value is\n"
+		       "    If the %s environment variable is defined, that "
+		       "value is\n"
 		       "    used. Otherwise the value \"$HOME/uuids\" is "
-		       "used.\n"
-		       "    Current default: /home/sunny/uuids\n");
+		       "used.\n", ENV_LOGDIR);
 		printf("  -q, --quiet\n"
 		       "    Be more quiet. "
 		       "Can be repeated to increase silence.\n");
