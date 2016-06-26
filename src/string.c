@@ -20,4 +20,49 @@
 
 #include "suuid.h"
 
+/*
+ * trim_str_front() - Modify dest by removing initial whitespace. Returns dest.
+ */
+
+char *trim_str_front(char *dest)
+{
+	char *p = dest;
+	size_t size = strlen(dest);
+
+	msg(4, "Entering trim_str_front(\"%s\")", dest);
+	while (p < dest + size && isspace(*p)) {
+		p++;
+		msg(4, "trim_str_front(): p = \"%s\"", p);
+	}
+	if (p == dest)
+		return dest; /* Nothing needs to be done */
+	memmove(dest, p, strlen(p) + 1);
+
+	return dest;
+}
+
+/*
+ * trim_str_end() - Modify dest by removing whitespace from the end of the 
+ * string. Returns dest.
+ */
+
+char *trim_str_end(char *dest)
+{
+	char *p;
+	size_t size = strlen(dest);
+
+	msg(4, "Entering trim_str_end(\"%s\")", dest);
+	if (!size)
+		return dest;
+	p = dest + size - 1;
+	msg(4, "trim_str_end(): init p to \"%s\"", p);
+	while (p > dest && isspace(*p)) {
+		*p = '\0';
+		p--;
+		msg(4, "trim_str_end(): p = \"%s\"", p);
+	}
+
+	return dest;
+}
+
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w fenc=UTF-8 : */

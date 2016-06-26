@@ -59,6 +59,7 @@
  * Standard header files
  */
 
+#include <ctype.h>
 #include <err.h>
 #include <errno.h>
 #include <getopt.h>
@@ -119,6 +120,10 @@ extern char *get_logdir();
 extern int add_to_logfile(char *, struct Entry *);
 extern void create_logfile(char *);
 extern int valid_xml_chars(char *);
+
+/* string.c */
+extern char *trim_str_front(char *);
+extern char *trim_str_end(char *);
 
 /* suuid.c */
 extern int msg(int, const char *, ...);

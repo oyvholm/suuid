@@ -340,8 +340,25 @@ int main(int argc, char *argv[])
 				return EXIT_ERROR;
 			}
 			did_read_from_stdin = TRUE;
-		} else
-			entry.txt = opt.comment;
+		} else {
+			entry.txt = strdup(opt.comment);
+			if (!entry.txt) {
+				fprintf(stderr,
+				        "%s: Cannot allocate memory for "
+				        "comment, strdup() failed: %s\n",
+				        progname, strerror(errno));
+				return EXIT_ERROR;
+			}
+		}
+
+		/* fixme: This is how it's done in the Perl version. I'm not 
+		 * sure if it's an ok thing to do, even though it looks nice in 
+		 * the log files and has worked great for years. Maybe this 
+		 * behaviour should be changed when the C version passes all 
+		 * tests in suuid.t .
+		 */
+		trim_str_front(entry.txt);
+		trim_str_end(entry.txt);
 	}
 
 	if (opt.comment != NULL && !valid_xml_chars(entry.txt)) {
