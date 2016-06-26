@@ -75,22 +75,9 @@ char *allocate_entry(char *elem, char *src)
 	return retval;
 }
 
-/*
-sub suuid_xml {
-    my ($Str, $skip_conv) = @_;
-    defined($skip_conv) || ($skip_conv = 0);
-    if (!$skip_conv) {
-        $Str =~ s/&/&amp;/gs;
-        $Str =~ s/</&lt;/gs;
-        $Str =~ s/>/&gt;/gs;
-        $Str =~ s/\\/\\\\/gs;
-        $Str =~ s/\n/\\n/gs;
-        $Str =~ s/\r/\\r/gs;
-        $Str =~ s/\t/\\t/gs;
-    }
-    return($Str);
-} # suuid_xml()
-*/
+/* suuid_xml() - Return pointer to string where the data in the text argument 
+ * is escaped for use in the XML file.
+ */
 
 char *suuid_xml(char *text)
 {

@@ -28,6 +28,7 @@ char *generate_uuid(void)
 {
 	static char uuid[38];
 	FILE *fp;
+
 	/* FIXME: Generate it properly */
 	fp = popen("/usr/bin/uuid", "r");
 	if (fp == NULL) {
@@ -38,6 +39,7 @@ char *generate_uuid(void)
 		fprintf(stderr, "%s: fgets() error", progname);
 	uuid[36] = '\0';
 	pclose(fp);
+
 	return uuid;
 }
 
@@ -49,6 +51,7 @@ char *uuid_date(char *uuid)
 {
 	/* fixme */
 	static char retval[32] = "2000-01-01T00:00:00.0000000Z";
+
 	return retval;
 }
 
@@ -62,11 +65,13 @@ int is_hex(char *p, unsigned int len)
 {
 	int retval = 1;
 	int i;
+
 	for (i = 0; i < len; i++) {
 		char c = p[i];
 		if (!in_range(c, '0', '9') && !in_range(c, 'a', 'f'))
 			retval = 0;
 	}
+
 	return retval;
 }
 
