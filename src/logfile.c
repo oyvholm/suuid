@@ -256,7 +256,7 @@ char *xml_entry(struct Entry *entry)
 
 char *get_logdir()
 {
-	char *retval;
+	char *retval = NULL;
 
 	if (opt.logdir)
 		retval = opt.logdir;
