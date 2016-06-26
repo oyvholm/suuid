@@ -87,9 +87,8 @@ char *suuid_xml(char *text)
 
 	retval = malloc(size * MAX_GROWTH + 1);
 	if (!retval) {
-		fprintf(stderr, "%s: Cannot allocate %lu bytes for XML\n",
-		                progname,
-		                size + MAX_GROWTH + 1);
+		myerror("Cannot allocate %lu bytes for XML\n",
+		        size + MAX_GROWTH + 1);
 		return NULL;
 	}
 
@@ -307,8 +306,7 @@ int add_to_logfile(char *fname, struct Entry *entry)
 		return EXIT_ERROR;
 	}
 	if (fseek(fp, -10, SEEK_END) == -1) {
-		fprintf(stderr, "%s: %s: Could not seek in log file: %s",
-		                progname, fname, strerror(errno));
+		myerror("%s: Could not seek in log file", fname);
 		return EXIT_ERROR;
 	}
 	filepos = ftell(fp);

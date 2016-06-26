@@ -35,8 +35,7 @@ char *read_from_fp(FILE *fp)
 		char *new_mem = realloc(retval,
 		                        BUFSIZ + bytes_read + 1);
 		if (!new_mem) {
-			fprintf(stderr, "%s: Cannot allocate memory for "
-			                "stdin buffer\n", progname);
+			myerror("Cannot allocate memory for stdin buffer");
 			if (retval)
 				free(retval);
 			return NULL;
@@ -46,8 +45,7 @@ char *read_from_fp(FILE *fp)
 		bytes_read += fread(p, 1, BUFSIZ, fp);
 		msg(4, "read_from_fp(): bytes_read = %lu", bytes_read);
 		if (ferror(fp)) {
-			fprintf(stderr, "%s: Error when reading stdin\n",
-			                progname);
+			myerror("Error when reading stdin");
 			free(retval);
 			return NULL;
 		}

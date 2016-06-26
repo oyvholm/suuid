@@ -55,7 +55,7 @@ int msg(int verbose, const char *format, ...)
  *   a: b: c
  * where a is the name of the program (progname), b is the output from the 
  * printf-like string and optional arguments, and c is the error message from 
- * errno.
+ * errno. Returns the number of characters written.
  */
 
 int myerror(const char *format, ...)
@@ -63,11 +63,11 @@ int myerror(const char *format, ...)
 	va_list ap;
 	int retval = 0;
 
-	va_start(ap, format);
 	retval = fprintf(stderr, "%s: ", progname);
+	va_start(ap, format);
 	retval += vfprintf(stderr, format, ap);
-	retval += fprintf(stderr, ": %s\n", strerror(errno));
 	va_end(ap);
+	retval += fprintf(stderr, ": %s\n", strerror(errno));
 
 	return retval;
 }
@@ -355,19 +355,15 @@ int main(int argc, char *argv[])
 		if (!strcmp(opt.comment, "-")) {
 			entry.txt = read_from_fp(stdin);
 			if (!entry.txt) {
-				fprintf(stderr,
-				        "%s: Could not read data from stdin\n",
-				        progname);
+				myerror("Could not read data from stdin");
 				return EXIT_ERROR;
 			}
 			did_read_from_stdin = TRUE;
 		} else {
 			entry.txt = strdup(opt.comment);
 			if (!entry.txt) {
-				fprintf(stderr,
-				        "%s: Cannot allocate memory for "
-				        "comment, strdup() failed: %s\n",
-				        progname, strerror(errno));
+				myerror("%s: Cannot allocate memory for "
+				        "comment, strdup() failed");
 				return EXIT_ERROR;
 			}
 		}
@@ -404,8 +400,7 @@ int main(int argc, char *argv[])
 	snprintf(logfile, fname_length, "%s/%s.xml", logdir, entry.host);
 	msg(2, "logfile = \"%s\"", logfile);
 	if (!create_logfile(logfile)) {
-		fprintf(stderr, "%s: %s: Error when creating log file\n",
-		                progname, logfile);
+		myerror("%s: Error when creating log file", logfile);
 		return EXIT_ERROR;
 	}
 	if (opt.verbose >= 4) {
@@ -415,8 +410,7 @@ int main(int argc, char *argv[])
 		i = i; /* Get rid of gcc warning */
 	}
 	if (add_to_logfile(logfile, &entry) == EXIT_ERROR) {
-		fprintf(stderr, "%s: %s: Error when adding entry "
-		                "to log file\n", progname, logfile);
+		myerror("%s: Error when adding entry to log file\n", logfile);
 		return(EXIT_ERROR);
 	}
 	if (!opt.whereto)
