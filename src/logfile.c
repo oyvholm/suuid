@@ -306,7 +306,11 @@ int add_to_logfile(char *fname, struct Entry *entry)
 		err(1, "%s: Could not open file for read+write", fname);
 		return EXIT_ERROR;
 	}
-	fseek(fp, -10, SEEK_END);
+	if (fseek(fp, -10, SEEK_END) == -1) {
+		fprintf(stderr, "%s: %s: Could not seek in log file: %s",
+		                progname, fname, strerror(errno));
+		return EXIT_ERROR;
+	}
 	filepos = ftell(fp);
 	msg(3, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
 	if (filepos == -1) {
