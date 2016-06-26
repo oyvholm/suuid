@@ -303,7 +303,7 @@ int add_to_logfile(char *fname, struct Entry *entry)
 	/* todo: Add file locking */
 	fp = fopen(fname, "r+");
 	if (!fp) {
-		err(1, "%s: Could not open file for read+write", fname);
+		myerror("%s: Could not open file for read+write", fname);
 		return EXIT_ERROR;
 	}
 	if (fseek(fp, -10, SEEK_END) == -1) {
@@ -314,7 +314,7 @@ int add_to_logfile(char *fname, struct Entry *entry)
 	filepos = ftell(fp);
 	msg(3, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
 	if (filepos == -1) {
-		err(1, "%s: Cannot read file position", fname);
+		myerror("%s: Cannot read file position", fname);
 		return EXIT_ERROR;
 	}
 	msg(3, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
@@ -326,14 +326,14 @@ int add_to_logfile(char *fname, struct Entry *entry)
 		msg(3, "add_to_logfile(): Seems as check_line is ok, "
 		       "it is '%s'", check_line);
 		if (fseek(fp, filepos, SEEK_SET) == -1) {
-			err(1, "%s: Cannot seek to position %lu",
+			myerror("%s: Cannot seek to position %lu",
 			       fname, filepos);
 			return EXIT_ERROR;
 		}
 	}
 	msg(3, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
 	if (fputs(xml_entry(entry), fp) < 0) {
-		warn("fputs()");
+		myerror("fputs()");
 		retval = EXIT_ERROR;
 	}
 	msg(3, "Before end tag is written");
@@ -368,7 +368,7 @@ char *create_logfile(char *name)
 		FILE *fp;
 		fp = fopen(name, "a");
 		if (!fp) {
-			err(1, "%s: Could not create log file", name);
+			myerror("%s: Could not create log file", name);
 			return NULL;
 		}
 		fprintf(fp, "%s\n%s\n<suuids>\n</suuids>\n",

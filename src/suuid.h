@@ -46,7 +46,6 @@
  */
 
 #include <ctype.h>
-#include <err.h>
 #include <errno.h>
 #include <getopt.h>
 #include <limits.h>
@@ -62,7 +61,6 @@
  */
 
 #define in_range(a,b,c)  ((a) >= (b) && (a) <= (c) ? TRUE : FALSE)
-#define myerror(a)  { fprintf(stderr, "%s: ", progname); perror(a); }
 
 /*
  * Typedefs
@@ -120,6 +118,7 @@ extern char *trim_str_end(char *);
 
 /* suuid.c */
 extern int msg(int, const char *, ...);
+extern int myerror(const char *, ...);
 extern void print_license(void);
 extern void print_version(void);
 extern void usage(int);

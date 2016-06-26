@@ -50,6 +50,20 @@ int msg(int verbose, const char *format, ...)
 	return retval;
 }
 
+int myerror(const char *format, ...)
+{
+	va_list ap;
+	int retval = 0;
+
+	va_start(ap, format);
+	retval = fprintf(stderr, "%s: ", progname);
+	retval += vfprintf(stderr, format, ap);
+	retval += fprintf(stderr, ": %s\n", strerror(errno));
+	va_end(ap);
+
+	return retval;
+}
+
 /*
  * print_license() - Display the program license
  */
@@ -374,7 +388,7 @@ int main(int argc, char *argv[])
 	               1;
 	logfile = malloc(fname_length + 1);
 	if (!logfile) {
-		err(1, "Could not allocate %lu bytes for logfile filename",
+		myerror("Could not allocate %lu bytes for logfile filename",
 		       fname_length + 1);
 		return EXIT_ERROR;
 	}
