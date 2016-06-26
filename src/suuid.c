@@ -373,9 +373,11 @@ int main(int argc, char *argv[])
 	               strlen(".xml") +
 	               1;
 	logfile = malloc(fname_length + 1);
-	if (!logfile)
+	if (!logfile) {
 		err(1, "Could not allocate %lu bytes for logfile filename",
 		       fname_length + 1);
+		return EXIT_ERROR;
+	}
 	/* fixme: Remove slash hardcoding */
 	snprintf(logfile, fname_length, "%s/%s.xml", logdir, entry.host);
 	msg(2, "logfile = \"%s\"", logfile);
