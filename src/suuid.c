@@ -368,7 +368,7 @@ char *process_uuid(char *logfile, struct Entry *entry)
 {
 	entry->uuid = generate_uuid();
 	if (!valid_uuid(entry->uuid)) {
-		fprintf(stderr, "%s: Got invalid UUID: \"%s\"",
+		fprintf(stderr, "%s: Got invalid UUID: \"%s\"\n",
 		                progname, entry->uuid);
 		return NULL;
 	}
