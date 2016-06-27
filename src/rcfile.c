@@ -21,8 +21,9 @@
 #include "suuid.h"
 
 /*
- * Check if line contains the keyword at the beginning of the line. If it does, 
- * return pointer to the value of that keyword, otherwise return NULL.
+ * has_key() - Check if line contains the keyword at the beginning of the line. 
+ * If it does, return pointer to the value of that keyword, otherwise return 
+ * NULL.
  */
 
 char *has_key(char *line, char *keyword)
@@ -57,25 +58,6 @@ char *has_key(char *line, char *keyword)
 }
 
 /*
- * check_rc() - Check an rc line for a specific keyword. If it's found, modify 
- * var to point to the value of that keyword.
- */
-
-void check_rc(char *keyword, char *var, char *line)
-{
-	char *p;
-
-	if (!has_key(line, keyword))
-		return;
-	msg(2, "check_rc(): Yo, found %s", keyword);
-	p = strchr(line, '=');
-	while (p && (*p == '=' || *p == ' '))
-		p++;
-	var = p;
-	msg(2, "check_rc() set var = \"%s\"", var);
-}
-
-/*
  * parse_rc_line() - Receive a line from the rcfile and check for each keyword 
  * by sending it to check_rc() whom will set the struct variable accordingly.
  */
@@ -83,10 +65,10 @@ void check_rc(char *keyword, char *var, char *line)
 void parse_rc_line(char *line, struct Rc *rc)
 {
 	msg(2, "Entering parse_rc_line(\"%s\", ...)", line);
-	msg(2, "rc->uuidcmd before check_rc(): \"%s\"", rc->uuidcmd);
+	msg(2, "rc->uuidcmd before has_key(): \"%s\"", rc->uuidcmd);
 	if (has_key(line, "uuidcmd"))
 		rc->uuidcmd = has_key(line, "uuidcmd");
-	msg(2, "rc->uuidcmd after check_rc(): \"%s\"", rc->uuidcmd);
+	msg(2, "rc->uuidcmd after has_key(): \"%s\"", rc->uuidcmd);
 }
 
 /*
