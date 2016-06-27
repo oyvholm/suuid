@@ -257,26 +257,25 @@ char *get_logdir()
 		retval = opt.logdir;
 	else if (getenv(ENV_LOGDIR))
 		retval = getenv(ENV_LOGDIR);
-	else {
-		if (!getenv("HOME")) {
-			msg(3, "get_logdir(): HOME not found");
-			fprintf(stderr, "%s: $%s and $HOME environment "
-			                "variables are not defined, cannot "
-			                "create logdir path",
-			                progname, ENV_LOGDIR);
+	else if (getenv("HOME")) {
+		int size = strlen(getenv("HOME")) +
+		           strlen("/uuids") + 1;
+
+		retval = malloc(size + 1);
+		if (!retval) {
+			perror("get_logdir(): Cannot allocate "
+			       "memory");
 			return NULL;
-		} else {
-			int size = strlen(getenv("HOME")) +
-			           strlen("/uuids") + 1;
-			retval = malloc(size + 1);
-			if (!retval) {
-				perror("get_logdir(): Cannot allocate "
-				       "memory");
-				return NULL;
-			}
-			snprintf(retval, size, "%s/uuids",
-			                       getenv("HOME"));
 		}
+		snprintf(retval, size, "%s/uuids",
+		                       getenv("HOME"));
+	} else {
+		msg(3, "get_logdir(): HOME not found");
+		fprintf(stderr, "%s: $%s and $HOME environment "
+		                "variables are not defined, cannot "
+		                "create logdir path",
+		                progname, ENV_LOGDIR);
+		return NULL;
 	}
 	msg(3, "get_logdir() returns \"%s\"", retval);
 
