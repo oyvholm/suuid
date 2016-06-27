@@ -61,7 +61,7 @@ char *allocate_entry(char *elem, char *src)
 		size += strlen("<") + strlen(elem) + strlen(">") +
 		        strlen(src) * MAX_GROWTH +
 		        strlen("<") + strlen(elem) + strlen("/> ") + 1;
-		msg(3, "allocate_entry(): size = %lu", size);
+		msg(4, "allocate_entry(): size = %lu", size);
 		retval = malloc(size + 1);
 		if (!retval)
 			perror("allocate_entry(): Cannot allocate memory");
@@ -70,7 +70,7 @@ char *allocate_entry(char *elem, char *src)
 			                       elem, suuid_xml(src), elem);
 	} else
 		retval = NULL;
-	msg(3, "allocate_entry() returns '%s'", retval);
+	msg(4, "allocate_entry() returns '%s'", retval);
 
 	return retval;
 }

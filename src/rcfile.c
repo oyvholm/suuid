@@ -96,25 +96,28 @@ int read_rcfile(char *rcfile, struct Rc *rc)
 	rc->uuidcmd = NULL;
 
 	if (!rcfile) {
-		/* It's perfectly fine if it's not readable, that probably 
-		 * means it doesn't exist.
-		 */
 		msg(3, "rcfile is NULL, return EXIT_OK from read_rcfile()");
 		return EXIT_OK;
 	}
 
 	fp = fopen(rcfile, "r");
 	if (!fp)
-		return EXIT_OK;
+		return EXIT_OK; /* It's perfectly fine if it's not readable, 
+		                 * that probably means it doesn't exist.
+		                 */
 
 	do {
 		if (!fgets(buf, BUFSIZ, fp) && errno) {
+			msg(3, "read_rcfile(): if part 1: buf = \"%s\"", buf);
 			myerror("%s: Could not read from rcfile", rcfile);
 			return EXIT_ERROR;
+		} else {
+			msg(3, "read_rcfile(): if part 2: buf = \"%s\"", buf);
+			trim_str_front(buf);
+			trim_str_end(buf);
+			parse_rc_line(buf, rc);
+			*buf = '\0';
 		}
-		trim_str_front(buf);
-		trim_str_end(buf);
-		parse_rc_line(buf, rc);
 	} while(!feof(fp));
 
 	return EXIT_OK;

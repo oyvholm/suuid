@@ -32,6 +32,7 @@ char *generate_uuid(void)
 
 	if (rc.uuidcmd)
 		cmd = rc.uuidcmd;
+	msg(3, "generate_uuid(): cmd = \"%s\"", cmd);
 
 	/* FIXME: Generate it properly */
 	fp = popen(cmd, "r");
