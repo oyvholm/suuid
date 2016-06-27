@@ -43,8 +43,11 @@ char *generate_uuid(void)
 		myerror("Could not exec /usr/bin/uuid");
 		return NULL;
 	}
-	if (!fgets(uuid, 37, fp))
-		myerror("generate_uuid(): fgets() error");
+	if (!fgets(uuid, 37, fp)) {
+		/* Nevermind read errors, valid_uuid() checks if it's valid  
+		 * later.
+		 */
+	}
 	uuid[36] = '\0';
 	pclose(fp);
 
