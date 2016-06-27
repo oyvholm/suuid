@@ -39,7 +39,8 @@
 #define stddebug  stderr
 
 #define ENV_LOGDIR  "SUUID_LOGDIR" /* Optional environment variable with path 
-                                      to log directory */
+                                    * to log directory
+                                    */
 
 /*
  * Standard header files

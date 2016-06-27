@@ -145,12 +145,8 @@ char *alloc_attr(char *attr, char *data)
 	int size;
 
 	msg(3, "Entering alloc_attr(\"%s\", \"%s\")", attr, data);
-	size = strlen(" ") +
-	       strlen(attr) +
-	       strlen("=\"") +
-	       strlen(data) +
-	       strlen("\"") +
-	       1;
+	size = strlen(" ") + strlen(attr) + strlen("=\"") + strlen(data) +
+	       strlen("\"") + 1;
 	msg(3, "data size = %lu", size);
 	retval = malloc(size + 1);
 	if (!retval)
@@ -179,10 +175,10 @@ char *xml_entry(struct Entry *entry)
 
 	msg(3, "xml_entry(): entry->date = '%s'", entry->date);
 	msg(3, "xml_entry(): entry->uuid = '%s'", entry->uuid);
-	msg(3, "xml_entry(): entry->tag = '%s'",  entry->tag);
-	msg(4, "xml_entry(): entry->txt = '%s'",  entry->txt);
+	msg(3, "xml_entry(): entry->tag  = '%s'", entry->tag);
+	msg(4, "xml_entry(): entry->txt  = '%s'", entry->txt);
 	msg(3, "xml_entry(): entry->host = '%s'", entry->host);
-	msg(3, "xml_entry(): entry->cwd = '%s'",  entry->cwd);
+	msg(3, "xml_entry(): entry->cwd  = '%s'", entry->cwd);
 	msg(3, "xml_entry(): entry->user = '%s'", entry->user);
 	msg(3, "xml_entry(): entry->sess = '%s'", entry->sess);
 
@@ -325,7 +321,7 @@ int add_to_logfile(char *fname, struct Entry *entry)
 		       "it is '%s'", check_line);
 		if (fseek(fp, filepos, SEEK_SET) == -1) {
 			myerror("%s: Cannot seek to position %lu",
-			       fname, filepos);
+			        fname, filepos);
 			return EXIT_ERROR;
 		}
 	}
@@ -370,7 +366,7 @@ char *create_logfile(char *name)
 			return NULL;
 		}
 		fprintf(fp, "%s\n%s\n<suuids>\n</suuids>\n",
-			xml_header, xml_doctype);
+		            xml_header, xml_doctype);
 		fclose(fp);
 	}
 	return name;
@@ -395,15 +391,12 @@ char *set_up_logfile(struct Options *opt, char *hostname)
 		return NULL;
 	}
 
-	fname_length = strlen(logdir) +
-	               strlen("/") +
-	               strlen(hostname) +
-	               strlen(".xml") +
-	               1;
+	fname_length = strlen(logdir) + strlen("/") +
+	               strlen(hostname) + strlen(".xml") + 1;
 	logfile = malloc(fname_length + 1);
 	if (!logfile) {
 		myerror("Could not allocate %lu bytes for logfile filename",
-		       fname_length + 1);
+		        fname_length + 1);
 		return NULL;
 	}
 	/* fixme: Remove slash hardcoding */

@@ -236,8 +236,7 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 		}
 		break;
 	default:
-		msg(2, "getopt_long() returned "
-		       "character code %d", c);
+		msg(2, "getopt_long() returned character code %d", c);
 		retval = EXIT_ERROR;
 		break;
 	}
@@ -413,7 +412,8 @@ int main(int argc, char *argv[])
 
 	progname = argv[0];
 	progname = "suuid"; /* fixme: Temporary kludge to make it compatible 
-	                       with the Perl version. */
+	                     * with the Perl version.
+	                     */
 
 	retval = parse_options(&opt, argc, argv);
 	msg(3, "retval after parse_options(): %d", retval);

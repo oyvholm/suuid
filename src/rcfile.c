@@ -33,8 +33,7 @@ char *has_key(char *line, char *keyword)
 
 	size = strlen(keyword) + 2;
 	search_str = malloc(size);
-	if (!search_str)
-	{
+	if (!search_str) {
 		myerror("has_key(): Could not allocate %lu bytes", size);
 		return NULL;
 	}
@@ -118,7 +117,7 @@ int read_rcfile(char *rcfile, struct Rc *rc)
 			parse_rc_line(buf, rc);
 			*buf = '\0';
 		}
-	} while(!feof(fp));
+	} while (!feof(fp));
 
 	return EXIT_OK;
 }

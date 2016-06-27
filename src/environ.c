@@ -33,8 +33,9 @@ char *get_hostname(void)
 	if (gethostname(buf, HOST_NAME_MAX) == -1)
 		return NULL;
 #if FAKE_HOST
-	retval = "fake"; /* Use "fake" as hostname to avoid conflicts
-	                    with files created by the Perl version */
+	retval = "fake"; /* Use "fake" as hostname to avoid conflicts with
+	                  * files created by the Perl version
+	                  */
 #endif
 	msg(3, "get_hostname() returns '%s'", retval);
 
@@ -57,7 +58,7 @@ char *getpath(void)
 		perror("getpath(): malloc() fail");
 		return NULL;
 	}
-	for (p = getcwd(retval, size); !p; ) {
+	for (p = getcwd(retval, size); !p;) {
 		size += BUFSIZ;
 		retval = realloc(retval, size);
 		if (!retval) {
