@@ -152,6 +152,7 @@ extern int valid_uuid(char *);
 
 extern char *progname;
 extern struct Options opt;
+extern struct Rc rc;
 
 #endif /* ifndef _SUUID_H */
 

@@ -26,6 +26,7 @@
 
 char *progname;
 struct Options opt;
+struct Rc rc;
 
 /*
  * msg() - Print a message prefixed with "[progname]: " to stddebug if 
@@ -308,7 +309,8 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 int fill_entry_struct(struct Entry *entry, struct Options *opt, struct Rc *rc)
 {
 	init_xml_entry(entry);
-	entry->host = get_hostname();
+	msg(3, "fill_entry_struct(): rc->hostname = \"%s\"", rc->hostname);
+	entry->host = rc->hostname ? rc->hostname : get_hostname();
 	entry->cwd = getpath();
 	entry->user = get_username();
 	entry->tty = get_tty();
@@ -398,7 +400,6 @@ char *process_uuid(char *logfile, struct Entry *entry)
 int main(int argc, char *argv[])
 {
 	int retval = EXIT_OK;
-	struct Rc rc;
 	char *logfile;
 	struct Entry entry;
 	char *uuid;
@@ -436,15 +437,18 @@ int main(int argc, char *argv[])
 		myerror("%s: Could not read rc file", opt.rcfile);
 		return EXIT_ERROR;
 	}
+	msg(3, "Back in main() after read_rcfile()");
 
 	if (fill_entry_struct(&entry, &opt, &rc) == EXIT_ERROR)
 		return EXIT_ERROR;
+	msg(3, "Back in main() after fill_entry_struct()");
 
 	logfile = set_up_logfile(&opt, entry.host);
 	if (!logfile) {
 		myerror("Could not initialise log file");
 		return EXIT_ERROR;
 	}
+	msg(3, "After set_up_logfile()");
 
 	for (i = 0; i < opt.count; i++) {
 		uuid = process_uuid(logfile, &entry);

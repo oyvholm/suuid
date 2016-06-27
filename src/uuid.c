@@ -27,10 +27,14 @@
 char *generate_uuid(void)
 {
 	static char uuid[38];
+	char *cmd = "/usr/bin/uuid";
 	FILE *fp;
 
+	if (rc.uuidcmd)
+		cmd = rc.uuidcmd;
+
 	/* FIXME: Generate it properly */
-	fp = popen("/usr/bin/uuid", "r");
+	fp = popen(cmd, "r");
 	if (!fp) {
 		myerror("Could not exec /usr/bin/uuid");
 		return NULL;

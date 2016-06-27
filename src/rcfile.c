@@ -64,9 +64,6 @@ void parse_rc_line(char *line, struct Rc *rc)
 {
 	msg(3, "Entering parse_rc_line(\"%s\", ...)", line);
 
-	rc->hostname = NULL;
-	rc->uuidcmd = NULL;
-
 	check_rc("uuidcmd", rc->uuidcmd, line);
 }
 
@@ -79,10 +76,15 @@ int read_rcfile(char *rcfile, struct Rc *rc)
 	FILE *fp;
 	char buf[BUFSIZ];
 
-	msg(3, "Entering rcfile(\"%s\", ...)", rcfile);
+	msg(3, "Entering read_rcfile(\"%s\", ...)", rcfile);
 
-	if (!rcfile)
+	rc->hostname = NULL;
+	rc->uuidcmd = NULL;
+
+	if (!rcfile) {
+		msg(3, "rcfile is NULL, return EXIT_OK from read_rcfile()");
 		return EXIT_OK;
+	}
 
 	fp = fopen(rcfile, "r");
 	if (!fp)
