@@ -299,11 +299,6 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 	return retval;
 }
 
-int read_rcfile(struct Rc *rc)
-{
-	return EXIT_OK;
-}
-
 /*
  * fill_entry_struct() - Fill the entry struct with information from the opt 
  * struct and the environment, like current directory, hostname, comment, etc.
@@ -437,7 +432,9 @@ int main(int argc, char *argv[])
 		return EXIT_OK;
 	}
 
-	if (!read_rcfile(&rc)) {
+	if (read_rcfile(opt.rcfile, &rc) == EXIT_ERROR) {
+		myerror("%s: Could not read rc file", opt.rcfile);
+		return EXIT_ERROR;
 	}
 
 	if (fill_entry_struct(&entry, &opt) == EXIT_ERROR)

@@ -118,6 +118,9 @@ extern char *create_logfile(char *);
 extern char *set_up_logfile(struct Options *, char *);
 extern int valid_xml_chars(char *);
 
+/* rcfile.c */
+extern int read_rcfile(char *, struct Rc *);
+
 /* string.c */
 extern char *trim_str_front(char *);
 extern char *trim_str_end(char *);
@@ -130,7 +133,6 @@ extern void print_version(void);
 extern void usage(int);
 extern int choose_opt_action(struct Options *, int, struct option *);
 extern int parse_options(struct Options *, int, char *[]);
-extern int read_rcfile(struct Rc *);
 extern int fill_entry_struct(struct Entry *, struct Options *);
 extern char *process_uuid(char *, struct Entry *);
 
