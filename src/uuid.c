@@ -60,7 +60,7 @@ char *uuid_date(char *uuid)
 	/* fixme */
 	static char retval[32];
 
-	strncpy(retval, uuid, 5); /* Disable gcc -Wextra warning */
+	uuid = uuid; /* Disable gcc -Wextra warning */
 	strcpy(retval, "2000-01-01T00:00:00.0000000Z");
 
 	return retval;
