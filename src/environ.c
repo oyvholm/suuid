@@ -33,9 +33,7 @@ char *get_hostname(void)
 	if (gethostname(buf, HOST_NAME_MAX) == -1)
 		return NULL;
 #if FAKE_HOST
-	retval = "fake"; /* Use "fake" as hostname to avoid conflicts with
-	                  * files created by the Perl version
-	                  */
+	retval = "fake";
 #endif
 	msg(3, "get_hostname() returns '%s'", retval);
 
