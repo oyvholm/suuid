@@ -351,8 +351,6 @@ char *process_uuid(char *logfile, struct Entry *entry)
 	}
 	entry->date = uuid_date(entry->uuid);
 
-	msg(3, "After utf8_check()");
-
 	if (opt.verbose >= 4) {
 		int i;
 
