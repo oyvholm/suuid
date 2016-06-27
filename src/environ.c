@@ -30,11 +30,14 @@ char *get_hostname(void)
 	static char buf[HOST_NAME_MAX + 1];
 	char *retval = buf;
 
-	if (gethostname(buf, HOST_NAME_MAX) == -1)
-		return NULL;
+	if (rc.hostname)
+		strncpy(buf, rc.hostname, HOST_NAME_MAX);
 #if FAKE_HOST
-	retval = "fake";
+	else if (1)
+		retval = "fake";
 #endif
+	else if (gethostname(buf, HOST_NAME_MAX) == -1)
+		return NULL;
 	msg(3, "get_hostname() returns '%s'", retval);
 
 	return retval;

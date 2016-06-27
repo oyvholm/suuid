@@ -316,7 +316,7 @@ int fill_entry_struct(struct Entry *entry, struct Options *opt, struct Rc *rc)
 {
 	init_xml_entry(entry);
 	msg(3, "fill_entry_struct(): rc->hostname = \"%s\"", rc->hostname);
-	entry->host = rc->hostname ? rc->hostname : get_hostname();
+	entry->host = get_hostname();
 	entry->cwd = getpath();
 	entry->user = get_username();
 	entry->tty = get_tty();
