@@ -409,7 +409,7 @@ int main(int argc, char *argv[])
 	char *logfile;
 	struct Entry entry;
 	char *uuid;
-	int i;
+	unsigned int i;
 
 	progname = argv[0];
 	progname = "suuid"; /* fixme: Temporary kludge to make it compatible 
