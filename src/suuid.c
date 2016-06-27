@@ -63,12 +63,13 @@ int myerror(const char *format, ...)
 {
 	va_list ap;
 	int retval = 0;
+	int orig_errno = errno;
 
 	retval = fprintf(stderr, "%s: ", progname);
 	va_start(ap, format);
 	retval += vfprintf(stderr, format, ap);
 	va_end(ap);
-	retval += fprintf(stderr, ": %s\n", strerror(errno));
+	retval += fprintf(stderr, ": %s\n", strerror(orig_errno));
 
 	return retval;
 }
