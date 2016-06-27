@@ -42,7 +42,13 @@ char *has_key(char *line, char *keyword)
 
 	if (!strncmp(line, search_str, strlen(search_str))) {
 		msg(2, "has_key(): Found \"%s\"", keyword);
-		retval = keyword;
+
+		/* Move retval to the first character that is not a space 
+		 * (ASCII 32) after the first equal sign.
+		 */
+		retval = strchr(line, '=');
+		while (retval && (*retval == '=' || *retval == ' '))
+			retval++;
 	} else
 		retval = NULL;
 	msg(2, "has_key() returns \"%s\"", retval);
