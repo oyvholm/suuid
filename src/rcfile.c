@@ -66,6 +66,8 @@ void parse_rc_line(char *line, struct Rc *rc)
 {
 	msg(2, "Entering parse_rc_line(\"%s\", ...)", line);
 	msg(2, "rc->uuidcmd before has_key(): \"%s\"", rc->uuidcmd);
+	if (has_key(line, "hostname"))
+		rc->hostname = has_key(line, "hostname");
 	if (has_key(line, "uuidcmd"))
 		rc->uuidcmd = has_key(line, "uuidcmd");
 	msg(2, "rc->uuidcmd after has_key(): \"%s\"", rc->uuidcmd);
