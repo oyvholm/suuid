@@ -188,6 +188,11 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 			dest->license = 1;
 		} else if (!strcmp(opts->name, "rcfile")) {
 			dest->rcfile = strdup(optarg);
+			if (!dest->rcfile) {
+				myerror("choose_opt_action(): Cannot allocate "
+				        "memory for --rcfile argument");
+				retval = EXIT_ERROR;
+			}
 		} else if (!strcmp(opts->name, "version")) {
 			dest->version = 1;
 		}
@@ -195,8 +200,8 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 	case 'c':
 		dest->comment = strdup(optarg);
 		if (!dest->comment) {
-			perror("choose_opt_action(): Cannot allocate "
-			       "memory for -c/--comment argument");
+			myerror("choose_opt_action(): Cannot allocate memory "
+			        "for -c/--comment argument");
 			retval = EXIT_ERROR;
 		}
 		break;
@@ -206,8 +211,8 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 	case 'l':
 		dest->logdir = strdup(optarg);
 		if (!dest->logdir) {
-			perror("choose_opt_action(): Cannot allocate "
-			       "memory for -l/--logdir argument");
+			myerror("choose_opt_action(): Cannot allocate memory "
+			        "for -l/--logdir argument");
 			retval = EXIT_ERROR;
 		}
 		break;
@@ -225,7 +230,8 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 	case 'w':
 		dest->whereto = strdup(optarg);
 		if (!dest->whereto) {
-			perror("Cannot allocate memory for -w argument");
+			myerror("choose_opt_action(): Cannot allocate memory "
+			        "for -w/--whereto argument");
 			retval = EXIT_ERROR;
 		}
 		break;
