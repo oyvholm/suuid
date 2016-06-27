@@ -237,7 +237,7 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 		}
 		break;
 	default:
-		msg(2, "getopt_long() returned character code %d", c);
+		msg(3, "getopt_long() returned character code %d", c);
 		retval = EXIT_ERROR;
 		break;
 	}
@@ -451,7 +451,7 @@ int main(int argc, char *argv[])
 
 		for (i = optind; i < argc; i++) {
 			char *a = argv[i];
-			msg(2, "Checking arg %d \"%s\"", i, a);
+			msg(3, "Checking arg %d \"%s\"", i, a);
 			printf("check_hex(\"%s\") = \"%s\"\n",
 			       a, check_hex(a, 5));
 		}
@@ -486,7 +486,7 @@ int main(int argc, char *argv[])
 		int t;
 
 		for (t = optind; t < argc; t++) {
-			msg(2, "Non-option arg: %s", argv[t]);
+			msg(3, "Non-option arg: %s", argv[t]);
 #if 0
 			puts(suuid_xml(argv[t])); /* For testing, remove when 
 			                           * suuid_xml() is wonderful.

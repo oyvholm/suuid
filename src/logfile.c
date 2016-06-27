@@ -183,7 +183,7 @@ char *xml_entry(struct Entry *entry)
 	msg(3, "xml_entry(): entry->sess = '%s'", entry->sess);
 
 	if (!entry->uuid) {
-		msg(2, "xml_entry(): uuid is NULL");
+		msg(3, "xml_entry(): uuid is NULL");
 		return NULL;
 	} else
 		e.uuid = alloc_attr("u", entry->uuid);
@@ -400,7 +400,7 @@ char *set_up_logfile(struct Options *opt, char *hostname)
 	}
 	/* fixme: Remove slash hardcoding */
 	snprintf(logfile, fname_length, "%s/%s.xml", logdir, hostname);
-	msg(2, "logfile = \"%s\"", logfile);
+	msg(3, "logfile = \"%s\"", logfile);
 	if (!create_logfile(logfile)) {
 		myerror("%s: Error when creating log file", logfile);
 		return NULL;
