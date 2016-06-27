@@ -21,8 +21,9 @@
 #include "suuid.h"
 
 /*
- * Check if line contains the keyword at the beginning of the line. If it does, 
- * return pointer to keyword, otherwise return NULL.
+ * has_key() - Check if line contains the keyword at the beginning of the line. 
+ * If it does, return pointer to the value of that keyword, otherwise return 
+ * NULL.
  */
 
 char *has_key(char *line, char *keyword)
@@ -38,35 +39,22 @@ char *has_key(char *line, char *keyword)
 		return NULL;
 	}
 	snprintf(search_str, size, "%s ", keyword);
-	msg(3, "has_key(): search_str = \"%s\"", search_str);
+	msg(2, "has_key(): search_str = \"%s\"", search_str);
 
 	if (!strncmp(line, search_str, strlen(search_str))) {
-		msg(3, "has_key(): Found \"%s\"", keyword);
-		retval = keyword;
+		msg(2, "has_key(): Found \"%s\"", keyword);
+
+		/* Move retval to the first character that is not a space 
+		 * (ASCII 32) after the first equal sign.
+		 */
+		retval = strchr(line, '=');
+		while (retval && (*retval == '=' || *retval == ' '))
+			retval++;
 	} else
 		retval = NULL;
-	msg(3, "has_key() returns \"%s\"", retval);
+	msg(2, "has_key() returns \"%s\"", retval);
 
 	return retval;
-}
-
-/*
- * check_rc() - Check an rc line for a specific keyword. If it's found, modify 
- * var to point to the value of that keyword.
- */
-
-void check_rc(char *keyword, char *var, char *line)
-{
-	char *p;
-
-	if (!has_key(line, keyword))
-		return;
-	msg(3, "check_rc(): Yo, found %s", keyword);
-	p = strchr(line, '=');
-	while (p && (*p == '=' || *p == ' '))
-		p++;
-	var = p;
-	msg(3, "check_rc() set var = \"%s\"", var);
 }
 
 /*
@@ -76,8 +64,11 @@ void check_rc(char *keyword, char *var, char *line)
 
 void parse_rc_line(char *line, struct Rc *rc)
 {
-	msg(3, "Entering parse_rc_line(\"%s\", ...)", line);
-	check_rc("uuidcmd", rc->uuidcmd, line);
+	msg(2, "Entering parse_rc_line(\"%s\", ...)", line);
+	msg(2, "rc->uuidcmd before has_key(): \"%s\"", rc->uuidcmd);
+	if (has_key(line, "uuidcmd"))
+		rc->uuidcmd = has_key(line, "uuidcmd");
+	msg(2, "rc->uuidcmd after has_key(): \"%s\"", rc->uuidcmd);
 }
 
 /*
@@ -89,13 +80,14 @@ int read_rcfile(char *rcfile, struct Rc *rc)
 	FILE *fp;
 	char buf[BUFSIZ];
 
-	msg(3, "Entering read_rcfile(\"%s\", ...)", rcfile);
+	msg(2, "Entering read_rcfile(\"%s\", ...)", rcfile);
+	msg(2, "read_rcfile(): rc->uuidcmd = \"%s\"", rc->uuidcmd);
 
 	rc->hostname = NULL;
 	rc->uuidcmd = NULL;
 
 	if (!rcfile) {
-		msg(3, "rcfile is NULL, return EXIT_OK from read_rcfile()");
+		msg(2, "rcfile is NULL, return EXIT_OK from read_rcfile()");
 		return EXIT_OK;
 	}
 
@@ -107,11 +99,11 @@ int read_rcfile(char *rcfile, struct Rc *rc)
 
 	do {
 		if (!fgets(buf, BUFSIZ, fp) && errno) {
-			msg(3, "read_rcfile(): if part 1: buf = \"%s\"", buf);
+			msg(2, "read_rcfile(): if part 1: buf = \"%s\"", buf);
 			myerror("%s: Could not read from rcfile", rcfile);
 			return EXIT_ERROR;
 		} else {
-			msg(3, "read_rcfile(): if part 2: buf = \"%s\"", buf);
+			msg(2, "read_rcfile(): if part 2: buf = \"%s\"", buf);
 			trim_str_front(buf);
 			trim_str_end(buf);
 			parse_rc_line(buf, rc);

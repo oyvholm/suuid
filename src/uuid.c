@@ -30,8 +30,11 @@ char *generate_uuid(void)
 	char *cmd = "/usr/bin/uuid";
 	FILE *fp;
 
-	if (rc.uuidcmd)
+	msg(2, "generate_uuid(): rc.uuidcmd = \"%s\"", rc.uuidcmd);
+	if (rc.uuidcmd) {
 		cmd = rc.uuidcmd;
+		msg(2, "generate_uuid(): Setting cmd to \"%s\"", cmd);
+	}
 	msg(3, "generate_uuid(): cmd = \"%s\"", cmd);
 
 	/* FIXME: Generate it properly */
