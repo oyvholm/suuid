@@ -67,6 +67,9 @@
  */
 
 typedef unsigned char bool;
+struct Rc {
+	char *hostname;
+};
 struct Entry {
 	char *date;
 	char *uuid;
@@ -84,6 +87,7 @@ struct Options {
 	int help;
 	int license;
 	char *logdir;
+	char *rcfile;
 	int verbose;
 	int version;
 	char *whereto;
@@ -126,6 +130,7 @@ extern void print_version(void);
 extern void usage(int);
 extern int choose_opt_action(struct Options *, int, struct option *);
 extern int parse_options(struct Options *, int, char *[]);
+extern int read_rcfile(struct Rc *);
 extern int fill_entry_struct(struct Entry *, struct Options *);
 extern char *process_uuid(char *, struct Entry *);
 

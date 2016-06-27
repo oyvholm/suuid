@@ -146,6 +146,8 @@ void usage(int retval)
 		printf("  -q, --quiet\n"
 		       "    Be more quiet. "
 		       "Can be repeated to increase silence.\n");
+		printf("  --rcfile X\n"
+		       "    Use file X instead of '$Std{'rcfile'}'.\n");
 		printf("  -v, --verbose\n"
 		       "    Increase level of verbosity. Can be repeated.\n");
 		printf("  --version\n"
@@ -183,6 +185,8 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 	case 0:
 		if (!strcmp(opts->name, "license")) {
 			dest->license = 1;
+		} else if (!strcmp(opts->name, "rcfile")) {
+			dest->rcfile = strdup(optarg);
 		} else if (!strcmp(opts->name, "version")) {
 			dest->version = 1;
 		}
@@ -249,6 +253,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 	dest->help = 0;
 	dest->license = 0;
 	dest->logdir = NULL;
+	dest->rcfile = NULL;
 	dest->verbose = 0;
 	dest->version = 0;
 	dest->whereto = NULL;
@@ -262,6 +267,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 			{"license", no_argument, 0, 0},
 			{"logdir", required_argument, 0, 'l'},
 			{"quiet", no_argument, 0, 'q'},
+			{"rcfile", required_argument, 0, 0},
 			{"verbose", no_argument, 0, 'v'},
 			{"version", no_argument, 0, 0},
 			{"whereto", no_argument, 0, 'w'},
@@ -291,6 +297,11 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 	msg(3, "parse_options() returns %d", retval);
 
 	return retval;
+}
+
+int read_rcfile(struct Rc *rc)
+{
+	return EXIT_OK;
 }
 
 /*
@@ -392,6 +403,7 @@ char *process_uuid(char *logfile, struct Entry *entry)
 int main(int argc, char *argv[])
 {
 	int retval = EXIT_OK;
+	struct Rc rc;
 	char *logfile;
 	struct Entry entry;
 	char *uuid;
@@ -423,6 +435,9 @@ int main(int argc, char *argv[])
 	if (opt.license) {
 		print_license();
 		return EXIT_OK;
+	}
+
+	if (!read_rcfile(&rc)) {
 	}
 
 	if (fill_entry_struct(&entry, &opt) == EXIT_ERROR)
