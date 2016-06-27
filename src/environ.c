@@ -109,8 +109,8 @@ char *get_tty(void)
 
 	retval = ttyname(STDIN_FILENO);
 
-	/* Legacy reasons, the Perl version of suuid calls `tty` from GNU 
-	 * coreutils, and it prints "not a tty\n" when ttyname() fails. The 
+	/* fixme: Legacy reasons, the Perl version of suuid calls `tty` from 
+	 * GNU coreutils, and it prints "not a tty\n" when ttyname() fails. The 
 	 * right thing to do is to return NULL so the tty element is omitted 
 	 * from the logs.
 	 */
