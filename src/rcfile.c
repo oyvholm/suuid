@@ -20,6 +20,11 @@
 
 #include "suuid.h"
 
+/*
+ * Check if line contains the keyword at the beginning of the line. If it does, 
+ * return pointer to keyword, otherwise return NULL.
+ */
+
 char *has_key(char *line, char *keyword)
 {
 	char *search_str;
@@ -46,6 +51,11 @@ char *has_key(char *line, char *keyword)
 	return retval;
 }
 
+/*
+ * check_rc() - Check an rc line for a specific keyword. If it's found, modify 
+ * var to point to the value of that keyword.
+ */
+
 void check_rc(char *keyword, char *var, char *line)
 {
 	char *p;
@@ -60,10 +70,14 @@ void check_rc(char *keyword, char *var, char *line)
 	msg(3, "check_rc() set var = \"%s\"", var);
 }
 
+/*
+ * parse_rc_line() - Receive a line from the rcfile and check for each keyword 
+ * by sending it to check_rc() whom will set the struct variable accordingly.
+ */
+
 void parse_rc_line(char *line, struct Rc *rc)
 {
 	msg(3, "Entering parse_rc_line(\"%s\", ...)", line);
-
 	check_rc("uuidcmd", rc->uuidcmd, line);
 }
 
@@ -82,6 +96,9 @@ int read_rcfile(char *rcfile, struct Rc *rc)
 	rc->uuidcmd = NULL;
 
 	if (!rcfile) {
+		/* It's perfectly fine if it's not readable, that probably 
+		 * means it doesn't exist.
+		 */
 		msg(3, "rcfile is NULL, return EXIT_OK from read_rcfile()");
 		return EXIT_OK;
 	}
