@@ -20,13 +20,67 @@
 
 #include "suuid.h"
 
+char *has_key(char *line, char *keyword)
+{
+	char *search_str;
+	size_t size;
+	char *retval;
+
+	size = strlen(keyword) + 2;
+	search_str = malloc(size);
+	if (!search_str)
+	{
+		myerror("has_key(): Could not allocate %lu bytes", size);
+		return NULL;
+	}
+	snprintf(search_str, size, "%s ", keyword);
+	msg(3, "has_key(): search_str = \"%s\"", search_str);
+
+	if (!strncmp(line, search_str, strlen(search_str))) {
+		msg(3, "has_key(): Found \"%s\"", keyword);
+		retval = keyword;
+	} else
+		retval = NULL;
+	msg(3, "has_key() returns \"%s\"", retval);
+
+	return retval;
+}
+
+void parse_rc_line(char *line, struct Rc *rc)
+{
+	msg(3, "Entering parse_rc_line(\"%s\", ...)", line);
+	trim_str_front(line);
+	trim_str_end(line);
+
+	if (has_key(line, "uuidcmd"))
+		msg(3, "parse_rc_line(): Yo, found uuidcmd");
+}
+
 /*
  * Read contents of rcfile into rc. Return EXIT_OK or EXIT_ERROR.
  */
 
 int read_rcfile(char *rcfile, struct Rc *rc)
 {
+	FILE *fp;
+	char buf[BUFSIZ];
+
 	msg(3, "Entering rcfile(\"%s\", ...)", rcfile);
+
+	if (!rcfile)
+		return EXIT_OK;
+
+	fp = fopen(rcfile, "r");
+	if (!fp)
+		return EXIT_OK;
+
+	do {
+		if (!fgets(buf, BUFSIZ, fp) && errno) {
+			myerror("%s: Could not read from rcfile", rcfile);
+			return EXIT_ERROR;
+		}
+		parse_rc_line(buf, rc);
+	} while(!feof(fp));
 
 	return EXIT_OK;
 }
