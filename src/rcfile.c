@@ -64,6 +64,9 @@ void parse_rc_line(char *line, struct Rc *rc)
 {
 	msg(3, "Entering parse_rc_line(\"%s\", ...)", line);
 
+	rc->hostname = NULL;
+	rc->uuidcmd = NULL;
+
 	check_rc("uuidcmd", rc->uuidcmd, line);
 }
 

@@ -305,7 +305,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
  * Returns EXIT_OK if no errors, EXIT_ERROR if errors.
  */
 
-int fill_entry_struct(struct Entry *entry, struct Options *opt)
+int fill_entry_struct(struct Entry *entry, struct Options *opt, struct Rc *rc)
 {
 	init_xml_entry(entry);
 	entry->host = get_hostname();
@@ -437,7 +437,7 @@ int main(int argc, char *argv[])
 		return EXIT_ERROR;
 	}
 
-	if (fill_entry_struct(&entry, &opt) == EXIT_ERROR)
+	if (fill_entry_struct(&entry, &opt, &rc) == EXIT_ERROR)
 		return EXIT_ERROR;
 
 	logfile = set_up_logfile(&opt, entry.host);
