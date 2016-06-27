@@ -22,7 +22,7 @@
 
 /*
  * Check if line contains the keyword at the beginning of the line. If it does, 
- * return pointer to keyword, otherwise return NULL.
+ * return pointer to the value of that keyword, otherwise return NULL.
  */
 
 char *has_key(char *line, char *keyword)
@@ -78,7 +78,8 @@ void parse_rc_line(char *line, struct Rc *rc)
 {
 	msg(2, "Entering parse_rc_line(\"%s\", ...)", line);
 	msg(2, "rc->uuidcmd before check_rc(): \"%s\"", rc->uuidcmd);
-	check_rc("uuidcmd", rc->uuidcmd, line);
+	if (has_key(line, "uuidcmd"))
+		rc->uuidcmd = has_key(line, "uuidcmd");
 	msg(2, "rc->uuidcmd after check_rc(): \"%s\"", rc->uuidcmd);
 }
 
@@ -92,6 +93,7 @@ int read_rcfile(char *rcfile, struct Rc *rc)
 	char buf[BUFSIZ];
 
 	msg(2, "Entering read_rcfile(\"%s\", ...)", rcfile);
+	msg(2, "read_rcfile(): rc->uuidcmd = \"%s\"", rc->uuidcmd);
 
 	rc->hostname = NULL;
 	rc->uuidcmd = NULL;
