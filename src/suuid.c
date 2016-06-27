@@ -336,6 +336,49 @@ int fill_entry_struct(struct Entry *entry, struct Options *opt)
 }
 
 /*
+ * process_uuid() - Generate UUID and write it to the log file.
+ * If no errors, send it to stdout and/or stderr and return a pointer to the 
+ * UUID. Otherwise return NULL.
+ */
+
+char *process_uuid(char *logfile, struct Entry *entry)
+{
+	entry->uuid = generate_uuid();
+	if (!valid_uuid(entry->uuid)) {
+		fprintf(stderr, "%s: Got invalid UUID: \"%s\"",
+		                progname, entry->uuid);
+		return NULL;
+	}
+	entry->date = uuid_date(entry->uuid);
+
+	msg(3, "After utf8_check()");
+
+	if (opt.verbose >= 4) {
+		int i;
+
+		i = system("(echo; echo After create_logfile:; "
+		           "cat /home/sunny/uuids/fake.xml; "
+		           "echo; echo) >&2");
+		i = i; /* Get rid of gcc warning */
+	}
+	if (add_to_logfile(logfile, entry) == EXIT_ERROR) {
+		myerror("%s: Error when adding entry to log file\n", logfile);
+		return NULL;
+	}
+
+	if (!opt.whereto)
+		puts(entry->uuid);
+	else {
+		if (strchr(opt.whereto, 'a') || strchr(opt.whereto, 'o'))
+			fprintf(stdout, "%s\n", entry->uuid);
+		if (strchr(opt.whereto, 'a') || strchr(opt.whereto, 'e'))
+			fprintf(stderr, "%s\n", entry->uuid);
+	}
+
+	return entry->uuid;
+}
+
+/*
  * main()
  */
 
@@ -344,7 +387,7 @@ int main(int argc, char *argv[])
 	int retval = EXIT_OK;
 	char *logfile;
 	struct Entry entry;
-	int i;
+	char *uuid;
 
 	progname = argv[0];
 	progname = "suuid"; /* fixme: Temporary kludge to make it compatible 
@@ -383,37 +426,9 @@ int main(int argc, char *argv[])
 		return EXIT_ERROR;
 	}
 
-	entry.uuid = generate_uuid();
-	if (!valid_uuid(entry.uuid)) {
-		fprintf(stderr, "%s: Got invalid UUID: \"%s\"",
-		                progname, entry.uuid);
-		return(EXIT_ERROR);
-	}
-	entry.date = uuid_date(entry.uuid);
-
-	msg(3, "After utf8_check()");
-
-	if (opt.verbose >= 4) {
-		i = system("(echo; echo After create_logfile:; "
-		           "cat /home/sunny/uuids/fake.xml; "
-		           "echo; echo) >&2");
-		i = i; /* Get rid of gcc warning */
-	}
-	if (add_to_logfile(logfile, &entry) == EXIT_ERROR) {
-		myerror("%s: Error when adding entry to log file\n", logfile);
-		return(EXIT_ERROR);
-	}
-	if (!opt.whereto)
-		puts(entry.uuid);
-	else {
-		if (strchr(opt.whereto, 'a') || strchr(opt.whereto, 'o'))
-			fprintf(stdout, "%s\n", entry.uuid);
-		if (strchr(opt.whereto, 'a') || strchr(opt.whereto, 'e'))
-			fprintf(stderr, "%s\n", entry.uuid);
-	}
-	free(logfile);
-	free(entry.txt);
-	free(entry.cwd);
+	uuid = process_uuid(logfile, &entry);
+	if (!uuid)
+		return EXIT_ERROR;
 
 	if (optind < argc) {
 		int t;
