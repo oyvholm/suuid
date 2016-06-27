@@ -46,14 +46,25 @@ char *has_key(char *line, char *keyword)
 	return retval;
 }
 
+void check_rc(char *keyword, char *var, char *line)
+{
+	char *p;
+
+	if (!has_key(line, keyword))
+		return;
+	msg(3, "check_rc(): Yo, found %s", keyword);
+	p = strchr(line, '=');
+	while (p && (*p == '=' || *p == ' '))
+		p++;
+	var = p;
+	msg(3, "check_rc() set var = \"%s\"", var);
+}
+
 void parse_rc_line(char *line, struct Rc *rc)
 {
 	msg(3, "Entering parse_rc_line(\"%s\", ...)", line);
-	trim_str_front(line);
-	trim_str_end(line);
 
-	if (has_key(line, "uuidcmd"))
-		msg(3, "parse_rc_line(): Yo, found uuidcmd");
+	check_rc("uuidcmd", rc->uuidcmd, line);
 }
 
 /*
@@ -79,6 +90,8 @@ int read_rcfile(char *rcfile, struct Rc *rc)
 			myerror("%s: Could not read from rcfile", rcfile);
 			return EXIT_ERROR;
 		}
+		trim_str_front(buf);
+		trim_str_end(buf);
 		parse_rc_line(buf, rc);
 	} while(!feof(fp));
 

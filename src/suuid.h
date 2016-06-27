@@ -69,6 +69,7 @@
 typedef unsigned char bool;
 struct Rc {
 	char *hostname;
+	char *uuidcmd;
 };
 struct Entry {
 	char *date;
