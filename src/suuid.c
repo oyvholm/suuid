@@ -141,6 +141,8 @@ void usage(int retval)
 		       "value is\n"
 		       "    used. Otherwise the value \"$HOME/uuids\" is "
 		       "used.\n", ENV_LOGDIR);
+		printf("  -n x, --count x\n"
+		       "    Print and store x UUIDs.\n");
 		printf("  -q, --quiet\n"
 		       "    Be more quiet. "
 		       "Can be repeated to increase silence.\n");
@@ -204,6 +206,11 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 			retval = EXIT_ERROR;
 		}
 		break;
+	case 'n':
+		if (!sscanf(optarg, "%u", &dest->count)) {
+			myerror("Error in -n/--count argument");
+			retval = EXIT_ERROR;
+		}
 	case 'q':
 		dest->verbose--;
 		break;
@@ -238,6 +245,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 	int c;
 
 	dest->comment = NULL;
+	dest->count = 1;
 	dest->help = 0;
 	dest->license = 0;
 	dest->logdir = NULL;
@@ -249,6 +257,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 		int option_index = 0;
 		static struct option long_options[] = {
 			{"comment", required_argument, 0, 'c'},
+			{"count", required_argument, 0, 'n'},
 			{"help", no_argument, 0, 'h'},
 			{"license", no_argument, 0, 0},
 			{"logdir", required_argument, 0, 'l'},
@@ -269,7 +278,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 		 *
 		 */
 
-		c = getopt_long(argc, argv, "c:hl:qvw:", long_options,
+		c = getopt_long(argc, argv, "c:hl:n:qvw:", long_options,
 		                &option_index);
 
 		if (c == -1)
@@ -386,6 +395,7 @@ int main(int argc, char *argv[])
 	char *logfile;
 	struct Entry entry;
 	char *uuid;
+	int i;
 
 	progname = argv[0];
 	progname = "suuid"; /* fixme: Temporary kludge to make it compatible 
@@ -424,9 +434,11 @@ int main(int argc, char *argv[])
 		return EXIT_ERROR;
 	}
 
-	uuid = process_uuid(logfile, &entry);
-	if (!uuid)
-		return EXIT_ERROR;
+	for (i = 0; i < opt.count; i++) {
+		uuid = process_uuid(logfile, &entry);
+		if (!uuid)
+			return EXIT_ERROR;
+	}
 
 	if (optind < argc) {
 		int t;

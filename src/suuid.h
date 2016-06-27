@@ -80,6 +80,7 @@ struct Entry {
 };
 struct Options {
 	char *comment;
+	unsigned int count;
 	int help;
 	int license;
 	char *logdir;
