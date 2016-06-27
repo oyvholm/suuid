@@ -144,7 +144,7 @@ extern unsigned char *utf8_check(unsigned char *);
 /* uuid.c */
 extern char *generate_uuid(void);
 extern char *uuid_date(char *);
-extern int is_hex(char *, unsigned int);
+extern char *check_hex(char *, size_t);
 extern int valid_uuid(char *);
 
 /*

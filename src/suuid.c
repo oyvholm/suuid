@@ -440,6 +440,25 @@ int main(int argc, char *argv[])
 		return EXIT_OK;
 	}
 
+#if 1
+	/*
+	 * Send non-option command line arguments to various functions for 
+	 * testing. This doesn't break anything, as the program only checks for 
+	 * options. Non-option arguments are ignored.
+	 */
+	if (optind < argc) {
+		int i;
+
+		for (i = optind; i < argc; i++) {
+			char *a = argv[i];
+			msg(2, "Checking arg %d \"%s\"", i, a);
+			printf("check_hex(\"%s\") = \"%s\"\n",
+			       a, check_hex(a, 5));
+		}
+		return EXIT_OK;
+	}
+#endif
+
 	if (read_rcfile(opt.rcfile, &rc) == EXIT_ERROR) {
 		myerror("%s: Could not read rc file", opt.rcfile);
 		return EXIT_ERROR;

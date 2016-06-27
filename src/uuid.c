@@ -61,23 +61,20 @@ char *uuid_date(char *uuid)
 }
 
 /*
- * is_hex() - Check that len bytes at the location pointed to by p are all 
- * legal lowercase hex chars. Return 1 if all characters are valid hex, 0 if 
- * not.
+ * check_hex() - Check that len bytes at the location pointed to by p are all 
+ * legal lowercase hex chars. Return a pointer to the first invalid character 
+ * or NULL if everything is ok.
  */
 
-int is_hex(char *p, unsigned int len)
+char *check_hex(char *hex, size_t len)
 {
-	int retval = 1;
-	int i;
+	char *p;
 
-	for (i = 0; i < len; i++) {
-		char c = p[i];
-		if (!in_range(c, '0', '9') && !in_range(c, 'a', 'f'))
-			retval = 0;
-	}
+	for (p = hex; p < hex + len; p++)
+		if (!in_range(*p, '0', '9') && !in_range(*p, 'a', 'f'))
+			return p;
 
-	return retval;
+	return NULL;
 }
 
 /*
@@ -95,9 +92,9 @@ int valid_uuid(char *u)
 	/* Check that it only contains lowercase hex and dashes at the right 
 	 * places
 	 */
-	if (!is_hex(u, 8) || u[8] != '-' || !is_hex(u + 9, 4) ||
-	    u[13] != '-' || !is_hex(u + 14, 4) || u[18] != '-' ||
-	    !is_hex(u + 19, 4) || u[23] != '-' || !is_hex(u + 24, 12))
+	if (check_hex(u, 8) || u[8] != '-' || check_hex(u + 9, 4) ||
+	    u[13] != '-' || check_hex(u + 14, 4) || u[18] != '-' ||
+	    check_hex(u + 19, 4) || u[23] != '-' || check_hex(u + 24, 12))
 		retval = 0;
 
 	/* At the moment only v1 UUIDs are allowed
