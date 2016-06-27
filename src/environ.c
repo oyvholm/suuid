@@ -55,14 +55,16 @@ char *getpath(void)
 
 	retval = malloc(size);
 	if (!retval) {
-		perror("getpath(): malloc() fail");
+		myerror("getpath(): Could not allocate %lu bytes in first "
+		        "malloc()", size);
 		return NULL;
 	}
 	for (p = getcwd(retval, size); !p;) {
 		size += BUFSIZ;
 		retval = realloc(retval, size);
 		if (!retval) {
-			perror("getpath(): realloc() fail");
+			myerror("getpath(): Could not reallocate %lu bytes",
+			        size);
 			return NULL;
 		}
 		p = getcwd(retval, size);
@@ -71,7 +73,7 @@ char *getpath(void)
 			 * problem that's not fixable by just allocating more 
 			 * memory.
 			 */
-			perror("getcwd()");
+			myerror("getpath(): getcwd() failed");
 			free(retval);
 			return NULL;
 		}

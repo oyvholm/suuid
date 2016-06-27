@@ -64,7 +64,7 @@ char *allocate_entry(char *elem, char *src)
 		msg(4, "allocate_entry(): size = %lu", size);
 		retval = malloc(size + 1);
 		if (!retval)
-			perror("allocate_entry(): Cannot allocate memory");
+			myerror("allocate_entry(): Cannot allocate memory");
 		else
 			snprintf(retval, size, "<%s>%s</%s> ",
 			                       elem, suuid_xml(src), elem);
@@ -150,7 +150,7 @@ char *alloc_attr(char *attr, char *data)
 	msg(3, "data size = %lu", size);
 	retval = malloc(size + 1);
 	if (!retval)
-		perror("alloc_attr(): Cannot allocate memory");
+		myerror("alloc_attr(): Cannot allocate memory");
 	else
 		snprintf(retval, size, " %s=\"%s\"", attr, data);
 	msg(3, "alloc_attr() returns \"%s\"", retval);
@@ -263,8 +263,8 @@ char *get_logdir()
 
 		retval = malloc(size + 1);
 		if (!retval) {
-			perror("get_logdir(): Cannot allocate "
-			       "memory");
+			myerror("get_logdir(): Cannot allocate %lu bytes",
+			        size);
 			return NULL;
 		}
 		snprintf(retval, size, "%s/uuids",
