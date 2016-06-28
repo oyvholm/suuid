@@ -87,7 +87,7 @@ char *suuid_xml(char *text)
 
 	retval = malloc(size * MAX_GROWTH + 1);
 	if (!retval) {
-		myerror("Cannot allocate %lu bytes for XML\n",
+		myerror("Cannot allocate %lu bytes for XML",
 		        size + MAX_GROWTH + 1);
 		return NULL;
 	}

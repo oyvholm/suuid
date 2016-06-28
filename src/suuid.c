@@ -400,7 +400,7 @@ char *process_uuid(char *logfile, struct Entry *entry)
 		i = i; /* Get rid of gcc warning */
 	}
 	if (add_to_logfile(logfile, entry) == EXIT_ERROR) {
-		myerror("%s: Error when adding entry to log file\n", logfile);
+		myerror("%s: Error when adding entry to log file", logfile);
 		return NULL;
 	}
 
