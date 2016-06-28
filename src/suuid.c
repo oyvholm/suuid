@@ -151,6 +151,12 @@ void usage(int retval)
 		printf("  -q, --quiet\n"
 		       "    Be more quiet. "
 		       "Can be repeated to increase silence.\n");
+		printf("  --raw\n"
+		       "    Don’t convert <txt> element to XML. When using "
+		       "this option, it is \n"
+		       "    expected that the value of the -c/--comment "
+		       "option is valid XML, \n"
+		       "    otherwise it will create corrupted log files.\n");
 		printf("  --rcfile X\n"
 		       "    Use file X instead of '$Std{'rcfile'}'.\n");
 		printf("  -v, --verbose\n"
@@ -190,6 +196,8 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 	case 0:
 		if (!strcmp(opts->name, "license")) {
 			dest->license = 1;
+		} else if (!strcmp(opts->name, "raw")) {
+			dest->raw = 1;
 		} else if (!strcmp(opts->name, "rcfile")) {
 			dest->rcfile = strdup(optarg);
 			if (!dest->rcfile) {
@@ -267,6 +275,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 	dest->license = 0;
 	dest->logdir = NULL;
 	dest->random_mac = 0;
+	dest->raw = 0;
 	dest->rcfile = NULL;
 	dest->verbose = 0;
 	dest->version = 0;
@@ -282,6 +291,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 			{"logdir", required_argument, 0, 'l'},
 			{"quiet", no_argument, 0, 'q'},
 			{"random-mac", no_argument, 0, 'm'},
+			{"raw", no_argument, 0, 0},
 			{"rcfile", required_argument, 0, 0},
 			{"verbose", no_argument, 0, 'v'},
 			{"version", no_argument, 0, 0},

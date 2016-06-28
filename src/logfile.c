@@ -191,7 +191,25 @@ char *xml_entry(struct Entry *entry)
 	if (entry->date)
 		e.date = alloc_attr("t", entry->date);
 
-	e.txt = allocate_entry("txt", entry->txt);
+	if (opt.raw) {
+		int size;
+		char *txt_space;
+
+		size = strlen("<txt> ") + strlen(entry->txt) +
+		       strlen(" </txt> ") + 1;
+		e.txt = malloc(size);
+		if (!e.txt) {
+			myerror("xml_entry(): Could not allocate %lu bytes "
+			        "for raw XML <txt> string", size);
+			return NULL;
+		}
+		txt_space = entry->txt[0] == '<' ? " " : "";
+		snprintf(e.txt, size, "<txt>%s%s%s</txt> ",
+		                      txt_space,
+		                      entry->txt,
+		                      txt_space);
+	} else
+		e.txt = allocate_entry("txt", entry->txt);
 	e.host = allocate_entry("host", entry->host);
 	e.cwd = allocate_entry("cwd", entry->cwd);
 	e.user = allocate_entry("user", entry->user);

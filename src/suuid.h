@@ -93,6 +93,7 @@ struct Options {
 	int license;
 	char *logdir;
 	int random_mac;
+	int raw;
 	char *rcfile;
 	int verbose;
 	int version;
