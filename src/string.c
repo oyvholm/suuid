@@ -57,8 +57,7 @@ char *trim_str_end(char *dest)
 	p = dest + size - 1;
 	msg(4, "trim_str_end(): init p to \"%s\"", p);
 	while (p > dest && isspace(*p)) {
-		*p = '\0';
-		p--;
+		*p-- = '\0';
 		msg(4, "trim_str_end(): p = \"%s\"", p);
 	}
 

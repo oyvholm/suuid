@@ -124,8 +124,7 @@ char *suuid_xml(char *text)
 			destp += 2;
 			break;
 		default:
-			*destp = *p;
-			destp++;
+			*destp++ = *p;
 			break;
 		}
 	}
