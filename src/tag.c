@@ -20,12 +20,28 @@
 
 #include "suuid.h"
 
+unsigned int tag_count = 0;
+unsigned int tag_list_ind = 0;
+
+void rewind_tag(void)
+{
+	tag_list_ind = 0;
+}
+
+char *get_next_tag(void) {
+	if (tag_list_ind < MAX_TAGS)
+		return entry.tag[tag_list_ind++];
+	else
+		return NULL;
+}
+
 char *store_tag(char *tag)
 {
 	if (utf8_check((unsigned char *)tag)) {
 		fprintf(stderr, "%s: Tags have to be in UTF-8\n", progname);
 		return(NULL);
 	}
+	entry.tag[tag_count++] = strdup(tag);
 
 	return tag;
 }

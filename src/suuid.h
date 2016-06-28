@@ -145,6 +145,8 @@ extern int fill_entry_struct(struct Entry *, struct Options *, struct Rc *);
 extern char *process_uuid(char *, struct Entry *);
 
 /* tag.c */
+void rewind_tag(void);
+char *get_next_tag(void);
 extern char *store_tag(char *);
 
 /* utf8.c */
