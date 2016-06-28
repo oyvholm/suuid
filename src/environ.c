@@ -30,7 +30,9 @@ char *get_hostname(void)
 	static char buf[HOST_NAME_MAX + 1];
 	char *retval = buf;
 
-	if (rc.hostname)
+	if (getenv(ENV_HOSTNAME))
+		strncpy(buf, getenv(ENV_HOSTNAME), HOST_NAME_MAX);
+	else if (rc.hostname)
 		strncpy(buf, rc.hostname, HOST_NAME_MAX);
 #if FAKE_HOST
 	else if (1)

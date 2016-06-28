@@ -40,6 +40,7 @@
 
 #define stddebug  stderr
 
+#define ENV_HOSTNAME  "SUUID_HOSTNAME" /* Optional environment variable */
 #define ENV_LOGDIR  "SUUID_LOGDIR" /* Optional environment variable with path 
                                     * to log directory
                                     */
