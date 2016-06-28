@@ -52,6 +52,12 @@ char *get_next_tag(void)
 
 char *store_tag(char *tag)
 {
+	char *p;
+
+	while ((p = strrchr(tag, ','))) {
+		store_tag(p + 1);
+		*p = '\0';
+	}
 	if (tag_exists(tag)) {
 		msg(2, "store_tag(\"%s\"): tag already exists, return", tag);
 		return tag;
