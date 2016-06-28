@@ -27,6 +27,7 @@
 char *progname;
 struct Options opt;
 struct Rc rc;
+struct Entry entry;
 
 /*
  * msg() - Print a message prefixed with "[progname]: " to stddebug if 
@@ -440,7 +441,6 @@ int main(int argc, char *argv[])
 {
 	int retval = EXIT_OK;
 	char *logfile;
-	struct Entry entry;
 	char *uuid;
 	unsigned int i;
 
