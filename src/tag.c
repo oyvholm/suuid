@@ -54,12 +54,16 @@ char *store_tag(char *tag)
 {
 	char *p;
 
-	while ((p = strrchr(tag, ','))) {
-		store_tag(p + 1);
-		*p = '\0';
+	while ((p = strchr(tag, ','))) {
+		*p++ = '\0';
+		store_tag(tag);
+		tag = p;
 	}
-	if (tag_exists(tag)) {
-		msg(2, "store_tag(\"%s\"): tag already exists, return", tag);
+	trim_str_front(tag);
+	trim_str_end(tag);
+	if (tag_exists(tag) || !strlen(tag)) {
+		msg(2, "store_tag(\"%s\"): tag already exists or is empty, "
+		       "return", tag);
 		return tag;
 	}
 	if (utf8_check((unsigned char *)tag)) {
