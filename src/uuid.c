@@ -37,7 +37,7 @@ char *generate_uuid(void)
 	}
 	msg(3, "generate_uuid(): cmd = \"%s\"", cmd);
 
-	/* FIXME: Generate it properly */
+	/* fixme: Generate it properly */
 	fp = popen(cmd, "r");
 	if (!fp) {
 		myerror("Could not exec /usr/bin/uuid");
