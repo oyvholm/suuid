@@ -347,7 +347,6 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 
 int fill_entry_struct(struct Entry *entry, struct Options *opt, struct Rc *rc)
 {
-	init_xml_entry(entry);
 	msg(4, "fill_entry_struct(): rc->hostname = \"%s\"", rc->hostname);
 	entry->host = get_hostname();
 	entry->cwd = getpath();
@@ -448,6 +447,8 @@ int main(int argc, char *argv[])
 	progname = "suuid"; /* fixme: Temporary kludge to make it compatible 
 	                     * with the Perl version.
 	                     */
+
+	init_xml_entry(&entry);
 
 	retval = parse_options(&opt, argc, argv);
 	msg(4, "retval after parse_options(): %d", retval);

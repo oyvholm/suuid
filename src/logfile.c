@@ -162,6 +162,34 @@ char *alloc_attr(char *attr, char *data)
 }
 
 /*
+ * get_xml_tags() - Return pointer to an XML string with <tag> elements 
+ * generated from the entry.tag[] array.
+ */
+
+char *get_xml_tags(void)
+{
+#define GXT_BUFSIZE  20000 /* fixme: Temporary */
+	static char buf[GXT_BUFSIZE + 1];
+	char tmpbuf[GXT_BUFSIZE + 1];
+	char *p;
+
+	msg(2, "Entering get_xml_tags()");
+	rewind_tag();
+	do {
+		p = get_next_tag();
+
+		if (p) {
+			msg(2, "get_xml_tags(): p = \"%s\"\n");
+			snprintf(tmpbuf, GXT_BUFSIZE, "<tag>%s</tag> ", p);
+			strncat(buf, tmpbuf, GXT_BUFSIZE - strlen(buf));
+		} else
+			msg(2, "get_xml_tags(): p is NULL");
+	} while (p);
+
+	return buf;
+}
+
+/*
  * xml_entry() - Return pointer to string with one XML entry extracted from the 
  * entry struct, or NULL if error.
  */
@@ -172,6 +200,7 @@ char *xml_entry(struct Entry *entry)
 	static char buf[XML_BUFSIZE];
 	struct Entry e;
 	char *retval;
+	char *tag_xml;
 
 	msg(4, "Entering xml_entry()");
 	init_xml_entry(&e);
@@ -193,6 +222,8 @@ char *xml_entry(struct Entry *entry)
 
 	if (entry->date)
 		e.date = alloc_attr("t", entry->date);
+
+	tag_xml = get_xml_tags();
 
 	if (opt.raw) {
 		int size;
@@ -220,7 +251,7 @@ char *xml_entry(struct Entry *entry)
 
 	snprintf(buf, XML_BUFSIZE, /* fixme: length */
 	         "<suuid%s%s> " /* date, uuid */
-	         "" /* tag */
+	         "%s" /* tag */
 	         "%s" /* txt */
 	         "%s" /* host */
 	         "%s" /* cwd */
@@ -230,7 +261,7 @@ char *xml_entry(struct Entry *entry)
 	         "</suuid>",
 	         (e.date) ? e.date : "",
 	         (e.uuid) ? e.uuid : "",
-	         /* tags here */
+	         tag_xml ? tag_xml : "",
 	         (e.txt) ? e.txt : "",
 	         (e.host) ? e.host : "",
 	         (e.cwd) ? e.cwd : "",
