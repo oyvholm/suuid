@@ -56,12 +56,12 @@ char *allocate_entry(char *elem, char *src)
 	char *retval;
 	size_t size = 0;
 
-	msg(4, "Entering allocate_entry(\"%s\", \"%s\")", elem, src);
+	msg(5, "Entering allocate_entry(\"%s\", \"%s\")", elem, src);
 	if (elem && src) {
 		size += strlen("<") + strlen(elem) + strlen(">") +
 		        strlen(src) * MAX_GROWTH +
 		        strlen("<") + strlen(elem) + strlen("/> ") + 1;
-		msg(4, "allocate_entry(): size = %lu", size);
+		msg(5, "allocate_entry(): size = %lu", size);
 		retval = malloc(size + 1);
 		if (!retval)
 			myerror("allocate_entry(): Cannot allocate memory");
@@ -70,7 +70,7 @@ char *allocate_entry(char *elem, char *src)
 			                       elem, suuid_xml(src), elem);
 	} else
 		retval = NULL;
-	msg(4, "allocate_entry() returns '%s'", retval);
+	msg(5, "allocate_entry() returns '%s'", retval);
 
 	return retval;
 }
@@ -143,16 +143,16 @@ char *alloc_attr(char *attr, char *data)
 	char *retval = NULL;
 	int size;
 
-	msg(3, "Entering alloc_attr(\"%s\", \"%s\")", attr, data);
+	msg(4, "Entering alloc_attr(\"%s\", \"%s\")", attr, data);
 	size = strlen(" ") + strlen(attr) + strlen("=\"") + strlen(data) +
 	       strlen("\"") + 1;
-	msg(3, "data size = %lu", size);
+	msg(4, "data size = %lu", size);
 	retval = malloc(size + 1);
 	if (!retval)
 		myerror("alloc_attr(): Cannot allocate memory");
 	else
 		snprintf(retval, size, " %s=\"%s\"", attr, data);
-	msg(3, "alloc_attr() returns \"%s\"", retval);
+	msg(4, "alloc_attr() returns \"%s\"", retval);
 	return retval;
 }
 
@@ -168,21 +168,21 @@ char *xml_entry(struct Entry *entry)
 	struct Entry e;
 	char *retval;
 
-	msg(3, "Entering xml_entry()");
+	msg(4, "Entering xml_entry()");
 	init_xml_entry(&e);
-	msg(3, "xml_entry(): After init_xml_entry()");
+	msg(4, "xml_entry(): After init_xml_entry()");
 
-	msg(3, "xml_entry(): entry->date = '%s'", entry->date);
-	msg(3, "xml_entry(): entry->uuid = '%s'", entry->uuid);
-	msg(3, "xml_entry(): entry->tag  = '%s'", entry->tag);
-	msg(4, "xml_entry(): entry->txt  = '%s'", entry->txt);
-	msg(3, "xml_entry(): entry->host = '%s'", entry->host);
-	msg(3, "xml_entry(): entry->cwd  = '%s'", entry->cwd);
-	msg(3, "xml_entry(): entry->user = '%s'", entry->user);
-	msg(3, "xml_entry(): entry->sess = '%s'", entry->sess);
+	msg(4, "xml_entry(): entry->date = '%s'", entry->date);
+	msg(4, "xml_entry(): entry->uuid = '%s'", entry->uuid);
+	msg(4, "xml_entry(): entry->tag  = '%s'", entry->tag);
+	msg(5, "xml_entry(): entry->txt  = '%s'", entry->txt);
+	msg(4, "xml_entry(): entry->host = '%s'", entry->host);
+	msg(4, "xml_entry(): entry->cwd  = '%s'", entry->cwd);
+	msg(4, "xml_entry(): entry->user = '%s'", entry->user);
+	msg(4, "xml_entry(): entry->sess = '%s'", entry->sess);
 
 	if (!entry->uuid) {
-		msg(3, "xml_entry(): uuid is NULL");
+		msg(4, "xml_entry(): uuid is NULL");
 		return NULL;
 	} else
 		e.uuid = alloc_attr("u", entry->uuid);
@@ -233,7 +233,7 @@ char *xml_entry(struct Entry *entry)
 	         (e.user) ? e.user : "",
 	         (e.tty) ? e.tty : "",
 	         (e.sess) ? e.sess : "");
-	msg(3, "xml_entry(): After snprintf()");
+	msg(4, "xml_entry(): After snprintf()");
 #if 0
 	static char fake[] = "<suuid t=\"2016-06-07T04:18:40.9460630Z\" "
 	                     "u=\"ea3beb96-2c66-11e6-aa54-02010e0a6634\"> "
@@ -254,7 +254,7 @@ char *xml_entry(struct Entry *entry)
 	                     "</suuid>";
 #endif
 	retval = buf;
-	msg(3, "xml_entry() returns '%s'", retval);
+	msg(4, "xml_entry() returns '%s'", retval);
 
 	return retval;
 }
@@ -287,14 +287,14 @@ char *get_logdir()
 		snprintf(retval, size, "%s/uuids",
 		                       getenv("HOME"));
 	} else {
-		msg(3, "get_logdir(): HOME not found");
+		msg(4, "get_logdir(): HOME not found");
 		fprintf(stderr, "%s: $%s and $HOME environment "
 		                "variables are not defined, cannot "
 		                "create logdir path",
 		                progname, ENV_LOGDIR);
 		return NULL;
 	}
-	msg(3, "get_logdir() returns \"%s\"", retval);
+	msg(4, "get_logdir() returns \"%s\"", retval);
 
 	return retval;
 }
@@ -322,18 +322,18 @@ int add_to_logfile(char *fname, struct Entry *entry)
 		return EXIT_ERROR;
 	}
 	filepos = ftell(fp);
-	msg(3, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
+	msg(4, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
 	if (filepos == -1) {
 		myerror("%s: Cannot read file position", fname);
 		return EXIT_ERROR;
 	}
-	msg(3, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
+	msg(4, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
 	if (strcmp(fgets(check_line, 10, fp), "</suuids>")) {
-		msg(3, "add_to_logfile(): check_line = '%s'", check_line);
+		msg(4, "add_to_logfile(): check_line = '%s'", check_line);
 		fprintf(stderr, "%s: %s: Unknown end line, adding to "
 		                "end of file\n", progname, fname);
 	} else {
-		msg(3, "add_to_logfile(): Seems as check_line is ok, "
+		msg(4, "add_to_logfile(): Seems as check_line is ok, "
 		       "it is '%s'", check_line);
 		if (fseek(fp, filepos, SEEK_SET) == -1) {
 			myerror("%s: Cannot seek to position %lu",
@@ -341,21 +341,21 @@ int add_to_logfile(char *fname, struct Entry *entry)
 			return EXIT_ERROR;
 		}
 	}
-	msg(3, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
+	msg(4, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
 	if (fputs(xml_entry(entry), fp) < 0) {
 		myerror("fputs()");
 		retval = EXIT_ERROR;
 	}
-	msg(3, "Before end tag is written");
+	msg(4, "Before end tag is written");
 	fprintf(fp, "\n</suuids>\n");
 	fclose(fp);
-	msg(3, "add_to_logfile(): fp is closed");
+	msg(4, "add_to_logfile(): fp is closed");
 	if (opt.verbose > 2) {
 		i = system("(echo; echo; cat /home/sunny/uuids/fake.xml; "
 		           "echo; echo) >&2");
 		i = i; /* Get rid of gcc warning */
 	}
-	msg(3, "add_to_logfile() returns %d", retval);
+	msg(4, "add_to_logfile() returns %d", retval);
 
 	return retval;
 }
@@ -371,7 +371,7 @@ char *create_logfile(char *name)
 	char *xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 	char *xml_doctype = "<!DOCTYPE suuids SYSTEM \"dtd/suuids.dtd\">";
 
-	msg(3, "Entering create_logfile(\"%s\")", name);
+	msg(4, "Entering create_logfile(\"%s\")", name);
 	if (access(name, F_OK) != -1)
 		return name; /* File already exists */
 	else {
@@ -400,7 +400,7 @@ char *set_up_logfile(struct Options *opt, char *hostname)
 	size_t fname_length; /* Total length of logfile name */
 
 	logdir = get_logdir(&opt);
-	msg(3, "logdir = '%s'", logdir);
+	msg(4, "logdir = '%s'", logdir);
 	if (!logdir) {
 		fprintf(stderr, "%s: Unable to find logdir location\n",
 		                progname);
@@ -417,7 +417,7 @@ char *set_up_logfile(struct Options *opt, char *hostname)
 	}
 	/* fixme: Remove slash hardcoding */
 	snprintf(logfile, fname_length, "%s/%s.xml", logdir, hostname);
-	msg(3, "logfile = \"%s\"", logfile);
+	msg(4, "logfile = \"%s\"", logfile);
 	if (!create_logfile(logfile)) {
 		myerror("%s: Error when creating log file", logfile);
 		return NULL;

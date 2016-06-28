@@ -30,12 +30,12 @@ char *generate_uuid(void)
 	char *cmd = "/usr/bin/uuid";
 	FILE *fp;
 
-	msg(2, "generate_uuid(): rc.uuidcmd = \"%s\"", rc.uuidcmd);
+	msg(3, "generate_uuid(): rc.uuidcmd = \"%s\"", rc.uuidcmd);
 	if (rc.uuidcmd) {
 		cmd = rc.uuidcmd;
-		msg(2, "generate_uuid(): Setting cmd to \"%s\"", cmd);
+		msg(3, "generate_uuid(): Setting cmd to \"%s\"", cmd);
 	}
-	msg(3, "generate_uuid(): cmd = \"%s\"", cmd);
+	msg(4, "generate_uuid(): cmd = \"%s\"", cmd);
 
 	/* fixme: Generate it properly */
 	/* fixme: Make -m/--random-mac actually do something */

@@ -251,7 +251,7 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 		}
 		break;
 	default:
-		msg(3, "getopt_long() returned character code %d", c);
+		msg(4, "getopt_long() returned character code %d", c);
 		retval = EXIT_ERROR;
 		break;
 	}
@@ -327,7 +327,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 		                           c, &long_options[option_index]);
 	}
 
-	msg(3, "parse_options() returns %d", retval);
+	msg(4, "parse_options() returns %d", retval);
 
 	return retval;
 }
@@ -341,7 +341,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 int fill_entry_struct(struct Entry *entry, struct Options *opt, struct Rc *rc)
 {
 	init_xml_entry(entry);
-	msg(3, "fill_entry_struct(): rc->hostname = \"%s\"", rc->hostname);
+	msg(4, "fill_entry_struct(): rc->hostname = \"%s\"", rc->hostname);
 	entry->host = get_hostname();
 	entry->cwd = getpath();
 	entry->user = get_username();
@@ -444,13 +444,13 @@ int main(int argc, char *argv[])
 	                     */
 
 	retval = parse_options(&opt, argc, argv);
-	msg(3, "retval after parse_options(): %d", retval);
+	msg(4, "retval after parse_options(): %d", retval);
 	if (retval != EXIT_OK) {
 		fprintf(stderr, "%s: Option error\n", progname);
 		return EXIT_ERROR;
 	}
 
-	msg(2, "Using verbose level %d", opt.verbose);
+	msg(3, "Using verbose level %d", opt.verbose);
 
 	if (opt.help) {
 		usage(EXIT_OK);
@@ -478,7 +478,7 @@ int main(int argc, char *argv[])
 
 		for (i = optind; i < argc; i++) {
 			char *a = argv[i];
-			msg(3, "Checking arg %d \"%s\"", i, a);
+			msg(4, "Checking arg %d \"%s\"", i, a);
 			printf("check_hex(\"%s\") = \"%s\"\n",
 			       a, check_hex(a, 5));
 		}
@@ -490,18 +490,18 @@ int main(int argc, char *argv[])
 		myerror("%s: Could not read rc file", opt.rcfile);
 		return EXIT_ERROR;
 	}
-	msg(3, "Back in main() after read_rcfile()");
+	msg(4, "Back in main() after read_rcfile()");
 
 	if (fill_entry_struct(&entry, &opt, &rc) == EXIT_ERROR)
 		return EXIT_ERROR;
-	msg(3, "Back in main() after fill_entry_struct()");
+	msg(4, "Back in main() after fill_entry_struct()");
 
 	logfile = set_up_logfile(&opt, entry.host);
 	if (!logfile) {
 		myerror("Could not initialise log file");
 		return EXIT_ERROR;
 	}
-	msg(3, "After set_up_logfile()");
+	msg(4, "After set_up_logfile()");
 
 	for (i = 0; i < opt.count; i++) {
 		uuid = process_uuid(logfile, &entry);
@@ -513,7 +513,7 @@ int main(int argc, char *argv[])
 		int t;
 
 		for (t = optind; t < argc; t++) {
-			msg(3, "Non-option arg: %s", argv[t]);
+			msg(4, "Non-option arg: %s", argv[t]);
 #if 0
 			puts(suuid_xml(argv[t])); /* For testing, remove when 
 			                           * suuid_xml() is wonderful.
@@ -522,7 +522,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	msg(2, "Returning from main() with value %d", retval);
+	msg(3, "Returning from main() with value %d", retval);
 
 	return retval;
 }

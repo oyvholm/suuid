@@ -40,7 +40,7 @@
 
 unsigned char *utf8_check(unsigned char *s)
 {
-	msg(3, "Entering utf8_check()");
+	msg(4, "Entering utf8_check()");
 	while (*s) {
 		if (*s < 0x80)
 			/* 0xxxxxxx */

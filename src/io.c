@@ -43,7 +43,7 @@ char *read_from_fp(FILE *fp)
 		retval = new_mem;
 		p = retval + bytes_read;
 		bytes_read += fread(p, 1, BUFSIZ, fp);
-		msg(4, "read_from_fp(): bytes_read = %lu", bytes_read);
+		msg(5, "read_from_fp(): bytes_read = %lu", bytes_read);
 		if (ferror(fp)) {
 			myerror("Error when reading stdin");
 			free(retval);

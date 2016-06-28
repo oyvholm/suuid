@@ -29,10 +29,10 @@ char *trim_str_front(char *dest)
 	char *p = dest;
 	size_t size = strlen(dest);
 
-	msg(4, "Entering trim_str_front(\"%s\")", dest);
+	msg(5, "Entering trim_str_front(\"%s\")", dest);
 	while (p < dest + size && isspace(*p)) {
 		p++;
-		msg(4, "trim_str_front(): p = \"%s\"", p);
+		msg(5, "trim_str_front(): p = \"%s\"", p);
 	}
 	if (p == dest)
 		return dest; /* Nothing needs to be done */
@@ -51,14 +51,14 @@ char *trim_str_end(char *dest)
 	char *p;
 	size_t size = strlen(dest);
 
-	msg(4, "Entering trim_str_end(\"%s\")", dest);
+	msg(5, "Entering trim_str_end(\"%s\")", dest);
 	if (!size)
 		return dest;
 	p = dest + size - 1;
-	msg(4, "trim_str_end(): init p to \"%s\"", p);
+	msg(5, "trim_str_end(): init p to \"%s\"", p);
 	while (p > dest && isspace(*p)) {
 		*p-- = '\0';
-		msg(4, "trim_str_end(): p = \"%s\"", p);
+		msg(5, "trim_str_end(): p = \"%s\"", p);
 	}
 
 	return dest;
