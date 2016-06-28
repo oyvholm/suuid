@@ -38,6 +38,7 @@ char *generate_uuid(void)
 	msg(3, "generate_uuid(): cmd = \"%s\"", cmd);
 
 	/* fixme: Generate it properly */
+	/* fixme: Make -m/--random-mac actually do something */
 	fp = popen(cmd, "r");
 	if (!fp) {
 		myerror("Could not exec /usr/bin/uuid");

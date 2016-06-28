@@ -143,6 +143,9 @@ void usage(int retval)
 		       "value is\n"
 		       "    used. Otherwise the value \"$HOME/uuids\" is "
 		       "used.\n", ENV_LOGDIR);
+		printf("  -m, --random-mac\n"
+		       "    Don’t use the hardware MAC address, generate a "
+		       "random address field.\n");
 		printf("  -n x, --count x\n"
 		       "    Print and store x UUIDs.\n");
 		printf("  -q, --quiet\n"
@@ -217,6 +220,9 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 			retval = EXIT_ERROR;
 		}
 		break;
+	case 'm':
+		dest->random_mac = 1;
+		break;
 	case 'n':
 		if (!sscanf(optarg, "%u", &dest->count)) {
 			myerror("Error in -n/--count argument");
@@ -260,6 +266,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 	dest->help = 0;
 	dest->license = 0;
 	dest->logdir = NULL;
+	dest->random_mac = 0;
 	dest->rcfile = NULL;
 	dest->verbose = 0;
 	dest->version = 0;
@@ -274,6 +281,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 			{"license", no_argument, 0, 0},
 			{"logdir", required_argument, 0, 'l'},
 			{"quiet", no_argument, 0, 'q'},
+			{"random-mac", no_argument, 0, 'm'},
 			{"rcfile", required_argument, 0, 0},
 			{"verbose", no_argument, 0, 'v'},
 			{"version", no_argument, 0, 0},
@@ -295,6 +303,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 		                "c:"
 		                "h"
 		                "l:"
+		                "m"
 		                "n:"
 		                "q"
 		                "v"
