@@ -172,19 +172,23 @@ char *get_xml_tags(void)
 	static char buf[GXT_BUFSIZE + 1];
 	char tmpbuf[GXT_BUFSIZE + 1];
 	char *p;
+	static bool done = 0;
 
+	if (done)
+		return buf;
 	msg(2, "Entering get_xml_tags()");
 	rewind_tag();
 	do {
 		p = get_next_tag();
 
 		if (p) {
-			msg(2, "get_xml_tags(): p = \"%s\"\n");
+			msg(2, "get_xml_tags(): p = \"%s\"", p);
 			snprintf(tmpbuf, GXT_BUFSIZE, "<tag>%s</tag> ", p);
 			strncat(buf, tmpbuf, GXT_BUFSIZE - strlen(buf));
 		} else
 			msg(2, "get_xml_tags(): p is NULL");
 	} while (p);
+	done = 1;
 
 	return buf;
 }

@@ -28,6 +28,20 @@ void rewind_tag(void)
 	tag_list_ind = 0;
 }
 
+bool tag_exists(char *tag)
+{
+	unsigned int i;
+
+	for (i = 0; i < tag_count; i++) {
+		msg(2, "tag_exists(): Checking \"%s\" vs \"%s\"",
+		       tag, entry.tag[i]);
+		if (!strcmp(tag, entry.tag[i])) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
 char *get_next_tag(void)
 {
 	if (tag_list_ind < MAX_TAGS)
@@ -38,6 +52,10 @@ char *get_next_tag(void)
 
 char *store_tag(char *tag)
 {
+	if (tag_exists(tag)) {
+		msg(2, "store_tag(\"%s\"): tag already exists, return", tag);
+		return tag;
+	}
 	if (utf8_check((unsigned char *)tag)) {
 		fprintf(stderr, "%s: Tags have to be in UTF-8\n", progname);
 		return(NULL);

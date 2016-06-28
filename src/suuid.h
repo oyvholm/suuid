@@ -147,6 +147,7 @@ extern char *process_uuid(char *, struct Entry *);
 
 /* tag.c */
 void rewind_tag(void);
+bool tag_exists(char *);
 char *get_next_tag(void);
 extern char *store_tag(char *);
 
