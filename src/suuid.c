@@ -160,6 +160,8 @@ void usage(int retval)
 		       "    otherwise it will create corrupted log files.\n");
 		printf("  --rcfile X\n"
 		       "    Use file X instead of '$Std{'rcfile'}'.\n");
+		printf("  -t x, --tag x\n"
+		       "    Use x as tag (category).\n");
 		printf("  -v, --verbose\n"
 		       "    Increase level of verbosity. Can be repeated.\n");
 		printf("  --version\n"

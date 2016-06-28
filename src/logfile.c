@@ -163,7 +163,7 @@ char *alloc_attr(char *attr, char *data)
 
 /*
  * get_xml_tags() - Return pointer to an XML string with <tag> elements 
- * generated from the entry.tag[] array.
+ * generated from the entry.tag[] array. If error, return NULL.
  */
 
 char *get_xml_tags(void)
@@ -182,8 +182,17 @@ char *get_xml_tags(void)
 		p = get_next_tag();
 
 		if (p) {
-			msg(2, "get_xml_tags(): p = \"%s\"", p);
-			snprintf(tmpbuf, GXT_BUFSIZE, "<tag>%s</tag> ", p);
+			char *ap;
+
+			ap = suuid_xml(p);
+			if (!ap) {
+				myerror("get_xml_tags(): suuid_xml() failed");
+				return NULL;
+			}
+
+			msg(2, "get_xml_tags(): ap = \"%s\"", ap);
+			snprintf(tmpbuf, GXT_BUFSIZE, "<tag>%s</tag> ", ap);
+			free(ap);
 			strncat(buf, tmpbuf, GXT_BUFSIZE - strlen(buf));
 		} else
 			msg(2, "get_xml_tags(): p is NULL");
@@ -228,6 +237,10 @@ char *xml_entry(struct Entry *entry)
 		e.date = alloc_attr("t", entry->date);
 
 	tag_xml = get_xml_tags();
+	if (!tag_xml) {
+		myerror("xml_entry(): get_xml_tags() failed");
+		return NULL;
+	}
 
 	if (opt.raw) {
 		int size;
