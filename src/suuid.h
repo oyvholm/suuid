@@ -44,6 +44,7 @@
 #define ENV_LOGDIR  "SUUID_LOGDIR" /* Optional environment variable with path 
                                     * to log directory
                                     */
+#define MAX_TAGS  1000 /* Maximum number of tags */
 
 /*
  * Standard header files
@@ -78,7 +79,7 @@ struct Rc {
 struct Entry {
 	char *date;
 	char *uuid;
-	char *tag;
+	char *tag[MAX_TAGS];
 	char *txt;
 	char *host;
 	char *cwd;

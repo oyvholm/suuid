@@ -33,15 +33,20 @@ size_t MAX_GROWTH = 5; /* When converting from plain text to the XML format
 
 void init_xml_entry(struct Entry *e)
 {
+	unsigned int i;
+
 	e->date = NULL;
 	e->uuid = NULL;
-	e->tag = NULL;
 	e->txt = NULL;
 	e->host = NULL;
 	e->cwd = NULL;
 	e->user = NULL;
 	e->tty = NULL;
 	e->sess = NULL;
+
+	for (i = 0; i < MAX_TAGS; i++)
+		e->tag[i] = NULL;
+
 }
 
 /*
@@ -174,7 +179,6 @@ char *xml_entry(struct Entry *entry)
 
 	msg(4, "xml_entry(): entry->date = '%s'", entry->date);
 	msg(4, "xml_entry(): entry->uuid = '%s'", entry->uuid);
-	msg(4, "xml_entry(): entry->tag  = '%s'", entry->tag);
 	msg(5, "xml_entry(): entry->txt  = '%s'", entry->txt);
 	msg(4, "xml_entry(): entry->host = '%s'", entry->host);
 	msg(4, "xml_entry(): entry->cwd  = '%s'", entry->cwd);
@@ -216,7 +220,7 @@ char *xml_entry(struct Entry *entry)
 
 	snprintf(buf, XML_BUFSIZE, /* fixme: length */
 	         "<suuid%s%s> " /* date, uuid */
-	         "%s" /* tag */
+	         "" /* tag */
 	         "%s" /* txt */
 	         "%s" /* host */
 	         "%s" /* cwd */
@@ -226,7 +230,7 @@ char *xml_entry(struct Entry *entry)
 	         "</suuid>",
 	         (e.date) ? e.date : "",
 	         (e.uuid) ? e.uuid : "",
-	         (e.tag) ? e.tag : "",
+	         /* tags here */
 	         (e.txt) ? e.txt : "",
 	         (e.host) ? e.host : "",
 	         (e.cwd) ? e.cwd : "",
