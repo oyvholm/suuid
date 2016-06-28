@@ -239,6 +239,10 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 	case 'q':
 		dest->verbose--;
 		break;
+	case 't':
+		if (!store_tag(optarg))
+			return EXIT_ERROR;
+		break;
 	case 'v':
 		dest->verbose++;
 		break;
@@ -293,6 +297,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 			{"random-mac", no_argument, 0, 'm'},
 			{"raw", no_argument, 0, 0},
 			{"rcfile", required_argument, 0, 0},
+			{"tag", required_argument, 0, 't'},
 			{"verbose", no_argument, 0, 'v'},
 			{"version", no_argument, 0, 0},
 			{"whereto", no_argument, 0, 'w'},
@@ -316,6 +321,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 		                "m"
 		                "n:"
 		                "q"
+		                "t:"
 		                "v"
 		                "w:"
 		                , long_options, &option_index);
@@ -445,10 +451,8 @@ int main(int argc, char *argv[])
 
 	retval = parse_options(&opt, argc, argv);
 	msg(4, "retval after parse_options(): %d", retval);
-	if (retval != EXIT_OK) {
-		fprintf(stderr, "%s: Option error\n", progname);
+	if (retval != EXIT_OK)
 		return EXIT_ERROR;
-	}
 
 	msg(3, "Using verbose level %d", opt.verbose);
 

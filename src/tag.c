@@ -20,4 +20,14 @@
 
 #include "suuid.h"
 
+char *store_tag(char *tag)
+{
+	if (utf8_check((unsigned char *)tag)) {
+		fprintf(stderr, "%s: Tags have to be in UTF-8\n", progname);
+		return(NULL);
+	}
+
+	return tag;
+}
+
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w fenc=UTF-8 : */

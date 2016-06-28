@@ -144,6 +144,9 @@ extern int parse_options(struct Options *, int, char *[]);
 extern int fill_entry_struct(struct Entry *, struct Options *, struct Rc *);
 extern char *process_uuid(char *, struct Entry *);
 
+/* tag.c */
+extern char *store_tag(char *);
+
 /* utf8.c */
 extern unsigned char *utf8_check(unsigned char *);
 
