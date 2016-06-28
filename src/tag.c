@@ -28,7 +28,8 @@ void rewind_tag(void)
 	tag_list_ind = 0;
 }
 
-char *get_next_tag(void) {
+char *get_next_tag(void)
+{
 	if (tag_list_ind < MAX_TAGS)
 		return entry.tag[tag_list_ind++];
 	else
