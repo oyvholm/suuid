@@ -291,8 +291,15 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 		 *
 		 */
 
-		c = getopt_long(argc, argv, "c:hl:n:qvw:", long_options,
-		                &option_index);
+		c = getopt_long(argc, argv,
+		                "c:"
+		                "h"
+		                "l:"
+		                "n:"
+		                "q"
+		                "v"
+		                "w:"
+		                , long_options, &option_index);
 
 		if (c == -1)
 			break;
