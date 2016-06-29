@@ -50,9 +50,15 @@ char *get_next_tag(void)
 		return NULL;
 }
 
-char *store_tag(char *tag)
+char *store_tag(char *arg)
 {
-	char *p;
+	char *tag, *p;
+
+	tag = strdup(arg); /* Don't modify the source */
+	if (!tag) {
+		myerror("store_tag(): Could not duplicate arg string");
+		return NULL;
+	}
 
 	while ((p = strchr(tag, ','))) {
 		*p++ = '\0';
@@ -68,7 +74,7 @@ char *store_tag(char *tag)
 	}
 	if (utf8_check((unsigned char *)tag)) {
 		fprintf(stderr, "%s: Tags have to be in UTF-8\n", progname);
-		return(NULL);
+		return NULL;
 	}
 	entry.tag[tag_count++] = strdup(tag);
 
