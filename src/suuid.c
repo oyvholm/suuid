@@ -492,9 +492,11 @@ int main(int argc, char *argv[])
 
 				while ((p = get_next_tag()))
 					printf("Found tag \"%s\"\n", p);
-			} else
+			} else if (!strcmp(a, "chex"))
 				printf("check_hex(\"%s\") = \"%s\"\n",
 				       a, check_hex(a, 5));
+			else
+				fprintf(stderr, "Unknown command: %s\n", a);
 		}
 		return EXIT_OK;
 	}
