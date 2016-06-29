@@ -197,20 +197,19 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 
 	switch (c) {
 	case 0:
-		if (!strcmp(opts->name, "license")) {
+		if (!strcmp(opts->name, "license"))
 			dest->license = 1;
-		} else if (!strcmp(opts->name, "raw")) {
+		else if (!strcmp(opts->name, "raw"))
 			dest->raw = 1;
-		} else if (!strcmp(opts->name, "rcfile")) {
+		else if (!strcmp(opts->name, "rcfile")) {
 			dest->rcfile = strdup(optarg);
 			if (!dest->rcfile) {
 				myerror("choose_opt_action(): Cannot allocate "
 				        "memory for --rcfile argument");
 				retval = EXIT_ERROR;
 			}
-		} else if (!strcmp(opts->name, "version")) {
+		} else if (!strcmp(opts->name, "version"))
 			dest->version = 1;
-		}
 		break;
 	case 'c':
 		dest->comment = strdup(optarg);

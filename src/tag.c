@@ -35,9 +35,8 @@ bool tag_exists(char *tag)
 	for (i = 0; i < tag_count; i++) {
 		msg(3, "tag_exists(): Checking \"%s\" vs \"%s\"",
 		       tag, entry.tag[i]);
-		if (!strcmp(tag, entry.tag[i])) {
+		if (!strcmp(tag, entry.tag[i]))
 			return TRUE;
-		}
 	}
 
 	return FALSE;

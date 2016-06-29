@@ -429,6 +429,7 @@ char *create_logfile(char *name)
 		return name; /* File already exists */
 	else {
 		FILE *fp;
+
 		fp = fopen(name, "a");
 		if (!fp) {
 			myerror("%s: Could not create log file", name);
@@ -438,6 +439,7 @@ char *create_logfile(char *name)
 		            xml_header, xml_doctype);
 		fclose(fp);
 	}
+
 	return name;
 }
 

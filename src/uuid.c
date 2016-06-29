@@ -45,7 +45,7 @@ char *generate_uuid(void)
 		return NULL;
 	}
 	if (!fgets(uuid, 37, fp)) {
-		/* Nevermind read errors, valid_uuid() checks if it's valid  
+		/* Nevermind read errors, valid_uuid() checks if it's valid 
 		 * later.
 		 */
 	}
