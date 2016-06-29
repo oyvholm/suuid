@@ -36,10 +36,16 @@
  *
  * Markus Kuhn <http://www.cl.cam.ac.uk/~mgk25/> -- 2005-03-30
  * License: http://www.cl.cam.ac.uk/~mgk25/short-license.html
+ *
+ * Modified by Øyvind A. Holm <sunny@sunbase.org> 2016-06-29 to receive and 
+ * return regular char * instead of unsigned char * to avoid casting 
+ * everywhere.
  */
 
-unsigned char *utf8_check(unsigned char *s)
+char *utf8_check(char *text)
 {
+	unsigned char *s = (unsigned char *)text;
+
 	msg(4, "Entering utf8_check()");
 	while (*s) {
 		if (*s < 0x80)
@@ -49,7 +55,7 @@ unsigned char *utf8_check(unsigned char *s)
 			/* 110XXXXx 10xxxxxx */
 			if ((s[1] & 0xc0) != 0x80 ||
 			    (s[0] & 0xfe) == 0xc0) /* overlong? */
-				return s;
+				return (char *)s;
 			else
 				s += 2;
 		} else if ((s[0] & 0xf0) == 0xe0) {
@@ -61,7 +67,7 @@ unsigned char *utf8_check(unsigned char *s)
 			    (s[1] & 0xe0) == 0xa0) || /* surrogate? */
 			    (s[0] == 0xef && s[1] == 0xbf &&
 			    (s[2] & 0xfe) == 0xbe)) /* U+FFFE or U+FFFF? */
-				return s;
+				return (char *)s;
 			else
 				s += 3;
 		} else if ((s[0] & 0xf8) == 0xf0) {
@@ -71,11 +77,11 @@ unsigned char *utf8_check(unsigned char *s)
 			    (s[1] & 0xf0) == 0x80) || /* overlong? */
 			    (s[0] == 0xf4 && s[1] > 0x8f) ||
 			    s[0] > 0xf4) /* > U+10FFFF? */
-				return s;
+				return (char *)s;
 			else
 				s += 4;
 		} else
-			return s;
+			return (char *)s;
 	}
 
 	return NULL;

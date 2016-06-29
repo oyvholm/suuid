@@ -73,7 +73,7 @@ char *store_tag(char *arg)
 		       "return", tag);
 		return tag;
 	}
-	if (utf8_check((unsigned char *)tag)) {
+	if (utf8_check(tag)) {
 		fprintf(stderr, "%s: Tags have to be in UTF-8\n", progname);
 		return NULL;
 	}

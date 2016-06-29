@@ -152,7 +152,7 @@ char *get_next_tag(void);
 extern char *store_tag(char *);
 
 /* utf8.c */
-extern unsigned char *utf8_check(unsigned char *);
+extern char *utf8_check(char *);
 
 /* uuid.c */
 extern char *generate_uuid(void);

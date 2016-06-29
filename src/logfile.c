@@ -488,7 +488,7 @@ int valid_xml_chars(char *s)
 {
 	unsigned char *p = (unsigned char *)s;
 
-	if (utf8_check((unsigned char *)s))
+	if (utf8_check(s))
 		return 0;
 	while (*p) {
 		if (*p < ' ' && *p != '\n' && *p != '\r' && *p != '\t')
