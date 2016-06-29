@@ -486,10 +486,11 @@ int main(int argc, char *argv[])
 		for (i = optind; i < argc; i++) {
 			char *a = argv[i];
 			msg(4, "Checking arg %d \"%s\"", i, a);
-			if (!strcmp(a, "jada")) {
+			if (!strcmp(a, "ptags")) {
 				char *p;
+
 				while ((p = get_next_tag()))
-					printf("Fant tag \"%s\"\n", p);
+					printf("Found tag \"%s\"\n", p);
 			} else
 				printf("check_hex(\"%s\") = \"%s\"\n",
 				       a, check_hex(a, 5));
