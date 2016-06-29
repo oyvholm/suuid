@@ -39,6 +39,7 @@ bool tag_exists(char *tag)
 			return TRUE;
 		}
 	}
+
 	return FALSE;
 }
 

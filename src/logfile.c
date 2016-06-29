@@ -158,6 +158,7 @@ char *alloc_attr(char *attr, char *data)
 	else
 		snprintf(retval, size, " %s=\"%s\"", attr, data);
 	msg(4, "alloc_attr() returns \"%s\"", retval);
+
 	return retval;
 }
 

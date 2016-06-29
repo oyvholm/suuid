@@ -485,6 +485,7 @@ int main(int argc, char *argv[])
 
 		for (i = optind; i < argc; i++) {
 			char *a = argv[i];
+
 			msg(4, "Checking arg %d \"%s\"", i, a);
 			if (!strcmp(a, "ptags")) {
 				char *p;
