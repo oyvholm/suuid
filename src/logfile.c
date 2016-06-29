@@ -404,8 +404,8 @@ int add_to_logfile(char *fname, struct Entry *entry)
 	fclose(fp);
 	msg(4, "add_to_logfile(): fp is closed");
 	if (opt.verbose > 2) {
-		i = system("(echo; echo; cat /home/sunny/uuids/fake.xml; "
-		           "echo; echo) >&2");
+		i = system("(echo; cat /home/sunny/uuids/fake.xml; "
+		           "echo) >&2");
 		i = i; /* Get rid of gcc warning */
 	}
 	msg(4, "add_to_logfile() returns %d", retval);

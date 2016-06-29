@@ -414,7 +414,7 @@ char *process_uuid(char *logfile, struct Entry *entry)
 
 		i = system("(echo; echo After create_logfile:; "
 		           "cat /home/sunny/uuids/fake.xml; "
-		           "echo; echo) >&2");
+		           "echo) >&2");
 		i = i; /* Get rid of gcc warning */
 	}
 	if (add_to_logfile(logfile, entry) == EXIT_ERROR) {
