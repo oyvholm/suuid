@@ -33,15 +33,20 @@ size_t MAX_GROWTH = 5; /* When converting from plain text to the XML format
 
 void init_xml_entry(struct Entry *e)
 {
+	unsigned int i;
+
 	e->date = NULL;
 	e->uuid = NULL;
-	e->tag = NULL;
 	e->txt = NULL;
 	e->host = NULL;
 	e->cwd = NULL;
 	e->user = NULL;
 	e->tty = NULL;
 	e->sess = NULL;
+
+	for (i = 0; i < MAX_TAGS; i++)
+		e->tag[i] = NULL;
+
 }
 
 /*
@@ -157,6 +162,47 @@ char *alloc_attr(char *attr, char *data)
 }
 
 /*
+ * get_xml_tags() - Return pointer to an XML string with <tag> elements 
+ * generated from the entry.tag[] array. If error, return NULL.
+ */
+
+char *get_xml_tags(void)
+{
+#define GXT_BUFSIZE  20000 /* fixme: Temporary */
+	static char buf[GXT_BUFSIZE + 1];
+	char tmpbuf[GXT_BUFSIZE + 1];
+	char *p;
+	static bool done = 0;
+
+	if (done)
+		return buf;
+	msg(3, "Entering get_xml_tags()");
+	rewind_tag();
+	do {
+		p = get_next_tag();
+
+		if (p) {
+			char *ap;
+
+			ap = suuid_xml(p);
+			if (!ap) {
+				myerror("get_xml_tags(): suuid_xml() failed");
+				return NULL;
+			}
+
+			msg(3, "get_xml_tags(): ap = \"%s\"", ap);
+			snprintf(tmpbuf, GXT_BUFSIZE, "<tag>%s</tag> ", ap);
+			free(ap);
+			strncat(buf, tmpbuf, GXT_BUFSIZE - strlen(buf));
+		} else
+			msg(3, "get_xml_tags(): p is NULL");
+	} while (p);
+	done = 1;
+
+	return buf;
+}
+
+/*
  * xml_entry() - Return pointer to string with one XML entry extracted from the 
  * entry struct, or NULL if error.
  */
@@ -167,6 +213,7 @@ char *xml_entry(struct Entry *entry)
 	static char buf[XML_BUFSIZE];
 	struct Entry e;
 	char *retval;
+	char *tag_xml;
 
 	msg(4, "Entering xml_entry()");
 	init_xml_entry(&e);
@@ -174,7 +221,6 @@ char *xml_entry(struct Entry *entry)
 
 	msg(4, "xml_entry(): entry->date = '%s'", entry->date);
 	msg(4, "xml_entry(): entry->uuid = '%s'", entry->uuid);
-	msg(4, "xml_entry(): entry->tag  = '%s'", entry->tag);
 	msg(5, "xml_entry(): entry->txt  = '%s'", entry->txt);
 	msg(4, "xml_entry(): entry->host = '%s'", entry->host);
 	msg(4, "xml_entry(): entry->cwd  = '%s'", entry->cwd);
@@ -189,6 +235,12 @@ char *xml_entry(struct Entry *entry)
 
 	if (entry->date)
 		e.date = alloc_attr("t", entry->date);
+
+	tag_xml = get_xml_tags();
+	if (!tag_xml) {
+		myerror("xml_entry(): get_xml_tags() failed");
+		return NULL;
+	}
 
 	if (opt.raw) {
 		int size;
@@ -226,7 +278,7 @@ char *xml_entry(struct Entry *entry)
 	         "</suuid>",
 	         (e.date) ? e.date : "",
 	         (e.uuid) ? e.uuid : "",
-	         (e.tag) ? e.tag : "",
+	         tag_xml ? tag_xml : "",
 	         (e.txt) ? e.txt : "",
 	         (e.host) ? e.host : "",
 	         (e.cwd) ? e.cwd : "",

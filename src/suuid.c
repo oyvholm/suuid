@@ -27,6 +27,7 @@
 char *progname;
 struct Options opt;
 struct Rc rc;
+struct Entry entry;
 
 /*
  * msg() - Print a message prefixed with "[progname]: " to stddebug if 
@@ -159,6 +160,8 @@ void usage(int retval)
 		       "    otherwise it will create corrupted log files.\n");
 		printf("  --rcfile X\n"
 		       "    Use file X instead of '$Std{'rcfile'}'.\n");
+		printf("  -t x, --tag x\n"
+		       "    Use x as tag (category).\n");
 		printf("  -v, --verbose\n"
 		       "    Increase level of verbosity. Can be repeated.\n");
 		printf("  --version\n"
@@ -239,6 +242,10 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 	case 'q':
 		dest->verbose--;
 		break;
+	case 't':
+		if (!store_tag(optarg))
+			return EXIT_ERROR;
+		break;
 	case 'v':
 		dest->verbose++;
 		break;
@@ -293,6 +300,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 			{"random-mac", no_argument, 0, 'm'},
 			{"raw", no_argument, 0, 0},
 			{"rcfile", required_argument, 0, 0},
+			{"tag", required_argument, 0, 't'},
 			{"verbose", no_argument, 0, 'v'},
 			{"version", no_argument, 0, 0},
 			{"whereto", no_argument, 0, 'w'},
@@ -316,6 +324,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 		                "m"
 		                "n:"
 		                "q"
+		                "t:"
 		                "v"
 		                "w:"
 		                , long_options, &option_index);
@@ -340,7 +349,6 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 
 int fill_entry_struct(struct Entry *entry, struct Options *opt, struct Rc *rc)
 {
-	init_xml_entry(entry);
 	msg(4, "fill_entry_struct(): rc->hostname = \"%s\"", rc->hostname);
 	entry->host = get_hostname();
 	entry->cwd = getpath();
@@ -434,7 +442,6 @@ int main(int argc, char *argv[])
 {
 	int retval = EXIT_OK;
 	char *logfile;
-	struct Entry entry;
 	char *uuid;
 	unsigned int i;
 
@@ -443,12 +450,12 @@ int main(int argc, char *argv[])
 	                     * with the Perl version.
 	                     */
 
+	init_xml_entry(&entry);
+
 	retval = parse_options(&opt, argc, argv);
 	msg(4, "retval after parse_options(): %d", retval);
-	if (retval != EXIT_OK) {
-		fprintf(stderr, "%s: Option error\n", progname);
+	if (retval != EXIT_OK)
 		return EXIT_ERROR;
-	}
 
 	msg(3, "Using verbose level %d", opt.verbose);
 
@@ -479,8 +486,14 @@ int main(int argc, char *argv[])
 		for (i = optind; i < argc; i++) {
 			char *a = argv[i];
 			msg(4, "Checking arg %d \"%s\"", i, a);
-			printf("check_hex(\"%s\") = \"%s\"\n",
-			       a, check_hex(a, 5));
+			if (!strcmp(a, "ptags")) {
+				char *p;
+
+				while ((p = get_next_tag()))
+					printf("Found tag \"%s\"\n", p);
+			} else
+				printf("check_hex(\"%s\") = \"%s\"\n",
+				       a, check_hex(a, 5));
 		}
 		return EXIT_OK;
 	}

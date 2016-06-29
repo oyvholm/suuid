@@ -44,6 +44,7 @@
 #define ENV_LOGDIR  "SUUID_LOGDIR" /* Optional environment variable with path 
                                     * to log directory
                                     */
+#define MAX_TAGS  1000 /* Maximum number of tags */
 
 /*
  * Standard header files
@@ -78,7 +79,7 @@ struct Rc {
 struct Entry {
 	char *date;
 	char *uuid;
-	char *tag;
+	char *tag[MAX_TAGS];
 	char *txt;
 	char *host;
 	char *cwd;
@@ -118,6 +119,7 @@ extern void init_xml_entry(struct Entry *);
 extern char *allocate_entry(char *, char *);
 extern char *suuid_xml(char *);
 extern char *alloc_attr(char *, char *);
+extern char *get_xml_tags(void);
 extern char *xml_entry(struct Entry *);
 extern char *get_logdir();
 extern int add_to_logfile(char *, struct Entry *);
@@ -143,6 +145,12 @@ extern int parse_options(struct Options *, int, char *[]);
 extern int fill_entry_struct(struct Entry *, struct Options *, struct Rc *);
 extern char *process_uuid(char *, struct Entry *);
 
+/* tag.c */
+void rewind_tag(void);
+bool tag_exists(char *);
+char *get_next_tag(void);
+extern char *store_tag(char *);
+
 /* utf8.c */
 extern unsigned char *utf8_check(unsigned char *);
 
@@ -159,6 +167,7 @@ extern int valid_uuid(char *);
 extern char *progname;
 extern struct Options opt;
 extern struct Rc rc;
+extern struct Entry entry;
 
 #endif /* ifndef _SUUID_H */
 
