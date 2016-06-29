@@ -47,6 +47,7 @@
 #define ENV_LOGDIR  "SUUID_LOGDIR" /* Optional environment variable with path 
                                     * to log directory
                                     */
+#define MAX_SESS  1000 /* Maximum number of sess elements per entry */
 #define MAX_TAGS  1000 /* Maximum number of tags */
 
 /*
@@ -79,6 +80,10 @@ struct Rc {
 	char *hostname;
 	char *uuidcmd;
 };
+struct Sess {
+	char *uuid;
+	char *desc;
+};
 struct Entry {
 	char *date;
 	char *uuid;
@@ -88,7 +93,7 @@ struct Entry {
 	char *cwd;
 	char *user;
 	char *tty;
-	char *sess;
+	struct Sess *sess[MAX_SESS];
 };
 struct Options {
 	char *comment;

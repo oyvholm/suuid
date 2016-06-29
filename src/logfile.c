@@ -42,11 +42,11 @@ void init_xml_entry(struct Entry *e)
 	e->cwd = NULL;
 	e->user = NULL;
 	e->tty = NULL;
-	e->sess = NULL;
 
 	for (i = 0; i < MAX_TAGS; i++)
 		e->tag[i] = NULL;
-
+	for (i = 0; i < MAX_SESS; i++)
+		e->sess[i] = NULL;
 }
 
 /*
@@ -226,7 +226,6 @@ char *xml_entry(struct Entry *entry)
 	msg(4, "xml_entry(): entry->host = '%s'", entry->host);
 	msg(4, "xml_entry(): entry->cwd  = '%s'", entry->cwd);
 	msg(4, "xml_entry(): entry->user = '%s'", entry->user);
-	msg(4, "xml_entry(): entry->sess = '%s'", entry->sess);
 
 	if (!entry->uuid) {
 		msg(4, "xml_entry(): uuid is NULL");
@@ -275,7 +274,7 @@ char *xml_entry(struct Entry *entry)
 	         "%s" /* cwd */
 	         "%s" /* user */
 	         "%s" /* tty */
-	         "%s" /* sess */
+	         "" /* sess */
 	         "</suuid>",
 	         (e.date) ? e.date : "",
 	         (e.uuid) ? e.uuid : "",
@@ -284,8 +283,9 @@ char *xml_entry(struct Entry *entry)
 	         (e.host) ? e.host : "",
 	         (e.cwd) ? e.cwd : "",
 	         (e.user) ? e.user : "",
-	         (e.tty) ? e.tty : "",
-	         (e.sess) ? e.sess : "");
+	         (e.tty) ? e.tty : ""
+	         /* (e.sess) ? e.sess : "" */
+	         );
 	msg(4, "xml_entry(): After snprintf()");
 #if 0
 	static char fake[] = "<suuid t=\"2016-06-07T04:18:40.9460630Z\" "
