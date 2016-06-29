@@ -493,7 +493,7 @@ bool valid_xml_chars(char *s)
 	if (utf8_check(s))
 		return FALSE;
 	while (*p) {
-		if (*p < ' ' && *p != '\n' && *p != '\r' && *p != '\t')
+		if (*p < ' ' && !strchr("\n\r\t", *p))
 			return FALSE;
 		if (*p == 127)
 			return FALSE;

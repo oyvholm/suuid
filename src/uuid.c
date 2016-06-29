@@ -81,7 +81,7 @@ char *check_hex(char *hex, size_t len)
 	char *p;
 
 	for (p = hex; p < hex + len; p++)
-		if (!in_range(*p, '0', '9') && !in_range(*p, 'a', 'f'))
+		if (!strchr("0123456789abcdef", *p))
 			return p;
 
 	return NULL;
