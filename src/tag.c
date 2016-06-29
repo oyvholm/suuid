@@ -33,7 +33,7 @@ bool tag_exists(char *tag)
 	unsigned int i;
 
 	for (i = 0; i < tag_count; i++) {
-		msg(2, "tag_exists(): Checking \"%s\" vs \"%s\"",
+		msg(3, "tag_exists(): Checking \"%s\" vs \"%s\"",
 		       tag, entry.tag[i]);
 		if (!strcmp(tag, entry.tag[i])) {
 			return TRUE;
@@ -68,7 +68,7 @@ char *store_tag(char *arg)
 	trim_str_front(tag);
 	trim_str_end(tag);
 	if (tag_exists(tag) || !strlen(tag)) {
-		msg(2, "store_tag(\"%s\"): tag already exists or is empty, "
+		msg(3, "store_tag(\"%s\"): tag already exists or is empty, "
 		       "return", tag);
 		return tag;
 	}

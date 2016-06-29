@@ -176,7 +176,7 @@ char *get_xml_tags(void)
 
 	if (done)
 		return buf;
-	msg(2, "Entering get_xml_tags()");
+	msg(3, "Entering get_xml_tags()");
 	rewind_tag();
 	do {
 		p = get_next_tag();
@@ -190,12 +190,12 @@ char *get_xml_tags(void)
 				return NULL;
 			}
 
-			msg(2, "get_xml_tags(): ap = \"%s\"", ap);
+			msg(3, "get_xml_tags(): ap = \"%s\"", ap);
 			snprintf(tmpbuf, GXT_BUFSIZE, "<tag>%s</tag> ", ap);
 			free(ap);
 			strncat(buf, tmpbuf, GXT_BUFSIZE - strlen(buf));
 		} else
-			msg(2, "get_xml_tags(): p is NULL");
+			msg(3, "get_xml_tags(): p is NULL");
 	} while (p);
 	done = 1;
 
