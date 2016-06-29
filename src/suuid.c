@@ -330,6 +330,16 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 }
 
 /*
+ * get_sess_info() - Read sess information from the environment variable and 
+ * insert it into the entry.sess array. Returns EXIT_OK or EXIT_ERROR.
+ */
+
+int get_sess_info(struct Entry *entry)
+{
+	return EXIT_OK;
+}
+
+/*
  * fill_entry_struct() - Fill the entry struct with information from the opt 
  * struct and the environment, like current directory, hostname, comment, etc.
  * Returns EXIT_OK if no errors, EXIT_ERROR if errors.
@@ -375,6 +385,10 @@ int fill_entry_struct(struct Entry *entry, struct Options *opt, struct Rc *rc)
 		 */
 		trim_str_front(entry->txt);
 		trim_str_end(entry->txt);
+	}
+	if (get_sess_info(entry) == EXIT_ERROR) {
+		myerror("fill_entry_struct(): get_sess_info() failed");
+		return EXIT_ERROR;
 	}
 
 	return EXIT_OK;
