@@ -90,14 +90,14 @@ struct Entry {
 struct Options {
 	char *comment;
 	unsigned int count;
-	int help;
-	int license;
+	bool help;
+	bool license;
 	char *logdir;
-	int random_mac;
-	int raw;
+	bool random_mac;
+	bool raw;
 	char *rcfile;
 	int verbose;
-	int version;
+	bool version;
 	char *whereto;
 };
 
@@ -125,7 +125,7 @@ extern char *get_logdir();
 extern int add_to_logfile(char *, struct Entry *);
 extern char *create_logfile(char *);
 extern char *set_up_logfile(struct Options *, char *);
-extern int valid_xml_chars(char *);
+extern bool valid_xml_chars(char *);
 
 /* rcfile.c */
 extern int read_rcfile(char *, struct Rc *);
@@ -158,7 +158,7 @@ extern char *utf8_check(char *);
 extern char *generate_uuid(void);
 extern char *uuid_date(char *);
 extern char *check_hex(char *, size_t);
-extern int valid_uuid(char *);
+extern bool valid_uuid(char *);
 
 /*
  * Global variables

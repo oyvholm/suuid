@@ -173,7 +173,7 @@ char *get_xml_tags(void)
 	static char buf[GXT_BUFSIZE + 1];
 	char tmpbuf[GXT_BUFSIZE + 1];
 	char *p;
-	static bool done = 0;
+	static bool done = FALSE;
 
 	if (done)
 		return buf;
@@ -198,7 +198,7 @@ char *get_xml_tags(void)
 		} else
 			msg(3, "get_xml_tags(): p is NULL");
 	} while (p);
-	done = 1;
+	done = TRUE;
 
 	return buf;
 }
@@ -483,24 +483,24 @@ char *set_up_logfile(struct Options *opt, char *hostname)
 
 /*
  * valid_xml_chars() - Check that the string pointed to by s contains valid 
- * UTF-8 and no control chars. Return 1 if ok, 0 if invalid.
+ * UTF-8 and no control chars. Return TRUE if ok, FALSE if invalid.
  */
 
-int valid_xml_chars(char *s)
+bool valid_xml_chars(char *s)
 {
 	unsigned char *p = (unsigned char *)s;
 
 	if (utf8_check(s))
-		return 0;
+		return FALSE;
 	while (*p) {
 		if (*p < ' ' && *p != '\n' && *p != '\r' && *p != '\t')
-			return 0;
+			return FALSE;
 		if (*p == 127)
-			return 0;
+			return FALSE;
 		p++;
 	}
 
-	return 1;
+	return TRUE;
 }
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w fenc=UTF-8 : */

@@ -88,16 +88,16 @@ char *check_hex(char *hex, size_t len)
 }
 
 /*
- * valid_uuid() - Check that the UUID pointed to by u is a valid UUID. Return 1 
- * if valid, 0 if not.
+ * valid_uuid() - Check that the UUID pointed to by u is a valid UUID. Return 
+ * TRUE if valid, FALSE if not.
  */
 
-int valid_uuid(char *u)
+bool valid_uuid(char *u)
 {
-	int retval = 1;
+	bool retval = TRUE;
 
 	if (strlen(u) != 36)
-		retval = 0;
+		retval = FALSE;
 
 	/* Check that it only contains lowercase hex and dashes at the right 
 	 * places
@@ -105,12 +105,12 @@ int valid_uuid(char *u)
 	if (check_hex(u, 8) || u[8] != '-' || check_hex(u + 9, 4) ||
 	    u[13] != '-' || check_hex(u + 14, 4) || u[18] != '-' ||
 	    check_hex(u + 19, 4) || u[23] != '-' || check_hex(u + 24, 12))
-		retval = 0;
+		retval = FALSE;
 
 	/* At the moment only v1 UUIDs are allowed
 	 */
 	if (u[14] != '1')
-		retval = 0;
+		retval = FALSE;
 
 	return retval;
 }
