@@ -20,4 +20,22 @@
 
 #include "suuid.h"
 
+/*
+ * get_sess_info() - Read sess information from the environment variable and 
+ * insert it into the entry.sess array. Returns EXIT_OK or EXIT_ERROR.
+ */
+
+int get_sess_info(struct Entry *entry)
+{
+	char *var;
+
+	var = entry->date; /* fixme: Temporary to get rid of gcc warning */
+	var = getenv(ENV_SESS);
+	if (!var)
+		return EXIT_OK;
+	msg(2, "get_sess_info(): var = \"%s\"", var);
+
+	return EXIT_OK;
+}
+
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */
