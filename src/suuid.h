@@ -192,7 +192,7 @@ extern char *utf8_check(char *);
 extern char *generate_uuid(void);
 extern char *uuid_date(char *);
 extern char *check_hex(char *, size_t);
-extern bool valid_uuid(char *);
+extern bool valid_uuid(char *, bool);
 
 /*
  * Global variables

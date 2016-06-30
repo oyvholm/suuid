@@ -88,14 +88,19 @@ char *check_hex(char *hex, size_t len)
 }
 
 /*
- * valid_uuid() - Check that the UUID pointed to by u is a valid UUID. Return 
- * TRUE if valid, FALSE if not.
+ * valid_uuid() - Check that the UUID pointed to by u is a valid UUID. If 
+ * check_len is TRUE, also check that the string length is exactly the same as 
+ * a standard UUID, 36 chars.
+ * Return TRUE if valid, FALSE if not.
  */
 
-bool valid_uuid(char *u)
+bool valid_uuid(char *u, bool check_len)
 {
-	if (strlen(u) != 36)
+	if (strlen(u) < 36)
 		return FALSE;
+	if (check_len)
+		if (strlen(u) != 36)
+			return FALSE;
 
 	/* Check that it only contains lowercase hex and dashes at the right 
 	 * places

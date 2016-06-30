@@ -411,7 +411,7 @@ int fill_entry_struct(struct Entry *entry, struct Options *opt, struct Rc *rc)
 char *process_uuid(char *logfile, struct Entry *entry)
 {
 	entry->uuid = generate_uuid();
-	if (!valid_uuid(entry->uuid)) {
+	if (!valid_uuid(entry->uuid, TRUE)) {
 		fprintf(stderr, "%s: '%s': Generated UUID is not in the "
 		                "expected format\n",
 		                progname, entry->uuid);
