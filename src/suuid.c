@@ -258,7 +258,7 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 		}
 		break;
 	default:
-		msg(4, "getopt_long() returned character code %d", c);
+		msg(3, "getopt_long() returned character code %d", c);
 		retval = EXIT_ERROR;
 		break;
 	}
@@ -519,7 +519,7 @@ int main(int argc, char *argv[])
 		int t;
 
 		for (t = optind; t < argc; t++)
-			msg(4, "Non-option arg: %s", argv[t]);
+			msg(3, "Non-option arg: %s", argv[t]);
 	}
 
 	msg(3, "Returning from main() with value %d", retval);
