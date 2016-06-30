@@ -430,7 +430,6 @@ int main(int argc, char *argv[])
 {
 	int retval = EXIT_OK;
 	char *logfile;
-	char *uuid;
 	unsigned int i;
 
 	progname = argv[0];
@@ -506,11 +505,9 @@ int main(int argc, char *argv[])
 	}
 	msg(4, "After set_up_logfile()");
 
-	for (i = 0; i < opt.count; i++) {
-		uuid = process_uuid(logfile, &entry);
-		if (!uuid)
+	for (i = 0; i < opt.count; i++)
+		if (!process_uuid(logfile, &entry))
 			return EXIT_ERROR;
-	}
 
 	if (optind < argc) {
 		int t;
