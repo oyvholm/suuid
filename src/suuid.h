@@ -34,6 +34,8 @@
 #define EXIT_OK     0
 #define EXIT_ERROR  1
 
+#define UUID_LENGTH  36 /* Length of a standard UUID */
+
 #define FAKE_HOST  1 /* Use "fake" as hostname to avoid conflicts with files 
                       * created by the Perl version
                       */
