@@ -82,7 +82,7 @@ int myerror(const char *format, ...)
 
 void print_license(void)
 {
-	puts("(C)opyleft STDyearDTS- Øyvind A. Holm <sunny@sunbase.org>");
+	puts("(C)opyleft 2016- Øyvind A. Holm <sunny@sunbase.org>");
 	puts("");
 	puts("This program is free software; you can redistribute it "
 	     "and/or modify it \n"
