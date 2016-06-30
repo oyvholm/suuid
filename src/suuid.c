@@ -336,6 +336,14 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 
 int get_sess_info(struct Entry *entry)
 {
+	char *var;
+
+	var = entry->date; /* fixme: Temporary to get rid of gcc warning */
+	var = getenv(ENV_SESS);
+	if (!var)
+		return EXIT_OK;
+	msg(2, "get_sess_info(): var = \"%s\"", var);
+
 	return EXIT_OK;
 }
 
