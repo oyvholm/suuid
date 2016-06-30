@@ -165,6 +165,8 @@ extern bool valid_xml_chars(char *);
 /* rcfile.c */
 extern int read_rcfile(char *, struct Rc *);
 
+/* sessvar.c */
+
 /* string.c */
 extern char *trim_str_front(char *);
 extern char *trim_str_end(char *);

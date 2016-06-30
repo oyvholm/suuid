@@ -2,8 +2,10 @@
 # File ID: 27e0d738-2b93-11e6-8668-02010e0a6634
 # Author: Øyvind A. Holm <sunny@sunbase.org>
 
-OBJS   = environ.o io.o logfile.o rcfile.o string.o suuid.o tag.o utf8.o uuid.o
-CFILES = environ.c io.c logfile.c rcfile.c string.c suuid.c tag.c utf8.c uuid.c
+OBJS   = environ.o io.o logfile.o rcfile.o sessvar.o string.o suuid.o \
+         tag.o utf8.o uuid.o
+CFILES = environ.c io.c logfile.c rcfile.c sessvar.c string.c suuid.c \
+         tag.c utf8.c uuid.c
 HFILES = suuid.h
 DEPS = $(HFILES) Makefile
 CC = gcc
@@ -29,6 +31,9 @@ logfile.o: logfile.c $(DEPS)
 
 rcfile.o: rcfile.c $(DEPS)
 	$(CC) $(CCFLAGS) rcfile.c
+
+sessvar.o: sessvar.c $(DEPS)
+	$(CC) $(CCFLAGS) sessvar.c
 
 string.o: string.c $(DEPS)
 	$(CC) $(CCFLAGS) string.c
