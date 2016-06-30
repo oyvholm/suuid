@@ -94,10 +94,8 @@ char *check_hex(char *hex, size_t len)
 
 bool valid_uuid(char *u)
 {
-	bool retval = TRUE;
-
 	if (strlen(u) != 36)
-		retval = FALSE;
+		return FALSE;
 
 	/* Check that it only contains lowercase hex and dashes at the right 
 	 * places
@@ -105,14 +103,14 @@ bool valid_uuid(char *u)
 	if (check_hex(u, 8) || u[8] != '-' || check_hex(u + 9, 4) ||
 	    u[13] != '-' || check_hex(u + 14, 4) || u[18] != '-' ||
 	    check_hex(u + 19, 4) || u[23] != '-' || check_hex(u + 24, 12))
-		retval = FALSE;
+		return FALSE;
 
 	/* At the moment only v1 UUIDs are allowed
 	 */
 	if (u[14] != '1')
-		retval = FALSE;
+		return FALSE;
 
-	return retval;
+	return TRUE;
 }
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */
