@@ -326,8 +326,6 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 		                           c, &long_options[option_index]);
 	}
 
-	msg(4, "parse_options() returns %d", retval);
-
 	return retval;
 }
 
@@ -443,7 +441,6 @@ int main(int argc, char *argv[])
 	init_xml_entry(&entry);
 
 	retval = parse_options(&opt, argc, argv);
-	msg(4, "retval after parse_options(): %d", retval);
 	if (retval != EXIT_OK)
 		return EXIT_ERROR;
 
