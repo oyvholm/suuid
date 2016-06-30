@@ -308,15 +308,15 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 		};
 
 		c = getopt_long(argc, argv,
-		                "c:"
-		                "h"
-		                "l:"
-		                "m"
-		                "n:"
-		                "q"
-		                "t:"
-		                "v"
-		                "w:"
+		                "c:" /* --comment */
+		                "h"  /* --help */
+		                "l:" /* --logdir */
+		                "m"  /* --random-mac */
+		                "n:" /* --count */
+		                "q"  /* --quiet */
+		                "t:" /* --tag */
+		                "v"  /* --verbose */
+		                "w:" /* --whereto */
 		                , long_options, &option_index);
 
 		if (c == -1)
