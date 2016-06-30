@@ -518,14 +518,8 @@ int main(int argc, char *argv[])
 	if (optind < argc) {
 		int t;
 
-		for (t = optind; t < argc; t++) {
+		for (t = optind; t < argc; t++)
 			msg(4, "Non-option arg: %s", argv[t]);
-#if 0
-			puts(suuid_xml(argv[t])); /* For testing, remove when 
-			                           * suuid_xml() is wonderful.
-			                           */
-#endif
-		}
 	}
 
 	msg(3, "Returning from main() with value %d", retval);
