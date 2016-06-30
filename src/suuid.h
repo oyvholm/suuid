@@ -37,6 +37,9 @@
 #define FAKE_HOST  1 /* Use "fake" as hostname to avoid conflicts with files 
                       * created by the Perl version
                       */
+#define PERL_COMPAT  1 /* Compile a version with some changes to make it 
+                        * compatible with the Perl version
+                        */
 
 #define stddebug  stderr
 

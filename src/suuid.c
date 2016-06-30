@@ -433,9 +433,11 @@ int main(int argc, char *argv[])
 	unsigned int i;
 
 	progname = argv[0];
+#if PERL_COMPAT
 	progname = "suuid"; /* fixme: Temporary kludge to make it compatible 
 	                     * with the Perl version.
 	                     */
+#endif
 
 	init_xml_entry(&entry);
 
