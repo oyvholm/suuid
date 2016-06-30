@@ -88,6 +88,25 @@ char *check_hex(char *hex, size_t len)
 }
 
 /*
+ * scan_for_uuid() - Return a pointer to the first UUID in the string s, or 
+ * NULL if no UUID was found.
+ */
+
+char *scan_for_uuid(char *s)
+{
+	char *p = s;
+
+	while (strlen(p) >= 36) {
+		msg(2, "scan_for_uuid(): p = \"%s\"", p);
+		if (valid_uuid(p, FALSE))
+			return p;
+		p++;
+	}
+
+	return NULL;
+}
+
+/*
  * valid_uuid() - Check that the UUID pointed to by u is a valid UUID. If 
  * check_len is TRUE, also check that the string length is exactly the same as 
  * a standard UUID, 36 chars.

@@ -493,16 +493,8 @@ int main(int argc, char *argv[])
 			char *a = argv[i];
 
 			msg(4, "Checking arg %d \"%s\"", i, a);
-			if (!strcmp(a, "ptags")) {
-				char *p;
-
-				while ((p = get_next_tag()))
-					printf("Found tag \"%s\"\n", p);
-			} else if (!strcmp(a, "chex"))
-				printf("check_hex(\"%s\") = \"%s\"\n",
-				       a, check_hex(a, 5));
-			else
-				fprintf(stderr, "Unknown command: %s\n", a);
+			printf("scan_for_uuid(\"%s\") = \"%s\"\n",
+			       a, scan_for_uuid(a));
 		}
 		return EXIT_OK;
 	}
