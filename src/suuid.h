@@ -166,6 +166,7 @@ extern bool valid_xml_chars(char *);
 extern int read_rcfile(char *, struct Rc *);
 
 /* sessvar.c */
+extern bool is_legal_desc_char(unsigned char);
 extern int get_sess_info(struct Entry *);
 
 /* string.c */
