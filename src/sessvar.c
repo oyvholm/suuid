@@ -49,18 +49,23 @@ int fill_sess(struct Sess *dest, char *desc, char *uuid)
 	       "\"%s\", \"%s\")",
 	       dest->uuid, dest->desc,
 	       desc, uuid);
+	DEBL;
 	if (desc && strlen(desc) && is_valid_desc_string(desc)) {
+		DEBL;
 		dest->desc = strdup(desc);
 		if (!dest->desc) {
 			myerror("fill_sess(): Could not duplicate desc");
 			return EXIT_ERROR;
 		}
+		DEBL;
 	}
+	DEBL;
 
 	if (uuid && valid_uuid(uuid, FALSE))
 		dest->uuid = desc;
 	else
 		return EXIT_ERROR;
+	DEBL;
 
 	return EXIT_OK;
 }
@@ -77,6 +82,7 @@ int get_sess_info(struct Entry *entry)
 	var = getenv(ENV_SESS);
 	if (!var)
 		return EXIT_OK;
+	DEBL;
 	msg(2, "get_sess_info(): var = \"%s\"", var);
 
 	s = strdup(var);
@@ -89,6 +95,7 @@ int get_sess_info(struct Entry *entry)
 	if (!scan_for_uuid(s))
 		return EXIT_OK;
 
+	DEBL;
 	desc_found = desc_end = NULL;
 	p = s;
 	while (*p) {
@@ -107,6 +114,7 @@ int get_sess_info(struct Entry *entry)
 			msg(2, "get_sess_info(): auuid = \"%s\"", auuid);
 
 			if (desc_end > desc_found) {
+				DEBL;
 				adesc = strndup(desc_found,
 				                desc_end - desc_found);
 				if (!adesc) {
@@ -119,10 +127,15 @@ int get_sess_info(struct Entry *entry)
 			}
 
 			if (fill_sess(&dest, adesc, auuid) == EXIT_OK) {
+				DEBL;
 				entry->sess[sessind]->uuid = auuid;
+				DEBL;
 				entry->sess[sessind]->desc = adesc;
+				DEBL;
 			}
+			DEBL;
 			p += UUID_LENGTH;
+			DEBL;
 		} else if (is_legal_desc_char(*p)) {
 			msg(6, "get_sess_info(): '%c' is a legal desc char",
 			       *p);
