@@ -121,7 +121,7 @@ struct Entry {
 	char *cwd;
 	char *user;
 	char *tty;
-	struct Sess *sess[MAX_SESS];
+	struct Sess sess[MAX_SESS];
 };
 struct Options {
 	char *comment;

@@ -46,7 +46,7 @@ void init_xml_entry(struct Entry *e)
 	for (i = 0; i < MAX_TAGS; i++)
 		e->tag[i] = NULL;
 	for (i = 0; i < MAX_SESS; i++)
-		e->sess[i] = NULL;
+		e->sess[i].uuid = e->sess[i].desc = NULL;
 }
 
 /*

@@ -128,9 +128,9 @@ int get_sess_info(struct Entry *entry)
 
 			if (fill_sess(&dest, adesc, auuid) == EXIT_OK) {
 				DEBL;
-				entry->sess[sessind]->uuid = auuid;
+				entry->sess[sessind].uuid = auuid;
 				DEBL;
-				entry->sess[sessind]->desc = adesc;
+				entry->sess[sessind].desc = adesc;
 				DEBL;
 			}
 			DEBL;
