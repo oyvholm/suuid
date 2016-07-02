@@ -78,7 +78,6 @@ int get_sess_info(struct Entry *entry)
 	var = getenv(ENV_SESS);
 	if (!var)
 		return EXIT_OK;
-	msg(2, "get_sess_info(): var = \"%s\"", var);
 
 	s = strdup(var);
 	if (!s) {
@@ -93,13 +92,10 @@ int get_sess_info(struct Entry *entry)
 	desc_found = desc_end = NULL;
 	p = s;
 	while (*p) {
-		msg(6, "Loop: p = \"%s\"", p);
 		if (valid_uuid(p, FALSE)) {
 			struct Sess dest;
 			char *auuid = NULL, *adesc = NULL;
 
-			msg(2, "get_sess_info(): Found valid UUID, p = \"%s\"",
-			       p);
 			dest.uuid = dest.desc = NULL;
 			auuid = strndup(p, UUID_LENGTH);
 			if (!auuid) {
@@ -107,17 +103,12 @@ int get_sess_info(struct Entry *entry)
 					"duplicate UUID");
 				return EXIT_ERROR;
 			}
-			msg(2, "get_sess_info(): auuid = \"%s\"", auuid);
 
-			msg(2, "Found valid UUID, and desc_found = \"%s\"",
-			        desc_found);
 			if (desc_found && !desc_end)
 				desc_end = p; /* There was no slash between 
 				               * desc and uuid, so desc_end 
 				               * hasn't been set.
 				               */
-			msg(2, "desc_found = \"%s\", desc_end = \"%s\"",
-			       desc_found, desc_end);
 			if (desc_end > desc_found) {
 				adesc = strndup(desc_found,
 				                desc_end - desc_found);
@@ -126,46 +117,26 @@ int get_sess_info(struct Entry *entry)
 					        "duplicate desc");
 					return EXIT_ERROR;
 				}
-				msg(2, "get_sess_info(): adesc = \"%s\"",
-				       adesc);
 			}
 
 			if (fill_sess(&dest, adesc, auuid) == EXIT_ERROR) {
 				myerror("get_sess_info(): fill_sess() failed");
 				return EXIT_ERROR;
 			}
-			msg(2, "%sget_sess_info(): dest.uuid after "
-			        "fill_sess(): \"%s\"%s",
-			        T_GREEN, dest.uuid, T_RESET);
-			msg(2, "%sget_sess_info(): dest.desc after "
-			        "fill_sess(): \"%s\"%s",
-			        T_GREEN, dest.desc, T_RESET);
 
 			entry->sess[sessind].uuid = dest.uuid;
 			entry->sess[sessind].desc = dest.desc;
 			p += UUID_LENGTH - 1;
-			msg(2, "p after increasing with "
-			       "UUID_LENGTH - 1 = \"%s\"", p);
 			desc_found = desc_end = NULL;
 			sessind++;
 		} else if (is_legal_desc_char(*p)) {
-			if (!desc_found && p >= s) {
+			if (!desc_found && p >= s)
 				desc_found = p;
-				msg(2, "get_sess_info(): Set desc_found to p, "
-				       "\"%s\"", desc_found);
-			}
 		} else if (*p == '/') {
-			if (desc_found) {
+			if (desc_found)
 				desc_end = p;
-				msg(2, "get_sess_info(): Found slash, "
-				       "desc_end is set to \"%s\"", desc_end);
-			} else
-				msg(2, "Found slash, but desc_found is not "
-				       "defined, doing nothing");
-		} else {
-			msg(2, "Found invalid desc char, reset");
+		} else
 			desc_found = desc_end = NULL;
-		}
 		p++;
 	}
 
