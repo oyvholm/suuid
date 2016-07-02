@@ -160,6 +160,7 @@ extern char *allocate_entry(char *, char *);
 extern char *suuid_xml(char *);
 extern char *alloc_attr(char *, char *);
 extern char *get_xml_tags(void);
+extern char *create_sess_xml(struct Entry *);
 extern char *xml_entry(struct Entry *);
 extern char *get_logdir();
 extern int add_to_logfile(char *, struct Entry *);
