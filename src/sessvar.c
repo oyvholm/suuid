@@ -45,10 +45,10 @@ bool is_valid_desc_string(char *s)
 
 int fill_sess(struct Sess *dest, char *desc, char *uuid)
 {
-	msg(2, "Entering fill_sess({uuid:\"%s\", uuid:\"%s\"}, "
-	       "\"%s\", \"%s\")",
-	       dest->uuid, dest->desc,
-	       desc, uuid);
+	msg(2, "%sEntering fill_sess({uuid:\"%s\", desc:\"%s\"}, "
+	       "\"%s\", \"%s\")%s",
+	       T_RED, dest->uuid, dest->desc,
+	       desc, uuid, T_RESET);
 	DEBL;
 	if (desc && strlen(desc) && is_valid_desc_string(desc)) {
 		DEBL;
@@ -61,10 +61,11 @@ int fill_sess(struct Sess *dest, char *desc, char *uuid)
 	}
 	DEBL;
 
-	if (uuid && valid_uuid(uuid, FALSE))
-		dest->uuid = desc;
+	if (uuid && valid_uuid(uuid, TRUE))
+		dest->uuid = uuid;
 	else
-		return EXIT_ERROR;
+		msg(2, "fill_sess() received invalid UUID \"%s\", "
+		       "should not happen", uuid);
 	DEBL;
 
 	return EXIT_OK;
@@ -99,6 +100,7 @@ int get_sess_info(struct Entry *entry)
 	desc_found = desc_end = NULL;
 	p = s;
 	while (*p) {
+		msg(6, "Loop: p = \"%s\"", p);
 		if (valid_uuid(p, FALSE)) {
 			struct Sess dest;
 			char *auuid = NULL, *adesc = NULL;
@@ -113,10 +115,14 @@ int get_sess_info(struct Entry *entry)
 			}
 			msg(2, "get_sess_info(): auuid = \"%s\"", auuid);
 
+			DEBL;
+			msg(2, "desc_found = %p, desc_end = %p",
+			       desc_found, desc_end);
 			if (desc_end > desc_found) {
 				DEBL;
 				adesc = strndup(desc_found,
 				                desc_end - desc_found);
+				DEBL;
 				if (!adesc) {
 					myerror("get_sess_info(): Could not "
 					        "duplicate desc");
@@ -126,25 +132,45 @@ int get_sess_info(struct Entry *entry)
 				       adesc);
 			}
 
-			if (fill_sess(&dest, adesc, auuid) == EXIT_OK) {
+			if (fill_sess(&dest, adesc, auuid) == EXIT_ERROR) {
+				myerror("get_sess_info(): fill_sess() failed");
 				DEBL;
-				entry->sess[sessind].uuid = auuid;
-				DEBL;
-				entry->sess[sessind].desc = adesc;
-				DEBL;
+				return EXIT_ERROR;
 			}
+			msg(2, "%sget_sess_info(): dest.uuid after "
+			        "fill_sess(): \"%s\"%s",
+			        T_GREEN, dest.uuid, T_RESET);
+			msg(2, "%sget_sess_info(): dest.desc after "
+			        "fill_sess(): \"%s\"%s",
+			        T_GREEN, dest.desc, T_RESET);
+
+			entry->sess[sessind].uuid = dest.uuid;
 			DEBL;
-			p += UUID_LENGTH;
+			entry->sess[sessind].desc = dest.desc;
+			DEBL;
+			p += UUID_LENGTH - 1;
+			msg(2, "p after increasing with "
+			       "UUID_LENGTH - 1 = \"%s\"", p);
+			desc_found = desc_end = NULL;
+			sessind++;
 			DEBL;
 		} else if (is_legal_desc_char(*p)) {
-			msg(6, "get_sess_info(): '%c' is a legal desc char",
-			       *p);
-			if (!desc_found && p > s)
-				desc_found = p - 1;
+			if (!desc_found && p >= s) {
+				desc_found = p;
+				msg(2, "get_sess_info(): Set desc_found to p, "
+				       "\"%s\"", desc_found);
+			}
 		} else if (*p == '/') {
-			msg(2, "get_sess_info(): Found slash");
-			desc_end = p;
-			p++;
+			if (desc_found) {
+				desc_end = p;
+				msg(2, "get_sess_info(): Found slash, "
+				       "desc_end is set to \"%s\"", desc_end);
+			} else
+				msg(2, "Found slash, but desc_found is not "
+				       "defined, doing nothing");
+		} else {
+			msg(2, "Found invalid desc char, reset");
+			desc_found = desc_end = NULL;
 		}
 		p++;
 	}
