@@ -73,13 +73,12 @@ int fill_sess(struct Sess *dest, char *desc, char *uuid)
 
 int get_sess_info(struct Entry *entry)
 {
-	char *var, *s, *p, *desc_found, *desc_end;
+	char *s, *p, *desc_found, *desc_end;
 
-	var = getenv(ENV_SESS);
-	if (!var)
+	if (!getenv(ENV_SESS))
 		return EXIT_OK;
 
-	s = strdup(var);
+	s = strdup(getenv(ENV_SESS));
 	if (!s) {
 		myerror("get_sess_info(): Could not duplicate %s environment "
 		        "variable", ENV_SESS);
