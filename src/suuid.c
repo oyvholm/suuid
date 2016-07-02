@@ -491,7 +491,6 @@ int main(int argc, char *argv[])
 	if (fill_entry_struct(&entry, &opt, &rc) == EXIT_ERROR)
 		return EXIT_ERROR;
 	msg(4, "Back in main() after fill_entry_struct()");
-	DEBL;
 	if (opt.verbose >= 2) {
 		unsigned int i = 0;
 		char *u, *d;

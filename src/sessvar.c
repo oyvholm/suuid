@@ -49,24 +49,19 @@ int fill_sess(struct Sess *dest, char *desc, char *uuid)
 	       "\"%s\", \"%s\")%s",
 	       T_RED, dest->uuid, dest->desc,
 	       desc, uuid, T_RESET);
-	DEBL;
 	if (desc && strlen(desc) && is_valid_desc_string(desc)) {
-		DEBL;
 		dest->desc = strdup(desc);
 		if (!dest->desc) {
 			myerror("fill_sess(): Could not duplicate desc");
 			return EXIT_ERROR;
 		}
-		DEBL;
 	}
-	DEBL;
 
 	if (uuid && valid_uuid(uuid, TRUE))
 		dest->uuid = uuid;
 	else
 		msg(2, "fill_sess() received invalid UUID \"%s\", "
 		       "should not happen", uuid);
-	DEBL;
 
 	return EXIT_OK;
 }
@@ -83,7 +78,6 @@ int get_sess_info(struct Entry *entry)
 	var = getenv(ENV_SESS);
 	if (!var)
 		return EXIT_OK;
-	DEBL;
 	msg(2, "get_sess_info(): var = \"%s\"", var);
 
 	s = strdup(var);
@@ -96,7 +90,6 @@ int get_sess_info(struct Entry *entry)
 	if (!scan_for_uuid(s))
 		return EXIT_OK;
 
-	DEBL;
 	desc_found = desc_end = NULL;
 	p = s;
 	while (*p) {
@@ -116,7 +109,6 @@ int get_sess_info(struct Entry *entry)
 			}
 			msg(2, "get_sess_info(): auuid = \"%s\"", auuid);
 
-			DEBL;
 			msg(2, "Found valid UUID, and desc_found = \"%s\"",
 			        desc_found);
 			if (desc_found && !desc_end)
@@ -127,10 +119,8 @@ int get_sess_info(struct Entry *entry)
 			msg(2, "desc_found = \"%s\", desc_end = \"%s\"",
 			       desc_found, desc_end);
 			if (desc_end > desc_found) {
-				DEBL;
 				adesc = strndup(desc_found,
 				                desc_end - desc_found);
-				DEBL;
 				if (!adesc) {
 					myerror("get_sess_info(): Could not "
 					        "duplicate desc");
@@ -142,7 +132,6 @@ int get_sess_info(struct Entry *entry)
 
 			if (fill_sess(&dest, adesc, auuid) == EXIT_ERROR) {
 				myerror("get_sess_info(): fill_sess() failed");
-				DEBL;
 				return EXIT_ERROR;
 			}
 			msg(2, "%sget_sess_info(): dest.uuid after "
@@ -153,15 +142,12 @@ int get_sess_info(struct Entry *entry)
 			        T_GREEN, dest.desc, T_RESET);
 
 			entry->sess[sessind].uuid = dest.uuid;
-			DEBL;
 			entry->sess[sessind].desc = dest.desc;
-			DEBL;
 			p += UUID_LENGTH - 1;
 			msg(2, "p after increasing with "
 			       "UUID_LENGTH - 1 = \"%s\"", p);
 			desc_found = desc_end = NULL;
 			sessind++;
-			DEBL;
 		} else if (is_legal_desc_char(*p)) {
 			if (!desc_found && p >= s) {
 				desc_found = p;
