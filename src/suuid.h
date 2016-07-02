@@ -34,6 +34,10 @@
 #define EXIT_OK     0
 #define EXIT_ERROR  1
 
+#define T_RESET  "\x1b[m\x0f"
+#define T_RED    "\x1b[31m"
+#define T_GREEN  "\x1b[32m"
+
 #define UUID_LENGTH  36 /* Length of a standard UUID */
 
 #define FAKE_HOST  1 /* Use "fake" as hostname to avoid conflicts with files 
@@ -96,6 +100,7 @@
  * Macros
  */
 
+#define DEBL  msg(2, "%s, line %u in %s()", __FILE__, __LINE__, __FUNCTION__)
 #define in_range(a,b,c)  ((a) >= (b) && (a) <= (c) ? TRUE : FALSE)
 
 /*
@@ -120,7 +125,7 @@ struct Entry {
 	char *cwd;
 	char *user;
 	char *tty;
-	struct Sess *sess[MAX_SESS];
+	struct Sess sess[MAX_SESS];
 };
 struct Options {
 	char *comment;
@@ -166,6 +171,9 @@ extern bool valid_xml_chars(char *);
 extern int read_rcfile(char *, struct Rc *);
 
 /* sessvar.c */
+extern bool is_legal_desc_char(unsigned char);
+extern bool is_valid_desc_string(char *);
+extern int fill_sess(struct Sess *, char *, char *);
 extern int get_sess_info(struct Entry *);
 
 /* string.c */
