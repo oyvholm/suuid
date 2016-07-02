@@ -45,10 +45,19 @@ bool is_valid_desc_string(char *s)
 
 int fill_sess(struct Sess *dest, char *desc, char *uuid)
 {
+	char *auuid = NULL;
+
 	msg(2, "%sEntering fill_sess({uuid:\"%s\", desc:\"%s\"}, "
 	       "\"%s\", \"%s\")%s",
 	       T_RED, dest->uuid, dest->desc,
 	       desc, uuid, T_RESET);
+
+	auuid = strndup(uuid, UUID_LENGTH);
+	if (!auuid) {
+		myerror("fill_sess(): Could not duplicate UUID");
+		return EXIT_ERROR;
+	}
+
 	if (desc && strlen(desc) && is_valid_desc_string(desc)) {
 		dest->desc = strdup(desc);
 		if (!dest->desc) {
@@ -57,11 +66,11 @@ int fill_sess(struct Sess *dest, char *desc, char *uuid)
 		}
 	}
 
-	if (uuid && valid_uuid(uuid, TRUE))
-		dest->uuid = uuid;
+	if (valid_uuid(auuid, TRUE))
+		dest->uuid = auuid;
 	else
 		msg(2, "fill_sess() received invalid UUID \"%s\", "
-		       "should not happen", uuid);
+		       "should not happen", auuid);
 
 	return EXIT_OK;
 }
@@ -93,16 +102,9 @@ int get_sess_info(struct Entry *entry)
 	while (*p) {
 		if (valid_uuid(p, FALSE)) {
 			struct Sess dest;
-			char *auuid = NULL, *adesc = NULL;
+			char *adesc = NULL;
 
 			dest.uuid = dest.desc = NULL;
-			auuid = strndup(p, UUID_LENGTH);
-			if (!auuid) {
-				myerror("get_sess_info(): Could not "
-				        "duplicate UUID");
-				return EXIT_ERROR;
-			}
-
 			if (desc_found && !desc_end)
 				desc_end = p; /* There was no slash between 
 				               * desc and uuid, so desc_end 
@@ -118,7 +120,7 @@ int get_sess_info(struct Entry *entry)
 				}
 			}
 
-			if (fill_sess(&dest, adesc, auuid) == EXIT_ERROR) {
+			if (fill_sess(&dest, adesc, p) == EXIT_ERROR) {
 				myerror("get_sess_info(): fill_sess() failed");
 				return EXIT_ERROR;
 			}
