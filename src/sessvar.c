@@ -43,14 +43,14 @@ bool is_valid_desc_string(char *s)
 	return TRUE;
 }
 
-int fill_sess(struct Sess *dest, char *desc, char *uuid)
+int fill_sess(struct Sess *dest, char *uuid, char *desc)
 {
 	char *auuid = NULL;
 
 	msg(2, "%sEntering fill_sess({uuid:\"%s\", desc:\"%s\"}, "
 	       "\"%s\", \"%s\")%s",
 	       T_RED, dest->uuid, dest->desc,
-	       desc, uuid, T_RESET);
+	       uuid, desc, T_RESET);
 
 	auuid = strndup(uuid, UUID_LENGTH);
 	if (!auuid) {
@@ -120,7 +120,7 @@ int get_sess_info(struct Entry *entry)
 				}
 			}
 
-			if (fill_sess(&dest, adesc, p) == EXIT_ERROR) {
+			if (fill_sess(&dest, p, adesc) == EXIT_ERROR) {
 				myerror("get_sess_info(): fill_sess() failed");
 				return EXIT_ERROR;
 			}
