@@ -107,6 +107,7 @@ int get_sess_info(struct Entry *entry)
 
 			msg(2, "get_sess_info(): Found valid UUID, p = \"%s\"",
 			       p);
+			dest.uuid = dest.desc = NULL;
 			auuid = strndup(p, UUID_LENGTH);
 			if (!auuid) {
 				myerror("get_sess_info(): Could not "
@@ -116,7 +117,14 @@ int get_sess_info(struct Entry *entry)
 			msg(2, "get_sess_info(): auuid = \"%s\"", auuid);
 
 			DEBL;
-			msg(2, "desc_found = %p, desc_end = %p",
+			msg(2, "Found valid UUID, and desc_found = \"%s\"",
+			        desc_found);
+			if (desc_found && !desc_end)
+				desc_end = p; /* There was no slash between 
+				               * desc and uuid, so desc_end 
+				               * hasn't been set.
+				               */
+			msg(2, "desc_found = \"%s\", desc_end = \"%s\"",
 			       desc_found, desc_end);
 			if (desc_end > desc_found) {
 				DEBL;

@@ -504,7 +504,7 @@ int main(int argc, char *argv[])
 			msg(2, "%sentry.sess[%u].desc = \"%s\"%s",
 			       T_RED, i, d, T_RESET);
 			i++;
-		} while (u && d);
+		} while (u);
 	}
 
 	logfile = set_up_logfile(&opt, entry.host);
