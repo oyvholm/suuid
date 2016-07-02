@@ -100,7 +100,7 @@ int get_sess_info(struct Entry *entry)
 			auuid = strndup(p, UUID_LENGTH);
 			if (!auuid) {
 				myerror("get_sess_info(): Could not "
-					"duplicate UUID");
+				        "duplicate UUID");
 				return EXIT_ERROR;
 			}
 
