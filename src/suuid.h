@@ -193,7 +193,7 @@ extern void print_version(void);
 extern void usage(int);
 extern int choose_opt_action(struct Options *, int, struct option *);
 extern int parse_options(struct Options *, int, char *[]);
-extern int fill_entry_struct(struct Entry *, struct Options *, struct Rc *);
+extern int fill_entry_struct(struct Entry *, struct Options *);
 extern char *process_uuid(FILE *, struct Entry *);
 
 /* tag.c */
