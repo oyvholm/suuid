@@ -63,19 +63,22 @@ char *allocate_entry(char *elem, char *src)
 
 	msg(5, "Entering allocate_entry(\"%s\", \"%s\")", elem, src);
 
-	if (elem && src) {
-		size += strlen("<") + strlen(elem) + strlen(">") +
-		        strlen(src) * MAX_GROWTH +
-		        strlen("<") + strlen(elem) + strlen("/> ") + 1;
-		msg(5, "allocate_entry(): size = %lu", size);
-		retval = malloc(size + 1);
-		if (!retval)
-			myerror("allocate_entry(): Cannot allocate memory");
-		else
-			snprintf(retval, size, "<%s>%s</%s> ",
-			                       elem, suuid_xml(src), elem);
-	} else
-		retval = NULL;
+	if (!elem || !src)
+		return NULL;
+
+	size += strlen("<") + strlen(elem) + strlen(">") +
+		strlen(src) * MAX_GROWTH +
+		strlen("<") + strlen(elem) + strlen("/> ") + 1;
+	msg(5, "allocate_entry(): size = %lu", size);
+
+	retval = malloc(size + 1);
+	if (!retval) {
+		myerror("allocate_entry(): Cannot allocate %lu bytes",
+		        size + 1);
+		return NULL;
+	}
+
+	snprintf(retval, size, "<%s>%s</%s> ", elem, suuid_xml(src), elem);
 
 	msg(5, "allocate_entry() returns '%s'", retval);
 	return retval;
@@ -156,10 +159,12 @@ char *alloc_attr(char *attr, char *data)
 	msg(4, "data size = %lu", size);
 
 	retval = malloc(size + 1);
-	if (!retval)
-		myerror("alloc_attr(): Cannot allocate memory");
-	else
-		snprintf(retval, size, " %s=\"%s\"", attr, data);
+	if (!retval) {
+		myerror("alloc_attr(): Cannot allocate %lu bytes", size + 1);
+		return NULL;
+	}
+
+	snprintf(retval, size, " %s=\"%s\"", attr, data);
 
 	msg(4, "alloc_attr() returns \"%s\"", retval);
 	return retval;
@@ -271,8 +276,9 @@ char *xml_entry(struct Entry *entry)
 	if (!entry->uuid) {
 		msg(4, "xml_entry(): uuid is NULL");
 		return NULL;
-	} else
-		e.uuid = alloc_attr("u", entry->uuid);
+	}
+
+	e.uuid = alloc_attr("u", entry->uuid);
 
 	if (entry->date)
 		e.date = alloc_attr("t", entry->date);
@@ -510,23 +516,20 @@ char *create_logfile(char *name)
 {
 	char *xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 	char *xml_doctype = "<!DOCTYPE suuids SYSTEM \"dtd/suuids.dtd\">";
+	FILE *fp;
 
 	msg(4, "Entering create_logfile(\"%s\")", name);
 
 	if (access(name, F_OK) != -1)
 		return name; /* File already exists */
-	else {
-		FILE *fp;
 
-		fp = fopen(name, "a");
-		if (!fp) {
-			myerror("%s: Could not create log file", name);
-			return NULL;
-		}
-		fprintf(fp, "%s\n%s\n<suuids>\n</suuids>\n",
-		            xml_header, xml_doctype);
-		fclose(fp);
+	fp = fopen(name, "a");
+	if (!fp) {
+		myerror("%s: Could not create log file", name);
+		return NULL;
 	}
+	fprintf(fp, "%s\n%s\n<suuids>\n</suuids>\n", xml_header, xml_doctype);
+	fclose(fp);
 
 	return name;
 }

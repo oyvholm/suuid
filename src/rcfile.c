@@ -104,13 +104,12 @@ int read_rcfile(char *rcfile, struct Rc *rc)
 			msg(3, "read_rcfile(): if part 1: buf = \"%s\"", buf);
 			myerror("%s: Could not read from rcfile", rcfile);
 			return EXIT_ERROR;
-		} else {
-			msg(3, "read_rcfile(): if part 2: buf = \"%s\"", buf);
-			trim_str_front(buf);
-			trim_str_end(buf);
-			parse_rc_line(buf, rc);
-			*buf = '\0';
 		}
+		msg(3, "read_rcfile(): if part 2: buf = \"%s\"", buf);
+		trim_str_front(buf);
+		trim_str_end(buf);
+		parse_rc_line(buf, rc);
+		*buf = '\0';
 	} while (!feof(fp));
 
 	return EXIT_OK;
