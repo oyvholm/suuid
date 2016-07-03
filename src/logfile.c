@@ -61,15 +61,12 @@ char *allocate_entry(char *elem, char *src)
 	char *retval;
 	size_t size = 0;
 
-	msg(5, "Entering allocate_entry(\"%s\", \"%s\")", elem, src);
-
 	if (!elem || !src)
 		return NULL;
 
 	size += strlen("<") + strlen(elem) + strlen(">") +
 		strlen(src) * MAX_GROWTH +
 		strlen("<") + strlen(elem) + strlen("/> ") + 1;
-	msg(5, "allocate_entry(): size = %lu", size);
 
 	retval = malloc(size + 1);
 	if (!retval) {
@@ -80,7 +77,6 @@ char *allocate_entry(char *elem, char *src)
 
 	snprintf(retval, size, "<%s>%s</%s> ", elem, suuid_xml(src), elem);
 
-	msg(5, "allocate_entry() returns '%s'", retval);
 	return retval;
 }
 
@@ -152,11 +148,8 @@ char *alloc_attr(char *attr, char *data)
 	char *retval = NULL;
 	int size;
 
-	msg(4, "Entering alloc_attr(\"%s\", \"%s\")", attr, data);
-
 	size = strlen(" ") + strlen(attr) + strlen("=\"") + strlen(data) +
 	       strlen("\"") + 1;
-	msg(4, "data size = %lu", size);
 
 	retval = malloc(size + 1);
 	if (!retval) {
@@ -166,7 +159,6 @@ char *alloc_attr(char *attr, char *data)
 
 	snprintf(retval, size, " %s=\"%s\"", attr, data);
 
-	msg(4, "alloc_attr() returns \"%s\"", retval);
 	return retval;
 }
 
@@ -185,7 +177,6 @@ char *get_xml_tags(void)
 
 	if (done)
 		return buf;
-	msg(3, "Entering get_xml_tags()");
 	buf[0] = '\0';
 	rewind_tag();
 	do {
@@ -200,12 +191,10 @@ char *get_xml_tags(void)
 				return NULL;
 			}
 
-			msg(3, "get_xml_tags(): ap = \"%s\"", ap);
 			snprintf(tmpbuf, GXT_BUFSIZE, "<tag>%s</tag> ", ap);
 			free(ap);
 			strncat(buf, tmpbuf, GXT_BUFSIZE - strlen(buf));
-		} else
-			msg(3, "get_xml_tags(): p is NULL");
+		}
 	} while (p);
 	done = TRUE;
 
@@ -229,7 +218,6 @@ char *create_sess_xml(struct Entry *entry)
 	while (entry->sess[i].uuid) {
 		char *u, *d;
 
-		msg(3, "create_sess_xml(): i = %u", i);
 		u = entry->sess[i].uuid;
 		d = entry->sess[i].desc;
 		if (d)
@@ -238,12 +226,10 @@ char *create_sess_xml(struct Entry *entry)
 		else
 			snprintf(tmpbuf, CSX_TMPBUFSIZE, "<sess>%s</sess> ",
 			                                 u);
-		msg(3, "buf before strncat(): \"%s\"", buf);
 		strncat(buf, tmpbuf, CSX_BUFSIZE - strlen(buf));
 		i++;
 	}
 
-	msg(3, "create_sess_xml() returns \"%s\"", buf);
 	return buf;
 #undef CSX_TMPBUFSIZE /* fixme */
 #undef CSX_BUFSIZE /* fixme */
@@ -262,21 +248,10 @@ char *xml_entry(struct Entry *entry)
 	char *retval;
 	char *tag_xml, *sess_xml;
 
-	msg(4, "Entering xml_entry()");
-
 	init_xml_entry(&e);
-	msg(4, "xml_entry(): After init_xml_entry()");
-	msg(4, "xml_entry(): entry->date = '%s'", entry->date);
-	msg(4, "xml_entry(): entry->uuid = '%s'", entry->uuid);
-	msg(5, "xml_entry(): entry->txt  = '%s'", entry->txt);
-	msg(4, "xml_entry(): entry->host = '%s'", entry->host);
-	msg(4, "xml_entry(): entry->cwd  = '%s'", entry->cwd);
-	msg(4, "xml_entry(): entry->user = '%s'", entry->user);
 
-	if (!entry->uuid) {
-		msg(4, "xml_entry(): uuid is NULL");
+	if (!entry->uuid)
 		return NULL;
-	}
 
 	e.uuid = alloc_attr("u", entry->uuid);
 
@@ -339,29 +314,8 @@ char *xml_entry(struct Entry *entry)
 	         (e.tty) ? e.tty : "",
 	         sess_xml
 	         );
-	msg(4, "xml_entry(): After snprintf()");
-#if 0
-	static char fake[] = "<suuid t=\"2016-06-07T04:18:40.9460630Z\" "
-	                     "u=\"ea3beb96-2c66-11e6-aa54-02010e0a6634\"> "
-	                     "<tag>ti</tag> "
-	                     "<txt>Jepp</txt> "
-	                     "<host>bellmann</host> "
-	                     "<cwd>/home/sunny/uuids</cwd> "
-	                     "<user>sunny</user> <tty>/dev/pts/7</tty> "
-	                     "<sess desc=\"xterm\">"
-	                     "8a390a22-2c2e-11e6-8ffb-02010e0a6634"
-	                     "</sess> "
-	                     "<sess desc=\"logging\">"
-	                     "9ad18242-2c2e-11e6-b1f8-02010e0a6634"
-	                     "</sess> "
-	                     "<sess desc=\"screen\">"
-	                     "9c4257a0-2c2e-11e6-b724-02010e0a6634"
-	                     "</sess> "
-	                     "</suuid>";
-#endif
 	retval = buf;
 
-	msg(4, "xml_entry() returns '%s'", retval);
 	return retval;
 }
 
@@ -393,7 +347,6 @@ char *get_logdir()
 		snprintf(retval, size, "%s/uuids",
 		                       getenv("HOME"));
 	} else {
-		msg(4, "get_logdir(): HOME not found");
 		fprintf(stderr, "%s: $%s and $HOME environment "
 		                "variables are not defined, cannot "
 		                "create logdir path",
@@ -401,7 +354,6 @@ char *get_logdir()
 		return NULL;
 	}
 
-	msg(4, "get_logdir() returns \"%s\"", retval);
 	return retval;
 }
 
@@ -434,26 +386,19 @@ FILE *open_logfile(char *fname)
 		return NULL;
 	}
 	filepos = ftell(fp);
-	msg(4, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
 	if (filepos == -1) {
 		myerror("%s: Cannot read file position", fname);
 		return NULL;
 	}
-	msg(4, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
-	if (strcmp(fgets(check_line, 10, fp), "</suuids>")) {
-		msg(4, "open_logfile(): check_line = '%s'", check_line);
+	if (strcmp(fgets(check_line, 10, fp), "</suuids>"))
 		fprintf(stderr, "%s: %s: Unknown end line, adding to "
 		                "end of file\n", progname, fname);
-	} else {
-		msg(4, "open_logfile(): Seems as check_line is ok, "
-		       "it is '%s'", check_line);
+	else
 		if (fseek(fp, filepos, SEEK_SET) == -1) {
 			myerror("%s: Cannot seek to position %lu",
 			        fname, filepos);
 			return NULL;
 		}
-	}
-	msg(4, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
 
 	return fp;
 }
@@ -490,19 +435,16 @@ int close_logfile(FILE *fp)
 	int retval = EXIT_OK;
 	int i;
 
-	msg(4, "Before end tag is written");
 	if (fprintf(fp, "</suuids>\n") != 10)
 		retval = EXIT_ERROR;
 	if (fclose(fp) == EOF)
 		retval = EXIT_ERROR;
-	msg(4, "close_logfile(): fp is closed");
 	if (opt.verbose >= 3) {
 		i = system("(echo; cat /home/sunny/uuids/fake.xml; "
 		           "echo) >&2");
 		i = i; /* Get rid of gcc warning */
 	}
 
-	msg(4, "close_logfile() returns %d", retval);
 	return retval;
 }
 
@@ -517,8 +459,6 @@ char *create_logfile(char *name)
 	char *xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 	char *xml_doctype = "<!DOCTYPE suuids SYSTEM \"dtd/suuids.dtd\">";
 	FILE *fp;
-
-	msg(4, "Entering create_logfile(\"%s\")", name);
 
 	if (access(name, F_OK) != -1)
 		return name; /* File already exists */
@@ -546,7 +486,6 @@ char *set_up_logfile(struct Options *opt, char *hostname)
 	size_t fname_length; /* Total length of logfile name */
 
 	logdir = get_logdir(&opt);
-	msg(4, "logdir = '%s'", logdir);
 	if (!logdir) {
 		fprintf(stderr, "%s: Unable to find logdir location\n",
 		                progname);
@@ -563,7 +502,6 @@ char *set_up_logfile(struct Options *opt, char *hostname)
 	}
 	/* fixme: Remove slash hardcoding */
 	snprintf(logfile, fname_length, "%s/%s.xml", logdir, hostname);
-	msg(4, "logfile = \"%s\"", logfile);
 	if (!create_logfile(logfile)) {
 		myerror("%s: Error when creating log file", logfile);
 		return NULL;

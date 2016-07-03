@@ -30,12 +30,8 @@ char *generate_uuid(void)
 	char *cmd = "/usr/bin/uuid";
 	FILE *fp;
 
-	msg(3, "generate_uuid(): rc.uuidcmd = \"%s\"", rc.uuidcmd);
-	if (rc.uuidcmd) {
+	if (rc.uuidcmd)
 		cmd = rc.uuidcmd;
-		msg(3, "generate_uuid(): Setting cmd to \"%s\"", cmd);
-	}
-	msg(4, "generate_uuid(): cmd = \"%s\"", cmd);
 
 	/* fixme: Generate it properly */
 	/* fixme: Make -m/--random-mac actually do something */
@@ -66,7 +62,6 @@ char *uuid_date(char *dest, char *uuid)
 	/* fixme: unfinished */
 	char hexbuf[16];
 
-	msg(2, "Entering uuid_date(\"%s\")", uuid);
 	if (!valid_uuid(uuid, FALSE))
 		return NULL;
 	if (uuid[14] != '1')
@@ -76,7 +71,6 @@ char *uuid_date(char *dest, char *uuid)
 	strncat(hexbuf, uuid + 15, 3);
 	strncat(hexbuf, uuid + 9, 4);
 	strncat(hexbuf, uuid, 8);
-	msg(2, "uuid_date(): hexbuf = \"%s\"", hexbuf);
 
 	if (1)
 		strncpy(dest, "2000-01-01T00:00:00.0000000Z", DATE_LENGTH + 1);
@@ -111,7 +105,6 @@ char *scan_for_uuid(char *s)
 	char *p = s;
 
 	while (strlen(p) >= UUID_LENGTH) {
-		msg(3, "scan_for_uuid(): p = \"%s\"", p);
 		if (valid_uuid(p, FALSE))
 			return p;
 		p++;

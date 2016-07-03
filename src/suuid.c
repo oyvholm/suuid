@@ -502,26 +502,10 @@ int main(int argc, char *argv[])
 		retval = EXIT_ERROR;
 		goto cleanup;
 	}
-	msg(4, "Back in main() after read_rcfile()");
 
 	if (fill_entry_struct(&entry, &opt) == EXIT_ERROR) {
 		retval = EXIT_ERROR;
 		goto cleanup;
-	}
-	msg(4, "Back in main() after fill_entry_struct()");
-	if (opt.verbose >= 3) {
-		unsigned int i = 0;
-		char *u, *d;
-
-		do {
-			u = entry.sess[i].uuid;
-			d = entry.sess[i].desc;
-			msg(3, "%sentry.sess[%u].uuid = \"%s\"%s",
-			       T_RED, i, u, T_RESET);
-			msg(3, "%sentry.sess[%u].desc = \"%s\"%s",
-			       T_RED, i, d, T_RESET);
-			i++;
-		} while (u);
 	}
 
 	logfile = set_up_logfile(&opt, entry.host);
@@ -530,7 +514,6 @@ int main(int argc, char *argv[])
 		retval = EXIT_ERROR;
 		goto cleanup;
 	}
-	msg(4, "After set_up_logfile()");
 
 	logfp = open_logfile(logfile);
 	if (!logfp) {

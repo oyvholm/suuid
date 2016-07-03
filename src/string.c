@@ -29,11 +29,8 @@ char *trim_str_front(char *dest)
 	char *p = dest;
 	size_t size = strlen(dest);
 
-	msg(5, "Entering trim_str_front(\"%s\")", dest);
-	while (p < dest + size && isspace(*p)) {
+	while (p < dest + size && isspace(*p))
 		p++;
-		msg(5, "trim_str_front(): p = \"%s\"", p);
-	}
 	if (p == dest)
 		return dest; /* Nothing needs to be done */
 	memmove(dest, p, strlen(p) + 1);
@@ -51,15 +48,11 @@ char *trim_str_end(char *dest)
 	char *p;
 	size_t size = strlen(dest);
 
-	msg(5, "Entering trim_str_end(\"%s\")", dest);
 	if (!size)
 		return dest;
 	p = dest + size - 1;
-	msg(5, "trim_str_end(): init p to \"%s\"", p);
-	while (p > dest && isspace(*p)) {
+	while (p > dest && isspace(*p))
 		*p-- = '\0';
-		msg(5, "trim_str_end(): p = \"%s\"", p);
-	}
 
 	return dest;
 }
@@ -90,7 +83,6 @@ char *utf8_check(char *text)
 {
 	unsigned char *s = (unsigned char *)text;
 
-	msg(4, "Entering utf8_check()");
 	while (*s) {
 		if (*s < 0x80)
 			/* 0xxxxxxx */

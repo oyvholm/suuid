@@ -39,11 +39,8 @@ char *has_key(char *line, char *keyword)
 		return NULL;
 	}
 	snprintf(search_str, size, "%s ", keyword);
-	msg(3, "has_key(): search_str = \"%s\"", search_str);
 
 	if (!strncmp(line, search_str, strlen(search_str))) {
-		msg(3, "has_key(): Found \"%s\"", keyword);
-
 		/* Move retval to the first character that is not a space 
 		 * (ASCII 32) after the first equal sign.
 		 */
@@ -53,7 +50,6 @@ char *has_key(char *line, char *keyword)
 	} else
 		retval = NULL;
 
-	msg(3, "has_key() returns \"%s\"", retval);
 	return retval;
 }
 
@@ -64,13 +60,10 @@ char *has_key(char *line, char *keyword)
 
 void parse_rc_line(char *line, struct Rc *rc)
 {
-	msg(3, "Entering parse_rc_line(\"%s\", ...)", line);
-	msg(3, "rc->uuidcmd before has_key(): \"%s\"", rc->uuidcmd);
 	if (has_key(line, "hostname"))
 		rc->hostname = has_key(line, "hostname");
 	if (has_key(line, "uuidcmd"))
 		rc->uuidcmd = has_key(line, "uuidcmd");
-	msg(3, "rc->uuidcmd after has_key(): \"%s\"", rc->uuidcmd);
 }
 
 /*
@@ -82,16 +75,11 @@ int read_rcfile(char *rcfile, struct Rc *rc)
 	FILE *fp;
 	char buf[BUFSIZ];
 
-	msg(3, "Entering read_rcfile(\"%s\", ...)", rcfile);
-	msg(3, "read_rcfile(): rc->uuidcmd = \"%s\"", rc->uuidcmd);
-
 	rc->hostname = NULL;
 	rc->uuidcmd = NULL;
 
-	if (!rcfile) {
-		msg(3, "rcfile is NULL, return EXIT_OK from read_rcfile()");
+	if (!rcfile)
 		return EXIT_OK;
-	}
 
 	fp = fopen(rcfile, "r");
 	if (!fp)
@@ -101,11 +89,9 @@ int read_rcfile(char *rcfile, struct Rc *rc)
 
 	do {
 		if (!fgets(buf, BUFSIZ, fp) && errno) {
-			msg(3, "read_rcfile(): if part 1: buf = \"%s\"", buf);
 			myerror("%s: Could not read from rcfile", rcfile);
 			return EXIT_ERROR;
 		}
-		msg(3, "read_rcfile(): if part 2: buf = \"%s\"", buf);
 		trim_str_front(buf);
 		trim_str_end(buf);
 		parse_rc_line(buf, rc);

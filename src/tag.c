@@ -32,12 +32,9 @@ bool tag_exists(char *tag)
 {
 	unsigned int i;
 
-	for (i = 0; i < tag_count; i++) {
-		msg(3, "tag_exists(): Checking \"%s\" vs \"%s\"",
-		       tag, entry.tag[i]);
+	for (i = 0; i < tag_count; i++)
 		if (!strcmp(tag, entry.tag[i]))
 			return TRUE;
-	}
 
 	return FALSE;
 }
@@ -67,11 +64,8 @@ char *store_tag(char *arg)
 	}
 	trim_str_front(tag);
 	trim_str_end(tag);
-	if (tag_exists(tag) || !strlen(tag)) {
-		msg(3, "store_tag(\"%s\"): tag already exists or is empty, "
-		       "return", tag);
+	if (tag_exists(tag) || !strlen(tag))
 		return tag;
-	}
 	if (utf8_check(tag)) {
 		fprintf(stderr, "%s: Tags have to be in UTF-8\n", progname);
 		return NULL;
