@@ -14,6 +14,7 @@ default:
 
 .PHONY: test
 test:
+	cd src && make test
 	cd tests && make
 
 .PHONY: test
