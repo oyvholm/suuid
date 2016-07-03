@@ -20,8 +20,6 @@
 
 #include "suuid.h"
 
-static unsigned int sessind;
-
 bool is_legal_desc_char(unsigned char c)
 {
 	return strchr(DESC_LEGAL, c) ? TRUE : FALSE;
@@ -47,6 +45,7 @@ int fill_sess(struct Entry *dest, char *uuid, char *desc, size_t desclen)
 {
 	char *auuid = NULL,
 	     *adesc = NULL;
+	static unsigned int sessind = 0;
 
 	msg(2, "%sEntering fill_sess(..., \"%s\", \"%s\", %lu)%s",
 	       T_RED, uuid, desc, desclen, T_RESET);
@@ -69,6 +68,7 @@ int fill_sess(struct Entry *dest, char *uuid, char *desc, size_t desclen)
 		else
 			dest->sess[sessind].desc = adesc;
 	}
+	sessind++;
 
 	return EXIT_OK;
 }
@@ -117,7 +117,6 @@ int get_sess_info(struct Entry *entry)
 
 			p += UUID_LENGTH - 1;
 			desc_found = desc_end = NULL;
-			sessind++;
 		} else if (is_legal_desc_char(*p)) {
 			if (!desc_found && p >= s)
 				desc_found = p;
