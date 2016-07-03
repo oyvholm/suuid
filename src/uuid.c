@@ -56,18 +56,32 @@ char *generate_uuid(void)
 }
 
 /*
- * uuid_date() - Return pointer to string with ISO date generated from UUID v1.
+ * uuid_date() - Receive an UUID v1 and write the UUID date to dest, 29 bytes 
+ * (ISO 8601 date plus terminating null byte). Return pointer to dest if ok, or 
+ * NULL if it's not a valid v1 UUID.
  */
 
-char *uuid_date(char *uuid)
+char *uuid_date(char *dest, char *uuid)
 {
-	/* fixme */
-	static char retval[32];
+	/* fixme: unfinished */
+	char hexbuf[16];
 
-	uuid = uuid; /* Disable gcc -Wextra warning */
-	strcpy(retval, "2000-01-01T00:00:00.0000000Z");
+	msg(2, "Entering uuid_date(\"%s\")", uuid);
+	if (!valid_uuid(uuid, FALSE))
+		return NULL;
+	if (uuid[14] != '1')
+		return NULL; /* Not a v1 UUID, has no timestamp */
 
-	return retval;
+	memset(hexbuf, 0, 16);
+	strncat(hexbuf, uuid + 15, 3);
+	strncat(hexbuf, uuid + 9, 4);
+	strncat(hexbuf, uuid, 8);
+	msg(2, "uuid_date(): hexbuf = \"%s\"", hexbuf);
+
+	if (1)
+		strncpy(dest, "2000-01-01T00:00:00.0000000Z", DATE_LENGTH + 1);
+
+	return dest;
 }
 
 /*

@@ -38,6 +38,7 @@
 #define T_RED    "\x1b[31m"
 #define T_GREEN  "\x1b[32m"
 
+#define DATE_LENGTH  28 /* Length of ISO date format with nanoseconds */
 #define UUID_LENGTH  36 /* Length of a standard UUID */
 
 #define FAKE_HOST  1 /* Use "fake" as hostname to avoid conflicts with files 
@@ -203,7 +204,7 @@ extern char *utf8_check(char *);
 
 /* uuid.c */
 extern char *generate_uuid(void);
-extern char *uuid_date(char *);
+extern char *uuid_date(char *, char *);
 extern char *check_hex(char *, size_t);
 extern char *scan_for_uuid(char *);
 extern bool valid_uuid(char *, bool);

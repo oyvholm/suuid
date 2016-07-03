@@ -399,7 +399,13 @@ char *process_uuid(char *logfile, struct Entry *entry)
 		                progname, entry->uuid);
 		return NULL;
 	}
-	entry->date = uuid_date(entry->uuid);
+	entry->date = malloc(DATE_LENGTH + 1);
+	if (!entry->date) {
+		myerror("process_uuid(): Could not allocate %lu bytes for "
+		        "date string", DATE_LENGTH + 1);
+		return NULL;
+	}
+	uuid_date(entry->date, entry->uuid);
 
 	if (opt.verbose >= 4) {
 		int i;
@@ -479,10 +485,11 @@ int main(int argc, char *argv[])
 
 		for (i = optind; i < argc; i++) {
 			char *a = argv[i];
+			char buf[DATE_LENGTH + 1];
 
 			msg(4, "Checking arg %d \"%s\"", i, a);
-			printf("scan_for_uuid(\"%s\") = \"%s\"\n",
-			       a, scan_for_uuid(a));
+			printf("uuid_date(\"%s\") = \"%s\"\n",
+			       a, uuid_date(buf, a));
 		}
 		return EXIT_OK;
 	}
