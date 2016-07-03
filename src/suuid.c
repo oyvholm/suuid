@@ -28,6 +28,9 @@ char *progname;
 struct Options opt;
 struct Rc rc;
 struct Entry entry;
+#if PERL_COMPAT
+bool perlexit13 = FALSE; /* If it is set to TRUE, the program exits with 13 */
+#endif
 
 /*
  * msg() - Print a message prefixed with "[progname]: " to stddebug if 
@@ -418,13 +421,11 @@ char *process_uuid(char *logfile, struct Entry *entry)
 	}
 	if (add_to_logfile(logfile, entry) == EXIT_ERROR) {
 #if PERL_COMPAT
-		exit(13); /* WTF? It's a strange return value from Perl. Have 
-		           * discussed it at length in earlier commit messages.
-		           */
+		perlexit13 = TRUE; /* errno EACCES from die() in Perl */
 #else
 		myerror("%s: Error when adding entry to log file", logfile);
-		return NULL;
 #endif
+		return NULL;
 	}
 
 	if (!opt.whereto)
@@ -546,6 +547,12 @@ int main(int argc, char *argv[])
 
 cleanup:
 
+#if PERL_COMPAT
+	if (perlexit13)
+		retval = 13; /* die() is used some places in the Perl version, 
+		              * and it exits with errno 13 (EACCES).
+		              */
+#endif
 	msg(3, "Returning from main() with value %d", retval);
 
 	return retval;

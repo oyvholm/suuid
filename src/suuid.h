@@ -217,6 +217,9 @@ extern char *progname;
 extern struct Options opt;
 extern struct Rc rc;
 extern struct Entry entry;
+#if PERL_COMPAT
+extern bool perlexit13;
+#endif
 
 #endif /* ifndef _SUUID_H */
 
