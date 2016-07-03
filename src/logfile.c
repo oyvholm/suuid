@@ -80,7 +80,8 @@ char *allocate_entry(char *elem, char *src)
 	return retval;
 }
 
-/* suuid_xml() - Return pointer to string where the data in the text argument 
+/*
+ * suuid_xml() - Return pointer to string where the data in the text argument 
  * is escaped for use in the XML file.
  */
 
