@@ -239,6 +239,7 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 			myerror("Error in -n/--count argument");
 			retval = EXIT_ERROR;
 		}
+		break;
 	case 'q':
 		dest->verbose--;
 		break;
