@@ -408,7 +408,11 @@ int add_to_logfile(char *fname, struct Entry *entry)
 	/* todo: Add file locking */
 	fp = fopen(fname, "r+");
 	if (!fp) {
+#if PERL_COMPAT
+		myerror("%s: Cannot open file for append", fname);
+#else
 		myerror("%s: Could not open file for read+write", fname);
+#endif
 		return EXIT_ERROR;
 	}
 	if (fseek(fp, -10, SEEK_END) == -1) {

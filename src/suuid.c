@@ -410,8 +410,14 @@ char *process_uuid(char *logfile, struct Entry *entry)
 		i = i; /* Get rid of gcc warning */
 	}
 	if (add_to_logfile(logfile, entry) == EXIT_ERROR) {
+#if PERL_COMPAT
+		exit(13); /* WTF? It's a strange return value from Perl. Have 
+		           * discussed it at length in earlier commit messages.
+		           */
+#else
 		myerror("%s: Error when adding entry to log file", logfile);
 		return NULL;
+#endif
 	}
 
 	if (!opt.whereto)
