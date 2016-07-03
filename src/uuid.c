@@ -26,7 +26,7 @@
 
 char *generate_uuid(void)
 {
-	static char uuid[38];
+	static char uuid[UUID_LENGTH + 2];
 	char *cmd = "/usr/bin/uuid";
 	FILE *fp;
 
@@ -44,12 +44,12 @@ char *generate_uuid(void)
 		myerror("Could not exec /usr/bin/uuid");
 		return NULL;
 	}
-	if (!fgets(uuid, 37, fp)) {
+	if (!fgets(uuid, UUID_LENGTH + 1, fp)) {
 		/* Nevermind read errors, valid_uuid() checks if it's valid 
 		 * later.
 		 */
 	}
-	uuid[36] = '\0';
+	uuid[UUID_LENGTH] = '\0';
 	pclose(fp);
 
 	return uuid;
@@ -88,16 +88,38 @@ char *check_hex(char *hex, size_t len)
 }
 
 /*
- * valid_uuid() - Check that the UUID pointed to by u is a valid UUID. Return 
- * TRUE if valid, FALSE if not.
+ * scan_for_uuid() - Return a pointer to the first UUID in the string s, or 
+ * NULL if no UUID was found.
  */
 
-bool valid_uuid(char *u)
+char *scan_for_uuid(char *s)
 {
-	bool retval = TRUE;
+	char *p = s;
 
-	if (strlen(u) != 36)
-		retval = FALSE;
+	while (strlen(p) >= UUID_LENGTH) {
+		msg(3, "scan_for_uuid(): p = \"%s\"", p);
+		if (valid_uuid(p, FALSE))
+			return p;
+		p++;
+	}
+
+	return NULL;
+}
+
+/*
+ * valid_uuid() - Check that the UUID pointed to by u is a valid UUID. If 
+ * check_len is TRUE, also check that the string length is exactly the same as 
+ * a standard UUID, UUID_LENGTH chars.
+ * Return TRUE if valid, FALSE if not.
+ */
+
+bool valid_uuid(char *u, bool check_len)
+{
+	if (strlen(u) < UUID_LENGTH)
+		return FALSE;
+	if (check_len)
+		if (strlen(u) != UUID_LENGTH)
+			return FALSE;
 
 	/* Check that it only contains lowercase hex and dashes at the right 
 	 * places
@@ -105,14 +127,14 @@ bool valid_uuid(char *u)
 	if (check_hex(u, 8) || u[8] != '-' || check_hex(u + 9, 4) ||
 	    u[13] != '-' || check_hex(u + 14, 4) || u[18] != '-' ||
 	    check_hex(u + 19, 4) || u[23] != '-' || check_hex(u + 24, 12))
-		retval = FALSE;
+		return FALSE;
 
 	/* At the moment only v1 UUIDs are allowed
 	 */
 	if (u[14] != '1')
-		retval = FALSE;
+		return FALSE;
 
-	return retval;
+	return TRUE;
 }
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */

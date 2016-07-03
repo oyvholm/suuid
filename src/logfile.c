@@ -42,11 +42,11 @@ void init_xml_entry(struct Entry *e)
 	e->cwd = NULL;
 	e->user = NULL;
 	e->tty = NULL;
-	e->sess = NULL;
 
 	for (i = 0; i < MAX_TAGS; i++)
 		e->tag[i] = NULL;
-
+	for (i = 0; i < MAX_SESS; i++)
+		e->sess[i].uuid = e->sess[i].desc = NULL;
 }
 
 /*
@@ -204,6 +204,42 @@ char *get_xml_tags(void)
 }
 
 /*
+ * create_sess_xml() - Return pointer to XML string generated from entry->sess, 
+ * or NULL if error.
+ */
+
+char *create_sess_xml(struct Entry *entry)
+{
+#define CSX_BUFSIZE 20000 /* fixme: Temporary, use dynamic allocation later */
+#define CSX_TMPBUFSIZE 1000 /* Another temporary fixme */
+	static char buf[CSX_BUFSIZE],
+	     tmpbuf[CSX_TMPBUFSIZE];
+	unsigned int i = 0;
+
+	while (entry->sess[i].uuid) {
+		char *u, *d;
+
+		msg(3, "create_sess_xml(): i = %u", i);
+		u = entry->sess[i].uuid;
+		d = entry->sess[i].desc;
+		if (d)
+			snprintf(tmpbuf, CSX_TMPBUFSIZE,
+			         "<sess desc=\"%s\">%s</sess> ", d, u);
+		else
+			snprintf(tmpbuf, CSX_TMPBUFSIZE, "<sess>%s</sess> ",
+			                                 u);
+		msg(3, "buf before strncat(): \"%s\"", buf);
+		strncat(buf, tmpbuf, CSX_BUFSIZE - strlen(buf));
+		i++;
+	}
+	msg(3, "create_sess_xml() returns \"%s\"", buf);
+
+	return buf;
+#undef CSX_TMPBUFSIZE /* fixme */
+#undef CSX_BUFSIZE /* fixme */
+}
+
+/*
  * xml_entry() - Return pointer to string with one XML entry extracted from the 
  * entry struct, or NULL if error.
  */
@@ -214,7 +250,7 @@ char *xml_entry(struct Entry *entry)
 	static char buf[XML_BUFSIZE];
 	struct Entry e;
 	char *retval;
-	char *tag_xml;
+	char *tag_xml, *sess_xml;
 
 	msg(4, "Entering xml_entry()");
 	init_xml_entry(&e);
@@ -226,7 +262,6 @@ char *xml_entry(struct Entry *entry)
 	msg(4, "xml_entry(): entry->host = '%s'", entry->host);
 	msg(4, "xml_entry(): entry->cwd  = '%s'", entry->cwd);
 	msg(4, "xml_entry(): entry->user = '%s'", entry->user);
-	msg(4, "xml_entry(): entry->sess = '%s'", entry->sess);
 
 	if (!entry->uuid) {
 		msg(4, "xml_entry(): uuid is NULL");
@@ -240,6 +275,11 @@ char *xml_entry(struct Entry *entry)
 	tag_xml = get_xml_tags();
 	if (!tag_xml) {
 		myerror("xml_entry(): get_xml_tags() failed");
+		return NULL;
+	}
+	sess_xml = create_sess_xml(entry);
+	if (!sess_xml) {
+		myerror("create_sess_xml() failed");
 		return NULL;
 	}
 
@@ -285,7 +325,8 @@ char *xml_entry(struct Entry *entry)
 	         (e.cwd) ? e.cwd : "",
 	         (e.user) ? e.user : "",
 	         (e.tty) ? e.tty : "",
-	         (e.sess) ? e.sess : "");
+	         sess_xml
+	         );
 	msg(4, "xml_entry(): After snprintf()");
 #if 0
 	static char fake[] = "<suuid t=\"2016-06-07T04:18:40.9460630Z\" "
@@ -403,7 +444,7 @@ int add_to_logfile(char *fname, struct Entry *entry)
 	fprintf(fp, "\n</suuids>\n");
 	fclose(fp);
 	msg(4, "add_to_logfile(): fp is closed");
-	if (opt.verbose > 2) {
+	if (opt.verbose >= 3) {
 		i = system("(echo; cat /home/sunny/uuids/fake.xml; "
 		           "echo) >&2");
 		i = i; /* Get rid of gcc warning */

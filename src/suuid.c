@@ -376,6 +376,10 @@ int fill_entry_struct(struct Entry *entry, struct Options *opt, struct Rc *rc)
 		trim_str_front(entry->txt);
 		trim_str_end(entry->txt);
 	}
+	if (get_sess_info(entry) == EXIT_ERROR) {
+		myerror("fill_entry_struct(): get_sess_info() failed");
+		return EXIT_ERROR;
+	}
 
 	return EXIT_OK;
 }
@@ -389,7 +393,7 @@ int fill_entry_struct(struct Entry *entry, struct Options *opt, struct Rc *rc)
 char *process_uuid(char *logfile, struct Entry *entry)
 {
 	entry->uuid = generate_uuid();
-	if (!valid_uuid(entry->uuid)) {
+	if (!valid_uuid(entry->uuid, TRUE)) {
 		fprintf(stderr, "%s: '%s': Generated UUID is not in the "
 		                "expected format\n",
 		                progname, entry->uuid);
@@ -471,16 +475,8 @@ int main(int argc, char *argv[])
 			char *a = argv[i];
 
 			msg(4, "Checking arg %d \"%s\"", i, a);
-			if (!strcmp(a, "ptags")) {
-				char *p;
-
-				while ((p = get_next_tag()))
-					printf("Found tag \"%s\"\n", p);
-			} else if (!strcmp(a, "chex"))
-				printf("check_hex(\"%s\") = \"%s\"\n",
-				       a, check_hex(a, 5));
-			else
-				fprintf(stderr, "Unknown command: %s\n", a);
+			printf("scan_for_uuid(\"%s\") = \"%s\"\n",
+			       a, scan_for_uuid(a));
 		}
 		return EXIT_OK;
 	}
@@ -495,6 +491,20 @@ int main(int argc, char *argv[])
 	if (fill_entry_struct(&entry, &opt, &rc) == EXIT_ERROR)
 		return EXIT_ERROR;
 	msg(4, "Back in main() after fill_entry_struct()");
+	if (opt.verbose >= 3) {
+		unsigned int i = 0;
+		char *u, *d;
+
+		do {
+			u = entry.sess[i].uuid;
+			d = entry.sess[i].desc;
+			msg(3, "%sentry.sess[%u].uuid = \"%s\"%s",
+			       T_RED, i, u, T_RESET);
+			msg(3, "%sentry.sess[%u].desc = \"%s\"%s",
+			       T_RED, i, d, T_RESET);
+			i++;
+		} while (u);
+	}
 
 	logfile = set_up_logfile(&opt, entry.host);
 	if (!logfile) {

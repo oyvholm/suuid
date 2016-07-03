@@ -34,6 +34,12 @@
 #define EXIT_OK     0
 #define EXIT_ERROR  1
 
+#define T_RESET  "\x1b[m\x0f"
+#define T_RED    "\x1b[31m"
+#define T_GREEN  "\x1b[32m"
+
+#define UUID_LENGTH  36 /* Length of a standard UUID */
+
 #define FAKE_HOST  1 /* Use "fake" as hostname to avoid conflicts with files 
                       * created by the Perl version
                       */
@@ -43,11 +49,37 @@
 
 #define stddebug  stderr
 
+#define ENV_SESS  "SESS_UUID" /* Name of environment variable where the session 
+                               * information is stored
+                               */
 #define ENV_HOSTNAME  "SUUID_HOSTNAME" /* Optional environment variable */
 #define ENV_LOGDIR  "SUUID_LOGDIR" /* Optional environment variable with path 
                                     * to log directory
                                     */
+#define MAX_SESS  1000 /* Maximum number of sess elements per entry */
 #define MAX_TAGS  1000 /* Maximum number of tags */
+#define LEGAL_UTF8_CHARS  "\x80\x81\x82\x83\x84\x85\x86\x87" \
+                          "\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f" \
+                          "\x90\x91\x92\x93\x94\x95\x96\x97" \
+                          "\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f" \
+                          "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7" \
+                          "\xa8\xa9\xaa\xab\xac\xad\xae\xaf" \
+                          "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7" \
+                          "\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf" \
+                                  "\xc2\xc3\xc4\xc5\xc6\xc7" \
+                          "\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf" \
+                          "\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7" \
+                          "\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf" \
+                          "\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7" \
+                          "\xe8\xe9\xea\xeb\xec\xed\xee\xef" \
+                          "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7" \
+                          "\xf8"
+#define DESC_LEGAL  "-."                         \
+                    "0123456789"                 \
+                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
+                    "_"                          \
+                    "abcdefghijklmnopqrstuvwxyz" \
+                    LEGAL_UTF8_CHARS /* Legal chars in sess descriptions */
 
 /*
  * Standard header files
@@ -68,6 +100,7 @@
  * Macros
  */
 
+#define DEBL  msg(2, "%s, line %u in %s()", __FILE__, __LINE__, __FUNCTION__)
 #define in_range(a,b,c)  ((a) >= (b) && (a) <= (c) ? TRUE : FALSE)
 
 /*
@@ -79,6 +112,10 @@ struct Rc {
 	char *hostname;
 	char *uuidcmd;
 };
+struct Sess {
+	char *uuid;
+	char *desc;
+};
 struct Entry {
 	char *date;
 	char *uuid;
@@ -88,7 +125,7 @@ struct Entry {
 	char *cwd;
 	char *user;
 	char *tty;
-	char *sess;
+	struct Sess sess[MAX_SESS];
 };
 struct Options {
 	char *comment;
@@ -123,6 +160,7 @@ extern char *allocate_entry(char *, char *);
 extern char *suuid_xml(char *);
 extern char *alloc_attr(char *, char *);
 extern char *get_xml_tags(void);
+extern char *create_sess_xml(struct Entry *);
 extern char *xml_entry(struct Entry *);
 extern char *get_logdir();
 extern int add_to_logfile(char *, struct Entry *);
@@ -132,6 +170,12 @@ extern bool valid_xml_chars(char *);
 
 /* rcfile.c */
 extern int read_rcfile(char *, struct Rc *);
+
+/* sessvar.c */
+extern bool is_legal_desc_char(unsigned char);
+extern bool is_valid_desc_string(char *);
+extern int fill_sess(struct Entry *, char *, char *, size_t);
+extern int get_sess_info(struct Entry *);
 
 /* string.c */
 extern char *trim_str_front(char *);
@@ -161,7 +205,8 @@ extern char *utf8_check(char *);
 extern char *generate_uuid(void);
 extern char *uuid_date(char *);
 extern char *check_hex(char *, size_t);
-extern bool valid_uuid(char *);
+extern char *scan_for_uuid(char *);
+extern bool valid_uuid(char *, bool);
 
 /*
  * Global variables
