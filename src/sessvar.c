@@ -96,7 +96,7 @@ int fill_sess(struct Entry *dest, char *uuid, char *desc, size_t desclen)
 
 int get_sess_info(struct Entry *entry)
 {
-	char *s, *p, *desc_found, *desc_end;
+	char *s, *p, *desc_found = NULL, *desc_end = NULL;
 
 	if (!getenv(ENV_SESS))
 		return EXIT_OK;
@@ -111,7 +111,6 @@ int get_sess_info(struct Entry *entry)
 	if (!scan_for_uuid(s))
 		return EXIT_OK;
 
-	desc_found = desc_end = NULL;
 	p = s;
 	while (*p) {
 		if (valid_uuid(p, FALSE)) {
@@ -122,6 +121,7 @@ int get_sess_info(struct Entry *entry)
 				               * desc and uuid, so desc_end 
 				               * hasn't been set.
 				               */
+
 			if (desc_end > desc_found)
 				desclen = desc_end - desc_found;
 
