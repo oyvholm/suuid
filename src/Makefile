@@ -3,9 +3,9 @@
 # Author: Øyvind A. Holm <sunny@sunbase.org>
 
 OBJS   = environ.o io.o logfile.o rcfile.o sessvar.o string.o suuid.o \
-         tag.o utf8.o uuid.o
+         tag.o uuid.o
 CFILES = environ.c io.c logfile.c rcfile.c sessvar.c string.c suuid.c \
-         tag.c utf8.c uuid.c
+         tag.c uuid.c
 HFILES = suuid.h
 DEPS = $(HFILES) Makefile
 CC = gcc
@@ -40,9 +40,6 @@ string.o: string.c $(DEPS)
 
 tag.o: tag.c $(DEPS)
 	$(CC) $(CCFLAGS) tag.c
-
-utf8.o: utf8.c $(DEPS)
-	$(CC) $(CCFLAGS) utf8.c
 
 uuid.o: uuid.c $(DEPS)
 	$(CC) $(CCFLAGS) uuid.c

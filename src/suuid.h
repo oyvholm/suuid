@@ -183,6 +183,7 @@ extern int get_sess_info(struct Entry *);
 /* string.c */
 extern char *trim_str_front(char *);
 extern char *trim_str_end(char *);
+extern char *utf8_check(char *);
 
 /* suuid.c */
 extern int msg(int, const char *, ...);
@@ -200,9 +201,6 @@ void rewind_tag(void);
 bool tag_exists(char *);
 char *get_next_tag(void);
 extern char *store_tag(char *);
-
-/* utf8.c */
-extern char *utf8_check(char *);
 
 /* uuid.c */
 extern char *generate_uuid(void);
