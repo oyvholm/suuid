@@ -20,10 +20,20 @@
 
 #include "suuid.h"
 
+/*
+ * is_legal_desc_char() - Return TRUE if the character c is a valid char for 
+ * use in the desc attribute in <sess> elements, FALSE if not.
+ */
+
 bool is_legal_desc_char(unsigned char c)
 {
 	return strchr(DESC_LEGAL, c) ? TRUE : FALSE;
 }
+
+/*
+ * is_valid_desc_string() - Return TRUE if the string s is a valid desc name, 
+ * return FALSE if not.
+ */
 
 bool is_valid_desc_string(char *s)
 {
@@ -40,6 +50,12 @@ bool is_valid_desc_string(char *s)
 
 	return TRUE;
 }
+
+/*
+ * fill_sess() - Fill the first available dest->sess element with uuid and desc 
+ * and increase the local counter. Return EXIT_OK if everything is ok, 
+ * EXIT_ERROR if something failed.
+ */
 
 int fill_sess(struct Entry *dest, char *uuid, char *desc, size_t desclen)
 {
