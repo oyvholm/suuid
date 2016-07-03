@@ -396,66 +396,102 @@ char *get_logdir()
 }
 
 /*
- * add_to_logfile() - Add the contents of *entry to the XML file fname.
+ * Open log file fname for read+write, check that the end of file is OK, set 
+ * the file position to the place where the new log entry shall be inserted. 
+ * Return FILE pointer to the opened stream, ready for writing. If anything 
+ * fails, NULL is returned.
  */
 
-int add_to_logfile(char *fname, struct Entry *entry)
+FILE *open_logfile(char *fname)
 {
-	int retval = EXIT_OK;
 	FILE *fp;
 	char check_line[12];
 	long filepos;
-	int i;
 
 	/* todo: Add file locking */
 	fp = fopen(fname, "r+");
 	if (!fp) {
 #if PERL_COMPAT
 		myerror("%s: Cannot open file for append", fname);
+		perlexit13 = TRUE;
 #else
 		myerror("%s: Could not open file for read+write", fname);
 #endif
-		return EXIT_ERROR;
+		return NULL;
 	}
 	if (fseek(fp, -10, SEEK_END) == -1) {
 		myerror("%s: Could not seek in log file", fname);
-		return EXIT_ERROR;
+		return NULL;
 	}
 	filepos = ftell(fp);
 	msg(4, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
 	if (filepos == -1) {
 		myerror("%s: Cannot read file position", fname);
-		return EXIT_ERROR;
+		return NULL;
 	}
 	msg(4, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
 	if (strcmp(fgets(check_line, 10, fp), "</suuids>")) {
-		msg(4, "add_to_logfile(): check_line = '%s'", check_line);
+		msg(4, "open_logfile(): check_line = '%s'", check_line);
 		fprintf(stderr, "%s: %s: Unknown end line, adding to "
 		                "end of file\n", progname, fname);
 	} else {
-		msg(4, "add_to_logfile(): Seems as check_line is ok, "
+		msg(4, "open_logfile(): Seems as check_line is ok, "
 		       "it is '%s'", check_line);
 		if (fseek(fp, filepos, SEEK_SET) == -1) {
 			myerror("%s: Cannot seek to position %lu",
 			        fname, filepos);
-			return EXIT_ERROR;
+			return NULL;
 		}
 	}
 	msg(4, "ftell(fp) at line %u is %lu", __LINE__, ftell(fp));
+
+	return fp;
+}
+
+/*
+ * add_to_logfile() - Add the contents of *entry to the logfile stream. Return 
+ * EXIT_OK or EXIT_ERROR.
+ */
+
+int add_to_logfile(FILE *fp, struct Entry *entry)
+{
+	int retval = EXIT_OK;
+
 	if (fputs(xml_entry(entry), fp) < 0) {
-		myerror("fputs()");
+		myerror("add_to_logfile(): fputs() failed");
 		retval = EXIT_ERROR;
 	}
+	if (fputc('\n', fp) == EOF) {
+		myerror("add_to_logfile(): fputc() failed");
+		retval = EXIT_ERROR;
+	}
+
+	return retval;
+}
+
+/*
+ * close_logfile() - Do the finishing changes on FILE stream fp, add end tag 
+ * and close the stream. Return EXIT_OK if no errors, if any errors were 
+ * detected, return EXIT_ERROR.
+ */
+
+int close_logfile(FILE *fp)
+{
+	int retval = EXIT_OK;
+	int i;
+
 	msg(4, "Before end tag is written");
-	fprintf(fp, "\n</suuids>\n");
-	fclose(fp);
-	msg(4, "add_to_logfile(): fp is closed");
+	if (fprintf(fp, "</suuids>\n") != 10)
+		retval = EXIT_ERROR;
+	if (fclose(fp) == EOF)
+		retval = EXIT_ERROR;
+	msg(4, "close_logfile(): fp is closed");
 	if (opt.verbose >= 3) {
 		i = system("(echo; cat /home/sunny/uuids/fake.xml; "
 		           "echo) >&2");
 		i = i; /* Get rid of gcc warning */
 	}
-	msg(4, "add_to_logfile() returns %d", retval);
+	msg(4, "close_logfile() returns %d", retval);
 
 	return retval;
 }

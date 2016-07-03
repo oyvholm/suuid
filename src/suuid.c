@@ -394,7 +394,7 @@ int fill_entry_struct(struct Entry *entry, struct Options *opt, struct Rc *rc)
  * UUID. Otherwise return NULL.
  */
 
-char *process_uuid(char *logfile, struct Entry *entry)
+char *process_uuid(FILE *logfp, struct Entry *entry)
 {
 	entry->uuid = generate_uuid();
 	if (!valid_uuid(entry->uuid, TRUE)) {
@@ -419,11 +419,11 @@ char *process_uuid(char *logfile, struct Entry *entry)
 		           "echo) >&2");
 		i = i; /* Get rid of gcc warning */
 	}
-	if (add_to_logfile(logfile, entry) == EXIT_ERROR) {
+	if (add_to_logfile(logfp, entry) == EXIT_ERROR) {
 #if PERL_COMPAT
 		perlexit13 = TRUE; /* errno EACCES from die() in Perl */
 #else
-		myerror("%s: Error when adding entry to log file", logfile);
+		myerror("process_uuid(): add_to_logfile() failed");
 #endif
 		return NULL;
 	}
@@ -448,6 +448,7 @@ int main(int argc, char *argv[])
 {
 	int retval = EXIT_OK;
 	char *logfile;
+	FILE *logfp;
 	unsigned int i;
 
 	progname = argv[0];
@@ -532,11 +533,21 @@ int main(int argc, char *argv[])
 	}
 	msg(4, "After set_up_logfile()");
 
+	logfp = open_logfile(logfile);
+	if (!logfp) {
+		myerror("open_logfile() failed, cannot open log file");
+		retval = EXIT_ERROR;
+		goto cleanup;
+	}
+
 	for (i = 0; i < opt.count; i++)
-		if (!process_uuid(logfile, &entry)) {
+		if (!process_uuid(logfp, &entry)) {
 			retval = EXIT_ERROR;
 			goto cleanup;
 		}
+
+	if (close_logfile(logfp) == EXIT_ERROR)
+		myerror("close_logfile() failed");
 
 	if (optind < argc) {
 		int t;

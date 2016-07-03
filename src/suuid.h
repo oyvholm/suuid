@@ -164,7 +164,9 @@ extern char *get_xml_tags(void);
 extern char *create_sess_xml(struct Entry *);
 extern char *xml_entry(struct Entry *);
 extern char *get_logdir();
-extern int add_to_logfile(char *, struct Entry *);
+extern FILE *open_logfile(char *);
+extern int add_to_logfile(FILE *, struct Entry *);
+extern int close_logfile(FILE *);
 extern char *create_logfile(char *);
 extern char *set_up_logfile(struct Options *, char *);
 extern bool valid_xml_chars(char *);
@@ -191,7 +193,7 @@ extern void usage(int);
 extern int choose_opt_action(struct Options *, int, struct option *);
 extern int parse_options(struct Options *, int, char *[]);
 extern int fill_entry_struct(struct Entry *, struct Options *, struct Rc *);
-extern char *process_uuid(char *, struct Entry *);
+extern char *process_uuid(FILE *, struct Entry *);
 
 /* tag.c */
 void rewind_tag(void);
