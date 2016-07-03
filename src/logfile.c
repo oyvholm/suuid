@@ -213,7 +213,7 @@ char *create_sess_xml(struct Entry *entry)
 #define CSX_BUFSIZE 20000 /* fixme: Temporary, use dynamic allocation later */
 #define CSX_TMPBUFSIZE 1000 /* Another temporary fixme */
 	static char buf[CSX_BUFSIZE],
-	     tmpbuf[CSX_TMPBUFSIZE];
+	            tmpbuf[CSX_TMPBUFSIZE];
 	unsigned int i = 0;
 
 	while (entry->sess[i].uuid) {
