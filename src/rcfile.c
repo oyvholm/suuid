@@ -52,8 +52,8 @@ char *has_key(char *line, char *keyword)
 			retval++;
 	} else
 		retval = NULL;
-	msg(3, "has_key() returns \"%s\"", retval);
 
+	msg(3, "has_key() returns \"%s\"", retval);
 	return retval;
 }
 

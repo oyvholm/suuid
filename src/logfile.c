@@ -62,6 +62,7 @@ char *allocate_entry(char *elem, char *src)
 	size_t size = 0;
 
 	msg(5, "Entering allocate_entry(\"%s\", \"%s\")", elem, src);
+
 	if (elem && src) {
 		size += strlen("<") + strlen(elem) + strlen(">") +
 		        strlen(src) * MAX_GROWTH +
@@ -75,8 +76,8 @@ char *allocate_entry(char *elem, char *src)
 			                       elem, suuid_xml(src), elem);
 	} else
 		retval = NULL;
-	msg(5, "allocate_entry() returns '%s'", retval);
 
+	msg(5, "allocate_entry() returns '%s'", retval);
 	return retval;
 }
 
@@ -149,16 +150,18 @@ char *alloc_attr(char *attr, char *data)
 	int size;
 
 	msg(4, "Entering alloc_attr(\"%s\", \"%s\")", attr, data);
+
 	size = strlen(" ") + strlen(attr) + strlen("=\"") + strlen(data) +
 	       strlen("\"") + 1;
 	msg(4, "data size = %lu", size);
+
 	retval = malloc(size + 1);
 	if (!retval)
 		myerror("alloc_attr(): Cannot allocate memory");
 	else
 		snprintf(retval, size, " %s=\"%s\"", attr, data);
-	msg(4, "alloc_attr() returns \"%s\"", retval);
 
+	msg(4, "alloc_attr() returns \"%s\"", retval);
 	return retval;
 }
 
@@ -234,8 +237,8 @@ char *create_sess_xml(struct Entry *entry)
 		strncat(buf, tmpbuf, CSX_BUFSIZE - strlen(buf));
 		i++;
 	}
-	msg(3, "create_sess_xml() returns \"%s\"", buf);
 
+	msg(3, "create_sess_xml() returns \"%s\"", buf);
 	return buf;
 #undef CSX_TMPBUFSIZE /* fixme */
 #undef CSX_BUFSIZE /* fixme */
@@ -255,9 +258,9 @@ char *xml_entry(struct Entry *entry)
 	char *tag_xml, *sess_xml;
 
 	msg(4, "Entering xml_entry()");
+
 	init_xml_entry(&e);
 	msg(4, "xml_entry(): After init_xml_entry()");
-
 	msg(4, "xml_entry(): entry->date = '%s'", entry->date);
 	msg(4, "xml_entry(): entry->uuid = '%s'", entry->uuid);
 	msg(5, "xml_entry(): entry->txt  = '%s'", entry->txt);
@@ -279,6 +282,7 @@ char *xml_entry(struct Entry *entry)
 		myerror("xml_entry(): get_xml_tags() failed");
 		return NULL;
 	}
+
 	sess_xml = create_sess_xml(entry);
 	if (!sess_xml) {
 		myerror("create_sess_xml() failed");
@@ -350,8 +354,8 @@ char *xml_entry(struct Entry *entry)
 	                     "</suuid>";
 #endif
 	retval = buf;
-	msg(4, "xml_entry() returns '%s'", retval);
 
+	msg(4, "xml_entry() returns '%s'", retval);
 	return retval;
 }
 
@@ -390,8 +394,8 @@ char *get_logdir()
 		                progname, ENV_LOGDIR);
 		return NULL;
 	}
-	msg(4, "get_logdir() returns \"%s\"", retval);
 
+	msg(4, "get_logdir() returns \"%s\"", retval);
 	return retval;
 }
 
@@ -491,8 +495,8 @@ int close_logfile(FILE *fp)
 		           "echo) >&2");
 		i = i; /* Get rid of gcc warning */
 	}
-	msg(4, "close_logfile() returns %d", retval);
 
+	msg(4, "close_logfile() returns %d", retval);
 	return retval;
 }
 
@@ -508,6 +512,7 @@ char *create_logfile(char *name)
 	char *xml_doctype = "<!DOCTYPE suuids SYSTEM \"dtd/suuids.dtd\">";
 
 	msg(4, "Entering create_logfile(\"%s\")", name);
+
 	if (access(name, F_OK) != -1)
 		return name; /* File already exists */
 	else {

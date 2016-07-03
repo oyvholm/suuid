@@ -40,8 +40,8 @@ char *get_hostname(void)
 #endif
 	else if (gethostname(buf, HOST_NAME_MAX) == -1)
 		return NULL;
-	msg(4, "get_hostname() returns '%s'", retval);
 
+	msg(4, "get_hostname() returns '%s'", retval);
 	return retval;
 }
 
@@ -99,8 +99,8 @@ char *get_username(void)
 		retval = NULL;
 	else
 		retval = pw->pw_name;
-	msg(4, "get_username() returns \"%s\"", retval);
 
+	msg(4, "get_username() returns \"%s\"", retval);
 	return retval;
 }
 
@@ -125,7 +125,6 @@ char *get_tty(void)
 #endif
 
 	msg(4, "get_tty() returns \"%s\"", retval);
-
 	return retval;
 }
 
