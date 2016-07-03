@@ -43,14 +43,14 @@ bool is_valid_desc_string(char *s)
 	return TRUE;
 }
 
-int fill_sess(struct Sess *dest, char *uuid, char *desc)
+int fill_sess(struct Sess *dest, char *uuid, char *desc, size_t desclen)
 {
-	char *auuid = NULL;
+	char *auuid = NULL,
+	     *adesc = NULL;
 
 	msg(2, "%sEntering fill_sess({uuid:\"%s\", desc:\"%s\"}, "
-	       "\"%s\", \"%s\")%s",
-	       T_RED, dest->uuid, dest->desc,
-	       uuid, desc, T_RESET);
+	       "\"%s\", \"%s\", %lu)%s",
+	       T_RED, dest->uuid, dest->desc, uuid, desc, desclen, T_RESET);
 
 	auuid = strndup(uuid, UUID_LENGTH);
 	if (!auuid) {
@@ -58,12 +58,16 @@ int fill_sess(struct Sess *dest, char *uuid, char *desc)
 		return EXIT_ERROR;
 	}
 
-	if (desc && strlen(desc) && is_valid_desc_string(desc)) {
-		dest->desc = strdup(desc);
-		if (!dest->desc) {
-			myerror("fill_sess(): Could not duplicate desc");
+	if (desc && desclen) {
+		adesc = strndup(desc, desclen);
+		if (!adesc) {
+			myerror("get_sess_info(): Could not duplicate desc");
 			return EXIT_ERROR;
 		}
+		if (!is_valid_desc_string(adesc))
+			free(adesc);
+		else
+			dest->desc = adesc;
 	}
 
 	if (valid_uuid(auuid, TRUE))
@@ -102,7 +106,7 @@ int get_sess_info(struct Entry *entry)
 	while (*p) {
 		if (valid_uuid(p, FALSE)) {
 			struct Sess dest;
-			char *adesc = NULL;
+			size_t desclen = 0;
 
 			dest.uuid = dest.desc = NULL;
 			if (desc_found && !desc_end)
@@ -110,17 +114,11 @@ int get_sess_info(struct Entry *entry)
 				               * desc and uuid, so desc_end 
 				               * hasn't been set.
 				               */
-			if (desc_end > desc_found) {
-				adesc = strndup(desc_found,
-				                desc_end - desc_found);
-				if (!adesc) {
-					myerror("get_sess_info(): Could not "
-					        "duplicate desc");
-					return EXIT_ERROR;
-				}
-			}
+			if (desc_end > desc_found)
+				desclen = desc_end - desc_found;
 
-			if (fill_sess(&dest, p, adesc) == EXIT_ERROR) {
+			if (fill_sess(&dest, p,
+				      desc_found, desclen) == EXIT_ERROR) {
 				myerror("get_sess_info(): fill_sess() failed");
 				return EXIT_ERROR;
 			}
