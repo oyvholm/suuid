@@ -174,7 +174,7 @@ extern int read_rcfile(char *, struct Rc *);
 /* sessvar.c */
 extern bool is_legal_desc_char(unsigned char);
 extern bool is_valid_desc_string(char *);
-extern int fill_sess(struct Sess *, char *, char *, size_t);
+extern int fill_sess(struct Entry *, char *, char *, size_t);
 extern int get_sess_info(struct Entry *);
 
 /* string.c */
