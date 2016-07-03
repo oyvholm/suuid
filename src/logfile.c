@@ -219,7 +219,7 @@ char *create_sess_xml(struct Entry *entry)
 	while (entry->sess[i].uuid) {
 		char *u, *d;
 
-		msg(2, "create_sess_xml(): i = %u", i);
+		msg(3, "create_sess_xml(): i = %u", i);
 		u = entry->sess[i].uuid;
 		d = entry->sess[i].desc;
 		if (d)
@@ -228,11 +228,11 @@ char *create_sess_xml(struct Entry *entry)
 		else
 			snprintf(tmpbuf, CSX_TMPBUFSIZE, "<sess>%s</sess> ",
 			                                 u);
-		msg(2, "buf before strncat(): \"%s\"", buf);
+		msg(3, "buf before strncat(): \"%s\"", buf);
 		strncat(buf, tmpbuf, CSX_BUFSIZE - strlen(buf));
 		i++;
 	}
-	msg(2, "create_sess_xml() returns \"%s\"", buf);
+	msg(3, "create_sess_xml() returns \"%s\"", buf);
 
 	return buf;
 #undef CSX_TMPBUFSIZE /* fixme */
@@ -444,7 +444,7 @@ int add_to_logfile(char *fname, struct Entry *entry)
 	fprintf(fp, "\n</suuids>\n");
 	fclose(fp);
 	msg(4, "add_to_logfile(): fp is closed");
-	if (opt.verbose > 2) {
+	if (opt.verbose >= 3) {
 		i = system("(echo; cat /home/sunny/uuids/fake.xml; "
 		           "echo) >&2");
 		i = i; /* Get rid of gcc warning */

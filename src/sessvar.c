@@ -63,7 +63,7 @@ int fill_sess(struct Entry *dest, char *uuid, char *desc, size_t desclen)
 	     *adesc = NULL;
 	static unsigned int sessind = 0;
 
-	msg(2, "%sEntering fill_sess(..., \"%s\", \"%s\", %lu)%s",
+	msg(3, "%sEntering fill_sess(..., \"%s\", \"%s\", %lu)%s",
 	       T_RED, uuid, desc, desclen, T_RESET);
 
 	auuid = strndup(uuid, UUID_LENGTH);

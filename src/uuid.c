@@ -97,7 +97,7 @@ char *scan_for_uuid(char *s)
 	char *p = s;
 
 	while (strlen(p) >= UUID_LENGTH) {
-		msg(2, "scan_for_uuid(): p = \"%s\"", p);
+		msg(3, "scan_for_uuid(): p = \"%s\"", p);
 		if (valid_uuid(p, FALSE))
 			return p;
 		p++;
