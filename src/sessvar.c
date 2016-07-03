@@ -57,6 +57,7 @@ int fill_sess(struct Sess *dest, char *uuid, char *desc, size_t desclen)
 		myerror("fill_sess(): Could not duplicate UUID");
 		return EXIT_ERROR;
 	}
+	dest->uuid = auuid;
 
 	if (desc && desclen) {
 		adesc = strndup(desc, desclen);
@@ -69,12 +70,6 @@ int fill_sess(struct Sess *dest, char *uuid, char *desc, size_t desclen)
 		else
 			dest->desc = adesc;
 	}
-
-	if (valid_uuid(auuid, TRUE))
-		dest->uuid = auuid;
-	else
-		msg(2, "fill_sess() received invalid UUID \"%s\", "
-		       "should not happen", auuid);
 
 	return EXIT_OK;
 }
