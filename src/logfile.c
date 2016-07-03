@@ -178,6 +178,7 @@ char *get_xml_tags(void)
 	if (done)
 		return buf;
 	msg(3, "Entering get_xml_tags()");
+	buf[0] = '\0';
 	rewind_tag();
 	do {
 		p = get_next_tag();
@@ -216,6 +217,7 @@ char *create_sess_xml(struct Entry *entry)
 	            tmpbuf[CSX_TMPBUFSIZE];
 	unsigned int i = 0;
 
+	buf[0] = '\0';
 	while (entry->sess[i].uuid) {
 		char *u, *d;
 
