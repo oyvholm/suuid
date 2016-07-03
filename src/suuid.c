@@ -498,12 +498,15 @@ int main(int argc, char *argv[])
 
 	if (read_rcfile(opt.rcfile, &rc) == EXIT_ERROR) {
 		myerror("%s: Could not read rc file", opt.rcfile);
-		return EXIT_ERROR;
+		retval = EXIT_ERROR;
+		goto cleanup;
 	}
 	msg(4, "Back in main() after read_rcfile()");
 
-	if (fill_entry_struct(&entry, &opt, &rc) == EXIT_ERROR)
-		return EXIT_ERROR;
+	if (fill_entry_struct(&entry, &opt, &rc) == EXIT_ERROR) {
+		retval = EXIT_ERROR;
+		goto cleanup;
+	}
 	msg(4, "Back in main() after fill_entry_struct()");
 	if (opt.verbose >= 3) {
 		unsigned int i = 0;
@@ -523,13 +526,16 @@ int main(int argc, char *argv[])
 	logfile = set_up_logfile(&opt, entry.host);
 	if (!logfile) {
 		myerror("Could not initialise log file");
-		return EXIT_ERROR;
+		retval = EXIT_ERROR;
+		goto cleanup;
 	}
 	msg(4, "After set_up_logfile()");
 
 	for (i = 0; i < opt.count; i++)
-		if (!process_uuid(logfile, &entry))
-			return EXIT_ERROR;
+		if (!process_uuid(logfile, &entry)) {
+			retval = EXIT_ERROR;
+			goto cleanup;
+		}
 
 	if (optind < argc) {
 		int t;
@@ -537,6 +543,8 @@ int main(int argc, char *argv[])
 		for (t = optind; t < argc; t++)
 			msg(3, "Non-option arg: %s", argv[t]);
 	}
+
+cleanup:
 
 	msg(3, "Returning from main() with value %d", retval);
 
