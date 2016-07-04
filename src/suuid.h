@@ -197,9 +197,9 @@ extern int fill_entry_struct(struct Entry *, struct Options *);
 extern char *process_uuid(FILE *, struct Entry *);
 
 /* tag.c */
-void rewind_tag(void);
-bool tag_exists(char *);
-char *get_next_tag(void);
+extern void rewind_tag(void);
+extern bool tag_exists(char *);
+extern char *get_next_tag(void);
 extern char *store_tag(char *);
 
 /* uuid.c */
