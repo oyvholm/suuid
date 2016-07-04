@@ -209,10 +209,7 @@ char *get_xml_tags(void)
 	static char buf[GXT_BUFSIZE + 1];
 	char tmpbuf[GXT_BUFSIZE + 1];
 	char *p;
-	static bool done = FALSE;
 
-	if (done)
-		return buf;
 	buf[0] = '\0';
 	rewind_tag();
 	do {
@@ -232,7 +229,6 @@ char *get_xml_tags(void)
 			strncat(buf, tmpbuf, GXT_BUFSIZE - strlen(buf));
 		}
 	} while (p);
-	done = TRUE;
 
 	return buf;
 }
