@@ -69,7 +69,7 @@ char *generate_uuid(void)
 	/* fixme: Make -m/--random-mac actually do something */
 	fp = popen(cmd, "r");
 	if (!fp) {
-		myerror("generate_uuid(): Could not exec %s", uuid);
+		myerror("generate_uuid(): Could not exec \"%s\"", cmd);
 		return NULL;
 	}
 	if (!fgets(uuid, UUID_LENGTH + 1, fp)) {
