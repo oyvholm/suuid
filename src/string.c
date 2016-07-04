@@ -21,6 +21,23 @@
 #include "suuid.h"
 
 /*
+ * check_hex() - Check that len bytes at the location pointed to by p are all 
+ * legal lowercase hex chars. Return a pointer to the first invalid character 
+ * or NULL if everything is ok.
+ */
+
+char *check_hex(char *hex, size_t len)
+{
+	char *p;
+
+	for (p = hex; p < hex + len; p++)
+		if (!strchr("0123456789abcdef", *p))
+			return p;
+
+	return NULL;
+}
+
+/*
  * trim_str_front() - Modify dest by removing initial whitespace. Returns dest.
  */
 

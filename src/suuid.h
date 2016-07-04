@@ -181,6 +181,7 @@ extern int fill_sess(struct Entry *, char *, char *, size_t);
 extern int get_sess_info(struct Entry *);
 
 /* string.c */
+extern char *check_hex(char *, size_t);
 extern char *trim_str_front(char *);
 extern char *trim_str_end(char *);
 extern char *utf8_check(char *);
@@ -205,7 +206,6 @@ extern char *store_tag(char *);
 /* uuid.c */
 extern char *generate_uuid(void);
 extern char *uuid_date(char *, char *);
-extern char *check_hex(char *, size_t);
 extern char *scan_for_uuid(char *);
 extern bool valid_uuid(char *, bool);
 
