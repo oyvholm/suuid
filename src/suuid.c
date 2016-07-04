@@ -420,6 +420,7 @@ int fill_entry_struct(struct Entry *entry, struct Options *opt)
 	}
 	if (get_sess_info(entry) == EXIT_ERROR) {
 		myerror("fill_entry_struct(): get_sess_info() failed");
+		free(entry->txt);
 		return EXIT_ERROR;
 	}
 
@@ -579,6 +580,9 @@ int main(int argc, char *argv[])
 	}
 
 cleanup:
+
+	free(entry.date);
+	free(entry.cwd);
 
 #if PERL_COMPAT
 	if (perlexit13)

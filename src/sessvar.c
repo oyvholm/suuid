@@ -105,8 +105,10 @@ int get_sess_info(struct Entry *entry)
 		return EXIT_ERROR;
 	}
 
-	if (!scan_for_uuid(s))
+	if (!scan_for_uuid(s)) {
+		free(s);
 		return EXIT_OK;
+	}
 
 	p = s;
 	while (*p) {
@@ -125,6 +127,7 @@ int get_sess_info(struct Entry *entry)
 			if (fill_sess(entry, p,
 				      desc_found, desclen) == EXIT_ERROR) {
 				myerror("get_sess_info(): fill_sess() failed");
+				free(s);
 				return EXIT_ERROR;
 			}
 
@@ -140,6 +143,7 @@ int get_sess_info(struct Entry *entry)
 			desc_found = desc_end = NULL;
 		p++;
 	}
+	free(s);
 
 	return EXIT_OK;
 }

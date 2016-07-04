@@ -139,7 +139,7 @@ void init_xml_entry(struct Entry *e)
 
 char *allocate_elem(char *elem, char *src)
 {
-	char *retval;
+	char *retval, *ap;
 	size_t size = 0;
 
 	if (!elem || !src) {
@@ -163,7 +163,13 @@ char *allocate_elem(char *elem, char *src)
 		return NULL;
 	}
 
-	snprintf(retval, size, "<%s>%s</%s> ", elem, suuid_xml(src), elem);
+	ap = suuid_xml(src);
+	if (!ap) {
+		myerror("allocate_elem(): suuid_xml() failed");
+		return NULL;
+	}
+	snprintf(retval, size, "<%s>%s</%s> ", elem, ap, elem);
+	free(ap);
 
 	return retval;
 }
@@ -363,6 +369,16 @@ char *xml_entry(struct Entry *entry)
 	         sess_xml
 	         );
 
+	free(e.tty);
+	free(e.user);
+	free(e.cwd);
+	free(e.host);
+	free(e.txt);
+	/* free(sess_xml); */ /* fixme: later */
+	/* free(tag_xml); */ /* fixme: later */
+	free(e.date);
+	free(e.uuid);
+
 	return retval;
 }
 
@@ -527,7 +543,7 @@ int add_to_logfile(FILE *fp, struct Entry *entry)
 		myerror("add_to_logfile(): xml_entry() failed");
 		return EXIT_ERROR;
 	}
-	if (fputs(xml_entry(entry), fp) < 0) {
+	if (fputs(ap, fp) < 0) {
 		myerror("add_to_logfile(): fputs() failed");
 		retval = EXIT_ERROR;
 	}
