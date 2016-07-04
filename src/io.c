@@ -37,8 +37,7 @@ char *read_from_fp(FILE *fp)
 		if (!new_mem) {
 			myerror("read_from_fp(): Cannot allocate memory for "
 			        "stream buffer");
-			if (retval)
-				free(retval);
+			free(retval);
 			return NULL;
 		}
 		retval = new_mem;
