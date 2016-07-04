@@ -27,57 +27,25 @@ size_t MAX_GROWTH = 5; /* When converting from plain text to the XML format
                         */
 
 /*
- * init_xml_entry() - Initialise Entry struct at memory position e with initial 
- * values.
+ * valid_xml_chars() - Check that the string pointed to by s contains valid 
+ * UTF-8 and no control chars. Return TRUE if ok, FALSE if invalid.
  */
 
-void init_xml_entry(struct Entry *e)
+bool valid_xml_chars(char *s)
 {
-	unsigned int i;
+	unsigned char *p = (unsigned char *)s;
 
-	e->date = NULL;
-	e->uuid = NULL;
-	e->txt = NULL;
-	e->host = NULL;
-	e->cwd = NULL;
-	e->user = NULL;
-	e->tty = NULL;
-
-	for (i = 0; i < MAX_TAGS; i++)
-		e->tag[i] = NULL;
-	for (i = 0; i < MAX_SESS; i++)
-		e->sess[i].uuid = e->sess[i].desc = NULL;
-}
-
-/*
- * allocate_entry() - Allocate space and write the XML element to it.
- *   elem: char * to name of XML element
- *   src: char * to data source
- * Returns char * to allocated area, or NULL if error.
- */
-
-char *allocate_entry(char *elem, char *src)
-{
-	char *retval;
-	size_t size = 0;
-
-	if (!elem || !src)
-		return NULL;
-
-	size += strlen("<") + strlen(elem) + strlen(">") +
-		strlen(src) * MAX_GROWTH +
-		strlen("<") + strlen(elem) + strlen("/> ") + 1;
-
-	retval = malloc(size + 1);
-	if (!retval) {
-		myerror("allocate_entry(): Cannot allocate %lu bytes",
-		        size + 1);
-		return NULL;
+	if (utf8_check(s))
+		return FALSE;
+	while (*p) {
+		if (*p < ' ' && !strchr("\n\r\t", *p))
+			return FALSE;
+		if (*p == 127)
+			return FALSE;
+		p++;
 	}
 
-	snprintf(retval, size, "<%s>%s</%s> ", elem, suuid_xml(src), elem);
-
-	return retval;
+	return TRUE;
 }
 
 /*
@@ -135,6 +103,60 @@ char *suuid_xml(char *text)
 		}
 	}
 	*destp = '\0';
+
+	return retval;
+}
+
+/*
+ * init_xml_entry() - Initialise Entry struct at memory position e with initial 
+ * values.
+ */
+
+void init_xml_entry(struct Entry *e)
+{
+	unsigned int i;
+
+	e->date = NULL;
+	e->uuid = NULL;
+	e->txt = NULL;
+	e->host = NULL;
+	e->cwd = NULL;
+	e->user = NULL;
+	e->tty = NULL;
+
+	for (i = 0; i < MAX_TAGS; i++)
+		e->tag[i] = NULL;
+	for (i = 0; i < MAX_SESS; i++)
+		e->sess[i].uuid = e->sess[i].desc = NULL;
+}
+
+/*
+ * allocate_entry() - Allocate space and write the XML element to it.
+ *   elem: char * to name of XML element
+ *   src: char * to data source
+ * Returns char * to allocated area, or NULL if error.
+ */
+
+char *allocate_entry(char *elem, char *src)
+{
+	char *retval;
+	size_t size = 0;
+
+	if (!elem || !src)
+		return NULL;
+
+	size += strlen("<") + strlen(elem) + strlen(">") +
+		strlen(src) * MAX_GROWTH +
+		strlen("<") + strlen(elem) + strlen("/> ") + 1;
+
+	retval = malloc(size + 1);
+	if (!retval) {
+		myerror("allocate_entry(): Cannot allocate %lu bytes",
+		        size + 1);
+		return NULL;
+	}
+
+	snprintf(retval, size, "<%s>%s</%s> ", elem, suuid_xml(src), elem);
 
 	return retval;
 }
@@ -359,6 +381,68 @@ char *get_logdir()
 }
 
 /*
+ * create_logfile() - Create logfile with initial XML structure if it doesn't 
+ * exist already. On success, return pointer to string with file name, or NULL 
+ * if error.
+ */
+
+char *create_logfile(char *name)
+{
+	char *xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+	char *xml_doctype = "<!DOCTYPE suuids SYSTEM \"dtd/suuids.dtd\">";
+	FILE *fp;
+
+	if (access(name, F_OK) != -1)
+		return name; /* File already exists */
+
+	fp = fopen(name, "a");
+	if (!fp) {
+		myerror("%s: Could not create log file", name);
+		return NULL;
+	}
+	fprintf(fp, "%s\n%s\n<suuids>\n</suuids>\n", xml_header, xml_doctype);
+	fclose(fp);
+
+	return name;
+}
+
+/*
+ * set_up_logfile() - Determine log file name and create an initial XML log 
+ * file if it doesn't exist.
+ * Return pointer to name of log file, or NULL if error.
+ */
+
+char *set_up_logfile(struct Options *opt, char *hostname)
+{
+	char *logdir, *logfile;
+	size_t fname_length; /* Total length of logfile name */
+
+	logdir = get_logdir(&opt);
+	if (!logdir) {
+		fprintf(stderr, "%s: Unable to find logdir location\n",
+		                progname);
+		return NULL;
+	}
+
+	fname_length = strlen(logdir) + strlen("/") +
+	               strlen(hostname) + strlen(".xml") + 1;
+	logfile = malloc(fname_length + 1);
+	if (!logfile) {
+		myerror("Could not allocate %lu bytes for logfile filename",
+		        fname_length + 1);
+		return NULL;
+	}
+	/* fixme: Remove slash hardcoding */
+	snprintf(logfile, fname_length, "%s/%s.xml", logdir, hostname);
+	if (!create_logfile(logfile)) {
+		myerror("%s: Error when creating log file", logfile);
+		return NULL;
+	}
+
+	return logfile;
+}
+
+/*
  * Open log file fname for read+write, check that the end of file is OK, set 
  * the file position to the place where the new log entry shall be inserted. 
  * Return FILE pointer to the opened stream, ready for writing. If anything 
@@ -447,90 +531,6 @@ int close_logfile(FILE *fp)
 	}
 
 	return retval;
-}
-
-/*
- * create_logfile() - Create logfile with initial XML structure if it doesn't 
- * exist already. On success, return pointer to string with file name, or NULL 
- * if error.
- */
-
-char *create_logfile(char *name)
-{
-	char *xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-	char *xml_doctype = "<!DOCTYPE suuids SYSTEM \"dtd/suuids.dtd\">";
-	FILE *fp;
-
-	if (access(name, F_OK) != -1)
-		return name; /* File already exists */
-
-	fp = fopen(name, "a");
-	if (!fp) {
-		myerror("%s: Could not create log file", name);
-		return NULL;
-	}
-	fprintf(fp, "%s\n%s\n<suuids>\n</suuids>\n", xml_header, xml_doctype);
-	fclose(fp);
-
-	return name;
-}
-
-/*
- * set_up_logfile() - Determine log file name and create an initial XML log 
- * file if it doesn't exist.
- * Return pointer to name of log file, or NULL if error.
- */
-
-char *set_up_logfile(struct Options *opt, char *hostname)
-{
-	char *logdir, *logfile;
-	size_t fname_length; /* Total length of logfile name */
-
-	logdir = get_logdir(&opt);
-	if (!logdir) {
-		fprintf(stderr, "%s: Unable to find logdir location\n",
-		                progname);
-		return NULL;
-	}
-
-	fname_length = strlen(logdir) + strlen("/") +
-	               strlen(hostname) + strlen(".xml") + 1;
-	logfile = malloc(fname_length + 1);
-	if (!logfile) {
-		myerror("Could not allocate %lu bytes for logfile filename",
-		        fname_length + 1);
-		return NULL;
-	}
-	/* fixme: Remove slash hardcoding */
-	snprintf(logfile, fname_length, "%s/%s.xml", logdir, hostname);
-	if (!create_logfile(logfile)) {
-		myerror("%s: Error when creating log file", logfile);
-		return NULL;
-	}
-
-	return logfile;
-}
-
-/*
- * valid_xml_chars() - Check that the string pointed to by s contains valid 
- * UTF-8 and no control chars. Return TRUE if ok, FALSE if invalid.
- */
-
-bool valid_xml_chars(char *s)
-{
-	unsigned char *p = (unsigned char *)s;
-
-	if (utf8_check(s))
-		return FALSE;
-	while (*p) {
-		if (*p < ' ' && !strchr("\n\r\t", *p))
-			return FALSE;
-		if (*p == 127)
-			return FALSE;
-		p++;
-	}
-
-	return TRUE;
 }
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */

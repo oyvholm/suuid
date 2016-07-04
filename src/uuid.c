@@ -21,6 +21,37 @@
 #include "suuid.h"
 
 /*
+ * valid_uuid() - Check that the UUID pointed to by u is a valid UUID. If 
+ * check_len is TRUE, also check that the string length is exactly the same as 
+ * a standard UUID, UUID_LENGTH chars.
+ * Return TRUE if valid, FALSE if not.
+ */
+
+bool valid_uuid(char *u, bool check_len)
+{
+	if (strlen(u) < UUID_LENGTH)
+		return FALSE;
+	if (check_len)
+		if (strlen(u) != UUID_LENGTH)
+			return FALSE;
+
+	/* Check that it only contains lowercase hex and dashes at the right 
+	 * places
+	 */
+	if (check_hex(u, 8) || u[8] != '-' || check_hex(u + 9, 4) ||
+	    u[13] != '-' || check_hex(u + 14, 4) || u[18] != '-' ||
+	    check_hex(u + 19, 4) || u[23] != '-' || check_hex(u + 24, 12))
+		return FALSE;
+
+	/* At the moment only v1 UUIDs are allowed
+	 */
+	if (u[14] != '1')
+		return FALSE;
+
+	return TRUE;
+}
+
+/*
  * generate_uuid()
  */
 
@@ -94,37 +125,6 @@ char *scan_for_uuid(char *s)
 	}
 
 	return NULL;
-}
-
-/*
- * valid_uuid() - Check that the UUID pointed to by u is a valid UUID. If 
- * check_len is TRUE, also check that the string length is exactly the same as 
- * a standard UUID, UUID_LENGTH chars.
- * Return TRUE if valid, FALSE if not.
- */
-
-bool valid_uuid(char *u, bool check_len)
-{
-	if (strlen(u) < UUID_LENGTH)
-		return FALSE;
-	if (check_len)
-		if (strlen(u) != UUID_LENGTH)
-			return FALSE;
-
-	/* Check that it only contains lowercase hex and dashes at the right 
-	 * places
-	 */
-	if (check_hex(u, 8) || u[8] != '-' || check_hex(u + 9, 4) ||
-	    u[13] != '-' || check_hex(u + 14, 4) || u[18] != '-' ||
-	    check_hex(u + 19, 4) || u[23] != '-' || check_hex(u + 24, 12))
-		return FALSE;
-
-	/* At the moment only v1 UUIDs are allowed
-	 */
-	if (u[14] != '1')
-		return FALSE;
-
-	return TRUE;
 }
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */

@@ -146,6 +146,8 @@ struct Options {
  * Function prototypes
  */
 
+#if 1 /* Set to 0 to test with without prototypes */
+
 /* environ.c */
 extern char *get_hostname(void);
 extern char *getpath(void);
@@ -156,20 +158,20 @@ extern char *get_tty(void);
 extern char *read_from_fp(FILE *);
 
 /* logfile.c */
+extern bool valid_xml_chars(char *);
+extern char *suuid_xml(char *);
 extern void init_xml_entry(struct Entry *);
 extern char *allocate_entry(char *, char *);
-extern char *suuid_xml(char *);
 extern char *alloc_attr(char *, char *);
 extern char *get_xml_tags(void);
 extern char *create_sess_xml(struct Entry *);
 extern char *xml_entry(struct Entry *);
 extern char *get_logdir();
+extern char *create_logfile(char *);
+extern char *set_up_logfile(struct Options *, char *);
 extern FILE *open_logfile(char *);
 extern int add_to_logfile(FILE *, struct Entry *);
 extern int close_logfile(FILE *);
-extern char *create_logfile(char *);
-extern char *set_up_logfile(struct Options *, char *);
-extern bool valid_xml_chars(char *);
 
 /* rcfile.c */
 extern int read_rcfile(char *, struct Rc *);
@@ -204,10 +206,12 @@ extern char *get_next_tag(void);
 extern char *store_tag(char *);
 
 /* uuid.c */
+extern bool valid_uuid(char *, bool);
 extern char *generate_uuid(void);
 extern char *uuid_date(char *, char *);
 extern char *scan_for_uuid(char *);
-extern bool valid_uuid(char *, bool);
+
+#endif
 
 /*
  * Global variables
