@@ -29,7 +29,7 @@
 
 bool valid_uuid(char *u, bool check_len)
 {
-	if (strlen(u) < UUID_LENGTH)
+	if (!u || strlen(u) < UUID_LENGTH)
 		return FALSE;
 	if (check_len)
 		if (strlen(u) != UUID_LENGTH)
