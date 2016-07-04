@@ -283,9 +283,18 @@ char *xml_entry(struct Entry *entry)
 		return NULL;
 
 	e.uuid = alloc_attr("u", entry->uuid);
+	if (!e.uuid) {
+		myerror("xml_entry(): alloc_attr() for uuid failed");
+		return NULL;
+	}
 
-	if (entry->date)
+	if (entry->date) {
 		e.date = alloc_attr("t", entry->date);
+		if (!e.date) {
+			myerror("xml_entry(): alloc_attr() for date failed");
+			return NULL;
+		}
+	}
 
 	tag_xml = get_xml_tags();
 	if (!tag_xml) {
