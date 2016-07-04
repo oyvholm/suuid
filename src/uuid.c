@@ -110,6 +110,95 @@ char *uuid_date(char *dest, char *uuid)
 }
 
 /*
+ * is_valid_date() - Check that the date pointed to by s is valid. If check_len 
+ * is TRUE, also check that the string length is correct.
+ * Return 1 if ok, 0 if invalid.
+ */
+
+bool is_valid_date(char *s, bool check_len)
+{
+	if (check_len && strlen(s) != DATE_LENGTH)
+		return FALSE;
+
+	if (s[0] != '2' || s[1] != '0' || /* Yay for Y2.1K */
+	    !isdigit(s[2]) || !isdigit(s[3]) || /* Two last digits in year */
+	    s[4] != '-' ||
+	    !strchr("01", s[5]) || !isdigit(s[6]) || /* Month */
+	    s[7] != '-' ||
+	    !strchr("0123", s[8]) || !isdigit(s[9]) || /* Day */
+	    s[10] != 'T' ||
+	    !strchr("012", s[11]) || !isdigit(s[12]) || /* Hour */
+	    s[13] != ':' ||
+	    !strchr("012345", s[14]) || !isdigit(s[15]) || /* Minute */
+	    s[16] != ':' ||
+	    !strchr("0123456", s[17]) || !isdigit(s[18]) || /* Second */
+	    s[19] != '.' ||
+	    !isdigit(s[20]) || !isdigit(s[21]) || !isdigit(s[22]) ||
+	    !isdigit(s[23]) || !isdigit(s[24]) || !isdigit(s[25]) ||
+	    !isdigit(s[26]) || /* Nanoseconds */
+	    s[27] != 'Z')
+		return FALSE;
+	else
+		return TRUE;
+}
+
+/*
+ * uuid_date_from_uuid() - Same functionality as uuid_date(), but use the 
+ * uuid(1) program to calculate the date. Use until uuid_date() works.
+ */
+
+char *uuid_date_from_uuid(char *dest, char *uuid)
+{
+	FILE *fp;
+	char cmd[50];
+	char *ap, *p;
+
+	if (!valid_uuid(uuid, FALSE))
+		return NULL;
+	if (uuid[14] != '1')
+		return NULL; /* Not a v1 UUID, has no timestamp */
+
+	memset(cmd, 0, 50);
+	snprintf(cmd, 49, "uuid -d %s", uuid);
+
+	fp = popen(cmd, "r");
+	if (!fp) {
+		myerror("uuid_date_from_uuid(): Could not exec \"%s\"", cmd);
+		return NULL;
+	}
+	ap = read_from_fp(fp);
+	pclose(fp);
+
+	p = strstr(ap, "content: time:");
+	if (!p) {
+		fprintf(stderr, "%s: uuid_date_from_uuid(): Search string not "
+		                 "found in uuid(1) output\n", progname);
+		return NULL;
+	}
+	p = strstr(p, "20"); /* This is how you create Y2.1K problems, kids */
+	if (!p) {
+		fprintf(stderr, "%s: uuid_date_from_uuid(): Didn't find year "
+		                "in uuid(1) output\n", progname);
+		return NULL;
+	}
+
+	p[10] = 'T';
+	p[26] = p[27];
+	p[27] = 'Z';
+	p[28] = '\0';
+
+	strncpy(dest, p, DATE_LENGTH + 1);
+	free(ap);
+	if (!is_valid_date(dest, TRUE)) {
+		fprintf(stderr, "uuid_date_from_uuid(): Generated date is "
+		                "invalid: \"%s\"\n", dest);
+		return NULL;
+	}
+
+	return dest;
+}
+
+/*
  * scan_for_uuid() - Return a pointer to the first UUID in the string s, or 
  * NULL if no UUID was found.
  */

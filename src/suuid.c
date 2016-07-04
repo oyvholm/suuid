@@ -408,7 +408,8 @@ char *process_uuid(FILE *logfp, struct Entry *entry)
 		        "date string", DATE_LENGTH + 1);
 		return NULL;
 	}
-	uuid_date(entry->date, entry->uuid);
+	if (!uuid_date_from_uuid(entry->date, entry->uuid))
+		return NULL;
 
 	if (opt.verbose >= 4) {
 		int i;
@@ -491,7 +492,7 @@ int main(int argc, char *argv[])
 
 			msg(4, "Checking arg %d \"%s\"", i, a);
 			printf("uuid_date(\"%s\") = \"%s\"\n",
-			       a, uuid_date(buf, a));
+			       a, uuid_date_from_uuid(buf, a));
 		}
 		return EXIT_OK;
 	}

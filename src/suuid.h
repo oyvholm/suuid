@@ -209,6 +209,8 @@ extern char *store_tag(char *);
 extern bool valid_uuid(char *, bool);
 extern char *generate_uuid(void);
 extern char *uuid_date(char *, char *);
+extern bool is_valid_date(char *, bool);
+extern char *uuid_date_from_uuid(char *, char *);
 extern char *scan_for_uuid(char *);
 
 #endif
