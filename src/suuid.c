@@ -353,6 +353,21 @@ int fill_entry_struct(struct Entry *entry, struct Options *opt)
 				myerror("Could not read data from stdin");
 				return EXIT_ERROR;
 			}
+		} else if (!strcmp(opt->comment, "--")) {
+			char *e;
+
+			e = get_editor();
+			if (!e) {
+				myerror("get_editor() failed");
+				return EXIT_ERROR;
+			}
+			entry->txt = read_from_editor(e);
+			if (!entry->txt) {
+				myerror("Could not read data from editor "
+				        "\"%s\"", e);
+				return EXIT_ERROR;
+			}
+			free(e);
 		} else {
 			entry->txt = strdup(opt->comment);
 			if (!entry->txt) {

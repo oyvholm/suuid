@@ -35,7 +35,8 @@ char *read_from_fp(FILE *fp)
 		char *new_mem = realloc(retval,
 		                        BUFSIZ + bytes_read + 1);
 		if (!new_mem) {
-			myerror("Cannot allocate memory for stdin buffer");
+			myerror("read_from_fp(): Cannot allocate memory for "
+			        "stream buffer");
 			if (retval)
 				free(retval);
 			return NULL;
@@ -44,11 +45,77 @@ char *read_from_fp(FILE *fp)
 		p = retval + bytes_read;
 		bytes_read += fread(p, 1, BUFSIZ, fp);
 		if (ferror(fp)) {
-			myerror("Error when reading stdin");
+			myerror("read_from_fp(): Read error");
 			free(retval);
 			return NULL;
 		}
 	} while (!feof(fp));
+
+	return retval;
+}
+
+/*
+ * read_from_file() - Read contents of file fname and return a pointer to a 
+ * allocated string with the contents, or NULL if error.
+ */
+
+char *read_from_file(char *fname)
+{
+	FILE *fp;
+	char *retval;
+
+	fp = fopen(fname, "rb");
+	if (!fp) {
+		myerror("read_from_file(): Could not open file for read");
+		return NULL;
+	}
+	retval = read_from_fp(fp);
+	if (!retval) {
+		myerror("read_from_file(): read_from_fp() failed");
+		return NULL;
+	}
+	fclose(fp);
+
+	return retval;
+}
+
+/*
+ * read_from_editor() - Open editor e on a temporary file and return the 
+ * contentes as an allocated string, or NULL if error.
+ */
+
+char *read_from_editor(char *editor)
+{
+	char *retval,
+	     tmpfile[] = ".tmp-suuid.XXXXXX",
+	     *cmdbuf;
+	size_t size;
+
+	if (mkstemp(tmpfile) == -1) {
+		myerror("read_from_editor(): Could not create file name for"
+		        "temporary file");
+		return NULL;
+	}
+	size = strlen(editor) + strlen(tmpfile) + 5;
+	cmdbuf = malloc(size);
+	if (!cmdbuf) {
+		myerror("read_from_editor(): Could not allocate %lu bytes for "
+		        "command buffer", size);
+		return NULL;
+	}
+	snprintf(cmdbuf, size, "%s %s", editor, tmpfile);
+	if (system(cmdbuf) == -1) {
+		myerror("read_from_editor(): Cannot execute \"%s\"", cmdbuf);
+		return NULL;
+	}
+	retval = read_from_file(tmpfile);
+	if (!retval) {
+		myerror("read_from_editor(): read_from_file() failed");
+		return NULL;
+	}
+	if (remove(tmpfile) == -1)
+		myerror("Warning: Could not remove temporary file \"%s\"",
+		        tmpfile);
 
 	return retval;
 }

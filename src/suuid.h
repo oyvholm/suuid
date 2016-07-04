@@ -50,6 +50,7 @@
 
 #define stddebug  stderr
 
+#define ENV_EDITOR  "SUUID_EDITOR" /* Name of editor to use with "-c --" */
 #define ENV_SESS  "SESS_UUID" /* Name of environment variable where the session 
                                * information is stored
                                */
@@ -57,6 +58,7 @@
 #define ENV_LOGDIR  "SUUID_LOGDIR" /* Optional environment variable with path 
                                     * to log directory
                                     */
+#define STD_EDITOR  "vi"
 #define MAX_SESS  1000 /* Maximum number of sess elements per entry */
 #define MAX_TAGS  1000 /* Maximum number of tags */
 #define LEGAL_UTF8_CHARS  "\x80\x81\x82\x83\x84\x85\x86\x87" \
@@ -149,6 +151,7 @@ struct Options {
 #if 1 /* Set to 0 to test with without prototypes */
 
 /* environ.c */
+extern char *get_editor(void);
 extern char *get_hostname(void);
 extern char *getpath(void);
 extern char *get_username(void);
@@ -156,6 +159,8 @@ extern char *get_tty(void);
 
 /* io.h */
 extern char *read_from_fp(FILE *);
+extern char *read_from_file(char *);
+extern char *read_from_editor(char *);
 
 /* logfile.c */
 extern bool valid_xml_chars(char *);

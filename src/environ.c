@@ -21,6 +21,41 @@
 #include "suuid.h"
 
 /*
+ * get_editor() - Return the name of the user's favourite text editor. Return 
+ * NULL if it can't find out.
+ */
+
+char *get_editor(void)
+{
+	char *retval;
+
+	if (getenv(ENV_EDITOR)) {
+		retval = strdup(getenv(ENV_EDITOR));
+		if (!retval) {
+			myerror("get_editor(): Could not duplicate "
+			        "%s environment variable", ENV_EDITOR);
+			return NULL;
+		}
+	} else if (getenv("EDITOR")) {
+		retval = strdup(getenv("EDITOR"));
+		if (!retval) {
+			myerror("get_editor(): Could not duplicate "
+			        "EDITOR environment variable");
+			return NULL;
+		}
+	} else {
+		retval = strdup(STD_EDITOR); /* In case it's free()'ed later */
+		if (!retval) {
+			myerror("get_editor(): Could not duplicate \"%s\"",
+			        STD_EDITOR);
+			return NULL;
+		}
+	}
+
+	return retval;
+}
+
+/*
  * get_hostname() - Return pointer to string with hostname of the computer, or 
  * NULL if error.
  */
