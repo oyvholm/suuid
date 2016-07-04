@@ -142,8 +142,15 @@ char *allocate_elem(char *elem, char *src)
 	char *retval;
 	size_t size = 0;
 
-	if (!elem || !src)
-		return NULL;
+	if (!elem || !src) {
+		retval = strdup("");
+		if (!retval) {
+			myerror("allocate_elem(): Could not duplicate empty "
+			        "string");
+			return NULL;
+		}
+		return retval;
+	}
 
 	size += strlen("<") + strlen(elem) + strlen(">") +
 		strlen(src) * MAX_GROWTH +
@@ -265,11 +272,10 @@ char *create_sess_xml(struct Entry *entry)
 
 char *xml_entry(struct Entry *entry)
 {
-#define XML_BUFSIZE  1000000 /* fixme: Temporary */
-	static char buf[XML_BUFSIZE];
 	struct Entry e;
 	char *retval;
 	char *tag_xml, *sess_xml;
+	size_t size;
 
 	init_xml_entry(&e);
 
@@ -317,7 +323,17 @@ char *xml_entry(struct Entry *entry)
 	e.user = allocate_elem("user", entry->user);
 	e.tty = allocate_elem("tty", entry->tty);
 
-	snprintf(buf, XML_BUFSIZE, /* fixme: length */
+	size = DATE_LENGTH + UUID_LENGTH + strlen(tag_xml) + strlen(e.txt) +
+	       strlen(e.host) + strlen(e.cwd) + strlen(e.user) +
+	       strlen(e.tty) + strlen(sess_xml) + 128;
+	retval = malloc(size);
+	if (!retval) {
+		myerror("xml_entry(): Could not allocate %lu bytes for XML "
+		        "string", size);
+		return NULL;
+	}
+
+	snprintf(retval, size,
 	         "<suuid%s%s> " /* date, uuid */
 	         "%s" /* tag */
 	         "%s" /* txt */
@@ -337,7 +353,6 @@ char *xml_entry(struct Entry *entry)
 	         (e.tty) ? e.tty : "",
 	         sess_xml
 	         );
-	retval = buf;
 
 	return retval;
 }
@@ -495,8 +510,14 @@ FILE *open_logfile(char *fname)
 
 int add_to_logfile(FILE *fp, struct Entry *entry)
 {
+	char *ap;
 	int retval = EXIT_OK;
 
+	ap = xml_entry(entry);
+	if (!ap) {
+		myerror("add_to_logfile(): xml_entry() failed");
+		return EXIT_ERROR;
+	}
 	if (fputs(xml_entry(entry), fp) < 0) {
 		myerror("add_to_logfile(): fputs() failed");
 		retval = EXIT_ERROR;
@@ -505,6 +526,7 @@ int add_to_logfile(FILE *fp, struct Entry *entry)
 		myerror("add_to_logfile(): fputc() failed");
 		retval = EXIT_ERROR;
 	}
+	free(ap);
 
 	return retval;
 }
