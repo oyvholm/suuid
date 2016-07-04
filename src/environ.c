@@ -62,16 +62,16 @@ char *get_editor(void)
 
 bool valid_hostname(char *s)
 {
-	char *p;
+	unsigned char *p;
 
 	if (!s || !strlen(s) || strlen(s) > HOST_NAME_MAX ||
 	    strstr(s, "..") || utf8_check(s))
 		return FALSE;
 
-	p = s;
+	p = (unsigned char *)s;
 	while (*p) {
-		if (strchr("!\"#$%&'()*+,-/:;<=>?@[\\]^`{|}~\x7f", *p) ||
-		    *p < '!')
+		if (strchr("!\"#$%&'()*+,-/:;<=>?@[\\]^`{|}~", *p) ||
+		    *p < '!' || *p >= '\x7f')
 			return FALSE;
 		p++;
 	}
