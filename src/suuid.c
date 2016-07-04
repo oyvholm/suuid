@@ -149,19 +149,20 @@ void usage(int retval)
 	       "(\"--\") as a \n"
 	       "    comment opens the editor defined in the environment "
 	       "variable \n"
-	       "    $SUUID_EDITOR to edit the message. If $SUUID_EDITOR is "
+	       "    %s to edit the message. If %s is "
 	       "not defined, \n"
-	       "    $EDITOR is read, if not defined, \"vi\" is called, it "
+	       "    EDITOR is read, if not defined, \"%s\" is called, it "
 	       "should exist \n"
-	       "    everywhere. It may not, but it should.\n");
+	       "    everywhere. It may not, but it should.\n",
+	       ENV_EDITOR, ENV_EDITOR, STD_EDITOR);
 	printf("  -h, --help\n"
 	       "    Show this help.\n");
 	printf("  -l x, --logdir x\n"
 	       "    Store log files in directory x.\n"
-	       "    If the SUUID_LOGDIR environment variable is defined, "
+	       "    If the %s environment variable is defined, "
 	       "that value is \n"
 	       "    used. Otherwise the value \"$HOME/uuids\" is used.\n"
-	       "    Current default: /home/sunny/uuids\n");
+	       "    Current default: %s\n", ENV_LOGDIR, get_logdir());
 	printf("  -m, --random-mac\n"
 	       "    Don’t use the hardware MAC address, generate a random "
 	       "address field.\n");
@@ -176,7 +177,7 @@ void usage(int retval)
 	       "valid XML, \n"
 	       "    otherwise it will create corrupted log files.\n");
 	printf("  --rcfile X\n"
-	       "    Use file X instead of '/home/sunny/.suuidrc'.\n");
+	       "    Use file X instead of '%s/.suuidrc'.\n", getenv("HOME"));
 	printf("  -t x, --tag x\n"
 	       "    Use x as tag (category).\n");
 	printf("  -v, --verbose\n"
@@ -199,19 +200,15 @@ void usage(int retval)
 	       "        Don’t output anything.\n"
 	       "    Default: \"o\"\n");
 	printf("\n");
-	printf("If the $SESS_UUID environment variable is defined by "
+	printf("If the %s environment variable is defined by "
 	       "sess(1) or another \n"
-	       "program, the value is logged if it is an UUID.\n");
+	       "program, the value is logged if it is an UUID.\n", ENV_SESS);
 	printf("\n");
 	printf("A different hostname can be specified in the environment "
 	       "variable \n"
-	       "$SUUID_HOSTNAME, or in the file /home/sunny/.suuidrc with "
+	       "%s, or in the file %s/.suuidrc with "
 	       "the format \n"
-	       "\"hostname = xxx\".\n");
-	printf("\n");
-	printf("To also store the entries in a Postgres database, add "
-	       "\"use-postgres = 1\" \n"
-	       "to /home/sunny/.suuidrc .\n");
+	       "\"hostname = xxx\".\n", ENV_HOSTNAME, getenv("HOME"));
 	printf("\n");
 }
 
