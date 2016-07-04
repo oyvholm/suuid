@@ -32,6 +32,9 @@ char *has_key(char *line, char *keyword)
 	size_t size;
 	char *retval;
 
+	assert(keyword);
+	assert(strlen(keyword));
+
 	size = strlen(keyword) + 2;
 	search_str = malloc(size);
 	if (!search_str) {

@@ -30,6 +30,7 @@ char *check_hex(char *hex, size_t len)
 {
 	char *p;
 
+	assert(hex);
 	for (p = hex; p < hex + len; p++)
 		if (!strchr("0123456789abcdef", *p))
 			return p;
@@ -44,8 +45,10 @@ char *check_hex(char *hex, size_t len)
 char *trim_str_front(char *dest)
 {
 	char *p = dest;
-	size_t size = strlen(dest);
+	size_t size;
 
+	assert(dest);
+	size = strlen(dest);
 	while (p < dest + size && isspace(*p))
 		p++;
 	if (p == dest)
@@ -63,8 +66,10 @@ char *trim_str_front(char *dest)
 char *trim_str_end(char *dest)
 {
 	char *p;
-	size_t size = strlen(dest);
+	size_t size;
 
+	assert(dest);
+	size = strlen(dest);
 	if (!size)
 		return dest;
 	p = dest + size - 1;
@@ -99,6 +104,8 @@ char *trim_str_end(char *dest)
 char *utf8_check(char *text)
 {
 	unsigned char *s = (unsigned char *)text;
+
+	assert(text);
 
 	while (*s) {
 		if (*s < 0x80)

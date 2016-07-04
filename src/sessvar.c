@@ -63,6 +63,9 @@ int fill_sess(struct Entry *dest, char *uuid, char *desc, size_t desclen)
 	     *adesc = NULL;
 	static unsigned int sessind = 0;
 
+	assert(dest);
+	assert(valid_uuid(uuid, FALSE));
+
 	auuid = strndup(uuid, UUID_LENGTH);
 	if (!auuid) {
 		myerror("fill_sess(): Could not duplicate UUID");
@@ -94,6 +97,8 @@ int fill_sess(struct Entry *dest, char *uuid, char *desc, size_t desclen)
 int get_sess_info(struct Entry *entry)
 {
 	char *s, *p, *desc_found = NULL, *desc_end = NULL;
+
+	assert(entry);
 
 	if (!getenv(ENV_SESS))
 		return EXIT_OK;

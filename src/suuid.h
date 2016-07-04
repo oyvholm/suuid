@@ -88,6 +88,7 @@
  * Standard header files
  */
 
+#include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <getopt.h>

@@ -154,6 +154,8 @@ char *uuid_date_from_uuid(char *dest, char *uuid)
 	char cmd[50];
 	char *ap, *p;
 
+	assert(dest);
+
 	if (!valid_uuid(uuid, FALSE))
 		return NULL;
 	if (uuid[14] != '1')

@@ -116,6 +116,8 @@ void init_xml_entry(struct Entry *e)
 {
 	unsigned int i;
 
+	assert(e);
+
 	e->date = NULL;
 	e->uuid = NULL;
 	e->txt = NULL;
@@ -142,7 +144,10 @@ char *allocate_elem(char *elem, char *src)
 	char *retval, *ap;
 	size_t size = 0;
 
-	if (!elem || !src) {
+	assert(elem);
+	assert(strlen(elem));
+
+	if (!src) {
 		retval = strdup("");
 		if (!retval) {
 			myerror("allocate_elem(): Could not duplicate empty "
@@ -183,6 +188,9 @@ char *alloc_attr(char *attr, char *data)
 {
 	char *retval = NULL;
 	int size;
+
+	assert(attr);
+	assert(strlen(attr));
 
 	size = strlen(" ") + strlen(attr) + strlen("=\"") + strlen(data) +
 	       strlen("\"") + 1;
@@ -275,6 +283,8 @@ char *create_sess_xml(struct Entry *entry)
 	            tmpbuf[CSX_TMPBUFSIZE];
 	unsigned int i = 0;
 
+	assert(entry);
+
 	buf[0] = '\0';
 	while (entry->sess[i].uuid) {
 		char *u, *d;
@@ -307,6 +317,8 @@ char *xml_entry(struct Entry *entry)
 	char *retval;
 	char *tag_xml, *sess_xml;
 	size_t size;
+
+	assert(entry);
 
 	init_xml_entry(&e);
 
@@ -457,6 +469,9 @@ char *create_logfile(char *name)
 	char *xml_doctype = "<!DOCTYPE suuids SYSTEM \"dtd/suuids.dtd\">";
 	FILE *fp;
 
+	assert(name);
+	assert(strlen(name));
+
 	if (access(name, F_OK) != -1)
 		return name; /* File already exists */
 
@@ -481,6 +496,8 @@ char *set_up_logfile(struct Options *opt, char *hostname)
 {
 	char *logdir, *logfile;
 	size_t fname_length; /* Total length of logfile name */
+
+	assert(opt);
 
 	logdir = get_logdir(&opt);
 	if (!logdir) {
@@ -519,6 +536,9 @@ FILE *open_logfile(char *fname)
 	FILE *fp;
 	char check_line[12];
 	long filepos;
+
+	assert(fname);
+	assert(strlen(fname));
 
 	/* todo: Add file locking */
 	fp = fopen(fname, "r+");
@@ -562,6 +582,8 @@ int add_to_logfile(FILE *fp, struct Entry *entry)
 {
 	char *ap;
 	int retval = EXIT_OK;
+
+	assert(entry);
 
 	ap = xml_entry(entry);
 	if (!ap) {
