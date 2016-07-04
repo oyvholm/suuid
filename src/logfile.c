@@ -564,7 +564,6 @@ FILE *open_logfile(char *fname)
 	assert(fname);
 	assert(strlen(fname));
 
-	/* todo: Add file locking */
 	fp = fopen(fname, "r+");
 	if (!fp) {
 #if PERL_COMPAT
@@ -573,6 +572,11 @@ FILE *open_logfile(char *fname)
 #else
 		myerror("%s: Could not open file for read+write", fname);
 #endif
+		return NULL;
+	}
+	if (flock(fileno(fp), LOCK_EX) == -1) {
+		myerror("Could not lock log file \"%s\"", fname);
+		fclose(fp);
 		return NULL;
 	}
 	if (fseek(fp, -10, SEEK_END) == -1) {
@@ -640,6 +644,7 @@ int close_logfile(FILE *fp)
 
 	if (fprintf(fp, "</suuids>\n") != 10)
 		retval = EXIT_ERROR;
+	flock(fileno(fp), LOCK_UN);
 	if (fclose(fp) == EOF)
 		retval = EXIT_ERROR;
 	if (opt.verbose >= 3) {
