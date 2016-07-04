@@ -23,10 +23,20 @@
 unsigned int tag_count = 0;
 unsigned int tag_list_ind = 0;
 
+/*
+ * rewind_tag() - Reset the index counter so get_next_tag() starts from the 
+ * beginning.
+ */
+
 void rewind_tag(void)
 {
 	tag_list_ind = 0;
 }
+
+/*
+ * tag_exists() - Return TRUE if tag already is added to the array, FALSE if 
+ * not.
+ */
 
 bool tag_exists(char *tag)
 {
@@ -39,6 +49,11 @@ bool tag_exists(char *tag)
 	return FALSE;
 }
 
+/*
+ * get_next_tag() - Return a pointer to a string with the next stored tag name. 
+ * Returns NULL when the last tag has been found.
+ */
+
 char *get_next_tag(void)
 {
 	if (tag_list_ind < MAX_TAGS)
@@ -46,6 +61,11 @@ char *get_next_tag(void)
 	else
 		return NULL;
 }
+
+/*
+ * store_tag() - Store a new tag in the array. If ok, return pointer to the tag 
+ * name, otherwise NULL.
+ */
 
 char *store_tag(char *arg)
 {

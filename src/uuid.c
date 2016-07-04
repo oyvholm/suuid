@@ -52,7 +52,8 @@ bool valid_uuid(char *u, bool check_len)
 }
 
 /*
- * generate_uuid()
+ * generate_uuid() - Return a pointer to a string with a generated UUID v1, or 
+ * NULL if error.
  */
 
 char *generate_uuid(void)

@@ -179,6 +179,8 @@ extern int add_to_logfile(FILE *, struct Entry *);
 extern int close_logfile(FILE *);
 
 /* rcfile.c */
+extern char *has_key(char *, char *);
+extern void parse_rc_line(char *, struct Rc *);
 extern int read_rcfile(char *, struct Rc *);
 
 /* sessvar.c */
