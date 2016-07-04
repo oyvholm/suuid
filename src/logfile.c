@@ -131,13 +131,13 @@ void init_xml_entry(struct Entry *e)
 }
 
 /*
- * allocate_entry() - Allocate space and write the XML element to it.
+ * allocate_elem() - Allocate space and write the XML element to it.
  *   elem: char * to name of XML element
  *   src: char * to data source
  * Returns char * to allocated area, or NULL if error.
  */
 
-char *allocate_entry(char *elem, char *src)
+char *allocate_elem(char *elem, char *src)
 {
 	char *retval;
 	size_t size = 0;
@@ -151,7 +151,7 @@ char *allocate_entry(char *elem, char *src)
 
 	retval = malloc(size + 1);
 	if (!retval) {
-		myerror("allocate_entry(): Cannot allocate %lu bytes",
+		myerror("allocate_elem(): Cannot allocate %lu bytes",
 		        size + 1);
 		return NULL;
 	}
@@ -311,11 +311,11 @@ char *xml_entry(struct Entry *entry)
 		                      entry->txt,
 		                      txt_space);
 	} else
-		e.txt = allocate_entry("txt", entry->txt);
-	e.host = allocate_entry("host", entry->host);
-	e.cwd = allocate_entry("cwd", entry->cwd);
-	e.user = allocate_entry("user", entry->user);
-	e.tty = allocate_entry("tty", entry->tty);
+		e.txt = allocate_elem("txt", entry->txt);
+	e.host = allocate_elem("host", entry->host);
+	e.cwd = allocate_elem("cwd", entry->cwd);
+	e.user = allocate_elem("user", entry->user);
+	e.tty = allocate_elem("tty", entry->tty);
 
 	snprintf(buf, XML_BUFSIZE, /* fixme: length */
 	         "<suuid%s%s> " /* date, uuid */

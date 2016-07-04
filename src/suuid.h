@@ -166,7 +166,7 @@ extern char *read_from_editor(char *);
 extern bool valid_xml_chars(char *);
 extern char *suuid_xml(char *);
 extern void init_xml_entry(struct Entry *);
-extern char *allocate_entry(char *, char *);
+extern char *allocate_elem(char *, char *);
 extern char *alloc_attr(char *, char *);
 extern char *get_xml_tags(void);
 extern char *create_sess_xml(struct Entry *);
