@@ -122,70 +122,97 @@ void print_version(void)
 
 void usage(int retval)
 {
-	if (retval != EXIT_OK)
+	if (retval != EXIT_OK) {
 		fprintf(stderr, "\nType \"%s --help\" for help screen. "
 		                "Returning with value %d.\n",
 		                progname, retval);
-	else {
-		puts("");
-		if (opt.verbose >= 1) {
-			print_version();
-			puts("");
-		}
-		printf("Usage: %s [options] [file [files [...]]]\n", progname);
-		printf("\n");
-		printf("Options:\n");
-		printf("\n");
-		printf("  -c x, --comment x\n"
-		       "    Store comment x in the log file.\n");
-		printf("  -h, --help\n"
-		       "    Show this help.\n");
-		printf("  --license\n"
-		       "    Print the software license\n");
-		printf("  -l x, --logdir x\n"
-		       "    Store log files in directory x.\n"
-		       "    If the %s environment variable is defined, that "
-		       "value is\n"
-		       "    used. Otherwise the value \"$HOME/uuids\" is "
-		       "used.\n", ENV_LOGDIR);
-		printf("  -m, --random-mac\n"
-		       "    Don’t use the hardware MAC address, generate a "
-		       "random address field.\n");
-		printf("  -n x, --count x\n"
-		       "    Print and store x UUIDs.\n");
-		printf("  -q, --quiet\n"
-		       "    Be more quiet. "
-		       "Can be repeated to increase silence.\n");
-		printf("  --raw\n"
-		       "    Don’t convert <txt> element to XML. When using "
-		       "this option, it is \n"
-		       "    expected that the value of the -c/--comment "
-		       "option is valid XML, \n"
-		       "    otherwise it will create corrupted log files.\n");
-		printf("  --rcfile X\n"
-		       "    Use file X instead of '$Std{'rcfile'}'.\n");
-		printf("  -t x, --tag x\n"
-		       "    Use x as tag (category).\n");
-		printf("  -v, --verbose\n"
-		       "    Increase level of verbosity. Can be repeated.\n");
-		printf("  --version\n"
-		       "    Print version information.\n");
-		printf("  -w x, --whereto x\n"
-		       "    x is a string which decides where the UUID will "
-		       "be written:\n"
-		       "      The string contains 'e' - stderr\n"
-		       "      The string contains 'o' - stdout\n"
-		       "    All other characters will be ignored. Examples:\n"
-		       "      e\n"
-		       "        Send to stderr.\n"
-		       "      eo\n"
-		       "        Send to both stdout and stderr.\n"
-		       "      a\n"
-		       "        Synonym for eo.\n"
-		       "      n\n"
-		       "        Don’t output anything.\n");
-		printf("\n");
+		return;
 	}
+
+	puts("");
+	if (opt.verbose >= 1) {
+		print_version();
+		puts("");
+	}
+	printf("Usage: suuid [options]\n");
+	printf("\n");
+	printf("Generates one or more UUIDs and stores it to a log file with "
+	       "optional \n"
+	       "comment or tag/category.\n");
+	printf("\n");
+	printf("Options:\n");
+	printf("\n");
+	printf("  -c x, --comment x\n"
+	       "    Store comment x in the log file. If \"-\" is specified as "
+	       "comment, the \n"
+	       "    program will read the comment from stdin. Two hyphens "
+	       "(\"--\") as a \n"
+	       "    comment opens the editor defined in the environment "
+	       "variable \n"
+	       "    $SUUID_EDITOR to edit the message. If $SUUID_EDITOR is "
+	       "not defined, \n"
+	       "    $EDITOR is read, if not defined, \"vi\" is called, it "
+	       "should exist \n"
+	       "    everywhere. It may not, but it should.\n");
+	printf("  -h, --help\n"
+	       "    Show this help.\n");
+	printf("  -l x, --logdir x\n"
+	       "    Store log files in directory x.\n"
+	       "    If the SUUID_LOGDIR environment variable is defined, "
+	       "that value is \n"
+	       "    used. Otherwise the value \"$HOME/uuids\" is used.\n"
+	       "    Current default: /home/sunny/uuids\n");
+	printf("  -m, --random-mac\n"
+	       "    Don’t use the hardware MAC address, generate a random "
+	       "address field.\n");
+	printf("  -n x, --count x\n"
+	       "    Print and store x UUIDs.\n");
+	printf("  -q, --quiet\n"
+	       "    Be more quiet. Can be repeated to increase silence.\n");
+	printf("  --raw\n"
+	       "    Don’t convert <txt> element to XML. When using this "
+	       "option, it is \n"
+	       "    expected that the value of the -c/--comment option is "
+	       "valid XML, \n"
+	       "    otherwise it will create corrupted log files.\n");
+	printf("  --rcfile X\n"
+	       "    Use file X instead of '/home/sunny/.suuidrc'.\n");
+	printf("  -t x, --tag x\n"
+	       "    Use x as tag (category).\n");
+	printf("  -v, --verbose\n"
+	       "    Increase level of verbosity. Can be repeated.\n");
+	printf("  --version\n"
+	       "    Print version information.\n");
+	printf("  -w x, --whereto x\n"
+	       "    x is a string which decides where the UUID will be "
+	       "written:\n"
+	       "      The string contains 'e' - stderr\n"
+	       "      The string contains 'o' - stdout\n"
+	       "    All other characters will be ignored. Examples:\n"
+	       "      e\n"
+	       "        Send to stderr.\n"
+	       "      eo\n"
+	       "        Send to both stdout and stderr.\n"
+	       "      a\n"
+	       "        Synonym for eo.\n"
+	       "      n\n"
+	       "        Don’t output anything.\n"
+	       "    Default: \"o\"\n");
+	printf("\n");
+	printf("If the $SESS_UUID environment variable is defined by "
+	       "sess(1) or another \n"
+	       "program, the value is logged if it is an UUID.\n");
+	printf("\n");
+	printf("A different hostname can be specified in the environment "
+	       "variable \n"
+	       "$SUUID_HOSTNAME, or in the file /home/sunny/.suuidrc with "
+	       "the format \n"
+	       "\"hostname = xxx\".\n");
+	printf("\n");
+	printf("To also store the entries in a Postgres database, add "
+	       "\"use-postgres = 1\" \n"
+	       "to /home/sunny/.suuidrc .\n");
+	printf("\n");
 }
 
 /*
