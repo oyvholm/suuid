@@ -58,7 +58,7 @@ bool valid_uuid(char *u, bool check_len)
 char *generate_uuid(void)
 {
 	static char uuid[UUID_LENGTH + 2];
-	char *cmd = "/usr/bin/uuid";
+	char *cmd = "uuid";
 	FILE *fp;
 
 	if (rc.uuidcmd)
@@ -68,7 +68,7 @@ char *generate_uuid(void)
 	/* fixme: Make -m/--random-mac actually do something */
 	fp = popen(cmd, "r");
 	if (!fp) {
-		myerror("Could not exec /usr/bin/uuid");
+		myerror("generate_uuid(): Could not exec %s", uuid);
 		return NULL;
 	}
 	if (!fgets(uuid, UUID_LENGTH + 1, fp)) {
