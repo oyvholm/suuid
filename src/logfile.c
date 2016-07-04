@@ -277,33 +277,57 @@ char *get_xml_tags(void)
 
 char *create_sess_xml(struct Entry *entry)
 {
-#define CSX_BUFSIZE 20000 /* fixme: Temporary, use dynamic allocation later */
-#define CSX_TMPBUFSIZE 1000 /* Another temporary fixme */
-	static char buf[CSX_BUFSIZE],
-	            tmpbuf[CSX_TMPBUFSIZE];
-	unsigned int i = 0;
+	unsigned int i;
+	size_t size = 0, tmpsize = 0;
+	char *buf, *tmpbuf;
 
 	assert(entry);
 
+	i = 0;
+	while (entry->sess[i].uuid) {
+		size_t len;
+
+		len = strlen(entry->sess[i].uuid) + 32;
+		if (entry->sess[i].desc)
+			len += strlen(entry->sess[i].desc) + 32;
+		size += len;
+		if (len > tmpsize)
+			tmpsize = len;
+		i++;
+	}
+
+	buf = malloc(size);
+	if (!buf) {
+		myerror("create_sess_xml(): Cannot allocate %lu bytes for buf",
+		        size);
+		return NULL;
+	}
+	tmpbuf = malloc(tmpsize);
+	if (!tmpbuf) {
+		myerror("create_sess_xml(): Cannot allocate %lu bytes for "
+		        "tmpbuf", tmpsize);
+		free(buf);
+		return NULL;
+	}
 	buf[0] = '\0';
+	i = 0;
 	while (entry->sess[i].uuid) {
 		char *u, *d;
 
 		u = entry->sess[i].uuid;
 		d = entry->sess[i].desc;
 		if (d)
-			snprintf(tmpbuf, CSX_TMPBUFSIZE,
+			snprintf(tmpbuf, tmpsize,
 			         "<sess desc=\"%s\">%s</sess> ", d, u);
 		else
-			snprintf(tmpbuf, CSX_TMPBUFSIZE, "<sess>%s</sess> ",
+			snprintf(tmpbuf, tmpsize, "<sess>%s</sess> ",
 			                                 u);
-		strncat(buf, tmpbuf, CSX_BUFSIZE - strlen(buf));
+		strncat(buf, tmpbuf, size - strlen(buf));
 		i++;
 	}
+	free(tmpbuf);
 
 	return buf;
-#undef CSX_TMPBUFSIZE /* fixme */
-#undef CSX_BUFSIZE /* fixme */
 }
 
 /*
