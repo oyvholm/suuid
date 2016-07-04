@@ -205,12 +205,39 @@ char *alloc_attr(char *attr, char *data)
 
 char *get_xml_tags(void)
 {
-#define GXT_BUFSIZE  20000 /* fixme: Temporary */
-	static char buf[GXT_BUFSIZE + 1];
-	char tmpbuf[GXT_BUFSIZE + 1];
-	char *p;
+	char *p,
+	     *buf,
+	     *tmpbuf;
+	size_t size = 0, tmpsize = 0;
 
+	rewind_tag();
+	do {
+		p = get_next_tag();
+		if (p) {
+			size_t len = strlen(p);
+
+			size += len * MAX_GROWTH + 16;
+			if (len > tmpsize)
+				tmpsize = len;
+		}
+	} while (p);
+
+	buf = malloc(size);
+	if (!buf) {
+		myerror("get_xml_tags(): Could not allocate %lu bytes for buf",
+		        size);
+		return NULL;
+	}
 	buf[0] = '\0';
+
+	tmpsize = tmpsize * MAX_GROWTH + 16;
+	tmpbuf = malloc(tmpsize);
+	if (!tmpbuf) {
+		myerror("get_xml_tags(): Could not allocate %lu bytes for "
+		        "tmpbuf", tmpsize);
+		return NULL;
+	}
+
 	rewind_tag();
 	do {
 		p = get_next_tag();
@@ -224,11 +251,13 @@ char *get_xml_tags(void)
 				return NULL;
 			}
 
-			snprintf(tmpbuf, GXT_BUFSIZE, "<tag>%s</tag> ", ap);
+			snprintf(tmpbuf, tmpsize, "<tag>%s</tag> ", ap);
 			free(ap);
-			strncat(buf, tmpbuf, GXT_BUFSIZE - strlen(buf));
+			strncat(buf, tmpbuf, size - strlen(buf));
 		}
 	} while (p);
+
+	free(tmpbuf);
 
 	return buf;
 }
@@ -371,7 +400,7 @@ char *xml_entry(struct Entry *entry)
 	free(e.host);
 	free(e.txt);
 	/* free(sess_xml); */ /* fixme: later */
-	/* free(tag_xml); */ /* fixme: later */
+	free(tag_xml);
 	free(e.date);
 	free(e.uuid);
 
