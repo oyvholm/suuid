@@ -367,6 +367,15 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 int fill_entry_struct(struct Entry *entry, struct Options *opt)
 {
 	entry->host = get_hostname();
+	if (!entry->host) {
+		myerror("fill_entry_struct(): Cannot get hostname");
+		return EXIT_ERROR;
+	}
+	if (!valid_hostname(entry->host)) {
+		myerror("fill_entry_struct(): Got invalid hostname: \"%s\"",
+		        entry->host);
+		return EXIT_ERROR;
+	}
 	entry->cwd = getpath();
 	entry->user = get_username();
 	entry->tty = get_tty();

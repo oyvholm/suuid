@@ -56,6 +56,30 @@ char *get_editor(void)
 }
 
 /*
+ * valid_hostname() - Check if hostname in string s is a somewhat valid 
+ * hostname. Return TRUE if ok, FALSE if not.
+ */
+
+bool valid_hostname(char *s)
+{
+	char *p;
+
+	if (!s || !strlen(s) || strlen(s) > HOST_NAME_MAX ||
+	    strstr(s, "..") || utf8_check(s))
+		return FALSE;
+
+	p = s;
+	while (*p) {
+		if (strchr("!\"#$%&'()*+,-/:;<=>?@[\\]^`{|}~\x7f", *p) ||
+		    *p < '!')
+			return FALSE;
+		p++;
+	}
+
+	return TRUE;
+}
+
+/*
  * get_hostname() - Return pointer to string with hostname of the computer, or 
  * NULL if error.
  */

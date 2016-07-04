@@ -153,6 +153,7 @@ struct Options {
 
 /* environ.c */
 extern char *get_editor(void);
+extern bool valid_hostname(char *);
 extern char *get_hostname(void);
 extern char *getpath(void);
 extern char *get_username(void);
