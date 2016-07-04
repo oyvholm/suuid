@@ -49,8 +49,8 @@ bool valid_xml_chars(char *s)
 }
 
 /*
- * suuid_xml() - Return pointer to string where the data in the text argument 
- * is escaped for use in the XML file.
+ * suuid_xml() - Return pointer to allocated string where the data in the text 
+ * argument is escaped for use in the XML file.
  */
 
 char *suuid_xml(char *text)
@@ -266,8 +266,8 @@ char *create_sess_xml(struct Entry *entry)
 }
 
 /*
- * xml_entry() - Return pointer to string with one XML entry extracted from the 
- * entry struct, or NULL if error.
+ * xml_entry() - Return pointer to allocated string with one XML entry 
+ * extracted from the entry struct, or NULL if error.
  */
 
 char *xml_entry(struct Entry *entry)

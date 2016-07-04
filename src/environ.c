@@ -21,8 +21,8 @@
 #include "suuid.h"
 
 /*
- * get_editor() - Return the name of the user's favourite text editor. Return 
- * NULL if it can't find out.
+ * get_editor() - Return pointer to allocated string with the name of the 
+ * user's favourite text editor. Return NULL if it can't find out.
  */
 
 char *get_editor(void)
