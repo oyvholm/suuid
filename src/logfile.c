@@ -435,7 +435,7 @@ char *xml_entry(struct Entry *entry)
 	free(e.cwd);
 	free(e.host);
 	free(e.txt);
-	/* free(sess_xml); */ /* fixme: later */
+	free(sess_xml);
 	free(tag_xml);
 	free(e.date);
 	free(e.uuid);
