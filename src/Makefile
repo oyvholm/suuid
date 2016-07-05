@@ -64,5 +64,6 @@ test: $(EXEC)
 locktest: $(EXEC)
 	rm -rf locktestdir
 	mkdir locktestdir
-	for f in $$(seq 1 200); do ./suuid -wn -l locktestdir; done &
-	for f in $$(seq 1 200); do ./suuid -wn -l locktestdir; done
+	for f in $$(seq 1 500); do ./suuid -wn -l locktestdir; done &
+	for f in $$(seq 1 500); do ./suuid -wn -l locktestdir; done &
+	for f in $$(seq 1 500); do ./suuid -wn -l locktestdir; done
