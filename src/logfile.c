@@ -482,6 +482,48 @@ char *get_logdir()
 }
 
 /*
+ * get_logfile_name() - Return pointer to an allocated string with log file 
+ * name, or NULL if it can't be determined.
+ */
+
+char *get_logfile_name(void)
+{
+	char *logdir, *logfile, *hostname;
+	size_t fname_length; /* Total length of logfile name */
+
+	logdir = get_logdir(&opt);
+	if (!logdir) {
+		fprintf(stderr, "%s: get_logfile_name(): Unable to find "
+		                "logdir location\n", progname);
+		return NULL;
+	}
+
+	hostname = get_hostname();
+	if (!hostname) {
+		myerror("get_logfile_name(): Cannot get hostname");
+		return NULL;
+	}
+	if (!valid_hostname(hostname)) {
+		myerror("get_logfile_name(): Got invalid hostname: \"%s\"",
+		        hostname);
+		return NULL;
+	}
+
+	fname_length = strlen(logdir) + strlen("/") +
+	               strlen(hostname) + strlen(".xml") + 1;
+	logfile = malloc(fname_length + 1);
+	if (!logfile) {
+		myerror("get_logfile_name(): Could not allocate %lu bytes for "
+		        "logfile filename", fname_length + 1);
+		return NULL;
+	}
+	/* fixme: Remove slash hardcoding, use some portable solution */
+	snprintf(logfile, fname_length, "%s/%s.xml", logdir, hostname);
+
+	return logfile;
+}
+
+/*
  * create_logfile() - Create logfile with initial XML structure if it doesn't 
  * exist already. On success, return pointer to string with file name, or NULL 
  * if error.
@@ -516,30 +558,11 @@ char *create_logfile(char *name)
  * Return pointer to name of log file, or NULL if error.
  */
 
-char *set_up_logfile(struct Options *opt, char *hostname)
+char *set_up_logfile(void)
 {
-	char *logdir, *logfile;
-	size_t fname_length; /* Total length of logfile name */
+	char *logfile;
 
-	assert(opt);
-
-	logdir = get_logdir(&opt);
-	if (!logdir) {
-		fprintf(stderr, "%s: Unable to find logdir location\n",
-		                progname);
-		return NULL;
-	}
-
-	fname_length = strlen(logdir) + strlen("/") +
-	               strlen(hostname) + strlen(".xml") + 1;
-	logfile = malloc(fname_length + 1);
-	if (!logfile) {
-		myerror("Could not allocate %lu bytes for logfile filename",
-		        fname_length + 1);
-		return NULL;
-	}
-	/* fixme: Remove slash hardcoding */
-	snprintf(logfile, fname_length, "%s/%s.xml", logdir, hostname);
+	logfile = get_logfile_name();
 	if (!create_logfile(logfile)) {
 		myerror("%s: Error when creating log file", logfile);
 		return NULL;

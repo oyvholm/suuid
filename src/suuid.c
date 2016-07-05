@@ -588,7 +588,7 @@ int main(int argc, char *argv[])
 		goto cleanup;
 	}
 
-	logfile = set_up_logfile(&opt, entry.host);
+	logfile = set_up_logfile();
 	if (!logfile) {
 		myerror("Could not initialise log file");
 		retval = EXIT_ERROR;
