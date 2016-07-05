@@ -98,6 +98,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 #include <unistd.h>
 
 /*
@@ -207,6 +208,7 @@ extern int choose_opt_action(struct Options *, int, struct option *);
 extern int parse_options(struct Options *, int, char *[]);
 extern int fill_entry_struct(struct Entry *, struct Options *);
 extern char *process_uuid(FILE *, struct Entry *);
+extern bool init_randomness(void);
 
 /* tag.c */
 extern void rewind_tag(void);

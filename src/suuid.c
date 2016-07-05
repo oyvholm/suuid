@@ -493,6 +493,26 @@ char *process_uuid(FILE *logfp, struct Entry *entry)
 }
 
 /*
+ * init_randomness() - Initialise the random number generator. Returns EXIT_OK 
+ * or EXIT_ERROR.
+ */
+
+bool init_randomness(void)
+{
+	struct timeval tv;
+	unsigned int val;
+
+	if (gettimeofday(&tv, NULL) == -1)
+		return EXIT_ERROR;
+
+	val = ((unsigned int)tv.tv_sec ^ (unsigned int)tv.tv_usec ^
+	       (unsigned int)getpid());
+	srandom(val);
+
+	return EXIT_OK;
+}
+
+/*
  * main()
  */
 
@@ -510,6 +530,10 @@ int main(int argc, char *argv[])
 	                     */
 #endif
 
+	if (init_randomness() == EXIT_ERROR) {
+		myerror("Could not initialiase randomness generator");
+		return EXIT_ERROR;
+	}
 	init_xml_entry(&entry);
 
 	retval = parse_options(&opt, argc, argv);
