@@ -175,7 +175,7 @@ extern char *alloc_attr(char *, char *);
 extern char *get_xml_tags(void);
 extern char *create_sess_xml(struct Entry *);
 extern char *xml_entry(struct Entry *);
-extern char *get_logdir();
+extern char *get_logdir(void);
 extern char *get_logfile_name(void);
 extern char *create_logfile(char *);
 extern char *set_up_logfile(void);

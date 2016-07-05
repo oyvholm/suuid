@@ -450,7 +450,7 @@ char *xml_entry(struct Entry *entry)
  * that also fails, return NULL.
  */
 
-char *get_logdir()
+char *get_logdir(void)
 {
 	char *retval = NULL;
 
@@ -491,7 +491,7 @@ char *get_logfile_name(void)
 	char *logdir, *logfile, *hostname;
 	size_t fname_length; /* Total length of logfile name */
 
-	logdir = get_logdir(&opt);
+	logdir = get_logdir();
 	if (!logdir) {
 		fprintf(stderr, "%s: get_logfile_name(): Unable to find "
 		                "logdir location\n", progname);
