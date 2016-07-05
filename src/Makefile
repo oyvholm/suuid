@@ -47,6 +47,7 @@ uuid.o: uuid.c $(DEPS)
 .PHONY: clean
 clean:
 	rm -fv $(EXEC) $(OBJS) *~ core core.$(EXEC) tags
+	rm -frv locktestdir
 	cd t && $(MAKE) clean
 
 .PHONY: edit
