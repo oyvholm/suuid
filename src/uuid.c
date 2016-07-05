@@ -52,6 +52,30 @@ bool valid_uuid(char *u, bool check_len)
 }
 
 /*
+ * scramble_mac_address() - overwrite the last 12 characters of the received 
+ * pointer to an UUID with random bytes as specified by RFC 4122. Return 
+ * pointer to the UUID if successful, or NULL if an invalid UUID was received.
+ */
+
+char *scramble_mac_address(char *uuid)
+{
+	int i;
+
+	if (!valid_uuid(uuid, FALSE))
+		return NULL;
+
+	for (i = UUID_LENGTH - 12; i < UUID_LENGTH; i += 2) {
+		char buf[3];
+
+		snprintf(buf, 3, "%02x", (unsigned int)random() & 0xff);
+		strncpy(uuid + i, buf, 2);
+	}
+	uuid[25] = "37bf"[random() & 0x03];
+
+	return uuid;
+}
+
+/*
  * generate_uuid() - Return a pointer to a string with a generated UUID v1, or 
  * NULL if error.
  */
@@ -66,7 +90,6 @@ char *generate_uuid(void)
 		cmd = rc.uuidcmd;
 
 	/* fixme: Generate it properly */
-	/* fixme: Make -m/--random-mac actually do something */
 	fp = popen(cmd, "r");
 	if (!fp) {
 		myerror("generate_uuid(): Could not exec \"%s\"", cmd);
@@ -79,6 +102,9 @@ char *generate_uuid(void)
 	}
 	uuid[UUID_LENGTH] = '\0';
 	pclose(fp);
+
+	if (opt.random_mac && !scramble_mac_address(uuid))
+		return NULL;
 
 	return uuid;
 }

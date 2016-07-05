@@ -218,6 +218,7 @@ extern char *store_tag(char *);
 
 /* uuid.c */
 extern bool valid_uuid(char *, bool);
+extern char *scramble_mac_address(char *);
 extern char *generate_uuid(void);
 extern char *uuid_date(char *, char *);
 extern bool is_valid_date(char *, bool);

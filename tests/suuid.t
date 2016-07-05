@@ -528,23 +528,23 @@ sub test_suuid_executable {
 
     # }}}
     if ($Opt{'all'}) {
-        # Disable the testing of unique/non-unique MAC addresses by default. It 
-        # has never worked reliably and varies from computer to computer. It's 
+        # Disable the testing of non-unique MAC addresses by default. It has 
+        # never worked reliably and varies from computer to computer. It's 
         # random whether uuid(1) or uuidgen(1) gets it right. As an example, on 
         # this machine none of them works.
         diag("Check for randomness in the MAC address field...");
         cmp_ok(unique_macs($Outfile), '==', 1, 'MAC adresses does not change');
-        ok(unlink($Outfile), "Delete [Outfile]");
-        likecmd("$CMD -m -n 5 -l $Outdir", # {{{
-            "/^($v1rand_templ\n){5}\$/s",
-            '/^$/',
-            0,
-            "-n (--count) option with -m (--random-mac)",
-        );
-
-        # }}}
-        cmp_ok(unique_macs($Outfile), '==', 5, 'MAC adresses are random');
     }
+    ok(unlink($Outfile), "Delete [Outfile]");
+    likecmd("$CMD -m -n 5 -l $Outdir", # {{{
+        "/^($v1rand_templ\n){5}\$/s",
+        '/^$/',
+        0,
+        "-n (--count) option with -m (--random-mac)",
+    );
+
+    # }}}
+    cmp_ok(unique_macs($Outfile), '==', 5, 'MAC adresses are random');
     diag("Testing -w (--whereto) option...");
     likecmd("$CMD -w o -l $Outdir", # {{{
         "/^$v1_templ\\n\$/s",
