@@ -460,7 +460,7 @@ char *get_logdir(void)
 		retval = getenv(ENV_LOGDIR);
 	else if (getenv("HOME")) {
 		int size = strlen(getenv("HOME")) +
-		           strlen("/uuids") + 1;
+		           strlen("/uuids") + 1; /* fixme: slash */
 
 		retval = malloc(size + 1);
 		if (!retval) {
@@ -468,7 +468,7 @@ char *get_logdir(void)
 			        size);
 			return NULL;
 		}
-		snprintf(retval, size, "%s/uuids",
+		snprintf(retval, size, "%s/uuids", /* fixme: slash */
 		                       getenv("HOME"));
 	} else {
 		fprintf(stderr, "%s: $%s and $HOME environment "
@@ -509,7 +509,7 @@ char *get_logfile_name(void)
 		return NULL;
 	}
 
-	fname_length = strlen(logdir) + strlen("/") +
+	fname_length = strlen(logdir) + strlen("/") + /* fixme: slash */
 	               strlen(hostname) + strlen(".xml") + 1;
 	logfile = malloc(fname_length + 1);
 	if (!logfile) {
