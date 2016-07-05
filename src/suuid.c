@@ -158,6 +158,8 @@ void usage(int retval)
 	       ENV_EDITOR, ENV_EDITOR, STD_EDITOR);
 	printf("  -h, --help\n"
 	       "    Show this help.\n");
+	printf("  --license\n"
+	       "    Print the software license\n");
 	printf("  -l x, --logdir x\n"
 	       "    Store log files in directory x.\n"
 	       "    If the %s environment variable is defined, "
