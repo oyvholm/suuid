@@ -59,3 +59,10 @@ tags: $(CFILES) $(HFILES)
 .PHONY: test
 test: $(EXEC)
 	cd t && make
+
+.PHONY: locktest
+locktest: $(EXEC)
+	rm -rf locktestdir
+	mkdir locktestdir
+	for f in $$(seq 1 200); do ./suuid -wn -l locktestdir; done &
+	for f in $$(seq 1 200); do ./suuid -wn -l locktestdir; done
