@@ -536,7 +536,7 @@ sub test_suuid_executable {
         cmp_ok(unique_macs($Outfile), '==', 1, 'MAC adresses does not change');
         ok(unlink($Outfile), "Delete [Outfile]");
         likecmd("$CMD -m -n 5 -l $Outdir", # {{{
-            "/^($v1_templ\n){5}\$/s",
+            "/^($v1rand_templ\n){5}\$/s",
             '/^$/',
             0,
             "-n (--count) option with -m (--random-mac)",
