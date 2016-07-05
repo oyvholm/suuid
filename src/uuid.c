@@ -106,6 +106,9 @@ char *generate_uuid(void)
 	if (opt.random_mac && !scramble_mac_address(uuid))
 		return NULL;
 
+	if (!valid_uuid(uuid, TRUE))
+		return NULL;
+
 	return uuid;
 }
 

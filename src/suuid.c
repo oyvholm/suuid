@@ -448,10 +448,13 @@ int fill_entry_struct(struct Entry *entry, struct Options *opt)
 char *process_uuid(FILE *logfp, struct Entry *entry)
 {
 	entry->uuid = generate_uuid();
-	if (!valid_uuid(entry->uuid, TRUE)) {
-		fprintf(stderr, "%s: '%s': Generated UUID is not in the "
-		                "expected format\n",
-		                progname, entry->uuid);
+	if (!entry->uuid) {
+#if PERL_COMPAT
+		fprintf(stderr, "%s: '': Generated UUID is not in the "
+		                "expected format\n", progname);
+#else
+		fprintf(stderr, "%s: UUID generation failed\n", progname);
+#endif
 		return NULL;
 	}
 	entry->date = malloc(DATE_LENGTH + 1);
