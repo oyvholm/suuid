@@ -644,6 +644,8 @@ int close_logfile(FILE *fp)
 
 	if (fprintf(fp, "</suuids>\n") != 10)
 		retval = EXIT_ERROR;
+	if (fflush(fp) == EOF)
+		retval = EXIT_ERROR;
 	flock(fileno(fp), LOCK_UN);
 	if (fclose(fp) == EOF)
 		retval = EXIT_ERROR;
