@@ -180,8 +180,8 @@ char *allocate_elem(char *elem, char *src)
 }
 
 /*
- * alloc_attr() - Return pointer to string with XML attribute. Returns NULL on 
- * error.
+ * alloc_attr() - Return pointer to allocated string with XML attribute. 
+ * Returns NULL on error.
  */
 
 char *alloc_attr(char *attr, char *data)
@@ -207,8 +207,8 @@ char *alloc_attr(char *attr, char *data)
 }
 
 /*
- * get_xml_tags() - Return pointer to an XML string with <tag> elements 
- * generated from the entry.tag[] array. If error, return NULL.
+ * get_xml_tags() - Return pointer to an allocated XML string with <tag> 
+ * elements generated from the entry.tag[] array. If error, return NULL.
  */
 
 char *get_xml_tags(void)
@@ -271,8 +271,8 @@ char *get_xml_tags(void)
 }
 
 /*
- * create_sess_xml() - Return pointer to XML string generated from entry->sess, 
- * or NULL if error.
+ * create_sess_xml() - Return pointer to allocated XML string generated from 
+ * entry->sess, or NULL if error.
  */
 
 char *create_sess_xml(struct Entry *entry)
@@ -444,10 +444,10 @@ char *xml_entry(struct Entry *entry)
 }
 
 /*
- * get_logdir() - Return pointer to string with location of the log directory. 
- * Use the value of -l/--logdir if it's defined, otherwise use the environment 
- * variable defined in ENV_LOGDIR, otherwise use "$HOME/uuids". If that also 
- * fails, return NULL.
+ * get_logdir() - Return pointer to allocated string with location of the log 
+ * directory. Use the value of -l/--logdir if it's defined, otherwise use the 
+ * environment variable defined in ENV_LOGDIR, otherwise use "$HOME/uuids". If 
+ * that also fails, return NULL.
  */
 
 char *get_logdir()
