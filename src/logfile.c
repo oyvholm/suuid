@@ -158,8 +158,8 @@ char *allocate_elem(char *elem, char *src)
 	}
 
 	size += strlen("<") + strlen(elem) + strlen(">") +
-		strlen(src) * MAX_GROWTH +
-		strlen("<") + strlen(elem) + strlen("/> ") + 1;
+	        strlen(src) * MAX_GROWTH +
+	        strlen("<") + strlen(elem) + strlen("/> ") + 1;
 
 	retval = malloc(size + 1);
 	if (!retval) {
@@ -213,9 +213,7 @@ char *alloc_attr(char *attr, char *data)
 
 char *get_xml_tags(void)
 {
-	char *p,
-	     *buf,
-	     *tmpbuf;
+	char *p, *buf, *tmpbuf;
 	size_t size = 0, tmpsize = 0;
 
 	rewind_tag();
@@ -320,8 +318,7 @@ char *create_sess_xml(struct Entry *entry)
 			snprintf(tmpbuf, tmpsize,
 			         "<sess desc=\"%s\">%s</sess> ", d, u);
 		else
-			snprintf(tmpbuf, tmpsize, "<sess>%s</sess> ",
-			                                 u);
+			snprintf(tmpbuf, tmpsize, "<sess>%s</sess> ", u);
 		strncat(buf, tmpbuf, size - strlen(buf));
 		i++;
 	}
@@ -389,9 +386,7 @@ char *xml_entry(struct Entry *entry)
 		}
 		txt_space = entry->txt[0] == '<' ? " " : "";
 		snprintf(e.txt, size, "<txt>%s%s%s</txt> ",
-		                      txt_space,
-		                      entry->txt,
-		                      txt_space);
+		                      txt_space, entry->txt, txt_space);
 	} else
 		e.txt = allocate_elem("txt", entry->txt);
 	e.host = allocate_elem("host", entry->host);
@@ -409,26 +404,23 @@ char *xml_entry(struct Entry *entry)
 		return NULL;
 	}
 
-	snprintf(retval, size,
-	         "<suuid%s%s> " /* date, uuid */
-	         "%s" /* tag */
-	         "%s" /* txt */
-	         "%s" /* host */
-	         "%s" /* cwd */
-	         "%s" /* user */
-	         "%s" /* tty */
-	         "%s" /* sess */
-	         "</suuid>",
-	         (e.date) ? e.date : "",
-	         (e.uuid) ? e.uuid : "",
-	         tag_xml ? tag_xml : "",
-	         (e.txt) ? e.txt : "",
-	         (e.host) ? e.host : "",
-	         (e.cwd) ? e.cwd : "",
-	         (e.user) ? e.user : "",
-	         (e.tty) ? e.tty : "",
-	         sess_xml
-	         );
+	snprintf(retval, size, "<suuid%s%s> " /* date, uuid */
+	                       "%s" /* tag */
+	                       "%s" /* txt */
+	                       "%s" /* host */
+	                       "%s" /* cwd */
+	                       "%s" /* user */
+	                       "%s" /* tty */
+	                       "%s" /* sess */
+	                       "</suuid>",
+	                       (e.date) ? e.date : "",
+	                       (e.uuid) ? e.uuid : "",
+	                       tag_xml ? tag_xml : "",
+	                       (e.txt) ? e.txt : "",
+	                       (e.host) ? e.host : "",
+	                       (e.cwd) ? e.cwd : "",
+	                       (e.user) ? e.user : "",
+	                       (e.tty) ? e.tty : "", sess_xml);
 
 	free(e.tty);
 	free(e.user);
@@ -483,8 +475,7 @@ char *get_logdir(void)
 	} else {
 		fprintf(stderr, "%s: $%s and $HOME environment "
 		                "variables are not defined, cannot "
-		                "create logdir path",
-		                progname, ENV_LOGDIR);
+		                "create logdir path", progname, ENV_LOGDIR);
 		return NULL;
 	}
 
@@ -600,12 +591,11 @@ FILE *open_logfile(char *fname)
 		if (strcmp(fgets(check_line, 10, fp), "</suuids>"))
 			fprintf(stderr, "%s: %s: Unknown end line, adding to "
 			                "end of file\n", progname, fname);
-		else
-			if (fseek(fp, filepos, SEEK_SET) == -1) {
-				myerror("%s: Cannot seek to position %lu",
-				        fname, filepos);
-				return NULL;
-			}
+		else if (fseek(fp, filepos, SEEK_SET) == -1) {
+			myerror("%s: Cannot seek to position %lu",
+			        fname, filepos);
+			return NULL;
+		}
 	} else {
 		/* File doesn't exist */
 		fp = fopen(fname, "a");

@@ -59,8 +59,7 @@ bool is_valid_desc_string(char *s)
 
 int fill_sess(struct Entry *dest, char *uuid, char *desc, size_t desclen)
 {
-	char *auuid = NULL,
-	     *adesc = NULL;
+	char *auuid = NULL, *adesc = NULL;
 	static unsigned int sessind = 0;
 
 	assert(dest);
