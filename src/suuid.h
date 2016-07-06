@@ -151,7 +151,7 @@ struct Options {
  * Function prototypes
  */
 
-#if 1 /* Set to 0 to test with without prototypes */
+#if 1 /* Set to 0 to test without prototypes */
 
 /* environ.c */
 extern char *get_editor(void);
