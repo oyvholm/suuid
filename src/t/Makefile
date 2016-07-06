@@ -1,7 +1,7 @@
 #!/usr/bin/make
 
-# tests/Makefile
-# File ID: 4906ed12-fb76-11dd-b5ce-000475e441b9
+# src/t/Makefile
+# File ID: f539e628-4346-11e6-9e79-02010e0a6634
 
 .PHONY: all
 all:
