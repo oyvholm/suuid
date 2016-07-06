@@ -156,7 +156,7 @@ void usage(int retval)
 		print_version();
 		puts("");
 	}
-	printf("Usage: suuid [options]\n");
+	printf("Usage: %s [options]\n", progname);
 	printf("\n");
 	printf("Generates one or more UUIDs and stores it to a log file with "
 	       "optional \n"
