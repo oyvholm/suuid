@@ -56,7 +56,7 @@ addtest:
 clean:
 	rm -fv $(EXEC) $(OBJS) *~ core core.$(EXEC) tags
 	rm -frv locktestdir
-	# cd t && $(MAKE) clean
+	cd t && $(MAKE) clean
 
 .PHONY: edit
 edit: tags
@@ -67,8 +67,7 @@ tags: $(CFILES) $(HFILES)
 
 .PHONY: test
 test: $(EXEC)
-	@echo Temporary disabled
-	# cd t && make
+	cd t && make
 
 .PHONY: locktest
 locktest: $(EXEC)
