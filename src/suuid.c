@@ -73,7 +73,7 @@ int myerror(const char *format, ...)
 	va_start(ap, format);
 	retval += vfprintf(stderr, format, ap);
 	va_end(ap);
-	if (errno)
+	if (orig_errno)
 		retval += fprintf(stderr, ": %s", strerror(orig_errno));
 	retval += fprintf(stderr, "\n");
 
