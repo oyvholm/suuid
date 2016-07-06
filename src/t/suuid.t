@@ -42,7 +42,7 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s/^.*\/(.*?)$/$1/;
-our $VERSION = '0.1.3';
+our $VERSION = '0.1.4';
 
 my %descriptions = ();
 
@@ -78,8 +78,6 @@ my $xml_header = join("",
 );
 
 my $Outdir = "tmp-suuid-t-$$-" . substr(rand, 2, 8);
-my $tmpdbname = "tmp-suuid-t-" . time . "-" . $$ . "-" . substr(rand, 2, 8);
-msg(1, "tmpdbname = '$tmpdbname'");
 
 exit(main());
 
@@ -137,42 +135,9 @@ END
     );
 
     # }}}
-    # FIXME: Add tests for -d/--dbname. Have to think about how the 
-    # whole database access thing should be dealed with first. Not 
-    # everybody is superuser in their own Postgres database.
-
-    # FIXME: Have to find a standard way of initialising the database.
-    testcmd("createdb \"$tmpdbname\"",
-        '',
-        '',
-        0,
-        'Create database',
-    );
-    testcmd("../conv-suuid --pg-table </dev/null | psql -X -d \"$tmpdbname\"",
-        <<END,
-CREATE TABLE
-SELECT 0
-SELECT 0
-CREATE FUNCTION
-CREATE TRIGGER
-CREATE INDEX
-CREATE INDEX
-CREATE INDEX
-END
-        '',
-        0,
-        'Create database tables',
-    );
 
     test_test_functions();
     test_suuid_executable();
-
-    testcmd("dropdb \"$tmpdbname\"",
-        '',
-        '',
-        0,
-        'Drop database',
-    );
 
     todo_section:
     ;
@@ -1157,7 +1122,6 @@ sub testcmd {
             : ''
     );
     $Txt =~ s/$Outdir/[Outdir]/g;
-    $Txt =~ s/$tmpdbname/[tmpdbname]/g;
     my $TMP_STDERR = "$CMD_BASENAME-stderr.tmp";
     my $retval = 1;
 
@@ -1192,7 +1156,6 @@ sub likecmd {
             : ''
     );
     $Txt =~ s/$Outdir/[Outdir]/g;
-    $Txt =~ s/$tmpdbname/[tmpdbname]/g;
     my $TMP_STDERR = "$CMD_BASENAME-stderr.tmp";
     my $retval = 1;
 
