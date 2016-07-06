@@ -114,7 +114,7 @@ void print_license(void)
 
 void print_version(void)
 {
-	printf("%s %s\n", progname, VERSION);
+	printf("%s %s (%s)\n", progname, VERSION, RELEASE_DATE);
 #if FAKE_HOST || PERL_COMPAT
 	printf("\nThis version is compiled with the following conditional directives:\n");
 #  if FAKE_HOST
