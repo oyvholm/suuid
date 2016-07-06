@@ -524,56 +524,30 @@ char *get_logfile_name(void)
 }
 
 /*
- * create_logfile() - Create logfile with initial XML structure if it doesn't 
- * exist already. On success, return pointer to string with file name, or NULL 
- * if error.
+ * lock_file() - Lock file associated with fp. If locking succeeds, return FILE 
+ * pointer to the stream, otherwise return NULL.
  */
 
-char *create_logfile(char *name)
+FILE *lock_file(FILE *fp, char *fname)
 {
-	char *xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-	char *xml_doctype = "<!DOCTYPE suuids SYSTEM \"dtd/suuids.dtd\">";
-	FILE *fp;
+	assert(fp);
+	assert(fname);
+	assert(strlen(fname));
 
-	assert(name);
-	assert(strlen(name));
-
-	if (access(name, F_OK) != -1)
-		return name; /* File already exists */
-
-	fp = fopen(name, "a");
-	if (!fp) {
-		myerror("%s: Could not create log file", name);
-		return NULL;
-	}
-	fprintf(fp, "%s\n%s\n<suuids>\n</suuids>\n", xml_header, xml_doctype);
-	fclose(fp);
-
-	return name;
-}
-
-/*
- * set_up_logfile() - Determine log file name and create an initial XML log 
- * file if it doesn't exist.
- * Return pointer to name of log file, or NULL if error.
- */
-
-char *set_up_logfile(void)
-{
-	char *logfile;
-
-	logfile = get_logfile_name();
-	if (!create_logfile(logfile)) {
-		myerror("%s: Error when creating log file", logfile);
+	if (flock(fileno(fp), LOCK_EX) == -1) {
+		myerror("Could not lock file \"%s\"", fname);
+		fclose(fp);
 		return NULL;
 	}
 
-	return logfile;
+	return fp;
 }
 
 /*
- * Open log file fname for read+write, check that the end of file is OK, set 
- * the file position to the place where the new log entry shall be inserted. 
+ * open_logfile() - Open log file fname for read+write, check that the end of 
+ * file is OK, set the file position to the place where the new log entry shall 
+ * be inserted. If the file doesn't exist, create it and write the initial XML 
+ * header to it.
  * Return FILE pointer to the opened stream, ready for writing. If anything 
  * fails, NULL is returned.
  */
@@ -581,45 +555,64 @@ char *set_up_logfile(void)
 FILE *open_logfile(char *fname)
 {
 	FILE *fp;
-	char check_line[12];
-	long filepos;
 
 	assert(fname);
 	assert(strlen(fname));
 
-	fp = fopen(fname, "r+");
-	if (!fp) {
+	if (access(fname, F_OK) != -1) {
+		long filepos;
+		char check_line[12];
+
+		/* File already exists */
+		fp = fopen(fname, "r+");
+		if (!fp) {
 #if PERL_COMPAT
-		myerror("%s: Cannot open file for append", fname);
-		perlexit13 = TRUE;
+			myerror("%s: Cannot open file for append", fname);
+			perlexit13 = TRUE;
 #else
-		myerror("%s: Could not open file for read+write", fname);
+			myerror("%s: Could not open file for read+write",
+			        fname);
 #endif
-		return NULL;
-	}
-	if (flock(fileno(fp), LOCK_EX) == -1) {
-		myerror("Could not lock log file \"%s\"", fname);
-		fclose(fp);
-		return NULL;
-	}
-	if (fseek(fp, -10, SEEK_END) == -1) {
-		myerror("%s: Could not seek in log file", fname);
-		return NULL;
-	}
-	filepos = ftell(fp);
-	if (filepos == -1) {
-		myerror("%s: Cannot read file position", fname);
-		return NULL;
-	}
-	if (strcmp(fgets(check_line, 10, fp), "</suuids>"))
-		fprintf(stderr, "%s: %s: Unknown end line, adding to "
-		                "end of file\n", progname, fname);
-	else
-		if (fseek(fp, filepos, SEEK_SET) == -1) {
-			myerror("%s: Cannot seek to position %lu",
-			        fname, filepos);
 			return NULL;
 		}
+		if (!lock_file(fp, fname))
+			return NULL;
+		if (fseek(fp, -10, SEEK_END) == -1) {
+			myerror("%s: Could not seek in log file", fname);
+			return NULL;
+		}
+		filepos = ftell(fp);
+		if (filepos == -1) {
+			myerror("%s: Cannot read file position", fname);
+			return NULL;
+		}
+		if (strcmp(fgets(check_line, 10, fp), "</suuids>"))
+			fprintf(stderr, "%s: %s: Unknown end line, adding to "
+			                "end of file\n", progname, fname);
+		else
+			if (fseek(fp, filepos, SEEK_SET) == -1) {
+				myerror("%s: Cannot seek to position %lu",
+				        fname, filepos);
+				return NULL;
+			}
+	} else {
+		/* File doesn't exist */
+		fp = fopen(fname, "a");
+		if (!fp) {
+			myerror("%s: Could not create log file", fname);
+			return NULL;
+		}
+		if (!lock_file(fp, fname))
+			return NULL;
+		if (fputs("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		          "<!DOCTYPE suuids SYSTEM \"dtd/suuids.dtd\">\n"
+		          "<suuids>\n", fp) == EOF) {
+			myerror("open_logfile(): Cannot write header to the "
+			        "log file");
+			fclose(fp);
+			return NULL;
+		}
+	}
 
 	return fp;
 }

@@ -588,9 +588,9 @@ int main(int argc, char *argv[])
 		goto cleanup;
 	}
 
-	logfile = set_up_logfile();
+	logfile = get_logfile_name();
 	if (!logfile) {
-		myerror("Could not initialise log file");
+		myerror("get_logfile_name() failed");
 		retval = EXIT_ERROR;
 		goto cleanup;
 	}
@@ -604,6 +604,7 @@ int main(int argc, char *argv[])
 
 	for (i = 0; i < opt.count; i++)
 		if (!process_uuid(logfp, &entry)) {
+			close_logfile(logfp);
 			retval = EXIT_ERROR;
 			goto cleanup;
 		}
