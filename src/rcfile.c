@@ -28,22 +28,16 @@
 
 char *has_key(char *line, char *keyword)
 {
-	char *search_str;
-	size_t size;
 	char *retval;
 
 	assert(keyword);
 	assert(strlen(keyword));
 
-	size = strlen(keyword) + 2;
-	search_str = malloc(size);
-	if (!search_str) {
-		myerror("has_key(): Could not allocate %lu bytes", size);
+	if (strlen(keyword) >= strlen(line))
 		return NULL;
-	}
-	snprintf(search_str, size, "%s ", keyword);
-
-	if (!strncmp(line, search_str, strlen(search_str))) {
+	if (!strncmp(line, keyword, strlen(keyword))) {
+		if (!strchr(" =", line[strlen(keyword)]))
+			return NULL;
 		/* Move retval to the first character that is not a space 
 		 * (ASCII 32) after the first equal sign.
 		 */
