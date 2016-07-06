@@ -25,7 +25,7 @@
  * Defines
  */
 
-#define VERSION       "0.1.2"
+#define VERSION       "0.1.3"
 #define RELEASE_DATE  "2016-07-06"
 
 #define FALSE  0

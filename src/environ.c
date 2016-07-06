@@ -70,7 +70,7 @@ bool valid_hostname(char *s)
 
 	p = (unsigned char *)s;
 	while (*p) {
-		if (strchr("!\"#$%&'()*+,-/:;<=>?@[\\]^`{|}~", *p) ||
+		if (strchr("!\"#$%&'()*+,/:;<=>?@[\\]^`{|}~", *p) ||
 		    *p < '!' || *p >= '\x7f')
 			return FALSE;
 		p++;
