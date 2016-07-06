@@ -356,6 +356,7 @@ sub test_suuid_executable {
              s_suuid() .
              s_suuid(
                 'txt' => '1\\\\n2\\\\n3\\\\n[\d\\\\n]+19998\\\\n19999\\\\n20000',
+                'tty' => '',
              ),
         ),
         "Monster entry was added to the log file",
@@ -365,7 +366,7 @@ sub test_suuid_executable {
     ok(unlink($Outfile), "Delete [Outfile]");
     testcmd("$CMD --rcfile rcfile-inv-uuidcmd -l $Outdir", # {{{
         '',
-        "suuid: '': Generated UUID is not in the expected format\n",
+        "../suuid: UUID generation failed\n",
         1,
         "uuidcmd does not generate valid UUID",
     );
@@ -491,7 +492,7 @@ sub test_suuid_executable {
     # }}}
     testcmd("$CMD -t schn\xfcffelhund -l $Outdir", # {{{
         "",
-        "suuid: Tags have to be in UTF-8\n",
+        "../suuid: Tags have to be in UTF-8\n",
         1,
         "Refuse non-UTF-8 tags",
     );
@@ -601,8 +602,10 @@ sub test_suuid_executable {
     ok(chmod(0444, $Outfile), "Make [Outfile] read-only");
     likecmd("$CMD -l $Outdir", # {{{
         '/^$/s',
-        "/^$CMD_BASENAME: $Outfile: Cannot open file for append: .*\$/s",
-        13,
+        '/^\.\.\/suuid: .*?\.xml: Could not open file for read\+write: Permission denied\n' .
+        '\.\.\/suuid: open_logfile\(\) failed, cannot open log file: Permission denied\n' .
+        '$/s',
+        1,
         "Unable to write to the log file",
     );
     if (defined($stat_array[2])) {
@@ -630,7 +633,7 @@ sub test_suuid_comment {
     # }}}
     testcmd("$CMD -c \"F\xf8kka \xf8pp\" -l $Outdir", # {{{
         "",
-        "suuid: Comment contains illegal characters or is not valid UTF-8\n",
+        "../suuid: Comment contains illegal characters or is not valid UTF-8\n",
         1,
         "Refuse non-UTF-8 text to --comment option",
     );
@@ -638,7 +641,7 @@ sub test_suuid_comment {
     # }}}
     testcmd("$CMD -c \"Ctrl-d: \x04\" -l $Outdir", # {{{
         "",
-        "suuid: Comment contains illegal characters or is not valid UTF-8\n",
+        "../suuid: Comment contains illegal characters or is not valid UTF-8\n",
         1,
         "Reject Ctrl-d in comment",
     );
@@ -654,7 +657,7 @@ sub test_suuid_comment {
     # }}}
     testcmd("echo \"F\xf8kka \xf8pp\" | $CMD -c - -l $Outdir", # {{{
         "",
-        "suuid: Comment contains illegal characters or is not valid UTF-8\n",
+        "../suuid: Comment contains illegal characters or is not valid UTF-8\n",
         1,
         "Reject non-UTF-8 comment from stdin",
     );
@@ -662,7 +665,7 @@ sub test_suuid_comment {
     # }}}
     testcmd("echo \"Ctrl-d: \x04\" | $CMD -c - -l $Outdir", # {{{
         "",
-        "suuid: Comment contains illegal characters or is not valid UTF-8\n",
+        "../suuid: Comment contains illegal characters or is not valid UTF-8\n",
         1,
         "Reject Ctrl-d in comment from stdin",
     );
@@ -670,7 +673,8 @@ sub test_suuid_comment {
     # }}}
     like(file_data($Outfile), # {{{
         s_top(
-            s_suuid('txt' => 'Great test') x 2,
+            s_suuid('txt' => 'Great test') .
+            s_suuid('txt' => 'Great test', 'tty' => ''),
         ),
         "Log contents OK after comment",
     );
@@ -1060,8 +1064,7 @@ sub s_suuid {
         ' ',
         "<user>$d{user}<\\/user>",
         ' ',
-        "<tty>$d{tty}<\\/tty>",
-        ' ' ,
+        length($d{tty}) ? "<tty>$d{tty}<\\/tty> " : "",
         length($d{sess})
             ? s_suuid_sess($d{sess})
             : '',
