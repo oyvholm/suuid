@@ -315,6 +315,7 @@ sub test_suuid_executable {
 
     # }}}
     my $Outfile = glob("$Outdir/*.xml");
+    defined($Outfile) || ($Outfile = '');
     like($Outfile, "/^$Outdir\\/\\S+\.xml\$/", "Filename of logfile OK");
     like(file_data($Outfile), # {{{
         s_top(
@@ -371,6 +372,7 @@ sub test_suuid_executable {
 
     # }}}
     my $host_outfile = glob("$Outdir/*.xml");
+    defined($host_outfile) || ($host_outfile = '');
     like(file_data($host_outfile), # {{{
         s_top(''),
         "suuid file is empty",
@@ -525,11 +527,17 @@ sub test_suuid_executable {
     );
 
     # }}}
-    diag("Check for randomness in the MAC address field...");
-    cmp_ok(unique_macs($Outfile), '==', 1, 'MAC adresses does not change');
+    if ($Opt{'all'}) {
+        # Disable the testing of non-unique MAC addresses by default. It has 
+        # never worked reliably and varies from computer to computer. It's 
+        # random whether uuid(1) or uuidgen(1) gets it right. As an example, on 
+        # this machine none of them works.
+        diag("Check for randomness in the MAC address field...");
+        cmp_ok(unique_macs($Outfile), '==', 1, 'MAC adresses does not change');
+    }
     ok(unlink($Outfile), "Delete [Outfile]");
     likecmd("$CMD -m -n 5 -l $Outdir", # {{{
-        "/^($v1_templ\n){5}\$/s",
+        "/^($v1rand_templ\n){5}\$/s",
         '/^$/',
         0,
         "-n (--count) option with -m (--random-mac)",
@@ -597,7 +605,9 @@ sub test_suuid_executable {
         13,
         "Unable to write to the log file",
     );
-    ok(chmod($stat_array[2], $Outfile), "Make [Outfile] writable again");
+    if (defined($stat_array[2])) {
+        ok(chmod($stat_array[2], $Outfile), "Make [Outfile] writable again");
+    }
 
     # }}}
     ok(unlink($Outfile), "Delete [Outfile]");
@@ -1115,11 +1125,15 @@ sub unique_macs {
     # {{{
     my $file = shift;
     my %mac = ();
-    open(my $fp, '<', $file) or die("$progname: $file: Cannot open file for read: $!\n");
-    while (<$fp>) {
-        /^<suuid t="[^"]+" u="$Lh{8}-$Lh{4}-1$Lh{3}-$Lh{4}-($Lh{12})".*/ && ($mac{$1} = 1);
+    if (open(my $fp, '<', $file)) {
+        while (<$fp>) {
+            /^<suuid t="[^"]+" u="$Lh{8}-$Lh{4}-1$Lh{3}-$Lh{4}-($Lh{12})".*/ && ($mac{$1} = 1);
+        }
+        close($fp);
+    } else {
+        diag("$file: Cannot open file for read: $!\n");
+        return('');
     }
-    close($fp);
     return(scalar(keys %mac));
     # }}}
 } # unique_macs()
@@ -1197,6 +1211,7 @@ sub likecmd {
 sub file_data {
     # Return file content as a string {{{
     my $File = shift;
+    defined($File) || return('');
     my $Txt;
     if (open(my $fp, '<', $File)) {
         local $/ = undef;
@@ -1204,7 +1219,7 @@ sub file_data {
         close($fp);
         return($Txt);
     } else {
-        return;
+        return('');
     }
     # }}}
 } # file_data()

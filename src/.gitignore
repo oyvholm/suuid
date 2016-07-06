@@ -1,0 +1,4 @@
+*.o
+/locktestdir/
+/suuid
+/tags
