@@ -516,14 +516,12 @@ char *process_uuid(FILE *logfp, struct Entry *entry)
 bool init_randomness(void)
 {
 	struct timeval tv;
-	unsigned int val;
 
 	if (gettimeofday(&tv, NULL) == -1)
 		return EXIT_ERROR;
 
-	val = ((unsigned int)tv.tv_sec ^ (unsigned int)tv.tv_usec ^
-	       (unsigned int)getpid());
-	srandom(val);
+	srandom((unsigned int)tv.tv_sec ^ (unsigned int)tv.tv_usec ^
+	        (unsigned int)getpid());
 
 	return EXIT_OK;
 }
