@@ -454,11 +454,21 @@ char *get_logdir(void)
 {
 	char *retval = NULL;
 
-	if (opt.logdir)
-		retval = opt.logdir;
-	else if (getenv(ENV_LOGDIR))
-		retval = getenv(ENV_LOGDIR);
-	else if (getenv("HOME")) {
+	if (opt.logdir) {
+		retval = strdup(opt.logdir);
+		if (!retval) {
+			myerror("get_logdir(): Could not duplicate "
+			        "-l/--logdir argument");
+			return NULL;
+		}
+	} else if (getenv(ENV_LOGDIR)) {
+		retval = strdup(getenv(ENV_LOGDIR));
+		if (!retval) {
+			myerror("get_logdir(): Could not duplicate %s "
+			        "environment variable", ENV_LOGDIR);
+			return NULL;
+		}
+	} else if (getenv("HOME")) {
 		int size = strlen(getenv("HOME")) +
 		           strlen("/uuids") + 1; /* fixme: slash */
 
@@ -519,6 +529,7 @@ char *get_logfile_name(void)
 	}
 	/* fixme: Remove slash hardcoding, use some portable solution */
 	snprintf(logfile, fname_length, "%s/%s.xml", logdir, hostname);
+	free(logdir);
 
 	return logfile;
 }
