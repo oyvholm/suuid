@@ -115,7 +115,7 @@ void print_license(void)
 void print_version(void)
 {
 	printf("%s %s (%s)\n", progname, VERSION, RELEASE_DATE);
-#if FAKE_HOST || PERL_COMPAT
+#if FAKE_HOST || PERL_COMPAT || TEST_FUNC
 	printf("\nThis version is compiled with the following conditional "
                "directives:\n");
 #  if FAKE_HOST
@@ -127,6 +127,13 @@ void print_version(void)
 	printf("\nPERL_COMPAT: Suppress the new and better behaviour, behave "
 	       "just like the \n"
 	       "original Perl version to make the tests succeed.\n");
+#  endif
+#  if TEST_FUNC
+	printf("\nTEST_FUNC: Send non-option command line arguments to "
+	       "various functions \n"
+	       "for testing. This doesn't break anything, as the program only "
+	       "checks for \n"
+	       "options. Non-option arguments are ignored.\n");
 #  endif
 #endif
 }
@@ -562,7 +569,7 @@ int main(int argc, char *argv[])
 		return EXIT_OK;
 	}
 
-#if 1
+#if TEST_FUNC
 	/*
 	 * Send non-option command line arguments to various functions for 
 	 * testing. This doesn't break anything, as the program only checks for 

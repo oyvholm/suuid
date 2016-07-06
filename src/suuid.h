@@ -25,7 +25,7 @@
  * Defines
  */
 
-#define VERSION       "0.1.1"
+#define VERSION       "0.1.2"
 #define RELEASE_DATE  "2016-07-06"
 
 #define FALSE  0
@@ -47,6 +47,10 @@
 #define PERL_COMPAT  0 /* Compile a version with some changes to make it 
                         * compatible with the Perl version
                         */
+#define TEST_FUNC  0 /* Send non-option arguments to a function for testing. 
+                      * Doesn't break anything, non-option arguments are 
+                      * ignored by the program.
+                      */
 
 #define stddebug  stderr
 
