@@ -555,7 +555,7 @@ sub test_suuid_executable {
     );
 
     # }}}
-    likecmd("$CMD -w e -l $Outdir", # {{{
+    likecmd("$CMD --whereto e -l $Outdir", # {{{
         '/^$/s',
         "/^$v1_templ\\n\$/s",
         0,

@@ -345,7 +345,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 			{"tag", required_argument, 0, 't'},
 			{"verbose", no_argument, 0, 'v'},
 			{"version", no_argument, 0, 0},
-			{"whereto", no_argument, 0, 'w'},
+			{"whereto", required_argument, 0, 'w'},
 			{0, 0, 0, 0}
 		};
 
