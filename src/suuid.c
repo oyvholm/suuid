@@ -466,14 +466,6 @@ char *process_uuid(FILE *logfp, struct Entry *entry)
 	if (!uuid_date_from_uuid(entry->date, entry->uuid))
 		return NULL;
 
-	if (opt.verbose >= 4) {
-		int i;
-
-		i = system("(echo; echo After create_logfile:; "
-		           "cat /home/sunny/uuids/fake.xml; "
-		           "echo) >&2");
-		i = i; /* Get rid of gcc warning */
-	}
 	if (add_to_logfile(logfp, entry) == EXIT_ERROR) {
 #if PERL_COMPAT
 		perlexit13 = TRUE; /* errno EACCES from die() in Perl */

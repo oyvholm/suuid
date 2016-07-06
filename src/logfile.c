@@ -667,7 +667,6 @@ int add_to_logfile(FILE *fp, struct Entry *entry)
 int close_logfile(FILE *fp)
 {
 	int retval = EXIT_OK;
-	int i;
 
 	if (fprintf(fp, "</suuids>\n") != 10)
 		retval = EXIT_ERROR;
@@ -676,11 +675,6 @@ int close_logfile(FILE *fp)
 	flock(fileno(fp), LOCK_UN);
 	if (fclose(fp) == EOF)
 		retval = EXIT_ERROR;
-	if (opt.verbose >= 3) {
-		i = system("(echo; cat /home/sunny/uuids/fake.xml; "
-		           "echo) >&2");
-		i = i; /* Get rid of gcc warning */
-	}
 
 	return retval;
 }
