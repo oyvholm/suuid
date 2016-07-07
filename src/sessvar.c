@@ -70,12 +70,12 @@ int fill_sess(struct Entry *dest, char *uuid, char *desc, size_t desclen)
 		myerror("fill_sess(): Could not duplicate UUID");
 		return EXIT_ERROR;
 	}
-	dest->sess[sessind].uuid = auuid;
 
 	if (desc && desclen) {
 		adesc = strndup(desc, desclen);
 		if (!adesc) {
 			myerror("get_sess_info(): Could not duplicate desc");
+			free(auuid);
 			return EXIT_ERROR;
 		}
 		if (!is_valid_desc_string(adesc))
@@ -83,6 +83,7 @@ int fill_sess(struct Entry *dest, char *uuid, char *desc, size_t desclen)
 		else
 			dest->sess[sessind].desc = adesc;
 	}
+	dest->sess[sessind].uuid = auuid;
 	sessind++;
 
 	return EXIT_OK;
