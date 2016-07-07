@@ -54,13 +54,6 @@ clean:
 edit: tags
 	$(EDITOR) *.c *.h Makefile t/*.t
 
-tags: $(CFILES) $(HFILES)
-	ctags $(CFILES) $(HFILES)
-
-.PHONY: test
-test: $(EXEC)
-	cd t && make
-
 .PHONY: locktest
 locktest: $(EXEC)
 	rm -rf locktestdir
@@ -68,3 +61,10 @@ locktest: $(EXEC)
 	for f in $$(seq 1 500); do ./suuid -wn -l locktestdir; done &
 	for f in $$(seq 1 500); do ./suuid -wn -l locktestdir; done &
 	for f in $$(seq 1 500); do ./suuid -wn -l locktestdir; done
+
+tags: $(CFILES) $(HFILES)
+	ctags $(CFILES) $(HFILES)
+
+.PHONY: test
+test: $(EXEC)
+	cd t && make
