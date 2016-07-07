@@ -44,14 +44,6 @@ tag.o: tag.c $(DEPS)
 uuid.o: uuid.c $(DEPS)
 	$(CC) $(CCFLAGS) uuid.c
 
-.PHONY: addtest
-addtest:
-	test -d ../.git
-	rm -rf ../x
-	cd .. && git clone . x
-	git diff --cached --binary | (cd ../x && git apply)
-	cd ../x/src && make test
-
 .PHONY: clean
 clean:
 	rm -fv $(EXEC) $(OBJS) *~ core core.$(EXEC) tags

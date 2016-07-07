@@ -1,4 +1,5 @@
 *.o
+/.testadd.tmp/
 /locktestdir/
 /suuid
 /tags
