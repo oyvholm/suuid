@@ -489,7 +489,7 @@ char *get_logdir(void)
 
 char *get_logfile_name(void)
 {
-	char *logdir, *logfile, *hostname;
+	char *logdir, *logfile = NULL, *hostname;
 	size_t fname_length; /* Total length of logfile name */
 
 	logdir = get_logdir();
@@ -502,12 +502,12 @@ char *get_logfile_name(void)
 	hostname = get_hostname();
 	if (!hostname) {
 		myerror("get_logfile_name(): Cannot get hostname");
-		return NULL;
+		goto cleanup;
 	}
 	if (!valid_hostname(hostname)) {
 		myerror("get_logfile_name(): Got invalid hostname: \"%s\"",
 		        hostname);
-		return NULL;
+		goto cleanup;
 	}
 
 	fname_length = strlen(logdir) + strlen("/") + /* fixme: slash */
@@ -516,10 +516,12 @@ char *get_logfile_name(void)
 	if (!logfile) {
 		myerror("get_logfile_name(): Could not allocate %lu bytes for "
 		        "logfile filename", fname_length + 1);
-		return NULL;
+		goto cleanup;
 	}
 	/* fixme: Remove slash hardcoding, use some portable solution */
 	snprintf(logfile, fname_length, "%s/%s.xml", logdir, hostname);
+
+cleanup:
 	free(logdir);
 
 	return logfile;
