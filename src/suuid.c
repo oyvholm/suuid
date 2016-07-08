@@ -254,34 +254,19 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 			dest->license = TRUE;
 		else if (!strcmp(opts->name, "raw"))
 			dest->raw = TRUE;
-		else if (!strcmp(opts->name, "rcfile")) {
-			dest->rcfile = strdup(optarg);
-			if (!dest->rcfile) {
-				myerror("choose_opt_action(): Cannot allocate "
-				        "memory for --rcfile argument");
-				retval = EXIT_ERROR;
-			}
-		} else if (!strcmp(opts->name, "version"))
+		else if (!strcmp(opts->name, "rcfile"))
+			dest->rcfile = optarg;
+		else if (!strcmp(opts->name, "version"))
 			dest->version = TRUE;
 		break;
 	case 'c':
-		dest->comment = strdup(optarg);
-		if (!dest->comment) {
-			myerror("choose_opt_action(): Cannot allocate memory "
-			        "for -c/--comment argument");
-			retval = EXIT_ERROR;
-		}
+		dest->comment = optarg;
 		break;
 	case 'h':
 		dest->help = TRUE;
 		break;
 	case 'l':
-		dest->logdir = strdup(optarg);
-		if (!dest->logdir) {
-			myerror("choose_opt_action(): Cannot allocate memory "
-			        "for -l/--logdir argument");
-			retval = EXIT_ERROR;
-		}
+		dest->logdir = optarg;
 		break;
 	case 'm':
 		dest->random_mac = TRUE;
@@ -303,12 +288,7 @@ int choose_opt_action(struct Options *dest, int c, struct option *opts)
 		dest->verbose++;
 		break;
 	case 'w':
-		dest->whereto = strdup(optarg);
-		if (!dest->whereto) {
-			myerror("choose_opt_action(): Cannot allocate memory "
-			        "for -w/--whereto argument");
-			retval = EXIT_ERROR;
-		}
+		dest->whereto = optarg;
 		break;
 	default:
 		msg(3, "getopt_long() returned character code %d", c);
