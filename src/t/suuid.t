@@ -42,7 +42,7 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s/^.*\/(.*?)$/$1/;
-our $VERSION = '0.1.4';
+our $VERSION = '0.1.6';
 
 my %descriptions = ();
 
@@ -577,6 +577,49 @@ sub test_suuid_executable {
     if (defined($stat_array[2])) {
         ok(chmod($stat_array[2], $Outfile), "Make [Outfile] writable again");
     }
+
+    # }}}
+    ok(unlink($Outfile), "Delete [Outfile]");
+    diag("Test what happens when the end of the log file is messed up");
+    ok(create_file($Outfile, ""), "Create empty log file");
+    likecmd("$CMD -l $Outdir", # {{{
+        "/^$v1_templ\\n\$/s",
+        '/^$/s',
+        0,
+        "Write to empty log file",
+    );
+    like(file_data($Outfile), # {{{
+        s_top(s_suuid()),
+        "The empty file was initialised",
+    );
+
+    # }}}
+    ok(create_file($Outfile, "Destroyed file\n"), "Create destroyed log file");
+    likecmd("$CMD -l $Outdir", # {{{
+        "/^$v1_templ\n\$/s",
+        '/^\.\.\/suuid: tmp-suuid-t-\d+-\d+\/.*?\.xml: Unknown end line, ' .
+            'adding to end of file\n$/s',
+        0,
+        "Write to log file with destroyed EOF",
+    );
+    like(file_data($Outfile), # {{{
+        '/^Destroyed file\n' . s_suuid() . '<\/suuids>\n$/s',
+        "New entry was added to end of file",
+    );
+
+    # }}}
+    ok(create_file($Outfile, "a"), "Create log file with one char");
+    likecmd("$CMD -l $Outdir", # {{{
+        "/^$v1_templ\n\$/s",
+        '/^\.\.\/suuid: tmp-suuid-t-\d+-\d+\/.*?\.xml: Unknown end line, ' .
+            'adding to end of file\n$/s',
+        0,
+        "Write to log file containing one char",
+    );
+    like(file_data($Outfile), # {{{
+        '/^a' . s_suuid() . '<\/suuids>\n$/s',
+        "New entry was added to EOF after that one character",
+    );
 
     # }}}
     ok(unlink($Outfile), "Delete [Outfile]");
@@ -1190,6 +1233,16 @@ sub file_data {
     }
     # }}}
 } # file_data()
+
+sub create_file {
+    # Create new file and fill it with data {{{
+    my ($file, $text) = @_;
+    open(my $fp, ">$file") or return 0;
+    print($fp $text);
+    close($fp);
+    return (file_data($file) eq $text) ? 1 : 0;
+    # }}}
+} # create_file()
 
 sub print_version {
     # Print program version {{{

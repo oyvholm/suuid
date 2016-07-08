@@ -25,8 +25,8 @@
  * Defines
  */
 
-#define VERSION       "0.1.5"
-#define RELEASE_DATE  "2016-07-06"
+#define VERSION       "0.1.6"
+#define RELEASE_DATE  "2016-07-08"
 
 #define FALSE  0
 #define TRUE   1
@@ -182,6 +182,11 @@ extern char *xml_entry(struct Entry *);
 extern char *get_logdir(void);
 extern char *get_logfile_name(void);
 extern FILE *lock_file(FILE *, char *);
+extern FILE *write_xml_header(FILE *);
+extern FILE *seek_to_eof(FILE *, char *);
+extern FILE *unknown_end_line(FILE *, char *);
+extern FILE *check_last_log_line(FILE *, char *);
+extern FILE *seek_to_entry_pos(FILE *, char *);
 extern FILE *open_logfile(char *);
 extern int add_to_logfile(FILE *, struct Entry *);
 extern int close_logfile(FILE *);

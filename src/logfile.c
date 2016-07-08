@@ -548,10 +548,125 @@ FILE *lock_file(FILE *fp, char *fname)
 }
 
 /*
- * open_logfile() - Open log file fname for read+write, check that the end of 
- * file is OK, set the file position to the place where the new log entry shall 
- * be inserted. If the file doesn't exist, create it and write the initial XML 
- * header to it.
+ * write_xml_header() - Write the initial log file header to the log file 
+ * stream.
+ *
+ * Return fp if success, NULL if FUBAR.
+ */
+
+FILE *write_xml_header(FILE *fp)
+{
+	char *header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+	                "<!DOCTYPE suuids SYSTEM \"dtd/suuids.dtd\">\n"
+	                "<suuids>\n";
+
+	if (fputs(header, fp) == EOF) {
+		myerror("Cannot write header to the log file");
+		return NULL;
+	}
+
+	return fp;
+}
+
+/*
+ * seek_to_eof() - Seek to end of fp, and display error message about fname if 
+ * it can't seek.
+ *
+ * Return fp if ok, NULL if error.
+ */
+
+FILE *seek_to_eof(FILE *fp, char *fname)
+{
+	if (fseek(fp, 0, SEEK_END) == -1) {
+		myerror("%s: Cannot seek to end of file", fname);
+		return NULL;
+	}
+
+	return fp;
+}
+
+/*
+ * unknown_end_line() - The last line in the logfile isn't "</suuids>\n". 
+ * Complain about it and set the file position to EOF.
+ *
+ * Returns with value from seek_to_eof().
+ */
+
+FILE *unknown_end_line(FILE *fp, char *fname)
+{
+	fprintf(stderr, "%s: %s: Unknown end line, adding to end of file\n",
+	                progname, fname);
+
+	return seek_to_eof(fp, fname);
+}
+
+/*
+ * check_last_log_line() - Check that the last line of the logfile is ok, it 
+ * should be identical to "</suuids>\n".
+ *
+ * If it isn't, return with value from unknown_end_line(). If it was ok, seek 
+ * to the correct position and return fp.
+ */
+
+FILE *check_last_log_line(FILE *fp, char *fname)
+{
+	long filepos;
+	char check_line[12];
+
+	if (fseek(fp, -10, SEEK_END) == -1) {
+		myerror("%s: Could not seek in log file", fname);
+		return NULL;
+	}
+	filepos = ftell(fp);
+	if (filepos == -1) {
+		myerror("%s: Cannot get file position of end line", fname);
+		return NULL;
+	}
+	if (!fgets(check_line, 10, fp)) {
+		myerror("Error when reading end line from log file \"%s\"",
+		        fname);
+		return NULL;
+	}
+	if (strcmp(check_line, "</suuids>"))
+		return unknown_end_line(fp, fname);
+	if (fseek(fp, filepos, SEEK_SET) == -1) {
+		myerror("%s: Cannot seek to position %lu", fname, filepos);
+		return NULL;
+	}
+
+	return fp;
+}
+
+/*
+ * seek_to_entry_pos() - Check the size of the log file and call the 
+ * appropriate function for setting the file position.
+ *
+ * Return NULL if error, otherwise return fp.
+ */
+
+FILE *seek_to_entry_pos(FILE *fp, char *fname)
+{
+	long filepos;
+
+	if (!seek_to_eof(fp, fname))
+		return NULL;
+	filepos = ftell(fp);
+	if (filepos == -1) {
+		myerror("%s: Cannot get file position at EOF", fname);
+		return NULL;
+	}
+	if (filepos > 10)
+		return check_last_log_line(fp, fname);
+	if (filepos == 0)
+		return write_xml_header(fp);
+
+	return unknown_end_line(fp, fname);
+}
+
+/*
+ * open_logfile() - Open log file fname for read+write if it exists, or create 
+ * it if it doesn't. Then lock it and give control to seek_to_entry_pos().
+ *
  * Return FILE pointer to the opened stream, ready for writing. If anything 
  * fails, NULL is returned.
  */
@@ -571,9 +686,6 @@ FILE *open_logfile(char *fname)
 	 */
 
 	if (access(fname, F_OK) != -1) {
-		long filepos;
-		char check_line[12];
-
 		/* File already exists */
 		fp = fopen(fname, "r+");
 		if (!fp) {
@@ -586,25 +698,6 @@ FILE *open_logfile(char *fname)
 #endif
 			return NULL;
 		}
-		if (!lock_file(fp, fname))
-			return NULL;
-		if (fseek(fp, -10, SEEK_END) == -1) {
-			myerror("%s: Could not seek in log file", fname);
-			return NULL;
-		}
-		filepos = ftell(fp);
-		if (filepos == -1) {
-			myerror("%s: Cannot read file position", fname);
-			return NULL;
-		}
-		if (strcmp(fgets(check_line, 10, fp), "</suuids>"))
-			fprintf(stderr, "%s: %s: Unknown end line, adding to "
-			                "end of file\n", progname, fname);
-		else if (fseek(fp, filepos, SEEK_SET) == -1) {
-			myerror("%s: Cannot seek to position %lu",
-			        fname, filepos);
-			return NULL;
-		}
 	} else {
 		/* File doesn't exist */
 		fp = fopen(fname, "a");
@@ -612,19 +705,11 @@ FILE *open_logfile(char *fname)
 			myerror("%s: Could not create log file", fname);
 			return NULL;
 		}
-		if (!lock_file(fp, fname))
-			return NULL;
-		if (fputs("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-		          "<!DOCTYPE suuids SYSTEM \"dtd/suuids.dtd\">\n"
-		          "<suuids>\n", fp) == EOF) {
-			myerror("open_logfile(): Cannot write header to the "
-			        "log file");
-			fclose(fp);
-			return NULL;
-		}
 	}
+	if (!lock_file(fp, fname))
+		return NULL;
 
-	return fp;
+	return seek_to_entry_pos(fp, fname);
 }
 
 /*
