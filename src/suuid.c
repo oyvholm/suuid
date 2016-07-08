@@ -613,12 +613,13 @@ int main(int argc, char *argv[])
 		goto cleanup;
 	}
 
-	for (i = 0; i < opt.count; i++)
+	for (i = 0; i < opt.count; i++) {
 		if (!process_uuid(logfp, &entry)) {
 			close_logfile(logfp);
 			retval = EXIT_ERROR;
 			goto cleanup;
 		}
+	}
 
 	if (close_logfile(logfp) == EXIT_ERROR)
 		myerror("close_logfile() failed");
