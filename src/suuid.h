@@ -25,7 +25,7 @@
  * Defines
  */
 
-#define VERSION       "0.1.7"
+#define VERSION       "0.1.8"
 #define RELEASE_DATE  "2016-07-08"
 
 #define FALSE  0
@@ -63,6 +63,7 @@
                                     * to log directory
                                     */
 #define STD_EDITOR  "vi"
+#define STD_RCFILE  ".suuidrc"
 #define MAX_SESS  1000 /* Maximum number of sess elements per entry */
 #define MAX_TAGS  1000 /* Maximum number of tags */
 #define LEGAL_UTF8_CHARS  "\x80\x81\x82\x83\x84\x85\x86\x87" \
@@ -192,6 +193,7 @@ extern int add_to_logfile(FILE *, struct Entry *);
 extern int close_logfile(FILE *);
 
 /* rcfile.c */
+extern char *get_rcfilename(void);
 extern char *has_key(char *, char *);
 extern void parse_rc_line(char *, struct Rc *);
 extern int read_rcfile(char *, struct Rc *);

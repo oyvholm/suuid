@@ -42,7 +42,7 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s/^.*\/(.*?)$/$1/;
-our $VERSION = '0.1.7';
+our $VERSION = '0.1.8';
 
 my %descriptions = ();
 
@@ -1039,6 +1039,29 @@ sub test_suuid_environment {
     is($ENV{'SUUID_EDITOR'},   undef, "SUUID_EDITOR is undefined");
     is($ENV{'SUUID_HOSTNAME'}, undef, "SUUID_HOSTNAME is undefined");
     is($ENV{'SUUID_LOGDIR'},   undef, "SUUID_LOGDIR is undefined");
+    likecmd("$CMD -l $Outdir", # {{{
+        "/^$v1_templ\\n\$/s",
+        '/^\.\.\/suuid: HOME environment variable not defined, cannot ' .
+            'determine name of rcfile\n$/s',
+        0,
+        "No HOME defined, but -l is set to [Outdir]",
+    );
+
+    # }}}
+    testcmd("$CMD", # {{{
+        '',
+        "../suuid: HOME environment variable not defined, cannot determine " .
+            "name of rcfile\n" .
+            "../suuid: \$SUUID_LOGDIR and \$HOME environment variables are " .
+            "not defined, cannot create logdir path\n" .
+            "../suuid: get_logfile_name(): Unable to find logdir location\n" .
+            "../suuid: get_logfile_name() failed\n",
+        1,
+        "Now it doesn't even have -l/--logdir",
+    );
+
+    # }}}
+    ok(unlink($Outfile), "Delete [Outfile]");
     $ENV{'HOME'} = $bck_home;
     return;
     # }}}

@@ -21,6 +21,41 @@
 #include "suuid.h"
 
 /*
+ * get_rcfilename() - Return pointer to a string with name of rcfile. If 
+ * neither opt.rcfile or HOME is defined, return NULL.
+ */
+
+char *get_rcfilename(void)
+{
+	char *retval = NULL, *env;
+	size_t size;
+
+	if (opt.rcfile) {
+		retval = strdup(opt.rcfile);
+		if (!retval) {
+			myerror("Cannot duplicate --rcfile argument");
+			return NULL;
+		}
+		return retval;
+	}
+	env = getenv("HOME");
+	if (!env) {
+		fprintf(stderr, "%s: HOME environment variable not defined, "
+		                "cannot determine name of rcfile\n", progname);
+		return NULL;
+	}
+	size = strlen(env) + strlen(STD_RCFILE) + 32;
+	retval = malloc(size);
+	if (!retval) {
+		myerror("Could not allocate %lu bytes for rcfile name", size);
+		return NULL;
+	}
+	snprintf(retval, size, "%s/%s", env, STD_RCFILE); /* fixme: slash */
+
+	return retval;
+}
+
+/*
  * has_key() - Check if line contains the keyword at the beginning of the line. 
  * If it does, return pointer to the value of that keyword, otherwise return 
  * NULL.

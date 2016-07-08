@@ -201,7 +201,8 @@ void usage(int retval)
 	       "valid XML, \n"
 	       "    otherwise it will create corrupted log files.\n");
 	printf("  --rcfile X\n"
-	       "    Use file X instead of '%s/.suuidrc'.\n", getenv("HOME"));
+	       "    Use file X instead of '%s/%s'.\n",
+	       getenv("HOME"), STD_RCFILE);
 	printf("  -t x, --tag x\n"
 	       "    Use x as tag (category).\n");
 	printf("  -v, --verbose\n"
@@ -230,9 +231,9 @@ void usage(int retval)
 	printf("\n");
 	printf("A different hostname can be specified in the environment "
 	       "variable \n"
-	       "%s, or in the file %s/.suuidrc with "
-	       "the format \n"
-	       "\"hostname = xxx\".\n", ENV_HOSTNAME, getenv("HOME"));
+	       "%s, or in the file %s/%s with the format \n"
+	       "\"hostname = xxx\".\n",
+	       ENV_HOSTNAME, getenv("HOME"), STD_RCFILE);
 	printf("\n");
 }
 
@@ -533,7 +534,7 @@ bool init_randomness(void)
 int main(int argc, char *argv[])
 {
 	int retval = EXIT_OK;
-	char *logfile;
+	char *rcfile, *logfile;
 	FILE *logfp;
 	unsigned int i;
 
@@ -588,7 +589,8 @@ int main(int argc, char *argv[])
 	}
 #endif
 
-	if (read_rcfile(opt.rcfile, &rc) == EXIT_ERROR) {
+	rcfile = get_rcfilename();
+	if (read_rcfile(rcfile, &rc) == EXIT_ERROR) {
 		myerror("%s: Could not read rc file", opt.rcfile);
 		retval = EXIT_ERROR;
 		goto cleanup;
@@ -635,6 +637,7 @@ cleanup:
 
 	free(entry.date);
 	free(entry.cwd);
+	free(rcfile);
 
 #if PERL_COMPAT
 	if (perlexit13)
