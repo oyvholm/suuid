@@ -703,6 +703,8 @@ sub test_suuid_comment {
 sub test_suuid_environment {
     # {{{
     my ($Outdir, $Outfile) = @_;
+    my $bck_home;
+
     diag("Test logging of \$SESS_UUID environment variable...");
     likecmd("SESS_UUID=27538da4-fc68-11dd-996d-000475e441b9 $CMD -t yess -l $Outdir", # {{{
         "/^$v1_templ\n\$/s",
@@ -1029,6 +1031,15 @@ sub test_suuid_environment {
 
     # }}}
     ok(unlink($Outfile), "Delete [Outfile]");
+    diag("Check behaviour without various environment variables");
+    $bck_home = $ENV{'HOME'};
+    delete $ENV{'HOME'};
+    is($ENV{'HOME'},           undef, "HOME is undefined");
+    is($ENV{'SESS_UUID'},      undef, "SESS_UUID is undefined");
+    is($ENV{'SUUID_EDITOR'},   undef, "SUUID_EDITOR is undefined");
+    is($ENV{'SUUID_HOSTNAME'}, undef, "SUUID_HOSTNAME is undefined");
+    is($ENV{'SUUID_LOGDIR'},   undef, "SUUID_LOGDIR is undefined");
+    $ENV{'HOME'} = $bck_home;
     return;
     # }}}
 } # test_suuid_environment()
