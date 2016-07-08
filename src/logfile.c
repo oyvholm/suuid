@@ -475,7 +475,7 @@ char *get_logdir(void)
 	} else {
 		fprintf(stderr, "%s: $%s and $HOME environment "
 		                "variables are not defined, cannot "
-		                "create logdir path", progname, ENV_LOGDIR);
+		                "create logdir path\n", progname, ENV_LOGDIR);
 		return NULL;
 	}
 
