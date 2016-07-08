@@ -136,6 +136,12 @@ END
 
     # }}}
 
+    $ENV{'HOME'} = "/dontexist/$Outdir";
+    delete $ENV{'SESS_UUID'};
+    delete $ENV{'SUUID_EDITOR'};
+    delete $ENV{'SUUID_HOSTNAME'};
+    delete $ENV{'SUUID_LOGDIR'};
+
     test_test_functions();
     test_suuid_executable();
 
