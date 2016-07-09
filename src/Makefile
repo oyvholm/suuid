@@ -4,8 +4,10 @@
 
 SUUID_OBJS = environ.o io.o logfile.o rcfile.o sessvar.o string.o suuid.o \
              tag.o uuid.o
+SESS_OBJS =  sess.o
 CFILES = environ.c io.c logfile.c rcfile.c sessvar.c string.c suuid.c \
-         tag.c uuid.c
+         tag.c uuid.c \
+         sess.c
 HFILES = suuid.h
 DEPS = $(HFILES) Makefile
 CC = gcc
@@ -13,10 +15,13 @@ LD = gcc
 CCFLAGS = -Wall -Wextra -Werror -Og -c -g -pedantic
 LDFLAGS = -Wall
 
-default: suuid
+default: suuid sess
 
 suuid: $(SUUID_OBJS)
 	$(LD) -o suuid $(LDFLAGS) $(SUUID_OBJS)
+
+sess: $(SESS_OBJS)
+	$(LD) -o sess $(LDFLAGS) $(SESS_OBJS)
 
 suuid.o: suuid.c $(DEPS)
 	$(CC) $(CCFLAGS) suuid.c
@@ -33,6 +38,9 @@ logfile.o: logfile.c $(DEPS)
 rcfile.o: rcfile.c $(DEPS)
 	$(CC) $(CCFLAGS) rcfile.c
 
+sess.o: sessvar.c $(DEPS)
+	$(CC) $(CCFLAGS) sess.c
+
 sessvar.o: sessvar.c $(DEPS)
 	$(CC) $(CCFLAGS) sessvar.c
 
@@ -47,7 +55,7 @@ uuid.o: uuid.c $(DEPS)
 
 .PHONY: clean
 clean:
-	rm -fv suuid $(SUUID_OBJS) *~ core core.suuid tags
+	rm -fv suuid $(SUUID_OBJS) $(SESS_OBJS) *~ core core.suuid tags
 	rm -frv locktestdir
 	cd t && $(MAKE) clean
 
