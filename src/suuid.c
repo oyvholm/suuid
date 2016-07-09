@@ -529,7 +529,7 @@ bool init_randomness(void)
 int main(int argc, char *argv[])
 {
 	int retval = EXIT_OK;
-	char *rcfile, *logfile;
+	char *rcfile, *logfile = NULL;
 	FILE *logfp;
 	unsigned int i;
 
@@ -630,6 +630,7 @@ int main(int argc, char *argv[])
 
 cleanup:
 
+	free(logfile);
 	free(entry.date);
 	free(entry.cwd);
 	free(rcfile);
