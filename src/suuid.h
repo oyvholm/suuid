@@ -207,8 +207,8 @@ extern int get_sess_info(struct Entry *entry);
 
 /* string.c */
 extern char *check_hex(const char *hex, const size_t len);
-extern char *trim_str_front(char *);
-extern char *trim_str_end(char *);
+extern char *trim_str_front(char *dest);
+extern char *trim_str_end(char *dest);
 extern char *utf8_check(const char *text);
 
 /* suuid.c */
