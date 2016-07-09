@@ -203,7 +203,7 @@ extern bool is_legal_desc_char(const unsigned char c);
 extern bool is_valid_desc_string(const char *s);
 extern int fill_sess(struct Entry *dest, const char *uuid,
                      const char *desc, const size_t desclen);
-extern int get_sess_info(struct Entry *);
+extern int get_sess_info(struct Entry *entry);
 
 /* string.c */
 extern char *check_hex(const char *hex, const size_t len);
