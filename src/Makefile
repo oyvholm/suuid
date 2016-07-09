@@ -11,7 +11,7 @@ DEPS = $(HFILES) Makefile
 CC = gcc
 LD = gcc
 CCFLAGS = -Wall -Wextra -Werror -Og -c -g -pedantic
-LDFLAGS = -Wall
+LDFLAGS = -Wall -Wextra -Werror
 EXEC = suuid
 
 $(EXEC): $(OBJS)
