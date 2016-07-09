@@ -199,8 +199,8 @@ extern void parse_rc_line(const char *line, struct Rc *rc);
 extern int read_rcfile(const char *rcfile, struct Rc *rc);
 
 /* sessvar.c */
-extern bool is_legal_desc_char(unsigned char);
-extern bool is_valid_desc_string(char *);
+extern bool is_legal_desc_char(const unsigned char c);
+extern bool is_valid_desc_string(const char *s);
 extern int fill_sess(struct Entry *, char *, char *, size_t);
 extern int get_sess_info(struct Entry *);
 
