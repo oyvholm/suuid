@@ -172,25 +172,25 @@ extern char *read_from_file(const char *fname);
 extern char *read_from_editor(const char *editor);
 
 /* logfile.c */
-extern bool valid_xml_chars(char *);
-extern char *suuid_xml(char *);
-extern void init_xml_entry(struct Entry *);
-extern char *allocate_elem(char *, char *);
-extern char *alloc_attr(char *, char *);
+extern bool valid_xml_chars(const char *s);
+extern char *suuid_xml(const char *text);
+extern void init_xml_entry(struct Entry *e);
+extern char *allocate_elem(const char *elem, const char *src);
+extern char *alloc_attr(const char *attr, const char *data);
 extern char *get_xml_tags(void);
-extern char *create_sess_xml(struct Entry *);
-extern char *xml_entry(struct Entry *);
+extern char *create_sess_xml(const struct Entry *entry);
+extern char *xml_entry(const struct Entry *entry);
 extern char *get_logdir(void);
 extern char *get_logfile_name(void);
-extern FILE *lock_file(FILE *, char *);
-extern FILE *write_xml_header(FILE *);
-extern FILE *seek_to_eof(FILE *, char *);
-extern FILE *unknown_end_line(FILE *, char *);
-extern FILE *check_last_log_line(FILE *, char *);
-extern FILE *seek_to_entry_pos(FILE *, char *);
-extern FILE *open_logfile(char *);
-extern int add_to_logfile(FILE *, struct Entry *);
-extern int close_logfile(FILE *);
+extern FILE *lock_file(FILE *fp, const char *fname);
+extern FILE *write_xml_header(FILE *fp);
+extern FILE *seek_to_eof(FILE *fp, const char *fname);
+extern FILE *unknown_end_line(FILE *fp, const char *fname);
+extern FILE *check_last_log_line(FILE *fp, const char *fname);
+extern FILE *seek_to_entry_pos(FILE *fp, const char *fname);
+extern FILE *open_logfile(const char *fname);
+extern int add_to_logfile(FILE *fp, const struct Entry *entry);
+extern int close_logfile(FILE *fp);
 
 /* rcfile.c */
 extern char *get_rcfilename(void);
