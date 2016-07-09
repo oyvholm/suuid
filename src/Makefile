@@ -9,6 +9,7 @@ CFILES = environ.c io.c logfile.c rcfile.c sessvar.c string.c suuid.c \
          tag.c uuid.c \
          sess.c
 SUUID_HFILES = suuid.h
+SESS_HFILES = sess.h
 SUUID_DEPS = $(SUUID_HFILES) Makefile
 CC = gcc
 LD = gcc
@@ -71,8 +72,8 @@ locktest: suuid
 	for f in $$(seq 1 500); do ./suuid -wn -l locktestdir; done &
 	for f in $$(seq 1 500); do ./suuid -wn -l locktestdir; done
 
-tags: $(CFILES) $(SUUID_HFILES)
-	ctags $(CFILES) $(SUUID_HFILES)
+tags: $(CFILES) $(SUUID_HFILES) $(SESS_HFILES)
+	ctags $(CFILES) $(SUUID_HFILES) $(SESS_HFILES)
 
 .PHONY: test
 test: suuid sess
