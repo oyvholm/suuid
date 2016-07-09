@@ -27,7 +27,7 @@
  * Return TRUE if valid, FALSE if not.
  */
 
-bool valid_uuid(char *u, bool check_len)
+bool valid_uuid(const char *u, const bool check_len)
 {
 	if (!u || strlen(u) < UUID_LENGTH)
 		return FALSE;

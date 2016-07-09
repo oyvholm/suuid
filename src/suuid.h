@@ -201,11 +201,12 @@ extern int read_rcfile(const char *rcfile, struct Rc *rc);
 /* sessvar.c */
 extern bool is_legal_desc_char(const unsigned char c);
 extern bool is_valid_desc_string(const char *s);
-extern int fill_sess(struct Entry *, char *, char *, size_t);
+extern int fill_sess(struct Entry *dest, const char *uuid,
+                     const char *desc, const size_t desclen);
 extern int get_sess_info(struct Entry *);
 
 /* string.c */
-extern char *check_hex(char *, size_t);
+extern char *check_hex(const char *hex, const size_t len);
 extern char *trim_str_front(char *);
 extern char *trim_str_end(char *);
 extern char *utf8_check(const char *text);
@@ -230,7 +231,7 @@ extern char *get_next_tag(void);
 extern char *store_tag(char *);
 
 /* uuid.c */
-extern bool valid_uuid(char *, bool);
+extern bool valid_uuid(const char *u, const bool check_len);
 extern char *scramble_mac_address(char *);
 extern char *generate_uuid(void);
 extern char *uuid_date(char *, char *);

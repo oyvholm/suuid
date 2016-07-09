@@ -26,14 +26,14 @@
  * or NULL if everything is ok.
  */
 
-char *check_hex(char *hex, size_t len)
+char *check_hex(const char *hex, const size_t len)
 {
-	char *p;
+	const char *p;
 
 	assert(hex);
 	for (p = hex; p < hex + len; p++)
 		if (!strchr("0123456789abcdef", *p))
-			return p;
+			return (char *)p;
 
 	return NULL;
 }

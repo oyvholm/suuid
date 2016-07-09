@@ -57,7 +57,8 @@ bool is_valid_desc_string(const char *s)
  * EXIT_ERROR if something failed.
  */
 
-int fill_sess(struct Entry *dest, char *uuid, char *desc, size_t desclen)
+int fill_sess(struct Entry *dest, const char *uuid,
+              const char *desc, const size_t desclen)
 {
 	char *auuid = NULL, *adesc = NULL;
 	static unsigned int sessind = 0;
