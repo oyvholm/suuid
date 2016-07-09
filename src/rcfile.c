@@ -61,7 +61,7 @@ char *get_rcfilename(void)
  * NULL.
  */
 
-char *has_key(char *line, char *keyword)
+char *has_key(const char *line, const char *keyword)
 {
 	char *retval;
 
@@ -90,7 +90,7 @@ char *has_key(char *line, char *keyword)
  * by sending it to check_rc() whom will set the struct variable accordingly.
  */
 
-void parse_rc_line(char *line, struct Rc *rc)
+void parse_rc_line(const char *line, struct Rc *rc)
 {
 	if (has_key(line, "hostname"))
 		rc->hostname = has_key(line, "hostname");
@@ -102,7 +102,7 @@ void parse_rc_line(char *line, struct Rc *rc)
  * Read contents of rcfile into rc. Return EXIT_OK or EXIT_ERROR.
  */
 
-int read_rcfile(char *rcfile, struct Rc *rc)
+int read_rcfile(const char *rcfile, struct Rc *rc)
 {
 	FILE *fp;
 	char buf[BUFSIZ];

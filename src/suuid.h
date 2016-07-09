@@ -194,9 +194,9 @@ extern int close_logfile(FILE *fp);
 
 /* rcfile.c */
 extern char *get_rcfilename(void);
-extern char *has_key(char *, char *);
-extern void parse_rc_line(char *, struct Rc *);
-extern int read_rcfile(char *, struct Rc *);
+extern char *has_key(const char *line, const char *keyword);
+extern void parse_rc_line(const char *line, struct Rc *rc);
+extern int read_rcfile(const char *rcfile, struct Rc *rc);
 
 /* sessvar.c */
 extern bool is_legal_desc_char(unsigned char);
