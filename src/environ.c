@@ -60,7 +60,7 @@ char *get_editor(void)
  * hostname. Return TRUE if ok, FALSE if not.
  */
 
-bool valid_hostname(char *s)
+bool valid_hostname(const char *s)
 {
 	unsigned char *p;
 

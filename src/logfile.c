@@ -31,7 +31,7 @@ size_t MAX_GROWTH = 5; /* When converting from plain text to the XML format
  * UTF-8 and no control chars. Return TRUE if ok, FALSE if invalid.
  */
 
-bool valid_xml_chars(char *s)
+bool valid_xml_chars(const char *s)
 {
 	unsigned char *p = (unsigned char *)s;
 
@@ -53,11 +53,12 @@ bool valid_xml_chars(char *s)
  * argument is escaped for use in the XML file.
  */
 
-char *suuid_xml(char *text)
+char *suuid_xml(const char *text)
 {
 	char *retval;
 	size_t size = strlen(text);
-	char *p, *destp;
+	const char *p;
+	char *destp;
 
 	retval = malloc(size * MAX_GROWTH + 1);
 	if (!retval) {
@@ -139,7 +140,7 @@ void init_xml_entry(struct Entry *e)
  * Returns char * to allocated area, or NULL if error.
  */
 
-char *allocate_elem(char *elem, char *src)
+char *allocate_elem(const char *elem, const char *src)
 {
 	char *retval, *ap;
 	size_t size = 0;
@@ -184,7 +185,7 @@ char *allocate_elem(char *elem, char *src)
  * Returns NULL on error.
  */
 
-char *alloc_attr(char *attr, char *data)
+char *alloc_attr(const char *attr, const char *data)
 {
 	char *retval = NULL;
 	int size;
@@ -273,7 +274,7 @@ char *get_xml_tags(void)
  * entry->sess, or NULL if error.
  */
 
-char *create_sess_xml(struct Entry *entry)
+char *create_sess_xml(const struct Entry *entry)
 {
 	unsigned int i;
 	size_t size = 0, tmpsize = 0;
@@ -332,7 +333,7 @@ char *create_sess_xml(struct Entry *entry)
  * extracted from the entry struct, or NULL if error.
  */
 
-char *xml_entry(struct Entry *entry)
+char *xml_entry(const struct Entry *entry)
 {
 	struct Entry e;
 	char *retval;
@@ -532,7 +533,7 @@ cleanup:
  * pointer to the stream, otherwise return NULL.
  */
 
-FILE *lock_file(FILE *fp, char *fname)
+FILE *lock_file(FILE *fp, const char *fname)
 {
 	assert(fp);
 	assert(fname);
@@ -575,7 +576,7 @@ FILE *write_xml_header(FILE *fp)
  * Return fp if ok, NULL if error.
  */
 
-FILE *seek_to_eof(FILE *fp, char *fname)
+FILE *seek_to_eof(FILE *fp, const char *fname)
 {
 	if (fseek(fp, 0, SEEK_END) == -1) {
 		myerror("%s: Cannot seek to end of file", fname);
@@ -592,7 +593,7 @@ FILE *seek_to_eof(FILE *fp, char *fname)
  * Returns with value from seek_to_eof().
  */
 
-FILE *unknown_end_line(FILE *fp, char *fname)
+FILE *unknown_end_line(FILE *fp, const char *fname)
 {
 	fprintf(stderr, "%s: %s: Unknown end line, adding to end of file\n",
 	                progname, fname);
@@ -608,7 +609,7 @@ FILE *unknown_end_line(FILE *fp, char *fname)
  * to the correct position and return fp.
  */
 
-FILE *check_last_log_line(FILE *fp, char *fname)
+FILE *check_last_log_line(FILE *fp, const char *fname)
 {
 	long filepos;
 	char check_line[12];
@@ -644,7 +645,7 @@ FILE *check_last_log_line(FILE *fp, char *fname)
  * Return NULL if error, otherwise return fp.
  */
 
-FILE *seek_to_entry_pos(FILE *fp, char *fname)
+FILE *seek_to_entry_pos(FILE *fp, const char *fname)
 {
 	long filepos;
 
@@ -671,7 +672,7 @@ FILE *seek_to_entry_pos(FILE *fp, char *fname)
  * fails, NULL is returned.
  */
 
-FILE *open_logfile(char *fname)
+FILE *open_logfile(const char *fname)
 {
 	FILE *fp;
 
@@ -717,7 +718,7 @@ FILE *open_logfile(char *fname)
  * EXIT_OK or EXIT_ERROR.
  */
 
-int add_to_logfile(FILE *fp, struct Entry *entry)
+int add_to_logfile(FILE *fp, const struct Entry *entry)
 {
 	char *ap;
 	int retval = EXIT_OK;

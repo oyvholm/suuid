@@ -25,7 +25,7 @@
  * use in the desc attribute in <sess> elements, FALSE if not.
  */
 
-bool is_legal_desc_char(unsigned char c)
+bool is_legal_desc_char(const unsigned char c)
 {
 	return strchr(DESC_LEGAL, c) ? TRUE : FALSE;
 }
@@ -35,9 +35,9 @@ bool is_legal_desc_char(unsigned char c)
  * return FALSE if not.
  */
 
-bool is_valid_desc_string(char *s)
+bool is_valid_desc_string(const char *s)
 {
-	char *p = s;
+	const char *p = s;
 
 	while (*p) {
 		if (!is_legal_desc_char(*p))
@@ -57,7 +57,8 @@ bool is_valid_desc_string(char *s)
  * EXIT_ERROR if something failed.
  */
 
-int fill_sess(struct Entry *dest, char *uuid, char *desc, size_t desclen)
+int fill_sess(struct Entry *dest, const char *uuid,
+              const char *desc, const size_t desclen)
 {
 	char *auuid = NULL, *adesc = NULL;
 	static unsigned int sessind = 0;

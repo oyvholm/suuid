@@ -26,14 +26,14 @@
  * or NULL if everything is ok.
  */
 
-char *check_hex(char *hex, size_t len)
+char *check_hex(const char *hex, const size_t len)
 {
-	char *p;
+	const char *p;
 
 	assert(hex);
 	for (p = hex; p < hex + len; p++)
 		if (!strchr("0123456789abcdef", *p))
-			return p;
+			return (char *)p;
 
 	return NULL;
 }
@@ -96,12 +96,14 @@ char *trim_str_end(char *dest)
  * Markus Kuhn <http://www.cl.cam.ac.uk/~mgk25/> -- 2005-03-30
  * License: http://www.cl.cam.ac.uk/~mgk25/short-license.html
  *
- * Modified by Øyvind A. Holm <sunny@sunbase.org> 2016-06-29 to receive and 
- * return regular char * instead of unsigned char * to avoid casting 
- * everywhere.
+ * Modifications by Øyvind A. Holm <sunny@sunbase.org>:
+ *
+ *   2016-06-29 - receive and return regular char * instead of unsigned char * 
+ *   to avoid casting everywhere.
+ *   2016-07-09 - Add const modifier to text argument.
  */
 
-char *utf8_check(char *text)
+char *utf8_check(const char *text)
 {
 	unsigned char *s = (unsigned char *)text;
 

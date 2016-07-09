@@ -38,7 +38,7 @@ void rewind_tag(void)
  * not.
  */
 
-bool tag_exists(char *tag)
+bool tag_exists(const char *tag)
 {
 	unsigned int i;
 
@@ -67,7 +67,7 @@ char *get_next_tag(void)
  * name, otherwise NULL.
  */
 
-char *store_tag(char *arg)
+char *store_tag(const char *arg)
 {
 	char *tag, *p;
 
