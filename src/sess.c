@@ -239,7 +239,8 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-	int retval = EXIT_OK;
+	int retval = EXIT_OK,
+	    t;
 
 	progname = argv[0];
 #if PERL_COMPAT
@@ -267,12 +268,7 @@ int main(int argc, char *argv[])
 		return EXIT_OK;
 	}
 
-	if (optind < argc) {
-		int t;
-
-		for (t = optind; t < argc; t++)
-			msg(3, "Non-option arg: %s", argv[t]);
-	} else {
+	if (optind == argc) {
 #if PERL_COMPAT
 		fprintf(stderr, "%s: No command specified. "
 		                "Use -h for help.\n", progname);
@@ -282,6 +278,9 @@ int main(int argc, char *argv[])
 #endif
 		return EXIT_ERROR;
 	}
+
+	for (t = optind; t < argc; t++)
+		msg(3, "Non-option arg: %s", argv[t]);
 
 	msg(3, "Returning from main() with value %d", retval);
 
