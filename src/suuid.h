@@ -160,7 +160,7 @@ struct Options {
 
 /* environ.c */
 extern char *get_editor(void);
-extern bool valid_hostname(char *);
+extern bool valid_hostname(const char *s);
 extern char *get_hostname(void);
 extern char *getpath(void);
 extern char *get_username(void);
@@ -208,7 +208,7 @@ extern int get_sess_info(struct Entry *);
 extern char *check_hex(char *, size_t);
 extern char *trim_str_front(char *);
 extern char *trim_str_end(char *);
-extern char *utf8_check(char *);
+extern char *utf8_check(const char *text);
 
 /* suuid.c */
 extern int msg(int, const char *, ...);
