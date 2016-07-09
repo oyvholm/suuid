@@ -34,6 +34,10 @@
 #define EXIT_OK     0
 #define EXIT_ERROR  1
 
+#define PERL_COMPAT  1 /* Compile a version with some changes to make it 
+                        * compatible with the Perl version
+                        */
+
 #define stddebug  stderr
 
 /*

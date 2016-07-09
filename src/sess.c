@@ -233,6 +233,11 @@ int main(int argc, char *argv[])
 	int retval = EXIT_OK;
 
 	progname = argv[0];
+#if PERL_COMPAT
+	progname = "sess"; /* fixme: Temporary kludge to make it compatible 
+	                    * with the Perl version.
+	                    */
+#endif
 
 	retval = parse_options(&opt, argc, argv);
 	if (retval != EXIT_OK) {
