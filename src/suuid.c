@@ -26,7 +26,6 @@
 
 char *progname;
 struct Options opt;
-struct Rc rc;
 struct Entry entry;
 #if PERL_COMPAT
 bool perlexit13 = FALSE; /* If it is set to TRUE, the program exits with 13 */
@@ -426,9 +425,10 @@ char *process_comment_option(const char *cmt)
  * Returns EXIT_OK if no errors, EXIT_ERROR if errors.
  */
 
-int fill_entry_struct(struct Entry *entry, const struct Options *opt)
+int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
+                      const struct Options *opt)
 {
-	entry->host = get_hostname();
+	entry->host = get_hostname(rc);
 	if (!entry->host) {
 		myerror("fill_entry_struct(): Cannot get hostname");
 		return EXIT_ERROR;
@@ -463,9 +463,9 @@ int fill_entry_struct(struct Entry *entry, const struct Options *opt)
  * UUID. Otherwise return NULL.
  */
 
-char *process_uuid(FILE *logfp, struct Entry *entry)
+char *process_uuid(FILE *logfp, const struct Rc *rc, struct Entry *entry)
 {
-	entry->uuid = generate_uuid();
+	entry->uuid = generate_uuid(rc);
 	if (!entry->uuid) {
 #if PERL_COMPAT
 		fprintf(stderr, "%s: '': Generated UUID is not in the "
@@ -530,6 +530,7 @@ bool init_randomness(void)
 int main(int argc, char *argv[])
 {
 	int retval = EXIT_OK;
+	struct Rc rc;
 	char *rcfile, *logfile = NULL;
 	FILE *logfp;
 	unsigned int i;
@@ -592,12 +593,12 @@ int main(int argc, char *argv[])
 		goto cleanup;
 	}
 
-	if (fill_entry_struct(&entry, &opt) == EXIT_ERROR) {
+	if (fill_entry_struct(&entry, &rc, &opt) == EXIT_ERROR) {
 		retval = EXIT_ERROR;
 		goto cleanup;
 	}
 
-	logfile = get_logfile_name();
+	logfile = get_logfile_name(&rc);
 	if (!logfile) {
 		myerror("get_logfile_name() failed");
 		retval = EXIT_ERROR;
@@ -612,7 +613,7 @@ int main(int argc, char *argv[])
 	}
 
 	for (i = 0; i < opt.count; i++) {
-		if (!process_uuid(logfp, &entry)) {
+		if (!process_uuid(logfp, &rc, &entry)) {
 			close_logfile(logfp);
 			retval = EXIT_ERROR;
 			goto cleanup;

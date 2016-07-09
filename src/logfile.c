@@ -488,7 +488,7 @@ char *get_logdir(void)
  * name, or NULL if it can't be determined.
  */
 
-char *get_logfile_name(void)
+char *get_logfile_name(const struct Rc *rc)
 {
 	char *logdir, *logfile = NULL, *hostname;
 	size_t fname_length; /* Total length of logfile name */
@@ -500,7 +500,7 @@ char *get_logfile_name(void)
 		return NULL;
 	}
 
-	hostname = get_hostname();
+	hostname = get_hostname(rc);
 	if (!hostname) {
 		myerror("get_logfile_name(): Cannot get hostname");
 		goto cleanup;
