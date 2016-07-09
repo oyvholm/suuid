@@ -228,9 +228,9 @@ extern bool init_randomness(void);
 
 /* tag.c */
 extern void rewind_tag(void);
-extern bool tag_exists(char *);
+extern bool tag_exists(const char *tag);
 extern char *get_next_tag(void);
-extern char *store_tag(char *);
+extern char *store_tag(const char *arg);
 
 /* uuid.c */
 extern bool valid_uuid(const char *u, const bool check_len);
