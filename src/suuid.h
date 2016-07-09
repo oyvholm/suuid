@@ -234,12 +234,12 @@ extern char *store_tag(const char *arg);
 
 /* uuid.c */
 extern bool valid_uuid(const char *u, const bool check_len);
-extern char *scramble_mac_address(char *);
+extern char *scramble_mac_address(char *uuid);
 extern char *generate_uuid(void);
-extern char *uuid_date(char *, char *);
-extern bool is_valid_date(char *, bool);
-extern char *uuid_date_from_uuid(char *, char *);
-extern char *scan_for_uuid(char *);
+extern char *uuid_date(char *dest, const char *uuid);
+extern bool is_valid_date(const char *s, const bool check_len);
+extern char *uuid_date_from_uuid(char *dest, const char *uuid);
+extern char *scan_for_uuid(const char *s);
 
 #endif
 

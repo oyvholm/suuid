@@ -118,7 +118,7 @@ char *generate_uuid(void)
  * NULL if it's not a valid v1 UUID.
  */
 
-char *uuid_date(char *dest, char *uuid)
+char *uuid_date(char *dest, const char *uuid)
 {
 	/* fixme: unfinished */
 	char hexbuf[16];
@@ -145,7 +145,7 @@ char *uuid_date(char *dest, char *uuid)
  * Return 1 if ok, 0 if invalid.
  */
 
-bool is_valid_date(char *s, bool check_len)
+bool is_valid_date(const char *s, const bool check_len)
 {
 	if (check_len && strlen(s) != DATE_LENGTH)
 		return FALSE;
@@ -177,7 +177,7 @@ bool is_valid_date(char *s, bool check_len)
  * uuid(1) program to calculate the date. Use until uuid_date() works.
  */
 
-char *uuid_date_from_uuid(char *dest, char *uuid)
+char *uuid_date_from_uuid(char *dest, const char *uuid)
 {
 	FILE *fp;
 	char cmd[50];
@@ -235,13 +235,13 @@ char *uuid_date_from_uuid(char *dest, char *uuid)
  * NULL if no UUID was found.
  */
 
-char *scan_for_uuid(char *s)
+char *scan_for_uuid(const char *s)
 {
-	char *p = s;
+	const char *p = s;
 
 	while (strlen(p) >= UUID_LENGTH) {
 		if (valid_uuid(p, FALSE))
-			return p;
+			return (char *)p;
 		p++;
 	}
 
