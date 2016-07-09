@@ -167,9 +167,9 @@ extern char *get_username(void);
 extern char *get_tty(void);
 
 /* io.h */
-extern char *read_from_fp(FILE *);
-extern char *read_from_file(char *);
-extern char *read_from_editor(char *);
+extern char *read_from_fp(FILE *fp);
+extern char *read_from_file(const char *fname);
+extern char *read_from_editor(const char *editor);
 
 /* logfile.c */
 extern bool valid_xml_chars(char *);

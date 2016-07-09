@@ -58,7 +58,7 @@ char *read_from_fp(FILE *fp)
  * allocated string with the contents, or NULL if error.
  */
 
-char *read_from_file(char *fname)
+char *read_from_file(const char *fname)
 {
 	FILE *fp;
 	char *retval;
@@ -83,7 +83,7 @@ char *read_from_file(char *fname)
  * contentes as an allocated string, or NULL if error.
  */
 
-char *read_from_editor(char *editor)
+char *read_from_editor(const char *editor)
 {
 	char *retval,
 	     tmpfile[] = ".tmp-suuid.XXXXXX",
