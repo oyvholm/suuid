@@ -363,6 +363,63 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 }
 
 /*
+ * process_comment_option() - Receive the argument used with -c/--comment and 
+ * decide what to do with it. Return pointer to allocated string with the 
+ * comment, or NULL if anything failed.
+ */
+
+char *process_comment_option(char *cmt)
+{
+	char *retval;
+
+	assert(cmt);
+	if (!strcmp(cmt, "-")) {
+		retval = read_from_fp(stdin);
+		if (!retval) {
+			myerror("Could not read data from stdin");
+			return NULL;
+		}
+	} else if (!strcmp(cmt, "--")) {
+		char *e;
+
+		e = get_editor();
+		if (!e) {
+			myerror("get_editor() failed");
+			return NULL;
+		}
+		retval = read_from_editor(e);
+		if (!retval) {
+			myerror("Could not read data from editor \"%s\"", e);
+			return NULL;
+		}
+		free(e);
+	} else {
+		retval = strdup(cmt);
+		if (!retval) {
+			myerror("%s: Cannot allocate memory for comment, "
+			        "strdup() failed");
+			return NULL;
+		}
+	}
+	if (!valid_xml_chars(retval)) {
+		fprintf(stderr, "%s: Comment contains illegal characters or "
+		                "is not valid UTF-8\n", progname);
+		free(retval);
+		return NULL;
+	}
+
+	/* fixme: This is how it's done in the Perl version. I'm not sure if 
+	 * it's an ok thing to do, even though it looks nice in the log files 
+	 * and has worked great for years. Maybe this behaviour should be 
+	 * changed when the C version passes all tests in suuid.t .
+	 */
+	trim_str_front(retval);
+	trim_str_end(retval);
+
+	return retval;
+}
+
+/*
  * fill_entry_struct() - Fill the entry struct with information from the opt 
  * struct and the environment, like current directory, hostname, comment, etc.
  * Returns EXIT_OK if no errors, EXIT_ERROR if errors.
@@ -385,53 +442,11 @@ int fill_entry_struct(struct Entry *entry, struct Options *opt)
 	entry->tty = get_tty();
 
 	if (opt->comment) {
-		if (!strcmp(opt->comment, "-")) {
-			entry->txt = read_from_fp(stdin);
-			if (!entry->txt) {
-				myerror("Could not read data from stdin");
-				return EXIT_ERROR;
-			}
-		} else if (!strcmp(opt->comment, "--")) {
-			char *e;
-
-			e = get_editor();
-			if (!e) {
-				myerror("get_editor() failed");
-				return EXIT_ERROR;
-			}
-			entry->txt = read_from_editor(e);
-			if (!entry->txt) {
-				myerror("Could not read data from editor "
-				        "\"%s\"", e);
-				return EXIT_ERROR;
-			}
-			free(e);
-		} else {
-			entry->txt = strdup(opt->comment);
-			if (!entry->txt) {
-				myerror("%s: Cannot allocate memory for "
-				        "comment, strdup() failed");
-				return EXIT_ERROR;
-			}
-		}
-		if (!valid_xml_chars(entry->txt)) {
-			fprintf(stderr, "%s: Comment contains illegal "
-			                "characters or is not valid UTF-8\n",
-			                progname);
-			free(entry->txt);
-			entry->txt = NULL;
+		entry->txt = process_comment_option(opt->comment);
+		if (!entry->txt)
 			return EXIT_ERROR;
-		}
-
-		/* fixme: This is how it's done in the Perl version. I'm not 
-		 * sure if it's an ok thing to do, even though it looks nice in 
-		 * the log files and has worked great for years. Maybe this 
-		 * behaviour should be changed when the C version passes all 
-		 * tests in suuid.t .
-		 */
-		trim_str_front(entry->txt);
-		trim_str_end(entry->txt);
 	}
+
 	if (get_sess_info(entry) == EXIT_ERROR) {
 		myerror("fill_entry_struct(): get_sess_info() failed");
 		free(entry->txt);
