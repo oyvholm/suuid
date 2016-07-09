@@ -41,7 +41,7 @@
 #define DATE_LENGTH  28 /* Length of ISO date format with nanoseconds */
 #define UUID_LENGTH  36 /* Length of a standard UUID */
 
-#define FAKE_HOST  0 /* Use "fake" as hostname to avoid conflicts with files 
+#define FAKE_HOST  1 /* Use "fake" as hostname to avoid conflicts with files 
                       * created by the Perl version
                       */
 #define PERL_COMPAT  0 /* Compile a version with some changes to make it 
