@@ -38,7 +38,7 @@ logfile.o: logfile.c $(DEPS)
 rcfile.o: rcfile.c $(DEPS)
 	$(CC) $(CCFLAGS) rcfile.c
 
-sess.o: sessvar.c $(DEPS)
+sess.o: sess.c $(DEPS)
 	$(CC) $(CCFLAGS) sess.c
 
 sessvar.o: sessvar.c $(DEPS)
