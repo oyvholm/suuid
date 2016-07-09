@@ -12,10 +12,11 @@ CC = gcc
 LD = gcc
 CCFLAGS = -Wall -Wextra -Werror -Og -c -g -pedantic
 LDFLAGS = -Wall
-EXEC = suuid
 
-$(EXEC): $(OBJS)
-	$(LD) -o $(EXEC) $(LDFLAGS) $(OBJS)
+default: suuid
+
+suuid: $(OBJS)
+	$(LD) -o suuid $(LDFLAGS) $(OBJS)
 
 suuid.o: suuid.c $(DEPS)
 	$(CC) $(CCFLAGS) suuid.c
@@ -46,7 +47,7 @@ uuid.o: uuid.c $(DEPS)
 
 .PHONY: clean
 clean:
-	rm -fv $(EXEC) $(OBJS) *~ core core.$(EXEC) tags
+	rm -fv suuid $(OBJS) *~ core core.suuid tags
 	rm -frv locktestdir
 	cd t && $(MAKE) clean
 
@@ -55,7 +56,7 @@ edit: tags
 	$(EDITOR) *.c *.h Makefile t/*.t
 
 .PHONY: locktest
-locktest: $(EXEC)
+locktest: suuid
 	rm -rf locktestdir
 	mkdir locktestdir
 	for f in $$(seq 1 500); do ./suuid -wn -l locktestdir; done &
@@ -66,5 +67,5 @@ tags: $(CFILES) $(HFILES)
 	ctags $(CFILES) $(HFILES)
 
 .PHONY: test
-test: $(EXEC)
+test: suuid
 	cd t && make
