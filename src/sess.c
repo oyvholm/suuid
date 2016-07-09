@@ -272,6 +272,15 @@ int main(int argc, char *argv[])
 
 		for (t = optind; t < argc; t++)
 			msg(3, "Non-option arg: %s", argv[t]);
+	} else {
+#if PERL_COMPAT
+		fprintf(stderr, "%s: No command specified. "
+		                "Use -h for help.\n", progname);
+#else
+		fprintf(stderr, "%s: No command specified, "
+		                "use -h for help\n", progname);
+#endif
+		return EXIT_ERROR;
 	}
 
 	msg(3, "Returning from main() with value %d", retval);
