@@ -2,8 +2,8 @@
 # File ID: 27e0d738-2b93-11e6-8668-02010e0a6634
 # Author: Øyvind A. Holm <sunny@sunbase.org>
 
-OBJS   = environ.o io.o logfile.o rcfile.o sessvar.o string.o suuid.o \
-         tag.o uuid.o
+SUUID_OBJS = environ.o io.o logfile.o rcfile.o sessvar.o string.o suuid.o \
+             tag.o uuid.o
 CFILES = environ.c io.c logfile.c rcfile.c sessvar.c string.c suuid.c \
          tag.c uuid.c
 HFILES = suuid.h
@@ -15,8 +15,8 @@ LDFLAGS = -Wall
 
 default: suuid
 
-suuid: $(OBJS)
-	$(LD) -o suuid $(LDFLAGS) $(OBJS)
+suuid: $(SUUID_OBJS)
+	$(LD) -o suuid $(LDFLAGS) $(SUUID_OBJS)
 
 suuid.o: suuid.c $(DEPS)
 	$(CC) $(CCFLAGS) suuid.c
@@ -47,7 +47,7 @@ uuid.o: uuid.c $(DEPS)
 
 .PHONY: clean
 clean:
-	rm -fv suuid $(OBJS) *~ core core.suuid tags
+	rm -fv suuid $(SUUID_OBJS) *~ core core.suuid tags
 	rm -frv locktestdir
 	cd t && $(MAKE) clean
 
