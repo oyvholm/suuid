@@ -217,11 +217,13 @@ extern int myerror(const char *format, ...);
 extern void print_license(void);
 extern void print_version(void);
 extern void usage(const int retval);
-extern int choose_opt_action(struct Options *, int, struct option *);
-extern int parse_options(struct Options *, int, char *[]);
-extern char *process_comment_option(char *);
-extern int fill_entry_struct(struct Entry *, struct Options *);
-extern char *process_uuid(FILE *, struct Entry *);
+extern int choose_opt_action(struct Options *dest, const int c,
+                             const struct option *opts);
+extern int parse_options(struct Options *dest,
+                         const int argc, char * const argv[]);
+extern char *process_comment_option(const char *cmt);
+extern int fill_entry_struct(struct Entry *entry, const struct Options *opt);
+extern char *process_uuid(FILE *logfp, struct Entry *entry);
 extern bool init_randomness(void);
 
 /* tag.c */
