@@ -11,6 +11,7 @@ CFILES = environ.c io.c logfile.c rcfile.c sessvar.c string.c suuid.c \
 SUUID_HFILES = suuid.h
 SESS_HFILES = sess.h
 SUUID_DEPS = $(SUUID_HFILES) Makefile
+SESS_DEPS = $(SESS_HFILES) Makefile
 CC = gcc
 LD = gcc
 CCFLAGS = -Wall -Wextra -Werror -Og -c -g -pedantic
@@ -39,7 +40,7 @@ logfile.o: logfile.c $(SUUID_DEPS)
 rcfile.o: rcfile.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) rcfile.c
 
-sess.o: sess.c $(DEPS)
+sess.o: sess.c $(SESS_DEPS)
 	$(CC) $(CCFLAGS) sess.c
 
 sessvar.o: sessvar.c $(SUUID_DEPS)
