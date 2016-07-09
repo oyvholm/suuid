@@ -9,7 +9,7 @@ CFILES = environ.c io.c logfile.c rcfile.c sessvar.c string.c suuid.c \
          tag.c uuid.c \
          sess.c
 SUUID_HFILES = suuid.h
-DEPS = $(SUUID_HFILES) Makefile
+SUUID_DEPS = $(SUUID_HFILES) Makefile
 CC = gcc
 LD = gcc
 CCFLAGS = -Wall -Wextra -Werror -Og -c -g -pedantic
@@ -23,34 +23,34 @@ suuid: $(SUUID_OBJS)
 sess: $(SESS_OBJS)
 	$(LD) -o sess $(LDFLAGS) $(SESS_OBJS)
 
-suuid.o: suuid.c $(DEPS)
+suuid.o: suuid.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) suuid.c
 
-environ.o: environ.c $(DEPS)
+environ.o: environ.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) environ.c
 
-io.o: io.c $(DEPS)
+io.o: io.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) io.c
 
-logfile.o: logfile.c $(DEPS)
+logfile.o: logfile.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) logfile.c
 
-rcfile.o: rcfile.c $(DEPS)
+rcfile.o: rcfile.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) rcfile.c
 
 sess.o: sess.c $(DEPS)
 	$(CC) $(CCFLAGS) sess.c
 
-sessvar.o: sessvar.c $(DEPS)
+sessvar.o: sessvar.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) sessvar.c
 
-string.o: string.c $(DEPS)
+string.o: string.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) string.c
 
-tag.o: tag.c $(DEPS)
+tag.o: tag.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) tag.c
 
-uuid.o: uuid.c $(DEPS)
+uuid.o: uuid.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) uuid.c
 
 .PHONY: clean
