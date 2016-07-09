@@ -39,7 +39,7 @@ bool perlexit13 = FALSE; /* If it is set to TRUE, the program exits with 13 */
  * Returns the number of characters written.
  */
 
-int msg(int verbose, const char *format, ...)
+int msg(const int verbose, const char *format, ...)
 {
 	va_list ap;
 	int retval = 0;
@@ -142,7 +142,7 @@ void print_version(void)
  * usage() - Prints a help screen
  */
 
-void usage(int retval)
+void usage(const int retval)
 {
 	if (retval != EXIT_OK) {
 		fprintf(stderr, "\nType \"%s --help\" for help screen. "
