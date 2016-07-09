@@ -26,7 +26,6 @@
 
 char *progname;
 struct Options opt;
-struct Entry entry;
 #if PERL_COMPAT
 bool perlexit13 = FALSE; /* If it is set to TRUE, the program exits with 13 */
 #endif
@@ -238,12 +237,12 @@ void usage(const int retval)
 
 /*
  * choose_opt_action() - Decide what to do when option c is found. Store 
- * changes in dest. opts is the struct with the definitions for the long 
- * options.
+ * changes in dest and entry. opts is the struct with the definitions for the 
+ * long options.
  * Return EXIT_OK if ok, EXIT_ERROR if c is unknown or anything fails.
  */
 
-int choose_opt_action(struct Options *dest, const int c,
+int choose_opt_action(struct Options *dest, struct Entry *entry, const int c,
                       const struct option *opts)
 {
 	int retval = EXIT_OK;
@@ -281,7 +280,7 @@ int choose_opt_action(struct Options *dest, const int c,
 		dest->verbose--;
 		break;
 	case 't':
-		if (!store_tag(optarg))
+		if (!store_tag(entry, optarg))
 			return EXIT_ERROR;
 		break;
 	case 'v':
@@ -304,7 +303,8 @@ int choose_opt_action(struct Options *dest, const int c,
  * Returns EXIT_OK if ok, EXIT_ERROR if error.
  */
 
-int parse_options(struct Options *dest, const int argc, char * const argv[])
+int parse_options(struct Options *dest, struct Entry *entry,
+                  const int argc, char * const argv[])
 {
 	int retval = EXIT_OK;
 	int c;
@@ -355,7 +355,7 @@ int parse_options(struct Options *dest, const int argc, char * const argv[])
 		if (c == -1)
 			break;
 
-		retval = choose_opt_action(dest,
+		retval = choose_opt_action(dest, entry,
 		                           c, &long_options[option_index]);
 	}
 
@@ -531,6 +531,7 @@ int main(int argc, char *argv[])
 {
 	int retval = EXIT_OK;
 	struct Rc rc;
+	struct Entry entry;
 	char *rcfile, *logfile = NULL;
 	FILE *logfp;
 	unsigned int i;
@@ -548,7 +549,7 @@ int main(int argc, char *argv[])
 	}
 	init_xml_entry(&entry);
 
-	retval = parse_options(&opt, argc, argv);
+	retval = parse_options(&opt, &entry, argc, argv);
 	if (retval != EXIT_OK)
 		return EXIT_ERROR;
 

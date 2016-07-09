@@ -209,17 +209,17 @@ char *alloc_attr(const char *attr, const char *data)
 
 /*
  * get_xml_tags() - Return pointer to an allocated XML string with <tag> 
- * elements generated from the entry.tag[] array. If error, return NULL.
+ * elements generated from the entry->tag[] array. If error, return NULL.
  */
 
-char *get_xml_tags(void)
+char *get_xml_tags(const struct Entry *entry)
 {
 	char *p, *buf, *tmpbuf;
 	size_t size = 0, tmpsize = 0;
 
 	rewind_tag();
 	do {
-		p = get_next_tag();
+		p = get_next_tag(entry);
 		if (p) {
 			size_t len = strlen(p);
 
@@ -247,7 +247,7 @@ char *get_xml_tags(void)
 
 	rewind_tag();
 	do {
-		p = get_next_tag();
+		p = get_next_tag(entry);
 
 		if (p) {
 			char *ap;
@@ -361,7 +361,7 @@ char *xml_entry(const struct Entry *entry)
 		}
 	}
 
-	tag_xml = get_xml_tags();
+	tag_xml = get_xml_tags(entry);
 	if (!tag_xml) {
 		myerror("xml_entry(): get_xml_tags() failed");
 		return NULL;

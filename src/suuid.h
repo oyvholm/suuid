@@ -177,7 +177,7 @@ extern char *suuid_xml(const char *text);
 extern void init_xml_entry(struct Entry *e);
 extern char *allocate_elem(const char *elem, const char *src);
 extern char *alloc_attr(const char *attr, const char *data);
-extern char *get_xml_tags(void);
+extern char *get_xml_tags(const struct Entry *entry);
 extern char *create_sess_xml(const struct Entry *entry);
 extern char *xml_entry(const struct Entry *entry);
 extern char *get_logdir(void);
@@ -217,9 +217,9 @@ extern int myerror(const char *format, ...);
 extern void print_license(void);
 extern void print_version(void);
 extern void usage(const int retval);
-extern int choose_opt_action(struct Options *dest, const int c,
-                             const struct option *opts);
-extern int parse_options(struct Options *dest,
+extern int choose_opt_action(struct Options *dest, struct Entry *entry,
+                             const int c, const struct option *opts);
+extern int parse_options(struct Options *dest, struct Entry *entry,
                          const int argc, char * const argv[]);
 extern char *process_comment_option(const char *cmt);
 extern int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
@@ -230,9 +230,9 @@ extern bool init_randomness(void);
 
 /* tag.c */
 extern void rewind_tag(void);
-extern bool tag_exists(const char *tag);
-extern char *get_next_tag(void);
-extern char *store_tag(const char *arg);
+extern bool tag_exists(const struct Entry *entry, const char *tag);
+extern char *get_next_tag(const struct Entry *entry);
+extern char *store_tag(struct Entry *entry, const char *arg);
 
 /* uuid.c */
 extern bool valid_uuid(const char *u, const bool check_len);

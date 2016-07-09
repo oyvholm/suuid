@@ -38,12 +38,12 @@ void rewind_tag(void)
  * not.
  */
 
-bool tag_exists(const char *tag)
+bool tag_exists(const struct Entry *entry, const char *tag)
 {
 	unsigned int i;
 
 	for (i = 0; i < tag_count; i++)
-		if (!strcmp(tag, entry.tag[i]))
+		if (!strcmp(tag, entry->tag[i]))
 			return TRUE;
 
 	return FALSE;
@@ -54,10 +54,10 @@ bool tag_exists(const char *tag)
  * Returns NULL when the last tag has been found.
  */
 
-char *get_next_tag(void)
+char *get_next_tag(const struct Entry *entry)
 {
 	if (tag_list_ind < MAX_TAGS)
-		return entry.tag[tag_list_ind++];
+		return entry->tag[tag_list_ind++];
 	else
 		return NULL;
 }
@@ -67,7 +67,7 @@ char *get_next_tag(void)
  * name, otherwise NULL.
  */
 
-char *store_tag(const char *arg)
+char *store_tag(struct Entry *entry, const char *arg)
 {
 	char *tag, *p;
 
@@ -79,18 +79,18 @@ char *store_tag(const char *arg)
 
 	while ((p = strchr(tag, ','))) {
 		*p++ = '\0';
-		store_tag(tag);
+		store_tag(entry, tag);
 		tag = p;
 	}
 	trim_str_front(tag);
 	trim_str_end(tag);
-	if (tag_exists(tag) || !strlen(tag))
+	if (tag_exists(entry, tag) || !strlen(tag))
 		return tag;
 	if (utf8_check(tag)) {
 		fprintf(stderr, "%s: Tags have to be in UTF-8\n", progname);
 		return NULL;
 	}
-	entry.tag[tag_count++] = strdup(tag);
+	entry->tag[tag_count++] = strdup(tag);
 
 	return tag;
 }
