@@ -75,5 +75,5 @@ tags: $(CFILES) $(SUUID_HFILES)
 	ctags $(CFILES) $(SUUID_HFILES)
 
 .PHONY: test
-test: suuid
+test: suuid sess
 	cd t && make
