@@ -554,18 +554,87 @@ bool init_randomness(void)
 }
 
 /*
+ * create_and_log_uuids() - Do everything in one place; Initialise the random 
+ * number generator, read values from the rc file, environment and command 
+ * line, generate the UUID(s) and write it to the log file. Returns a struct 
+ * uuid_result with the number of UUIDs generated and a value indicating 
+ * success or not.
+ */
+
+struct uuid_result create_and_log_uuids(const struct Options *opt)
+{
+	struct uuid_result retval;
+	char *rcfile = NULL, *logfile = NULL;
+	FILE *logfp;
+	unsigned int i;
+	struct Rc rc;
+	struct Entry entry;
+
+	retval.count = 0;
+	retval.success = TRUE;
+	init_xml_entry(&entry);
+
+	if (init_randomness() == EXIT_ERROR) {
+		myerror("Could not initialiase randomness generator");
+		retval.success = FALSE;
+		goto cleanup;
+	}
+
+	rcfile = get_rcfilename(opt);
+	if (read_rcfile(rcfile, &rc) == EXIT_ERROR) {
+		myerror("%s: Could not read rc file", opt->rcfile);
+		retval.success = FALSE;
+		goto cleanup;
+	}
+
+	if (fill_entry_struct(&entry, &rc, opt) == EXIT_ERROR) {
+		retval.success = FALSE;
+		goto cleanup;
+	}
+
+	logfile = get_logfile_name(&rc, opt);
+	if (!logfile) {
+		myerror("get_logfile_name() failed");
+		retval.success = FALSE;
+		goto cleanup;
+	}
+
+	logfp = open_logfile(logfile);
+	if (!logfp) {
+		myerror("open_logfile() failed, cannot open log file");
+		retval.success = FALSE;
+		goto cleanup;
+	}
+
+	for (i = 0; i < opt->count; i++) {
+		if (!process_uuid(logfp, &rc, opt, &entry)) {
+			close_logfile(logfp);
+			retval.success = FALSE;
+			goto cleanup;
+		}
+	}
+
+	if (close_logfile(logfp) == EXIT_ERROR)
+		myerror("close_logfile() failed");
+
+cleanup:
+	free(logfile);
+	free(entry.date);
+	free(entry.cwd);
+	free(rcfile);
+
+	return retval;
+}
+
+/*
  * main()
  */
 
 int main(int argc, char *argv[])
 {
 	int retval = EXIT_OK;
+	struct uuid_result result;
 	struct Options opt;
-	struct Rc rc;
-	struct Entry entry;
-	char *rcfile, *logfile = NULL;
-	FILE *logfp;
-	unsigned int i;
 
 	progname = argv[0];
 #if PERL_COMPAT
@@ -573,12 +642,6 @@ int main(int argc, char *argv[])
 	                     * with the Perl version.
 	                     */
 #endif
-
-	if (init_randomness() == EXIT_ERROR) {
-		myerror("Could not initialiase randomness generator");
-		return EXIT_ERROR;
-	}
-	init_xml_entry(&entry);
 
 	retval = parse_options(&opt, argc, argv);
 	if (retval != EXIT_OK)
@@ -618,49 +681,9 @@ int main(int argc, char *argv[])
 	}
 #endif
 
-	rcfile = get_rcfilename(&opt);
-	if (read_rcfile(rcfile, &rc) == EXIT_ERROR) {
-		myerror("%s: Could not read rc file", opt.rcfile);
+	result = create_and_log_uuids(&opt);
+	if (!result.success)
 		retval = EXIT_ERROR;
-		goto cleanup;
-	}
-
-	if (fill_entry_struct(&entry, &rc, &opt) == EXIT_ERROR) {
-		retval = EXIT_ERROR;
-		goto cleanup;
-	}
-
-	logfile = get_logfile_name(&rc, &opt);
-	if (!logfile) {
-		myerror("get_logfile_name() failed");
-		retval = EXIT_ERROR;
-		goto cleanup;
-	}
-
-	logfp = open_logfile(logfile);
-	if (!logfp) {
-		myerror("open_logfile() failed, cannot open log file");
-		retval = EXIT_ERROR;
-		goto cleanup;
-	}
-
-	for (i = 0; i < opt.count; i++) {
-		if (!process_uuid(logfp, &rc, &opt, &entry)) {
-			close_logfile(logfp);
-			retval = EXIT_ERROR;
-			goto cleanup;
-		}
-	}
-
-	if (close_logfile(logfp) == EXIT_ERROR)
-		myerror("close_logfile() failed");
-
-cleanup:
-
-	free(logfile);
-	free(entry.date);
-	free(entry.cwd);
-	free(rcfile);
 
 #if PERL_COMPAT
 	if (perlexit13)

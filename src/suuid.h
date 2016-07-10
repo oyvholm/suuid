@@ -152,6 +152,10 @@ struct Options {
 	bool version;
 	char *whereto;
 };
+struct uuid_result {
+	unsigned int count;
+	bool success;
+};
 
 /*
  * Function prototypes
@@ -229,6 +233,7 @@ extern int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
 extern char *process_uuid(FILE *logfp, const struct Rc *rc,
                           const struct Options *opt, struct Entry *entry);
 extern bool init_randomness(void);
+extern struct uuid_result create_and_log_uuids(const struct Options *opt);
 
 /* tag.c */
 extern void rewind_tag(void);
