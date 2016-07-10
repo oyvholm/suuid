@@ -212,6 +212,7 @@ extern char *trim_str_end(char *dest);
 extern char *utf8_check(const char *text);
 
 /* suuid.c */
+extern int verbose_level(const int action, ...);
 extern int msg(const int verbose, const char *format, ...);
 extern int myerror(const char *format, ...);
 extern void print_license(void);
