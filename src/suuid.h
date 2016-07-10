@@ -172,6 +172,13 @@ extern char *get_username(void);
 extern char *get_tty(void);
 
 /* genuuid.c */
+extern char *process_comment_option(const char *cmt);
+extern int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
+                             const struct Options *opt);
+extern char *process_uuid(FILE *logfp, const struct Rc *rc,
+                          const struct Options *opt, struct Entry *entry);
+extern bool init_randomness(void);
+extern struct uuid_result create_and_log_uuids(const struct Options *opt);
 
 /* io.h */
 extern char *read_from_fp(FILE *fp);
@@ -229,13 +236,6 @@ extern int choose_opt_action(struct Options *dest,
                              const int c, const struct option *opts);
 extern int parse_options(struct Options *dest,
                          const int argc, char * const argv[]);
-extern char *process_comment_option(const char *cmt);
-extern int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
-                             const struct Options *opt);
-extern char *process_uuid(FILE *logfp, const struct Rc *rc,
-                          const struct Options *opt, struct Entry *entry);
-extern bool init_randomness(void);
-extern struct uuid_result create_and_log_uuids(const struct Options *opt);
 
 /* tag.c */
 extern void rewind_tag(void);
