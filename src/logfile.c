@@ -438,17 +438,17 @@ char *xml_entry(const struct Entry *entry)
 
 /*
  * get_logdir() - Return pointer to allocated string with location of the log 
- * directory. Use the value of -l/--logdir if it's defined, otherwise use the 
+ * directory. Use the value of opt->logdir if it's defined, otherwise use the 
  * environment variable defined in ENV_LOGDIR, otherwise use "$HOME/uuids". If 
  * that also fails, return NULL.
  */
 
-char *get_logdir(void)
+char *get_logdir(const struct Options *opt)
 {
 	char *retval = NULL;
 
-	if (opt.logdir) {
-		retval = strdup(opt.logdir);
+	if (opt && opt->logdir) {
+		retval = strdup(opt->logdir);
 		if (!retval) {
 			myerror("get_logdir(): Could not duplicate "
 			        "-l/--logdir argument");
@@ -488,12 +488,12 @@ char *get_logdir(void)
  * name, or NULL if it can't be determined.
  */
 
-char *get_logfile_name(const struct Rc *rc)
+char *get_logfile_name(const struct Rc *rc, const struct Options *opt)
 {
 	char *logdir, *logfile = NULL, *hostname;
 	size_t fname_length; /* Total length of logfile name */
 
-	logdir = get_logdir();
+	logdir = get_logdir(opt);
 	if (!logdir) {
 		fprintf(stderr, "%s: get_logfile_name(): Unable to find "
 		                "logdir location\n", progname);

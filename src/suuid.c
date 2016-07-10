@@ -205,7 +205,7 @@ void usage(const int retval)
 	       "    If the %s environment variable is defined, "
 	       "that value is \n"
 	       "    used. Otherwise the value \"$HOME/uuids\" is used.\n"
-	       "    Current default: %s\n", ENV_LOGDIR, get_logdir());
+	       "    Current default: %s\n", ENV_LOGDIR, get_logdir(NULL));
 	printf("  -m, --random-mac\n"
 	       "    Don’t use the hardware MAC address, generate a random "
 	       "address field.\n");
@@ -621,7 +621,7 @@ int main(int argc, char *argv[])
 		goto cleanup;
 	}
 
-	logfile = get_logfile_name(&rc);
+	logfile = get_logfile_name(&rc, &opt);
 	if (!logfile) {
 		myerror("get_logfile_name() failed");
 		retval = EXIT_ERROR;
