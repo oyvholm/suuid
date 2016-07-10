@@ -96,6 +96,7 @@
 #include <getopt.h>
 #include <limits.h>
 #include <pwd.h>
+#include <signal.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -175,6 +176,7 @@ extern int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
                              const struct Options *opt);
 extern char *process_uuid(FILE *logfp, const struct Rc *rc,
                           const struct Options *opt, struct Entry *entry);
+extern void sighandler(const int sig);
 extern struct uuid_result create_and_log_uuids(const struct Options *opt);
 
 /* io.h */

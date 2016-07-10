@@ -20,6 +20,8 @@
 
 #include "suuid.h"
 
+bool should_terminate = FALSE;
+
 /*
  * init_randomness() - Initialise the random number generator. Returns EXIT_OK 
  * or EXIT_ERROR.
@@ -181,6 +183,22 @@ char *process_uuid(FILE *logfp, const struct Rc *rc, const struct Options *opt,
 }
 
 /*
+ * sighandler() - Called when it receives a termination signal. Set the 
+ * variable should_terminate to indicate that the fun is over, but don't 
+ * terminate until the log file has been closed properly.
+ */
+
+void sighandler(const int sig)
+{
+	if (sig == SIGHUP || sig == SIGINT ||
+	    sig == SIGQUIT || sig == SIGTERM) {
+		fprintf(stderr, "%s: Termination signal received, aborting\n",
+		                progname);
+		should_terminate = TRUE;
+	}
+}
+
+/*
  * create_and_log_uuids() - Do everything in one place; Initialise the random 
  * number generator, read values from the rc file, environment and command 
  * line, generate the UUID(s) and write it to the log file. Returns a struct 
@@ -226,6 +244,11 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 		goto cleanup;
 	}
 
+	signal(SIGHUP, sighandler);
+	signal(SIGINT, sighandler);
+	signal(SIGQUIT, sighandler);
+	signal(SIGTERM, sighandler);
+
 	logfp = open_logfile(logfile);
 	if (!logfp) {
 		myerror("open_logfile() failed, cannot open log file");
@@ -240,7 +263,13 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 			goto cleanup;
 		}
 		retval.count++;
+		if (should_terminate)
+			break;
 	}
+
+	if (retval.count < opt->count)
+		fprintf(stderr, "%s: Generated only %u of %u UUIDs\n",
+		                progname, retval.count, opt->count);
 
 	if (close_logfile(logfp) == EXIT_ERROR)
 		myerror("close_logfile() failed");
