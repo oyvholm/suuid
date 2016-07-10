@@ -609,7 +609,7 @@ int main(int argc, char *argv[])
 	}
 #endif
 
-	rcfile = get_rcfilename();
+	rcfile = get_rcfilename(&opt);
 	if (read_rcfile(rcfile, &rc) == EXIT_ERROR) {
 		myerror("%s: Could not read rc file", opt.rcfile);
 		retval = EXIT_ERROR;

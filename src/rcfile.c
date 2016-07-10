@@ -22,16 +22,16 @@
 
 /*
  * get_rcfilename() - Return pointer to a string with name of rcfile. If 
- * neither opt.rcfile or HOME is defined, return NULL.
+ * neither opt->rcfile or HOME is defined, return NULL.
  */
 
-char *get_rcfilename(void)
+char *get_rcfilename(const struct Options *opt)
 {
 	char *retval = NULL, *env;
 	size_t size;
 
-	if (opt.rcfile) {
-		retval = strdup(opt.rcfile);
+	if (opt && opt->rcfile) {
+		retval = strdup(opt->rcfile);
 		if (!retval) {
 			myerror("Cannot duplicate --rcfile argument");
 			return NULL;

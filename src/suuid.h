@@ -193,7 +193,7 @@ extern int add_to_logfile(FILE *fp, const struct Entry *entry);
 extern int close_logfile(FILE *fp);
 
 /* rcfile.c */
-extern char *get_rcfilename(void);
+extern char *get_rcfilename(const struct Options *opt);
 extern char *has_key(const char *line, const char *keyword);
 extern void parse_rc_line(const char *line, struct Rc *rc);
 extern int read_rcfile(const char *rcfile, struct Rc *rc);
