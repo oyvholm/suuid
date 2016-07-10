@@ -238,6 +238,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 			retval.success = FALSE;
 			goto cleanup;
 		}
+		retval.count++;
 	}
 
 	if (close_logfile(logfp) == EXIT_ERROR)
