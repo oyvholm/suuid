@@ -169,12 +169,12 @@ extern char *get_username(void);
 extern char *get_tty(void);
 
 /* genuuid.c */
+extern bool init_randomness(void);
 extern char *process_comment_option(const char *cmt);
 extern int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
                              const struct Options *opt);
 extern char *process_uuid(FILE *logfp, const struct Rc *rc,
                           const struct Options *opt, struct Entry *entry);
-extern bool init_randomness(void);
 extern struct uuid_result create_and_log_uuids(const struct Options *opt);
 
 /* io.h */

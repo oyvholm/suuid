@@ -21,6 +21,24 @@
 #include "suuid.h"
 
 /*
+ * init_randomness() - Initialise the random number generator. Returns EXIT_OK 
+ * or EXIT_ERROR.
+ */
+
+bool init_randomness(void)
+{
+	struct timeval tv;
+
+	if (gettimeofday(&tv, NULL) == -1)
+		return EXIT_ERROR;
+
+	srandom((unsigned int)tv.tv_sec ^ (unsigned int)tv.tv_usec ^
+	        (unsigned int)getpid());
+
+	return EXIT_OK;
+}
+
+/*
  * process_comment_option() - Receive the argument used with -c/--comment and 
  * decide what to do with it. Return pointer to allocated string with the 
  * comment, or NULL if anything failed.
@@ -160,24 +178,6 @@ char *process_uuid(FILE *logfp, const struct Rc *rc, const struct Options *opt,
 	}
 
 	return entry->uuid;
-}
-
-/*
- * init_randomness() - Initialise the random number generator. Returns EXIT_OK 
- * or EXIT_ERROR.
- */
-
-bool init_randomness(void)
-{
-	struct timeval tv;
-
-	if (gettimeofday(&tv, NULL) == -1)
-		return EXIT_ERROR;
-
-	srandom((unsigned int)tv.tv_sec ^ (unsigned int)tv.tv_usec ^
-	        (unsigned int)getpid());
-
-	return EXIT_OK;
 }
 
 /*
