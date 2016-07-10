@@ -25,7 +25,6 @@
  */
 
 char *progname;
-struct Options opt;
 #if PERL_COMPAT
 bool perlexit13 = FALSE; /* If it is set to TRUE, the program exits with 13 */
 #endif
@@ -553,6 +552,7 @@ bool init_randomness(void)
 int main(int argc, char *argv[])
 {
 	int retval = EXIT_OK;
+	struct Options opt;
 	struct Rc rc;
 	struct Entry entry;
 	char *rcfile, *logfile = NULL;
