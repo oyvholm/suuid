@@ -171,6 +171,8 @@ extern char *getpath(void);
 extern char *get_username(void);
 extern char *get_tty(void);
 
+/* genuuid.c */
+
 /* io.h */
 extern char *read_from_fp(FILE *fp);
 extern char *read_from_file(const char *fname);
