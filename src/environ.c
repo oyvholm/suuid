@@ -167,11 +167,7 @@ char *get_username(void)
 
 char *get_tty(void)
 {
-	char *retval;
-
-	retval = ttyname(STDIN_FILENO);
-
-	return retval;
+	return ttyname(STDIN_FILENO);
 }
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */
