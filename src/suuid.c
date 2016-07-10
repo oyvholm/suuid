@@ -507,7 +507,7 @@ char *process_uuid(FILE *logfp, const struct Rc *rc, const struct Options *opt,
 	if (!uuid_date_from_uuid(entry->date, entry->uuid))
 		return NULL;
 
-	if (add_to_logfile(logfp, entry) == EXIT_ERROR) {
+	if (add_to_logfile(logfp, entry, opt->raw) == EXIT_ERROR) {
 #if PERL_COMPAT
 		perlexit13 = TRUE; /* errno EACCES from die() in Perl */
 #else

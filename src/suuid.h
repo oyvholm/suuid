@@ -179,7 +179,7 @@ extern char *allocate_elem(const char *elem, const char *src);
 extern char *alloc_attr(const char *attr, const char *data);
 extern char *get_xml_tags(const struct Entry *entry);
 extern char *create_sess_xml(const struct Entry *entry);
-extern char *xml_entry(const struct Entry *entry);
+extern char *xml_entry(const struct Entry *entry, const bool raw);
 extern char *get_logdir(const struct Options *opt);
 extern char *get_logfile_name(const struct Rc *rc, const struct Options *opt);
 extern FILE *lock_file(FILE *fp, const char *fname);
@@ -189,7 +189,7 @@ extern FILE *unknown_end_line(FILE *fp, const char *fname);
 extern FILE *check_last_log_line(FILE *fp, const char *fname);
 extern FILE *seek_to_entry_pos(FILE *fp, const char *fname);
 extern FILE *open_logfile(const char *fname);
-extern int add_to_logfile(FILE *fp, const struct Entry *entry);
+extern int add_to_logfile(FILE *fp, const struct Entry *entry, const bool raw);
 extern int close_logfile(FILE *fp);
 
 /* rcfile.c */

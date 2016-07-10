@@ -330,10 +330,11 @@ char *create_sess_xml(const struct Entry *entry)
 
 /*
  * xml_entry() - Return pointer to allocated string with one XML entry 
- * extracted from the entry struct, or NULL if error.
+ * extracted from the entry struct, or NULL if error. If raw is TRUE, insert 
+ * the comment into the XML unmodified, no escaping is performed.
  */
 
-char *xml_entry(const struct Entry *entry)
+char *xml_entry(const struct Entry *entry, const bool raw)
 {
 	struct Entry e;
 	char *retval;
@@ -373,7 +374,7 @@ char *xml_entry(const struct Entry *entry)
 		return NULL;
 	}
 
-	if (opt.raw) {
+	if (raw) {
 		int size;
 		char *txt_space;
 
@@ -718,14 +719,14 @@ FILE *open_logfile(const char *fname)
  * EXIT_OK or EXIT_ERROR.
  */
 
-int add_to_logfile(FILE *fp, const struct Entry *entry)
+int add_to_logfile(FILE *fp, const struct Entry *entry, const bool raw)
 {
 	char *ap;
 	int retval = EXIT_OK;
 
 	assert(entry);
 
-	ap = xml_entry(entry);
+	ap = xml_entry(entry, raw);
 	if (!ap) {
 		myerror("add_to_logfile(): xml_entry() failed");
 		return EXIT_ERROR;
