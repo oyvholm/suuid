@@ -691,13 +691,8 @@ FILE *open_logfile(const char *fname)
 		/* File already exists */
 		fp = fopen(fname, "r+");
 		if (!fp) {
-#if PERL_COMPAT
-			myerror("%s: Cannot open file for append", fname);
-			perlexit13 = TRUE;
-#else
 			myerror("%s: Could not open file for read+write",
 			        fname);
-#endif
 			return NULL;
 		}
 	} else {

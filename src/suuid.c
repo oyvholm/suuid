@@ -25,9 +25,6 @@
  */
 
 char *progname;
-#if PERL_COMPAT
-bool perlexit13 = FALSE; /* If it is set to TRUE, the program exits with 13 */
-#endif
 
 /*
  * verbose_level() - Get or set the verbosity level. If action is 0, return the 
@@ -133,18 +130,13 @@ void print_license(void)
 void print_version(void)
 {
 	printf("%s %s (%s)\n", progname, VERSION, RELEASE_DATE);
-#if FAKE_HOST || PERL_COMPAT || TEST_FUNC
+#if FAKE_HOST || TEST_FUNC
 	printf("\nThis version is compiled with the following conditional "
                "directives:\n");
 #  if FAKE_HOST
 	printf("\nFAKE_HOST: Always return \"fake\" as hostname. This is to "
 	       "make sure it \n"
 	       "doesn't write to the real log file.\n");
-#  endif
-#  if PERL_COMPAT
-	printf("\nPERL_COMPAT: Suppress the new and better behaviour, behave "
-	       "just like the \n"
-	       "original Perl version to make the tests succeed.\n");
 #  endif
 #  if TEST_FUNC
 	printf("\nTEST_FUNC: Send non-option command line arguments to "
@@ -396,11 +388,6 @@ int main(int argc, char *argv[])
 	struct Options opt;
 
 	progname = argv[0];
-#if PERL_COMPAT
-	progname = "suuid"; /* fixme: Temporary kludge to make it compatible 
-	                     * with the Perl version.
-	                     */
-#endif
 
 	retval = parse_options(&opt, argc, argv);
 	if (retval != EXIT_OK)
@@ -443,13 +430,6 @@ int main(int argc, char *argv[])
 	result = create_and_log_uuids(&opt);
 	if (!result.success)
 		retval = EXIT_ERROR;
-
-#if PERL_COMPAT
-	if (perlexit13)
-		retval = 13; /* die() is used some places in the Perl version, 
-		              * and it exits with errno 13 (EACCES).
-		              */
-#endif
 
 	msg(3, "Returning from main() with value %d", retval);
 	return retval;

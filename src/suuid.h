@@ -44,9 +44,6 @@
 #define FAKE_HOST  0 /* Use "fake" as hostname to avoid conflicts with files 
                       * created by the Perl version
                       */
-#define PERL_COMPAT  0 /* Compile a version with some changes to make it 
-                        * compatible with the Perl version
-                        */
 #define TEST_FUNC  0 /* Send non-option arguments to a function for testing. 
                       * Doesn't break anything, non-option arguments are 
                       * ignored by the program.
@@ -262,9 +259,6 @@ extern char *progname;
 extern struct Options opt;
 extern struct Rc rc;
 extern struct Entry entry;
-#if PERL_COMPAT
-extern bool perlexit13;
-#endif
 
 #endif /* ifndef _SUUID_H */
 

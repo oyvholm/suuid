@@ -132,12 +132,7 @@ char *process_uuid(FILE *logfp, const struct Rc *rc, const struct Options *opt,
 {
 	entry->uuid = generate_uuid(rc, opt->random_mac);
 	if (!entry->uuid) {
-#if PERL_COMPAT
-		fprintf(stderr, "%s: '': Generated UUID is not in the "
-		                "expected format\n", progname);
-#else
 		fprintf(stderr, "%s: UUID generation failed\n", progname);
-#endif
 		return NULL;
 	}
 	entry->date = malloc(DATE_LENGTH + 1);
@@ -150,11 +145,7 @@ char *process_uuid(FILE *logfp, const struct Rc *rc, const struct Options *opt,
 		return NULL;
 
 	if (add_to_logfile(logfp, entry, opt->raw) == EXIT_ERROR) {
-#if PERL_COMPAT
-		perlexit13 = TRUE; /* errno EACCES from die() in Perl */
-#else
 		myerror("process_uuid(): add_to_logfile() failed");
-#endif
 		return NULL;
 	}
 
