@@ -87,15 +87,24 @@ char *has_key(const char *line, const char *keyword)
 
 /*
  * parse_rc_line() - Receive a line from the rcfile and check for each keyword 
- * by sending it to check_rc() whom will set the struct variable accordingly.
+ * by sending it to check_rc() which will set the struct variable accordingly. 
+ * If ok, return EXIT_OK. If strdup() failed, return EXIT_ERROR.
  */
 
-void parse_rc_line(const char *line, struct Rc *rc)
+int parse_rc_line(const char *line, struct Rc *rc)
 {
-	if (has_key(line, "hostname"))
-		rc->hostname = has_key(line, "hostname");
-	if (has_key(line, "uuidcmd"))
-		rc->uuidcmd = has_key(line, "uuidcmd");
+	if (has_key(line, "hostname")) {
+		rc->hostname = strdup(has_key(line, "hostname"));
+		if (!rc->hostname)
+			return EXIT_ERROR;
+	}
+	if (has_key(line, "uuidcmd")) {
+		rc->uuidcmd = strdup(has_key(line, "uuidcmd"));
+		if (!rc->uuidcmd)
+			return EXIT_ERROR;
+	}
+
+	return EXIT_OK;
 }
 
 /*
@@ -126,7 +135,11 @@ int read_rcfile(const char *rcfile, struct Rc *rc)
 		}
 		trim_str_front(buf);
 		trim_str_end(buf);
-		parse_rc_line(buf, rc);
+		if (parse_rc_line(buf, rc) == EXIT_ERROR) {
+			myerror("Could not allocate memory for line from "
+			        "rc file \"%s\"", rcfile);
+			return EXIT_ERROR;
+		}
 		*buf = '\0';
 	} while (!feof(fp));
 

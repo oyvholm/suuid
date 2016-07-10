@@ -276,6 +276,8 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 
 cleanup:
 	free(logfile);
+	free(rc.uuidcmd);
+	free(rc.hostname);
 	free(entry.txt);
 	free(entry.date);
 	free(entry.cwd);

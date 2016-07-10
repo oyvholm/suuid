@@ -25,7 +25,7 @@
  * Defines
  */
 
-#define VERSION       "0.2.0"
+#define VERSION       "0.2.1"
 #define RELEASE_DATE  "2016-07-10"
 
 #define FALSE  0
@@ -208,7 +208,7 @@ extern int close_logfile(FILE *fp);
 /* rcfile.c */
 extern char *get_rcfilename(const struct Options *opt);
 extern char *has_key(const char *line, const char *keyword);
-extern void parse_rc_line(const char *line, struct Rc *rc);
+extern int parse_rc_line(const char *line, struct Rc *rc);
 extern int read_rcfile(const char *rcfile, struct Rc *rc);
 
 /* sessvar.c */
