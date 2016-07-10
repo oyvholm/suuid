@@ -2,20 +2,20 @@
 # File ID: 27e0d738-2b93-11e6-8668-02010e0a6634
 # Author: Øyvind A. Holm <sunny@sunbase.org>
 
-SUUID_OBJS = environ.o io.o logfile.o rcfile.o sessvar.o string.o suuid.o \
-             tag.o uuid.o
-SESS_OBJS =  sess.o
-CFILES = environ.c io.c logfile.c rcfile.c sessvar.c string.c suuid.c \
-         tag.c uuid.c \
-         sess.c
+SUUID_OBJS = environ.o genuuid.o io.o logfile.o rcfile.o sessvar.o string.o \
+             suuid.o tag.o uuid.o
+SESS_OBJS  = sess.o
+CFILES     = environ.c genuuid.c io.c logfile.c rcfile.c sessvar.c string.c \
+             suuid.c tag.c uuid.c \
+             sess.c
 SUUID_HFILES = suuid.h
 SESS_HFILES = sess.h
 SUUID_DEPS = $(SUUID_HFILES) Makefile
 SESS_DEPS = $(SESS_HFILES) Makefile
 CC = gcc
 LD = gcc
-CCFLAGS = -Wall -Wextra -Werror -Og -c -g -pedantic
-LDFLAGS = -Wall
+CCFLAGS = -Wall -Wextra -Werror -O2 -c -g -pedantic
+LDFLAGS = -Wall -Wextra -Werror
 
 default: suuid sess
 
@@ -30,6 +30,9 @@ suuid.o: suuid.c $(SUUID_DEPS)
 
 environ.o: environ.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) environ.c
+
+genuuid.o: genuuid.c $(SUUID_DEPS)
+	$(CC) $(CCFLAGS) genuuid.c
 
 io.o: io.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) io.c

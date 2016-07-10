@@ -25,17 +25,32 @@
  */
 
 char *progname;
-struct Options opt;
-struct Rc rc;
-struct Entry entry;
-#if PERL_COMPAT
-bool perlexit13 = FALSE; /* If it is set to TRUE, the program exits with 13 */
-#endif
 
 /*
- * msg() - Print a message prefixed with "[progname]: " to stddebug if 
- * opt.verbose is equal or higher than the first argument. The rest of the 
- * arguments are delivered to vfprintf().
+ * verbose_level() - Get or set the verbosity level. If action is 0, return the 
+ * current level. If action is non-zero, set the level to argument 2 and return 
+ * the new level.
+ */
+
+int verbose_level(const int action, ...)
+{
+	static int level = 0;
+
+	if (action) {
+		va_list ap;
+
+		va_start(ap, action);
+		level = va_arg(ap, int);
+		va_end(ap);
+	}
+
+	return level;
+}
+
+/*
+ * msg() - Print a message prefixed with "[progname]: " to stddebug if the 
+ * current verbose level is equal or higher than the first argument. The rest 
+ * of the arguments are delivered to vfprintf().
  * Returns the number of characters written.
  */
 
@@ -44,7 +59,7 @@ int msg(const int verbose, const char *format, ...)
 	va_list ap;
 	int retval = 0;
 
-	if (opt.verbose >= verbose) {
+	if (verbose_level(0) >= verbose) {
 		va_start(ap, format);
 		retval = fprintf(stddebug, "%s: ", progname);
 		retval += vfprintf(stddebug, format, ap);
@@ -115,18 +130,13 @@ void print_license(void)
 void print_version(void)
 {
 	printf("%s %s (%s)\n", progname, VERSION, RELEASE_DATE);
-#if FAKE_HOST || PERL_COMPAT || TEST_FUNC
+#if FAKE_HOST || TEST_FUNC
 	printf("\nThis version is compiled with the following conditional "
                "directives:\n");
 #  if FAKE_HOST
 	printf("\nFAKE_HOST: Always return \"fake\" as hostname. This is to "
 	       "make sure it \n"
 	       "doesn't write to the real log file.\n");
-#  endif
-#  if PERL_COMPAT
-	printf("\nPERL_COMPAT: Suppress the new and better behaviour, behave "
-	       "just like the \n"
-	       "original Perl version to make the tests succeed.\n");
 #  endif
 #  if TEST_FUNC
 	printf("\nTEST_FUNC: Send non-option command line arguments to "
@@ -152,7 +162,7 @@ void usage(const int retval)
 	}
 
 	puts("");
-	if (opt.verbose >= 1) {
+	if (verbose_level(0) >= 1) {
 		print_version();
 		puts("");
 	}
@@ -186,7 +196,7 @@ void usage(const int retval)
 	       "    If the %s environment variable is defined, "
 	       "that value is \n"
 	       "    used. Otherwise the value \"$HOME/uuids\" is used.\n"
-	       "    Current default: %s\n", ENV_LOGDIR, get_logdir());
+	       "    Current default: %s\n", ENV_LOGDIR, get_logdir(NULL));
 	printf("  -m, --random-mac\n"
 	       "    Don’t use the hardware MAC address, generate a random "
 	       "address field.\n");
@@ -239,15 +249,16 @@ void usage(const int retval)
 
 /*
  * choose_opt_action() - Decide what to do when option c is found. Store 
- * changes in dest. opts is the struct with the definitions for the long 
- * options.
+ * changes in dest and entry. opts is the struct with the definitions for the 
+ * long options.
  * Return EXIT_OK if ok, EXIT_ERROR if c is unknown or anything fails.
  */
 
-int choose_opt_action(struct Options *dest, const int c,
-                      const struct option *opts)
+int choose_opt_action(struct Options *dest,
+                      const int c, const struct option *opts)
 {
 	int retval = EXIT_OK;
+	static unsigned int tag_count = 0;
 
 	switch (c) {
 	case 0:
@@ -282,8 +293,7 @@ int choose_opt_action(struct Options *dest, const int c,
 		dest->verbose--;
 		break;
 	case 't':
-		if (!store_tag(optarg))
-			return EXIT_ERROR;
+		dest->tag[tag_count++] = optarg;
 		break;
 	case 'v':
 		dest->verbose++;
@@ -309,6 +319,7 @@ int parse_options(struct Options *dest, const int argc, char * const argv[])
 {
 	int retval = EXIT_OK;
 	int c;
+	unsigned int i;
 
 	dest->comment = NULL;
 	dest->count = 1;
@@ -321,6 +332,8 @@ int parse_options(struct Options *dest, const int argc, char * const argv[])
 	dest->verbose = 0;
 	dest->version = FALSE;
 	dest->whereto = NULL;
+	for (i = 0; i < MAX_TAGS; i++)
+		dest->tag[i] = NULL;
 
 	while (retval == EXIT_OK) {
 		int option_index = 0;
@@ -359,168 +372,9 @@ int parse_options(struct Options *dest, const int argc, char * const argv[])
 		retval = choose_opt_action(dest,
 		                           c, &long_options[option_index]);
 	}
+	verbose_level(1, dest->verbose);
 
 	return retval;
-}
-
-/*
- * process_comment_option() - Receive the argument used with -c/--comment and 
- * decide what to do with it. Return pointer to allocated string with the 
- * comment, or NULL if anything failed.
- */
-
-char *process_comment_option(const char *cmt)
-{
-	char *retval;
-
-	assert(cmt);
-	if (!strcmp(cmt, "-")) {
-		retval = read_from_fp(stdin);
-		if (!retval) {
-			myerror("Could not read data from stdin");
-			return NULL;
-		}
-	} else if (!strcmp(cmt, "--")) {
-		char *e;
-
-		e = get_editor();
-		if (!e) {
-			myerror("get_editor() failed");
-			return NULL;
-		}
-		retval = read_from_editor(e);
-		if (!retval) {
-			myerror("Could not read data from editor \"%s\"", e);
-			return NULL;
-		}
-		free(e);
-	} else {
-		retval = strdup(cmt);
-		if (!retval) {
-			myerror("%s: Cannot allocate memory for comment, "
-			        "strdup() failed");
-			return NULL;
-		}
-	}
-	if (!valid_xml_chars(retval)) {
-		fprintf(stderr, "%s: Comment contains illegal characters or "
-		                "is not valid UTF-8\n", progname);
-		free(retval);
-		return NULL;
-	}
-
-	/* fixme: This is how it's done in the Perl version. I'm not sure if 
-	 * it's an ok thing to do, even though it looks nice in the log files 
-	 * and has worked great for years. Maybe this behaviour should be 
-	 * changed when the C version passes all tests in suuid.t .
-	 */
-	trim_str_front(retval);
-	trim_str_end(retval);
-
-	return retval;
-}
-
-/*
- * fill_entry_struct() - Fill the entry struct with information from the opt 
- * struct and the environment, like current directory, hostname, comment, etc.
- * Returns EXIT_OK if no errors, EXIT_ERROR if errors.
- */
-
-int fill_entry_struct(struct Entry *entry, const struct Options *opt)
-{
-	entry->host = get_hostname();
-	if (!entry->host) {
-		myerror("fill_entry_struct(): Cannot get hostname");
-		return EXIT_ERROR;
-	}
-	if (!valid_hostname(entry->host)) {
-		myerror("fill_entry_struct(): Got invalid hostname: \"%s\"",
-		        entry->host);
-		return EXIT_ERROR;
-	}
-	entry->cwd = getpath();
-	entry->user = get_username();
-	entry->tty = get_tty();
-
-	if (opt->comment) {
-		entry->txt = process_comment_option(opt->comment);
-		if (!entry->txt)
-			return EXIT_ERROR;
-	}
-
-	if (get_sess_info(entry) == EXIT_ERROR) {
-		myerror("fill_entry_struct(): get_sess_info() failed");
-		free(entry->txt);
-		return EXIT_ERROR;
-	}
-
-	return EXIT_OK;
-}
-
-/*
- * process_uuid() - Generate UUID and write it to the log file.
- * If no errors, send it to stdout and/or stderr and return a pointer to the 
- * UUID. Otherwise return NULL.
- */
-
-char *process_uuid(FILE *logfp, struct Entry *entry)
-{
-	entry->uuid = generate_uuid();
-	if (!entry->uuid) {
-#if PERL_COMPAT
-		fprintf(stderr, "%s: '': Generated UUID is not in the "
-		                "expected format\n", progname);
-#else
-		fprintf(stderr, "%s: UUID generation failed\n", progname);
-#endif
-		return NULL;
-	}
-	entry->date = malloc(DATE_LENGTH + 1);
-	if (!entry->date) {
-		myerror("process_uuid(): Could not allocate %lu bytes for "
-		        "date string", DATE_LENGTH + 1);
-		return NULL;
-	}
-	if (!uuid_date_from_uuid(entry->date, entry->uuid))
-		return NULL;
-
-	if (add_to_logfile(logfp, entry) == EXIT_ERROR) {
-#if PERL_COMPAT
-		perlexit13 = TRUE; /* errno EACCES from die() in Perl */
-#else
-		myerror("process_uuid(): add_to_logfile() failed");
-#endif
-		return NULL;
-	}
-
-	if (!opt.whereto)
-		puts(entry->uuid);
-	else {
-		if (strchr(opt.whereto, 'a') || strchr(opt.whereto, 'o'))
-			fprintf(stdout, "%s\n", entry->uuid);
-		if (strchr(opt.whereto, 'a') || strchr(opt.whereto, 'e'))
-			fprintf(stderr, "%s\n", entry->uuid);
-	}
-
-	return entry->uuid;
-}
-
-/*
- * init_randomness() - Initialise the random number generator. Returns EXIT_OK 
- * or EXIT_ERROR.
- */
-
-bool init_randomness(void)
-{
-	struct timeval tv;
-
-	if (gettimeofday(&tv, NULL) == -1)
-		return EXIT_ERROR;
-
-	srandom((unsigned int)tv.tv_sec ^ (unsigned int)tv.tv_usec ^
-	        (unsigned int)getpid());
-
-	return EXIT_OK;
 }
 
 /*
@@ -530,28 +384,16 @@ bool init_randomness(void)
 int main(int argc, char *argv[])
 {
 	int retval = EXIT_OK;
-	char *rcfile, *logfile = NULL;
-	FILE *logfp;
-	unsigned int i;
+	struct uuid_result result;
+	struct Options opt;
 
 	progname = argv[0];
-#if PERL_COMPAT
-	progname = "suuid"; /* fixme: Temporary kludge to make it compatible 
-	                     * with the Perl version.
-	                     */
-#endif
-
-	if (init_randomness() == EXIT_ERROR) {
-		myerror("Could not initialiase randomness generator");
-		return EXIT_ERROR;
-	}
-	init_xml_entry(&entry);
 
 	retval = parse_options(&opt, argc, argv);
 	if (retval != EXIT_OK)
 		return EXIT_ERROR;
 
-	msg(3, "Using verbose level %d", opt.verbose);
+	msg(3, "Using verbose level %d", verbose_level(0));
 
 	if (opt.help) {
 		usage(EXIT_OK);
@@ -585,65 +427,11 @@ int main(int argc, char *argv[])
 	}
 #endif
 
-	rcfile = get_rcfilename();
-	if (read_rcfile(rcfile, &rc) == EXIT_ERROR) {
-		myerror("%s: Could not read rc file", opt.rcfile);
+	result = create_and_log_uuids(&opt);
+	if (!result.success)
 		retval = EXIT_ERROR;
-		goto cleanup;
-	}
 
-	if (fill_entry_struct(&entry, &opt) == EXIT_ERROR) {
-		retval = EXIT_ERROR;
-		goto cleanup;
-	}
-
-	logfile = get_logfile_name();
-	if (!logfile) {
-		myerror("get_logfile_name() failed");
-		retval = EXIT_ERROR;
-		goto cleanup;
-	}
-
-	logfp = open_logfile(logfile);
-	if (!logfp) {
-		myerror("open_logfile() failed, cannot open log file");
-		retval = EXIT_ERROR;
-		goto cleanup;
-	}
-
-	for (i = 0; i < opt.count; i++) {
-		if (!process_uuid(logfp, &entry)) {
-			close_logfile(logfp);
-			retval = EXIT_ERROR;
-			goto cleanup;
-		}
-	}
-
-	if (close_logfile(logfp) == EXIT_ERROR)
-		myerror("close_logfile() failed");
-
-	if (optind < argc) {
-		int t;
-
-		for (t = optind; t < argc; t++)
-			msg(3, "Non-option arg: %s", argv[t]);
-	}
-
-cleanup:
-
-	free(logfile);
-	free(entry.date);
-	free(entry.cwd);
-	free(rcfile);
-
-#if PERL_COMPAT
-	if (perlexit13)
-		retval = 13; /* die() is used some places in the Perl version, 
-		              * and it exits with errno 13 (EACCES).
-		              */
-#endif
 	msg(3, "Returning from main() with value %d", retval);
-
 	return retval;
 }
 

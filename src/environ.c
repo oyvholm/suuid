@@ -84,15 +84,15 @@ bool valid_hostname(const char *s)
  * NULL if error.
  */
 
-char *get_hostname(void)
+char *get_hostname(const struct Rc *rc)
 {
 	static char buf[HOST_NAME_MAX + 1];
 	char *retval = buf;
 
 	if (getenv(ENV_HOSTNAME))
 		strncpy(buf, getenv(ENV_HOSTNAME), HOST_NAME_MAX);
-	else if (rc.hostname)
-		strncpy(buf, rc.hostname, HOST_NAME_MAX);
+	else if (rc->hostname)
+		strncpy(buf, rc->hostname, HOST_NAME_MAX);
 #if FAKE_HOST
 	else if (1)
 		retval = "fake";
@@ -167,21 +167,7 @@ char *get_username(void)
 
 char *get_tty(void)
 {
-	char *retval;
-
-	retval = ttyname(STDIN_FILENO);
-
-#if PERL_COMPAT
-	/* fixme: Legacy reasons, the Perl version of suuid calls `tty` from 
-	 * GNU coreutils, and it prints "not a tty\n" when ttyname() fails. The 
-	 * right thing to do is to return NULL so the tty element is omitted 
-	 * from the logs.
-	 */
-	if (!retval)
-		retval = "not a tty";
-#endif
-
-	return retval;
+	return ttyname(STDIN_FILENO);
 }
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */
