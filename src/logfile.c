@@ -209,17 +209,17 @@ char *alloc_attr(const char *attr, const char *data)
 
 /*
  * get_xml_tags() - Return pointer to an allocated XML string with <tag> 
- * elements generated from the entry.tag[] array. If error, return NULL.
+ * elements generated from the entry->tag[] array. If error, return NULL.
  */
 
-char *get_xml_tags(void)
+char *get_xml_tags(const struct Entry *entry)
 {
 	char *p, *buf, *tmpbuf;
 	size_t size = 0, tmpsize = 0;
 
 	rewind_tag();
 	do {
-		p = get_next_tag();
+		p = get_next_tag(entry);
 		if (p) {
 			size_t len = strlen(p);
 
@@ -247,7 +247,7 @@ char *get_xml_tags(void)
 
 	rewind_tag();
 	do {
-		p = get_next_tag();
+		p = get_next_tag(entry);
 
 		if (p) {
 			char *ap;
@@ -330,10 +330,11 @@ char *create_sess_xml(const struct Entry *entry)
 
 /*
  * xml_entry() - Return pointer to allocated string with one XML entry 
- * extracted from the entry struct, or NULL if error.
+ * extracted from the entry struct, or NULL if error. If raw is TRUE, insert 
+ * the comment into the XML unmodified, no escaping is performed.
  */
 
-char *xml_entry(const struct Entry *entry)
+char *xml_entry(const struct Entry *entry, const bool raw)
 {
 	struct Entry e;
 	char *retval;
@@ -361,7 +362,7 @@ char *xml_entry(const struct Entry *entry)
 		}
 	}
 
-	tag_xml = get_xml_tags();
+	tag_xml = get_xml_tags(entry);
 	if (!tag_xml) {
 		myerror("xml_entry(): get_xml_tags() failed");
 		return NULL;
@@ -373,7 +374,7 @@ char *xml_entry(const struct Entry *entry)
 		return NULL;
 	}
 
-	if (opt.raw) {
+	if (raw) {
 		int size;
 		char *txt_space;
 
@@ -438,17 +439,17 @@ char *xml_entry(const struct Entry *entry)
 
 /*
  * get_logdir() - Return pointer to allocated string with location of the log 
- * directory. Use the value of -l/--logdir if it's defined, otherwise use the 
+ * directory. Use the value of opt->logdir if it's defined, otherwise use the 
  * environment variable defined in ENV_LOGDIR, otherwise use "$HOME/uuids". If 
  * that also fails, return NULL.
  */
 
-char *get_logdir(void)
+char *get_logdir(const struct Options *opt)
 {
 	char *retval = NULL;
 
-	if (opt.logdir) {
-		retval = strdup(opt.logdir);
+	if (opt && opt->logdir) {
+		retval = strdup(opt->logdir);
 		if (!retval) {
 			myerror("get_logdir(): Could not duplicate "
 			        "-l/--logdir argument");
@@ -488,19 +489,19 @@ char *get_logdir(void)
  * name, or NULL if it can't be determined.
  */
 
-char *get_logfile_name(void)
+char *get_logfile_name(const struct Rc *rc, const struct Options *opt)
 {
 	char *logdir, *logfile = NULL, *hostname;
 	size_t fname_length; /* Total length of logfile name */
 
-	logdir = get_logdir();
+	logdir = get_logdir(opt);
 	if (!logdir) {
 		fprintf(stderr, "%s: get_logfile_name(): Unable to find "
 		                "logdir location\n", progname);
 		return NULL;
 	}
 
-	hostname = get_hostname();
+	hostname = get_hostname(rc);
 	if (!hostname) {
 		myerror("get_logfile_name(): Cannot get hostname");
 		goto cleanup;
@@ -718,14 +719,14 @@ FILE *open_logfile(const char *fname)
  * EXIT_OK or EXIT_ERROR.
  */
 
-int add_to_logfile(FILE *fp, const struct Entry *entry)
+int add_to_logfile(FILE *fp, const struct Entry *entry, const bool raw)
 {
 	char *ap;
 	int retval = EXIT_OK;
 
 	assert(entry);
 
-	ap = xml_entry(entry);
+	ap = xml_entry(entry, raw);
 	if (!ap) {
 		myerror("add_to_logfile(): xml_entry() failed");
 		return EXIT_ERROR;

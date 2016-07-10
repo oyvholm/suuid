@@ -25,17 +25,35 @@
  */
 
 char *progname;
-struct Options opt;
-struct Rc rc;
-struct Entry entry;
 #if PERL_COMPAT
 bool perlexit13 = FALSE; /* If it is set to TRUE, the program exits with 13 */
 #endif
 
 /*
- * msg() - Print a message prefixed with "[progname]: " to stddebug if 
- * opt.verbose is equal or higher than the first argument. The rest of the 
- * arguments are delivered to vfprintf().
+ * verbose_level() - Get or set the verbosity level. If action is 0, return the 
+ * current level. If action is non-zero, set the level to argument 2 and return 
+ * the new level.
+ */
+
+int verbose_level(const int action, ...)
+{
+	static int level = 0;
+
+	if (action) {
+		va_list ap;
+
+		va_start(ap, action);
+		level = va_arg(ap, int);
+		va_end(ap);
+	}
+
+	return level;
+}
+
+/*
+ * msg() - Print a message prefixed with "[progname]: " to stddebug if the 
+ * current verbose level is equal or higher than the first argument. The rest 
+ * of the arguments are delivered to vfprintf().
  * Returns the number of characters written.
  */
 
@@ -44,7 +62,7 @@ int msg(const int verbose, const char *format, ...)
 	va_list ap;
 	int retval = 0;
 
-	if (opt.verbose >= verbose) {
+	if (verbose_level(0) >= verbose) {
 		va_start(ap, format);
 		retval = fprintf(stddebug, "%s: ", progname);
 		retval += vfprintf(stddebug, format, ap);
@@ -152,7 +170,7 @@ void usage(const int retval)
 	}
 
 	puts("");
-	if (opt.verbose >= 1) {
+	if (verbose_level(0) >= 1) {
 		print_version();
 		puts("");
 	}
@@ -186,7 +204,7 @@ void usage(const int retval)
 	       "    If the %s environment variable is defined, "
 	       "that value is \n"
 	       "    used. Otherwise the value \"$HOME/uuids\" is used.\n"
-	       "    Current default: %s\n", ENV_LOGDIR, get_logdir());
+	       "    Current default: %s\n", ENV_LOGDIR, get_logdir(NULL));
 	printf("  -m, --random-mac\n"
 	       "    Don’t use the hardware MAC address, generate a random "
 	       "address field.\n");
@@ -239,12 +257,12 @@ void usage(const int retval)
 
 /*
  * choose_opt_action() - Decide what to do when option c is found. Store 
- * changes in dest. opts is the struct with the definitions for the long 
- * options.
+ * changes in dest and entry. opts is the struct with the definitions for the 
+ * long options.
  * Return EXIT_OK if ok, EXIT_ERROR if c is unknown or anything fails.
  */
 
-int choose_opt_action(struct Options *dest, const int c,
+int choose_opt_action(struct Options *dest, struct Entry *entry, const int c,
                       const struct option *opts)
 {
 	int retval = EXIT_OK;
@@ -282,7 +300,7 @@ int choose_opt_action(struct Options *dest, const int c,
 		dest->verbose--;
 		break;
 	case 't':
-		if (!store_tag(optarg))
+		if (!store_tag(entry, optarg))
 			return EXIT_ERROR;
 		break;
 	case 'v':
@@ -305,7 +323,8 @@ int choose_opt_action(struct Options *dest, const int c,
  * Returns EXIT_OK if ok, EXIT_ERROR if error.
  */
 
-int parse_options(struct Options *dest, const int argc, char * const argv[])
+int parse_options(struct Options *dest, struct Entry *entry,
+                  const int argc, char * const argv[])
 {
 	int retval = EXIT_OK;
 	int c;
@@ -356,9 +375,10 @@ int parse_options(struct Options *dest, const int argc, char * const argv[])
 		if (c == -1)
 			break;
 
-		retval = choose_opt_action(dest,
+		retval = choose_opt_action(dest, entry,
 		                           c, &long_options[option_index]);
 	}
+	verbose_level(1, dest->verbose);
 
 	return retval;
 }
@@ -426,9 +446,10 @@ char *process_comment_option(const char *cmt)
  * Returns EXIT_OK if no errors, EXIT_ERROR if errors.
  */
 
-int fill_entry_struct(struct Entry *entry, const struct Options *opt)
+int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
+                      const struct Options *opt)
 {
-	entry->host = get_hostname();
+	entry->host = get_hostname(rc);
 	if (!entry->host) {
 		myerror("fill_entry_struct(): Cannot get hostname");
 		return EXIT_ERROR;
@@ -463,9 +484,10 @@ int fill_entry_struct(struct Entry *entry, const struct Options *opt)
  * UUID. Otherwise return NULL.
  */
 
-char *process_uuid(FILE *logfp, struct Entry *entry)
+char *process_uuid(FILE *logfp, const struct Rc *rc, const struct Options *opt,
+                   struct Entry *entry)
 {
-	entry->uuid = generate_uuid();
+	entry->uuid = generate_uuid(rc, opt->random_mac);
 	if (!entry->uuid) {
 #if PERL_COMPAT
 		fprintf(stderr, "%s: '': Generated UUID is not in the "
@@ -484,7 +506,7 @@ char *process_uuid(FILE *logfp, struct Entry *entry)
 	if (!uuid_date_from_uuid(entry->date, entry->uuid))
 		return NULL;
 
-	if (add_to_logfile(logfp, entry) == EXIT_ERROR) {
+	if (add_to_logfile(logfp, entry, opt->raw) == EXIT_ERROR) {
 #if PERL_COMPAT
 		perlexit13 = TRUE; /* errno EACCES from die() in Perl */
 #else
@@ -493,12 +515,12 @@ char *process_uuid(FILE *logfp, struct Entry *entry)
 		return NULL;
 	}
 
-	if (!opt.whereto)
+	if (!opt->whereto)
 		puts(entry->uuid);
 	else {
-		if (strchr(opt.whereto, 'a') || strchr(opt.whereto, 'o'))
+		if (strchr(opt->whereto, 'a') || strchr(opt->whereto, 'o'))
 			fprintf(stdout, "%s\n", entry->uuid);
-		if (strchr(opt.whereto, 'a') || strchr(opt.whereto, 'e'))
+		if (strchr(opt->whereto, 'a') || strchr(opt->whereto, 'e'))
 			fprintf(stderr, "%s\n", entry->uuid);
 	}
 
@@ -530,6 +552,9 @@ bool init_randomness(void)
 int main(int argc, char *argv[])
 {
 	int retval = EXIT_OK;
+	struct Options opt;
+	struct Rc rc;
+	struct Entry entry;
 	char *rcfile, *logfile = NULL;
 	FILE *logfp;
 	unsigned int i;
@@ -547,11 +572,11 @@ int main(int argc, char *argv[])
 	}
 	init_xml_entry(&entry);
 
-	retval = parse_options(&opt, argc, argv);
+	retval = parse_options(&opt, &entry, argc, argv);
 	if (retval != EXIT_OK)
 		return EXIT_ERROR;
 
-	msg(3, "Using verbose level %d", opt.verbose);
+	msg(3, "Using verbose level %d", verbose_level(0));
 
 	if (opt.help) {
 		usage(EXIT_OK);
@@ -585,19 +610,19 @@ int main(int argc, char *argv[])
 	}
 #endif
 
-	rcfile = get_rcfilename();
+	rcfile = get_rcfilename(&opt);
 	if (read_rcfile(rcfile, &rc) == EXIT_ERROR) {
 		myerror("%s: Could not read rc file", opt.rcfile);
 		retval = EXIT_ERROR;
 		goto cleanup;
 	}
 
-	if (fill_entry_struct(&entry, &opt) == EXIT_ERROR) {
+	if (fill_entry_struct(&entry, &rc, &opt) == EXIT_ERROR) {
 		retval = EXIT_ERROR;
 		goto cleanup;
 	}
 
-	logfile = get_logfile_name();
+	logfile = get_logfile_name(&rc, &opt);
 	if (!logfile) {
 		myerror("get_logfile_name() failed");
 		retval = EXIT_ERROR;
@@ -612,7 +637,7 @@ int main(int argc, char *argv[])
 	}
 
 	for (i = 0; i < opt.count; i++) {
-		if (!process_uuid(logfp, &entry)) {
+		if (!process_uuid(logfp, &rc, &opt, &entry)) {
 			close_logfile(logfp);
 			retval = EXIT_ERROR;
 			goto cleanup;

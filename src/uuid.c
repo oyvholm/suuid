@@ -80,14 +80,14 @@ char *scramble_mac_address(char *uuid)
  * NULL if error.
  */
 
-char *generate_uuid(void)
+char *generate_uuid(const struct Rc *rc, const bool random_mac)
 {
 	static char uuid[UUID_LENGTH + 2];
 	char *cmd = "uuid";
 	FILE *fp;
 
-	if (rc.uuidcmd)
-		cmd = rc.uuidcmd;
+	if (rc->uuidcmd)
+		cmd = rc->uuidcmd;
 
 	/* fixme: Generate it properly */
 	fp = popen(cmd, "r");
@@ -103,7 +103,7 @@ char *generate_uuid(void)
 	uuid[UUID_LENGTH] = '\0';
 	pclose(fp);
 
-	if (opt.random_mac && !scramble_mac_address(uuid))
+	if (random_mac && !scramble_mac_address(uuid))
 		return NULL;
 
 	if (!valid_uuid(uuid, TRUE))
