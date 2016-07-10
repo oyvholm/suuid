@@ -488,7 +488,7 @@ int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
 char *process_uuid(FILE *logfp, const struct Rc *rc, const struct Options *opt,
                    struct Entry *entry)
 {
-	entry->uuid = generate_uuid(rc);
+	entry->uuid = generate_uuid(rc, opt->random_mac);
 	if (!entry->uuid) {
 #if PERL_COMPAT
 		fprintf(stderr, "%s: '': Generated UUID is not in the "
