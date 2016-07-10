@@ -262,10 +262,11 @@ void usage(const int retval)
  * Return EXIT_OK if ok, EXIT_ERROR if c is unknown or anything fails.
  */
 
-int choose_opt_action(struct Options *dest, struct Entry *entry, const int c,
-                      const struct option *opts)
+int choose_opt_action(struct Options *dest,
+                      const int c, const struct option *opts)
 {
 	int retval = EXIT_OK;
+	static unsigned int tag_count = 0;
 
 	switch (c) {
 	case 0:
@@ -300,8 +301,7 @@ int choose_opt_action(struct Options *dest, struct Entry *entry, const int c,
 		dest->verbose--;
 		break;
 	case 't':
-		if (!store_tag(entry, optarg))
-			return EXIT_ERROR;
+		dest->tag[tag_count++] = optarg;
 		break;
 	case 'v':
 		dest->verbose++;
@@ -323,11 +323,11 @@ int choose_opt_action(struct Options *dest, struct Entry *entry, const int c,
  * Returns EXIT_OK if ok, EXIT_ERROR if error.
  */
 
-int parse_options(struct Options *dest, struct Entry *entry,
-                  const int argc, char * const argv[])
+int parse_options(struct Options *dest, const int argc, char * const argv[])
 {
 	int retval = EXIT_OK;
 	int c;
+	unsigned int i;
 
 	dest->comment = NULL;
 	dest->count = 1;
@@ -340,6 +340,8 @@ int parse_options(struct Options *dest, struct Entry *entry,
 	dest->verbose = 0;
 	dest->version = FALSE;
 	dest->whereto = NULL;
+	for (i = 0; i < MAX_TAGS; i++)
+		dest->tag[i] = NULL;
 
 	while (retval == EXIT_OK) {
 		int option_index = 0;
@@ -375,7 +377,7 @@ int parse_options(struct Options *dest, struct Entry *entry,
 		if (c == -1)
 			break;
 
-		retval = choose_opt_action(dest, entry,
+		retval = choose_opt_action(dest,
 		                           c, &long_options[option_index]);
 	}
 	verbose_level(1, dest->verbose);
@@ -449,6 +451,8 @@ char *process_comment_option(const char *cmt)
 int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
                       const struct Options *opt)
 {
+	unsigned int i;
+
 	entry->host = get_hostname(rc);
 	if (!entry->host) {
 		myerror("fill_entry_struct(): Cannot get hostname");
@@ -462,6 +466,10 @@ int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
 	entry->cwd = getpath();
 	entry->user = get_username();
 	entry->tty = get_tty();
+
+	for (i = 0; i < MAX_TAGS && opt->tag[i]; i++)
+		if (!store_tag(entry, opt->tag[i]))
+			return EXIT_ERROR;
 
 	if (opt->comment) {
 		entry->txt = process_comment_option(opt->comment);
@@ -572,7 +580,7 @@ int main(int argc, char *argv[])
 	}
 	init_xml_entry(&entry);
 
-	retval = parse_options(&opt, &entry, argc, argv);
+	retval = parse_options(&opt, argc, argv);
 	if (retval != EXIT_OK)
 		return EXIT_ERROR;
 

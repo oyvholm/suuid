@@ -147,6 +147,7 @@ struct Options {
 	bool random_mac;
 	bool raw;
 	char *rcfile;
+	char *tag[MAX_TAGS];
 	int verbose;
 	bool version;
 	char *whereto;
@@ -218,9 +219,9 @@ extern int myerror(const char *format, ...);
 extern void print_license(void);
 extern void print_version(void);
 extern void usage(const int retval);
-extern int choose_opt_action(struct Options *dest, struct Entry *entry,
+extern int choose_opt_action(struct Options *dest,
                              const int c, const struct option *opts);
-extern int parse_options(struct Options *dest, struct Entry *entry,
+extern int parse_options(struct Options *dest,
                          const int argc, char * const argv[]);
 extern char *process_comment_option(const char *cmt);
 extern int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
