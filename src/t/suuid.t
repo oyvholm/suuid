@@ -594,6 +594,8 @@ sub test_suuid_executable {
         0,
         "Write to empty log file",
     );
+
+    # }}}
     like(file_data($Outfile), # {{{
         s_top(s_suuid()),
         "The empty file was initialised",
@@ -608,6 +610,8 @@ sub test_suuid_executable {
         0,
         "Write to log file with destroyed EOF",
     );
+
+    # }}}
     like(file_data($Outfile), # {{{
         '/^Destroyed file\n' . s_suuid() . '<\/suuids>\n$/s',
         "New entry was added to end of file",
@@ -622,6 +626,8 @@ sub test_suuid_executable {
         0,
         "Write to log file containing one char",
     );
+
+    # }}}
     like(file_data($Outfile), # {{{
         '/^a' . s_suuid() . '<\/suuids>\n$/s',
         "New entry was added to EOF after that one character",
