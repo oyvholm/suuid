@@ -10,7 +10,7 @@ HFILES = suuid.h
 DEPS = $(HFILES) Makefile
 CC = gcc
 LD = gcc
-CCFLAGS = -Wall -Wextra -Werror -Og -c -g -pedantic
+CCFLAGS = -Wall -Wextra -Werror -O2 -c -g -pedantic
 LDFLAGS = -Wall -Wextra -Werror
 EXEC = suuid
 
