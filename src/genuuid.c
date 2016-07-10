@@ -48,6 +48,7 @@ char *process_comment_option(const char *cmt)
 		retval = read_from_editor(e);
 		if (!retval) {
 			myerror("Could not read data from editor \"%s\"", e);
+			free(e);
 			return NULL;
 		}
 		free(e);
@@ -246,6 +247,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 
 cleanup:
 	free(logfile);
+	free(entry.txt);
 	free(entry.date);
 	free(entry.cwd);
 	free(rcfile);
