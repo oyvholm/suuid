@@ -485,7 +485,8 @@ int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
  * UUID. Otherwise return NULL.
  */
 
-char *process_uuid(FILE *logfp, const struct Rc *rc, struct Entry *entry)
+char *process_uuid(FILE *logfp, const struct Rc *rc, const struct Options *opt,
+                   struct Entry *entry)
 {
 	entry->uuid = generate_uuid(rc);
 	if (!entry->uuid) {
@@ -515,12 +516,12 @@ char *process_uuid(FILE *logfp, const struct Rc *rc, struct Entry *entry)
 		return NULL;
 	}
 
-	if (!opt.whereto)
+	if (!opt->whereto)
 		puts(entry->uuid);
 	else {
-		if (strchr(opt.whereto, 'a') || strchr(opt.whereto, 'o'))
+		if (strchr(opt->whereto, 'a') || strchr(opt->whereto, 'o'))
 			fprintf(stdout, "%s\n", entry->uuid);
-		if (strchr(opt.whereto, 'a') || strchr(opt.whereto, 'e'))
+		if (strchr(opt->whereto, 'a') || strchr(opt->whereto, 'e'))
 			fprintf(stderr, "%s\n", entry->uuid);
 	}
 
@@ -636,7 +637,7 @@ int main(int argc, char *argv[])
 	}
 
 	for (i = 0; i < opt.count; i++) {
-		if (!process_uuid(logfp, &rc, &entry)) {
+		if (!process_uuid(logfp, &rc, &opt, &entry)) {
 			close_logfile(logfp);
 			retval = EXIT_ERROR;
 			goto cleanup;

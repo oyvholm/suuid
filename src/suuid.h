@@ -226,7 +226,7 @@ extern char *process_comment_option(const char *cmt);
 extern int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
                              const struct Options *opt);
 extern char *process_uuid(FILE *logfp, const struct Rc *rc,
-                          struct Entry *entry);
+                          const struct Options *opt, struct Entry *entry);
 extern bool init_randomness(void);
 
 /* tag.c */
