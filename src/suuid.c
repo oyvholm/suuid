@@ -655,13 +655,6 @@ int main(int argc, char *argv[])
 	if (close_logfile(logfp) == EXIT_ERROR)
 		myerror("close_logfile() failed");
 
-	if (optind < argc) {
-		int t;
-
-		for (t = optind; t < argc; t++)
-			msg(3, "Non-option arg: %s", argv[t]);
-	}
-
 cleanup:
 
 	free(logfile);
@@ -675,8 +668,8 @@ cleanup:
 		              * and it exits with errno 13 (EACCES).
 		              */
 #endif
-	msg(3, "Returning from main() with value %d", retval);
 
+	msg(3, "Returning from main() with value %d", retval);
 	return retval;
 }
 
