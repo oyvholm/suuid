@@ -479,6 +479,125 @@ sub test_suuid_executable {
 
     # }}}
     ok(unlink($Outfile), "Delete [Outfile]");
+    likecmd("$CMD -t abc,def,ghi -l $Outdir", # {{{
+        "/^$v1_templ\n\$/s",
+        '/^$/',
+        0,
+        "Three tags in one argument separated with commas",
+    );
+
+    # }}}
+    like(file_data($Outfile), # {{{
+        s_top(
+            s_suuid('tag' => 'abc,def,ghi'),
+        ),
+        "Log contents OK after comma-separated tags",
+    );
+
+    # }}}
+    ok(unlink($Outfile), "Delete [Outfile]");
+    likecmd("$CMD -t abc,abc,abc -l $Outdir", # {{{
+        "/^$v1_templ\n\$/s",
+        '/^$/',
+        0,
+        "Three comma-separated tags, duplicates",
+    );
+
+    # }}}
+    like(file_data($Outfile), # {{{
+        s_top(
+            s_suuid('tag' => 'abc'),
+        ),
+        "Duplicate comma-separated tags was removed",
+    );
+
+    # }}}
+    ok(unlink($Outfile), "Delete [Outfile]");
+    likecmd("$CMD -t abc --tag abc -t abc -l $Outdir", # {{{
+        "/^$v1_templ\n\$/s",
+        '/^$/',
+        0,
+        "Three -t with duplicated tags",
+    );
+
+    # }}}
+    like(file_data($Outfile), # {{{
+        s_top(
+            s_suuid('tag' => 'abc'),
+        ),
+        "Duplicate tags was removed",
+    );
+
+    # }}}
+    ok(unlink($Outfile), "Delete [Outfile]");
+    likecmd("$CMD -t abc -t '' -t def -l $Outdir", # {{{
+        "/^$v1_templ\n\$/s",
+        '/^$/',
+        0,
+        "-t with empty tag",
+    );
+
+    # }}}
+    like(file_data($Outfile), # {{{
+        s_top(
+            s_suuid('tag' => 'abc,def'),
+        ),
+        "Empty tag was not stored",
+    );
+
+    # }}}
+    ok(unlink($Outfile), "Delete [Outfile]");
+    likecmd("$CMD --tag '  abc  ' -l $Outdir", # {{{
+        "/^$v1_templ\n\$/s",
+        '/^$/',
+        0,
+        "Tag with surrounding spaces",
+    );
+
+    # }}}
+    like(file_data($Outfile), # {{{
+        s_top(
+            s_suuid('tag' => 'abc'),
+        ),
+        "Remove surrounding spaces from tag",
+    );
+
+    # }}}
+    ok(unlink($Outfile), "Delete [Outfile]");
+    likecmd("$CMD --tag '  with space  ' -l $Outdir", # {{{
+        "/^$v1_templ\n\$/s",
+        '/^$/',
+        0,
+        "Tag with surrounding spaces and space in the middle",
+    );
+
+    # }}}
+    like(file_data($Outfile), # {{{
+        s_top(
+            s_suuid('tag' => 'with space'),
+        ),
+        "Remove surrounding spaces from tag, whitespace in tag kept",
+    );
+
+    # }}}
+    ok(unlink($Outfile), "Delete [Outfile]");
+    likecmd("$CMD --tag '&<>' -l $Outdir", # {{{
+        "/^$v1_templ\n\$/s",
+        '/^$/',
+        0,
+        "Tag with &, < and >",
+    );
+
+    # }}}
+    like(file_data($Outfile), # {{{
+        s_top(
+            s_suuid('tag' => '&amp;&lt;&gt;'),
+        ),
+        "&<> in tag was converted",
+    );
+
+    # }}}
+    ok(unlink($Outfile), "Delete [Outfile]");
     test_suuid_comment($Outdir, $Outfile);
     diag("Testing -n (--count) option...");
     likecmd("$CMD -n 5 -c \"Great test\" -t testeri -l $Outdir", # {{{
