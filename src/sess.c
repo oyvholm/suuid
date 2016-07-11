@@ -241,6 +241,7 @@ int main(int argc, char *argv[])
 {
 	int retval = EXIT_OK,
 	    t;
+	struct uuid_result result;
 
 	progname = argv[0];
 #if PERL_COMPAT
@@ -282,8 +283,12 @@ int main(int argc, char *argv[])
 	for (t = optind; t < argc; t++)
 		msg(3, "Non-option arg: %s", argv[t]);
 
-	msg(3, "Returning from main() with value %d", retval);
+	opt.count = 1;
+	result = create_and_log_uuids(&opt);
+	if (!result.success)
+		retval = EXIT_ERROR;
 
+	msg(3, "Returning from main() with value %d", retval);
 	return retval;
 }
 
