@@ -258,9 +258,6 @@ extern char *scan_for_uuid(const char *s);
  */
 
 extern char *progname;
-extern struct Options opt;
-extern struct Rc rc;
-extern struct Entry entry;
 
 #endif /* ifndef _SUUID_H */
 
