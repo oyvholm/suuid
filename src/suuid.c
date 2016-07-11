@@ -249,8 +249,8 @@ void usage(const int retval)
 
 /*
  * choose_opt_action() - Decide what to do when option c is found. Store 
- * changes in dest and entry. opts is the struct with the definitions for the 
- * long options.
+ * changes in dest. opts is the struct with the definitions for the long 
+ * options.
  * Return EXIT_OK if ok, EXIT_ERROR if c is unknown or anything fails.
  */
 
