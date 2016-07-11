@@ -44,17 +44,6 @@
 #include <string.h>
 
 #include "common.h"
-/*
- * Typedefs
- */
-
-typedef unsigned char bool;
-struct Options {
-	bool help;
-	bool license;
-	int verbose;
-	bool version;
-};
 
 /*
  * Function prototypes

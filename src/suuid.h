@@ -58,48 +58,6 @@
 #include <unistd.h>
 
 #include "common.h"
-/*
- * Typedefs
- */
-
-typedef unsigned char bool;
-struct Rc {
-	char *hostname;
-	char *uuidcmd;
-};
-struct Sess {
-	char *uuid;
-	char *desc;
-};
-struct Entry {
-	char *date;
-	char *uuid;
-	char *tag[MAX_TAGS];
-	char *txt;
-	char *host;
-	char *cwd;
-	char *user;
-	char *tty;
-	struct Sess sess[MAX_SESS];
-};
-struct Options {
-	char *comment;
-	unsigned int count;
-	bool help;
-	bool license;
-	char *logdir;
-	bool random_mac;
-	bool raw;
-	char *rcfile;
-	char *tag[MAX_TAGS];
-	int verbose;
-	bool version;
-	char *whereto;
-};
-struct uuid_result {
-	unsigned int count;
-	bool success;
-};
 
 /*
  * Function prototypes

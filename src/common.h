@@ -78,6 +78,49 @@
 #define DEBL  msg(2, "%s, line %u in %s()", __FILE__, __LINE__, __func__)
 #define in_range(a,b,c)  ((a) >= (b) && (a) <= (c) ? TRUE : FALSE)
 
+/*
+ * Typedefs
+ */
+
+typedef unsigned char bool;
+struct Rc {
+	char *hostname;
+	char *uuidcmd;
+};
+struct Sess {
+	char *uuid;
+	char *desc;
+};
+struct Entry {
+	char *date;
+	char *uuid;
+	char *tag[MAX_TAGS];
+	char *txt;
+	char *host;
+	char *cwd;
+	char *user;
+	char *tty;
+	struct Sess sess[MAX_SESS];
+};
+struct Options {
+	char *comment;
+	unsigned int count;
+	bool help;
+	bool license;
+	char *logdir;
+	bool random_mac;
+	bool raw;
+	char *rcfile;
+	char *tag[MAX_TAGS];
+	int verbose;
+	bool version;
+	char *whereto;
+};
+struct uuid_result {
+	unsigned int count;
+	bool success;
+};
+
 #endif /* ifndef _COMMON_H */
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */
