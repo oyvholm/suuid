@@ -28,17 +28,9 @@
 #define VERSION       "0.0.0"
 #define RELEASE_DATE  "2016-00-00"
 
-#define FALSE  0
-#define TRUE   1
-
-#define EXIT_OK     0
-#define EXIT_ERROR  1
-
 #define PERL_COMPAT  1 /* Compile a version with some changes to make it 
                         * compatible with the Perl version
                         */
-
-#define stddebug  stderr
 
 /*
  * Standard header files
@@ -51,13 +43,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-/*
- * Macros
- */
-
-#define DEBL  msg(2, "%s, line %u in %s()", __FILE__, __LINE__, __func__)
-#define in_range(a,b,c)  ((a) >= (b) && (a) <= (c) ? TRUE : FALSE)
-
+#include "common.h"
 /*
  * Typedefs
  */
