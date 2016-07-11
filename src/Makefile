@@ -8,8 +8,8 @@ SESS_OBJS  = sess.o
 CFILES     = environ.c genuuid.c io.c logfile.c rcfile.c sessvar.c string.c \
              suuid.c tag.c uuid.c \
              sess.c
-SUUID_HFILES = suuid.h
-SESS_HFILES = sess.h
+SUUID_HFILES = suuid.h common.h
+SESS_HFILES = sess.h common.h
 SUUID_DEPS = $(SUUID_HFILES) Makefile
 SESS_DEPS = $(SESS_HFILES) Makefile
 CC = gcc
