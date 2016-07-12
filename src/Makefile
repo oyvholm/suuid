@@ -79,9 +79,13 @@ locktest: suuid
 	for f in $$(seq 1 500); do ./suuid -wn -l locktestdir; done &
 	for f in $$(seq 1 500); do ./suuid -wn -l locktestdir; done
 
+.PHONY: newtest
+newtest: test sess
+	cd t && ./Genlog ./sess.t
+
 tags: $(COMMON_C) suuid.c sess.c $(SUUID_HFILES) $(SESS_HFILES)
 	ctags $(COMMON_C) suuid.c sess.c $(SUUID_HFILES) $(SESS_HFILES)
 
 .PHONY: test
-test: suuid sess
-	cd t && make
+test: suuid
+	cd t && $(MAKE)
