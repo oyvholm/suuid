@@ -329,6 +329,7 @@ int parse_options(struct Options *dest, const int argc, char * const argv[])
 	dest->random_mac = FALSE;
 	dest->raw = FALSE;
 	dest->rcfile = NULL;
+	dest->uuid = NULL;
 	dest->verbose = 0;
 	dest->version = FALSE;
 	dest->whereto = NULL;

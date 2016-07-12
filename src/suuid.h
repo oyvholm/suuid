@@ -146,6 +146,7 @@ struct Options {
 	bool raw;
 	char *rcfile;
 	char *tag[MAX_TAGS];
+	char *uuid;
 	int verbose;
 	bool version;
 	char *whereto;
