@@ -25,7 +25,6 @@
  */
 
 char *progname;
-struct Options opt;
 
 /*
  * verbose_level() - Get or set the verbosity level. If action is 0, return the 
@@ -266,6 +265,7 @@ int main(int argc, char *argv[])
 {
 	int retval = EXIT_OK;
 	int t;
+	struct Options opt;
 	struct uuid_result result;
 	size_t cmdsize = 0;
 	char *cmd = NULL;
