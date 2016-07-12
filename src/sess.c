@@ -308,6 +308,9 @@ int main(int argc, char *argv[])
 		goto cleanup;
 	}
 
+	msg(1, "Executing \"%s\"", cmd);
+	retval = system(cmd);
+
 	opt.count = 1;
 	result = create_and_log_uuids(&opt);
 	if (!result.success) {
