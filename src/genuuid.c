@@ -211,7 +211,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	struct uuid_result retval;
 	char *rcfile = NULL, *logfile = NULL;
 	FILE *logfp;
-	unsigned int i;
+	unsigned int i, count = opt->count;
 	struct Rc rc;
 	struct Entry entry;
 
@@ -256,7 +256,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 		goto cleanup;
 	}
 
-	for (i = 0; i < opt->count; i++) {
+	for (i = 0; i < count; i++) {
 		if (!process_uuid(logfp, &rc, opt, &entry)) {
 			close_logfile(logfp);
 			retval.success = FALSE;
