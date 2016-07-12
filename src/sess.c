@@ -300,8 +300,6 @@ int main(int argc, char *argv[])
 		strcat(cmd, argv[t]);
 		strcat(cmd, " ");
 	}
-	trim_str_front(cmd);
-	trim_str_end(cmd);
 	if (!strlen(cmd)) {
 		fprintf(stderr, "%s: Command is empty\n", progname);
 		retval = EXIT_ERROR;
