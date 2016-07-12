@@ -110,9 +110,14 @@ void print_license(void)
 void print_version(void)
 {
 	printf("%s %s (%s)\n", progname, VERSION, RELEASE_DATE);
-#if PERL_COMPAT
+#if FAKE_HOST || PERL_COMPAT
 	printf("\nThis version is compiled with the following conditional "
                "directives:\n");
+#  if FAKE_HOST
+	printf("\nFAKE_HOST: Always return \"fake\" as hostname. This is to "
+	       "make sure it \n"
+	       "doesn't write to the real log file.\n");
+#  endif
 #  if PERL_COMPAT
 	printf("\nPERL_COMPAT: Suppress the new and better behaviour, behave "
 	       "just like the \n"
