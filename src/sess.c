@@ -286,14 +286,15 @@ int main(int argc, char *argv[])
 		msg(3, "Non-option arg: %s", argv[t]);
 		cmdsize += strlen(argv[t]) + 1; /* Add one for space */
 	}
-	cmd = malloc(cmdsize + 1);
+	cmdsize += 1; /* Terminating '\0' */
+	cmd = malloc(cmdsize);
 	if (!cmd) {
 		myerror("Could not allocate %lu bytes for command string",
-		        cmdsize + 1);
+		        cmdsize);
 		retval = EXIT_ERROR;
 		goto cleanup;
 	}
-	memset(cmd, 0, cmdsize + 1);
+	memset(cmd, 0, cmdsize);
 
 	for (t = optind; t < argc; t++) {
 		strcat(cmd, argv[t]);
