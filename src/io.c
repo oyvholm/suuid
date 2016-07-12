@@ -80,7 +80,7 @@ char *read_from_file(const char *fname)
 
 /*
  * read_from_editor() - Open editor e on a temporary file and return the 
- * contentes as an allocated string, or NULL if error.
+ * contents as an allocated string, or NULL if error.
  */
 
 char *read_from_editor(const char *editor)
