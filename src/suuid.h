@@ -28,11 +28,6 @@
 #define VERSION       "0.2.1"
 #define RELEASE_DATE  "2016-07-10"
 
-
-
-#define FAKE_HOST  1 /* Use "fake" as hostname to avoid conflicts with files 
-                      * created by the Perl version
-                      */
 #define TEST_FUNC  0 /* Send non-option arguments to a function for testing. 
                       * Doesn't break anything, non-option arguments are 
                       * ignored by the program.

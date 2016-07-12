@@ -21,6 +21,10 @@
 #ifndef _COMMON_H
 #define _COMMON_H
 
+#define FAKE_HOST  1 /* Use "fake" as hostname to avoid conflicts with files 
+                      * created by the Perl version
+                      */
+
 #define FALSE  0
 #define TRUE   1
 
