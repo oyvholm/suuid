@@ -249,8 +249,8 @@ void usage(const int retval)
 
 /*
  * choose_opt_action() - Decide what to do when option c is found. Store 
- * changes in dest and entry. opts is the struct with the definitions for the 
- * long options.
+ * changes in dest. opts is the struct with the definitions for the long 
+ * options.
  * Return EXIT_OK if ok, EXIT_ERROR if c is unknown or anything fails.
  */
 
@@ -329,6 +329,7 @@ int parse_options(struct Options *dest, const int argc, char * const argv[])
 	dest->random_mac = FALSE;
 	dest->raw = FALSE;
 	dest->rcfile = NULL;
+	dest->uuid = NULL;
 	dest->verbose = 0;
 	dest->version = FALSE;
 	dest->whereto = NULL;

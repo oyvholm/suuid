@@ -151,7 +151,16 @@ int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
 char *process_uuid(FILE *logfp, const struct Rc *rc, const struct Options *opt,
                    struct Entry *entry)
 {
-	entry->uuid = generate_uuid(rc, opt->random_mac);
+	if (opt->uuid) {
+		assert(valid_uuid(opt->uuid, TRUE));
+		if (!valid_uuid(opt->uuid, TRUE)) {
+			fprintf(stderr, "process_uuid(): UUID \"%s\" is not "
+			                "valid.", opt->uuid);
+			return NULL;
+		}
+		entry->uuid = opt->uuid;
+	} else
+		entry->uuid = generate_uuid(rc, opt->random_mac);
 	if (!entry->uuid) {
 		fprintf(stderr, "%s: UUID generation failed\n", progname);
 		return NULL;
@@ -203,7 +212,8 @@ void sighandler(const int sig)
  * number generator, read values from the rc file, environment and command 
  * line, generate the UUID(s) and write it to the log file. Returns a struct 
  * uuid_result with the number of UUIDs generated and a value indicating 
- * success or not.
+ * success or not. If opt->uuid contains an UUID, set count to 1 to avoid 
+ * duplicates in the log file.
  */
 
 struct uuid_result create_and_log_uuids(const struct Options *opt)
@@ -211,7 +221,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	struct uuid_result retval;
 	char *rcfile = NULL, *logfile = NULL;
 	FILE *logfp;
-	unsigned int i;
+	unsigned int i, count = opt->count;
 	struct Rc rc;
 	struct Entry entry;
 
@@ -256,7 +266,9 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 		goto cleanup;
 	}
 
-	for (i = 0; i < opt->count; i++) {
+	if (opt->uuid)
+		count = 1;
+	for (i = 0; i < count; i++) {
 		if (!process_uuid(logfp, &rc, opt, &entry)) {
 			close_logfile(logfp);
 			retval.success = FALSE;

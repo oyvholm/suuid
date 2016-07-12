@@ -84,9 +84,6 @@ extern int parse_options(struct Options *dest,
  */
 
 extern char *progname;
-extern struct Options opt;
-extern struct Rc rc;
-extern struct Entry entry;
 
 #endif /* ifndef _SUUID_H */
 
