@@ -242,9 +242,7 @@ int main(int argc, char *argv[])
 
 	progname = argv[0];
 #if PERL_COMPAT
-	progname = "sess"; /* fixme: Temporary kludge to make it compatible 
-	                    * with the Perl version.
-	                    */
+	progname = "sess";
 #endif
 
 	retval = parse_options(&opt, argc, argv);
