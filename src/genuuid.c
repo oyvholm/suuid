@@ -252,6 +252,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	struct Entry entry;
 
 	retval.count = 0;
+	memset(retval.lastuuid, 0, UUID_LENGTH + 1);
 	retval.success = TRUE;
 	init_xml_entry(&entry);
 
@@ -304,6 +305,8 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 		if (should_terminate)
 			break;
 	}
+	if (valid_uuid(entry.uuid, TRUE))
+		strncpy(retval.lastuuid, entry.uuid, UUID_LENGTH + 1);
 
 	if (retval.count < opt->count)
 		fprintf(stderr, "%s: Generated only %u of %u UUIDs\n",

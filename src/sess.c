@@ -239,6 +239,8 @@ int main(int argc, char *argv[])
 	int retval = EXIT_OK,
 	    t;
 	struct uuid_result result;
+	size_t cmdsize = 0;
+	char *cmd = NULL;
 
 	progname = argv[0];
 #if PERL_COMPAT
@@ -275,13 +277,28 @@ int main(int argc, char *argv[])
 		return EXIT_ERROR;
 	}
 
-	for (t = optind; t < argc; t++)
+	for (t = optind; t < argc; t++) {
 		msg(3, "Non-option arg: %s", argv[t]);
+		cmdsize += strlen(argv[t]) + 1;
+	}
+	cmd = malloc(cmdsize + 1);
+	if (!cmd) {
+		myerror("Could not allocate %lu bytes for command string",
+		        cmdsize + 1);
+		retval = EXIT_ERROR;
+		goto cleanup;
+	}
 
 	opt.count = 1;
 	result = create_and_log_uuids(&opt);
-	if (!result.success)
+	if (!result.success) {
+		myerror("Error generating UUID, session not started");
 		retval = EXIT_ERROR;
+		goto cleanup;
+	}
+
+cleanup:
+	free(cmd);
 
 	msg(3, "Returning from main() with value %d", retval);
 	return retval;

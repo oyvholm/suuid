@@ -119,6 +119,7 @@ struct Options {
 };
 struct uuid_result {
 	unsigned int count;
+	char lastuuid[UUID_LENGTH + 1];
 	bool success;
 };
 
