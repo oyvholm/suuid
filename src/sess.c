@@ -201,10 +201,7 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 	int retval = EXIT_OK;
 	int c;
 
-	dest->help = FALSE;
-	dest->license = FALSE;
-	dest->verbose = 0;
-	dest->version = FALSE;
+	init_opt(dest);
 
 	while (retval == EXIT_OK) {
 		int option_index = 0;
