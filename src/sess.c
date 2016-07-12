@@ -241,8 +241,8 @@ int parse_options(struct Options *dest, int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-	int retval = EXIT_OK,
-	    t;
+	int retval = EXIT_OK;
+	int t;
 	struct uuid_result result;
 	size_t cmdsize = 0;
 	char *cmd = NULL;
