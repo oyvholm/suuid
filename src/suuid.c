@@ -319,22 +319,8 @@ int parse_options(struct Options *dest, const int argc, char * const argv[])
 {
 	int retval = EXIT_OK;
 	int c;
-	unsigned int i;
 
-	dest->comment = NULL;
-	dest->count = 1;
-	dest->help = FALSE;
-	dest->license = FALSE;
-	dest->logdir = NULL;
-	dest->random_mac = FALSE;
-	dest->raw = FALSE;
-	dest->rcfile = NULL;
-	dest->uuid = NULL;
-	dest->verbose = 0;
-	dest->version = FALSE;
-	dest->whereto = NULL;
-	for (i = 0; i < MAX_TAGS; i++)
-		dest->tag[i] = NULL;
+	init_opt(dest);
 
 	while (retval == EXIT_OK) {
 		int option_index = 0;
