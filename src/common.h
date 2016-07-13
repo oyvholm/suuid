@@ -210,6 +210,7 @@ extern char *get_desc_from_command(const char *cmd);
 extern int fill_sess(struct Entry *dest, const char *uuid,
                      const char *desc, const size_t desclen);
 extern int get_sess_info(struct Entry *entry);
+extern char *concat_cmd_string(const int argc, char * const argv[]);
 extern int run_session(const struct Options *orig_opt,
                        const int argc, char * const argv[]);
 

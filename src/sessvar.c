@@ -187,22 +187,16 @@ int get_sess_info(struct Entry *entry)
 }
 
 /*
- * run_session() - Execute a shell command and log it with start time, end time 
- * and return value. Return the value the program will exit with, EXIT_OK or 
- * EXIT_ERROR.
+ * concat_cmd_string() - Concatenate the command line arguments received in 
+ * argc and argv with a single space character between them. Return pointer to 
+ * allocated string containing the command, or NULL if anything fails.
  */
 
-int run_session(const struct Options *orig_opt,
-                const int argc, char * const argv[])
+char *concat_cmd_string(const int argc, char * const argv[])
 {
-	int retval = EXIT_OK;
-	struct Options opt = *orig_opt;
 	int t;
 	size_t cmdsize = 0;
 	char *cmd = NULL;
-	char *start_uuid;
-	char *cmd_desc = NULL;
-	struct uuid_result result;
 
 	for (t = optind; t < argc; t++) {
 		msg(3, "Non-option arg: %s", argv[t]);
@@ -213,8 +207,7 @@ int run_session(const struct Options *orig_opt,
 	if (!cmd) {
 		myerror("Could not allocate %lu bytes for command string",
 		        cmdsize);
-		retval = EXIT_ERROR;
-		goto cleanup;
+		return NULL;
 	}
 	memset(cmd, 0, cmdsize);
 
@@ -226,9 +219,32 @@ int run_session(const struct Options *orig_opt,
 		cmd[strlen(cmd) - 1] = '\0'; /* Remove added space */
 	if (!strlen(cmd)) {
 		fprintf(stderr, "%s: Command is empty\n", progname);
-		retval = EXIT_ERROR;
-		goto cleanup;
+		free(cmd);
+		return NULL;
 	}
+
+	return cmd;
+}
+
+/*
+ * run_session() - Execute a shell command and log it with start time, end time 
+ * and return value. Return the value the program will exit with, EXIT_OK or 
+ * EXIT_ERROR.
+ */
+
+int run_session(const struct Options *orig_opt,
+                const int argc, char * const argv[])
+{
+	int retval = EXIT_OK;
+	struct Options opt = *orig_opt;
+	char *cmd = NULL;
+	char *start_uuid;
+	char *cmd_desc = NULL;
+	struct uuid_result result;
+
+	cmd = concat_cmd_string(argc, argv);
+	if (!cmd)
+		return EXIT_ERROR;
 	cmd_desc = get_desc_from_command(cmd);
 	msg(2, "cmd_desc = \"%s\"", cmd_desc);
 
