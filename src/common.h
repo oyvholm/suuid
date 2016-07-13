@@ -25,6 +25,25 @@
                       * created by the Perl version
                       */
 
+/*
+ * Standard header files
+ */
+
+#include <assert.h>
+#include <ctype.h>
+#include <errno.h>
+#include <getopt.h>
+#include <limits.h>
+#include <pwd.h>
+#include <signal.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/file.h>
+#include <sys/time.h>
+#include <unistd.h>
+
 #define FALSE  0
 #define TRUE   1
 

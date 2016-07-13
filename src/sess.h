@@ -32,17 +32,6 @@
                         * compatible with the Perl version
                         */
 
-/*
- * Standard header files
- */
-
-#include <errno.h>
-#include <getopt.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "common.h"
 
 /*
