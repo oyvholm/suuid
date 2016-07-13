@@ -264,13 +264,7 @@ int parse_options(struct Options *dest, const int argc, char * const argv[])
 int main(int argc, char *argv[])
 {
 	int retval = EXIT_OK;
-	int t;
 	struct Options opt;
-	struct uuid_result result;
-	size_t cmdsize = 0;
-	char *cmd = NULL;
-	char *start_uuid;
-	char *cmd_desc = NULL;
 
 	progname = argv[0];
 #if PERL_COMPAT
@@ -307,53 +301,7 @@ int main(int argc, char *argv[])
 		return EXIT_ERROR;
 	}
 
-	for (t = optind; t < argc; t++) {
-		msg(3, "Non-option arg: %s", argv[t]);
-		cmdsize += strlen(argv[t]) + 1; /* Add one for space */
-	}
-	cmdsize += 1; /* Terminating '\0' */
-	cmd = malloc(cmdsize);
-	if (!cmd) {
-		myerror("Could not allocate %lu bytes for command string",
-		        cmdsize);
-		retval = EXIT_ERROR;
-		goto cleanup;
-	}
-	memset(cmd, 0, cmdsize);
-
-	for (t = optind; t < argc; t++) {
-		strcat(cmd, argv[t]);
-		strcat(cmd, " ");
-	}
-	if (strlen(cmd) && cmd[strlen(cmd) - 1] == ' ')
-		cmd[strlen(cmd) - 1] = '\0'; /* Remove added space */
-	if (!strlen(cmd)) {
-		fprintf(stderr, "%s: Command is empty\n", progname);
-		retval = EXIT_ERROR;
-		goto cleanup;
-	}
-	cmd_desc = get_desc_from_command(cmd);
-	msg(2, "cmd_desc = \"%s\"", cmd_desc);
-
-	opt.count = 1;
-	result = create_and_log_uuids(&opt);
-	if (!result.success) {
-		myerror("Error generating UUID, session not started");
-		retval = EXIT_ERROR;
-		goto cleanup;
-	}
-	start_uuid = strdup(result.lastuuid);
-	if (!start_uuid) {
-		myerror("Could not duplicate start UUID");
-	}
-	assert(valid_uuid(start_uuid, TRUE));
-
-	msg(1, "Executing \"%s\"", cmd);
-	retval = system(cmd);
-
-cleanup:
-	free(cmd_desc);
-	free(cmd);
+	retval = run_session(&opt, argc, argv);
 
 	msg(3, "Returning from main() with value %d", retval);
 	return retval;

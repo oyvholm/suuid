@@ -186,4 +186,73 @@ int get_sess_info(struct Entry *entry)
 	return EXIT_OK;
 }
 
+/*
+ * run_session() - Execute a shell command and log it with start time, end time 
+ * and return value. Return the value the program will exit with, EXIT_OK or 
+ * EXIT_ERROR.
+ */
+
+int run_session(const struct Options *orig_opt,
+                const int argc, char * const argv[])
+{
+	int retval = EXIT_OK;
+	struct Options opt = *orig_opt;
+	int t;
+	size_t cmdsize = 0;
+	char *cmd = NULL;
+	char *start_uuid;
+	char *cmd_desc = NULL;
+	struct uuid_result result;
+
+	for (t = optind; t < argc; t++) {
+		msg(3, "Non-option arg: %s", argv[t]);
+		cmdsize += strlen(argv[t]) + 1; /* Add one for space */
+	}
+	cmdsize += 1; /* Terminating '\0' */
+	cmd = malloc(cmdsize);
+	if (!cmd) {
+		myerror("Could not allocate %lu bytes for command string",
+		        cmdsize);
+		retval = EXIT_ERROR;
+		goto cleanup;
+	}
+	memset(cmd, 0, cmdsize);
+
+	for (t = optind; t < argc; t++) {
+		strcat(cmd, argv[t]);
+		strcat(cmd, " ");
+	}
+	if (strlen(cmd) && cmd[strlen(cmd) - 1] == ' ')
+		cmd[strlen(cmd) - 1] = '\0'; /* Remove added space */
+	if (!strlen(cmd)) {
+		fprintf(stderr, "%s: Command is empty\n", progname);
+		retval = EXIT_ERROR;
+		goto cleanup;
+	}
+	cmd_desc = get_desc_from_command(cmd);
+	msg(2, "cmd_desc = \"%s\"", cmd_desc);
+
+	opt.count = 1;
+	result = create_and_log_uuids(&opt);
+	if (!result.success) {
+		myerror("Error generating UUID, session not started");
+		retval = EXIT_ERROR;
+		goto cleanup;
+	}
+	start_uuid = strdup(result.lastuuid);
+	if (!start_uuid) {
+		myerror("Could not duplicate start UUID");
+	}
+	assert(valid_uuid(start_uuid, TRUE));
+
+	msg(1, "Executing \"%s\"", cmd);
+	retval = system(cmd);
+
+cleanup:
+	free(cmd_desc);
+	free(cmd);
+
+	return(retval);
+}
+
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */
