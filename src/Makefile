@@ -2,22 +2,28 @@
 # File ID: 27e0d738-2b93-11e6-8668-02010e0a6634
 # Author: Øyvind A. Holm <sunny@sunbase.org>
 
-SUUID_EXEC   = suuid
-SESS_EXEC    = sess
-COMMON_OBJS  = environ.o genuuid.o io.o logfile.o rcfile.o sessvar.o string.o \
-               tag.o uuid.o
-SUUID_OBJS   = suuid.o
-SESS_OBJS    = sess.o
-COMMON_C     = environ.c genuuid.c io.c logfile.c rcfile.c sessvar.c string.c \
-               tag.c uuid.c
+SUUID_EXEC = suuid
+SESS_EXEC  = sess
+
+COMMON_OBJS = environ.o genuuid.o io.o logfile.o rcfile.o sessvar.o string.o \
+              tag.o uuid.o
+SUUID_OBJS  = suuid.o
+SESS_OBJS   = sess.o
+
+COMMON_C = environ.c genuuid.c io.c logfile.c rcfile.c sessvar.c string.c \
+           tag.c uuid.c
+
 SUUID_HFILES = suuid.h common.h
 SESS_HFILES  = sess.h common.h
-SUUID_DEPS   = $(SUUID_HFILES) Makefile
-SESS_DEPS    = $(SESS_HFILES) $(SUUID_DEPS) Makefile
-LOCKTESTDIR  = locktestdir
+
+SUUID_DEPS = $(SUUID_HFILES) Makefile
+SESS_DEPS  = $(SESS_HFILES) $(SUUID_DEPS) Makefile
+
+LOCKTESTDIR = locktestdir
 CTAGS = ctags
 CC = gcc
 LD = gcc
+
 CCFLAGS = -Wall -Wextra -Werror -O2 -c -g -pedantic
 LDFLAGS = -Wall -Wextra -Werror
 
