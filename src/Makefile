@@ -5,7 +5,7 @@
 SUUID_EXEC = suuid
 SESS_EXEC  = sess
 
-LOCKTESTDIR = locktestdir
+TESTLOCKDIR = testlockdir
 CTAGS = ctags
 
 CC = gcc
@@ -76,23 +76,23 @@ clean:
 	rm -fv $(SUUID_EXEC) $(SUUID_OBJS)
 	rm -fv $(SESS_EXEC) $(SESS_OBJS)
 	rm -fv *~ core core.$(SUUID_EXEC) tags
-	rm -frv $(LOCKTESTDIR)
+	rm -frv $(TESTLOCKDIR)
 	cd t && $(MAKE) clean
 
 .PHONY: edit
 edit: tags
 	$(EDITOR) *.c *.h Makefile t/*.t
 
-.PHONY: locktest
-locktest: $(SUUID_EXEC)
-	rm -rf $(LOCKTESTDIR)
-	mkdir $(LOCKTESTDIR)
-	for f in $$(seq 1 500); do ./$(SUUID_EXEC) -wn -l $(LOCKTESTDIR); done &
-	for f in $$(seq 1 500); do ./$(SUUID_EXEC) -wn -l $(LOCKTESTDIR); done &
-	for f in $$(seq 1 500); do ./$(SUUID_EXEC) -wn -l $(LOCKTESTDIR); done
+.PHONY: testlock
+testlock: $(SUUID_EXEC)
+	rm -rf $(TESTLOCKDIR)
+	mkdir $(TESTLOCKDIR)
+	for f in $$(seq 1 500); do ./$(SUUID_EXEC) -wn -l $(TESTLOCKDIR); done &
+	for f in $$(seq 1 500); do ./$(SUUID_EXEC) -wn -l $(TESTLOCKDIR); done &
+	for f in $$(seq 1 500); do ./$(SUUID_EXEC) -wn -l $(TESTLOCKDIR); done
 
-.PHONY: newtest
-newtest: test $(SESS_EXEC)
+.PHONY: testnew
+testnew: test $(SESS_EXEC)
 	cd t && ./Genlog ./sess.t
 
 tags: $(COMMON_C) suuid.c sess.c $(SUUID_HFILES) $(SESS_HFILES)

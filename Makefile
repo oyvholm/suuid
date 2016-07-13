@@ -12,9 +12,9 @@
 default:
 	cd src && make
 
-.PHONY: newtest
-newtest: test
-	cd src && make newtest
+.PHONY: testnew
+testnew: test
+	cd src && make testnew
 
 .PHONY: test
 test:
