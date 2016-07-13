@@ -1,12 +1,6 @@
-#!/bin/bash
-
-#=======================================================================
-# Makefile
+# Top Makefile in <sunny256/suuid.git>
 # File ID: c9f9bc1a-28d8-11e5-b53c-fefdb24f8e10
-#
 # Author: Øyvind A. Holm <sunny@sunbase.org>
-# License: GNU General Public License version 2 or later.
-#=======================================================================
 
 .PHONY: default
 default:
