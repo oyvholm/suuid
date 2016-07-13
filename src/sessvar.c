@@ -238,7 +238,7 @@ int run_session(const struct Options *orig_opt,
 	int retval = EXIT_OK;
 	struct Options opt = *orig_opt;
 	char *cmd = NULL;
-	char *start_uuid;
+	char *start_uuid = NULL;
 	char *cmd_desc = NULL;
 	struct uuid_result result;
 
@@ -258,6 +258,7 @@ int run_session(const struct Options *orig_opt,
 	start_uuid = strdup(result.lastuuid);
 	if (!start_uuid) {
 		myerror("Could not duplicate start UUID");
+		goto cleanup;
 	}
 	assert(valid_uuid(start_uuid, TRUE));
 
@@ -265,6 +266,7 @@ int run_session(const struct Options *orig_opt,
 	retval = system(cmd);
 
 cleanup:
+	free(start_uuid);
 	free(cmd_desc);
 	free(cmd);
 
