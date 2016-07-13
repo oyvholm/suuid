@@ -130,6 +130,7 @@ void print_license(void)
 void print_version(void)
 {
 	printf("%s %s (%s)\n", progname, VERSION, RELEASE_DATE);
+	printf("\n*** THIS PROGRAM IS UNFINISHED, DON'T USE ***\n");
 #if FAKE_HOST || PERL_COMPAT
 	printf("\nThis version is compiled with the following conditional "
                "directives:\n");
@@ -163,6 +164,7 @@ void usage(const int retval)
 		print_version();
 		puts("");
 	}
+	printf("*** THIS PROGRAM IS UNFINISHED, DON'T USE ***\n\n");
 	printf("Usage: %s [options]\n", progname);
 	printf("\n");
 	printf("Options:\n");
