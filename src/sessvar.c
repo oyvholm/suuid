@@ -228,8 +228,9 @@ char *concat_cmd_string(const int argc, char * const argv[])
 
 /*
  * run_session() - Execute a shell command and log it with start time, end time 
- * and return value. Return the value the program will exit with, EXIT_OK or 
- * EXIT_ERROR.
+ * and return value. If any error occurs, return -1. Otherwise, return with the 
+ * value from system(), which by a nice coincidence also return -1 on error or 
+ * the return value from the program.
  */
 
 int run_session(const struct Options *orig_opt,
@@ -244,7 +245,7 @@ int run_session(const struct Options *orig_opt,
 
 	cmd = concat_cmd_string(argc, argv);
 	if (!cmd)
-		return EXIT_ERROR;
+		return -1;
 	cmd_desc = get_desc_from_command(cmd);
 	msg(2, "cmd_desc = \"%s\"", cmd_desc);
 
@@ -252,7 +253,7 @@ int run_session(const struct Options *orig_opt,
 	result = create_and_log_uuids(&opt);
 	if (!result.success) {
 		myerror("Error generating UUID, session not started");
-		retval = EXIT_ERROR;
+		retval = -1;
 		goto cleanup;
 	}
 	start_uuid = strdup(result.lastuuid);
