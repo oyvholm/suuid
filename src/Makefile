@@ -14,6 +14,7 @@ SUUID_HFILES = suuid.h common.h
 SESS_HFILES  = sess.h common.h
 SUUID_DEPS   = $(SUUID_HFILES) Makefile
 SESS_DEPS    = $(SESS_HFILES) $(SUUID_DEPS) Makefile
+LOCKTESTDIR  = locktestdir
 CC = gcc
 LD = gcc
 CCFLAGS = -Wall -Wextra -Werror -O2 -c -g -pedantic
@@ -66,7 +67,7 @@ clean:
 	rm -fv $(SUUID_EXEC) $(SUUID_OBJS)
 	rm -fv $(SESS_EXEC) $(SESS_OBJS)
 	rm -fv *~ core core.$(SUUID_EXEC) tags
-	rm -frv locktestdir
+	rm -frv $(LOCKTESTDIR)
 	cd t && $(MAKE) clean
 
 .PHONY: edit
@@ -75,11 +76,11 @@ edit: tags
 
 .PHONY: locktest
 locktest: $(SUUID_EXEC)
-	rm -rf locktestdir
-	mkdir locktestdir
-	for f in $$(seq 1 500); do ./$(SUUID_EXEC) -wn -l locktestdir; done &
-	for f in $$(seq 1 500); do ./$(SUUID_EXEC) -wn -l locktestdir; done &
-	for f in $$(seq 1 500); do ./$(SUUID_EXEC) -wn -l locktestdir; done
+	rm -rf $(LOCKTESTDIR)
+	mkdir $(LOCKTESTDIR)
+	for f in $$(seq 1 500); do ./$(SUUID_EXEC) -wn -l $(LOCKTESTDIR); done &
+	for f in $$(seq 1 500); do ./$(SUUID_EXEC) -wn -l $(LOCKTESTDIR); done &
+	for f in $$(seq 1 500); do ./$(SUUID_EXEC) -wn -l $(LOCKTESTDIR); done
 
 .PHONY: newtest
 newtest: test $(SESS_EXEC)
