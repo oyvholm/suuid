@@ -264,7 +264,11 @@ int run_session(const struct Options *orig_opt,
 	assert(valid_uuid(start_uuid, TRUE));
 
 	msg(1, "Executing \"%s\"", cmd);
-	retval = system(cmd);
+	retval = system(cmd); /* fixme: This value is shifted with 8 bits in 
+	                       * main(). Check if it's ok.
+	                       */
+	msg(2, "run_session(): retval from system() = %d (0x%x)",
+	       retval, retval);
 
 cleanup:
 	free(start_uuid);

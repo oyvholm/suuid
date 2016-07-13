@@ -302,8 +302,14 @@ int main(int argc, char *argv[])
 	}
 
 	retval = run_session(&opt, argc, argv);
+	msg(2, "retval from run_session() = %d (0x%x)", retval, retval);
 
-	msg(3, "Returning from main() with value %d", retval);
+	retval >>= 8; /* fixme: The return value from system() is 32512 
+	               * (0x7f00) if the command isn't found. Seems as the 
+	               * value has to be shifted by 8 bits, but check up on 
+	               * this to see if it's kosher.
+	               */
+	msg(3, "Returning from main() with value %d (0x%x)", retval, retval);
 	return retval;
 }
 
