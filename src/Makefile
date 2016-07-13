@@ -5,6 +5,16 @@
 SUUID_EXEC = suuid
 SESS_EXEC  = sess
 
+LOCKTESTDIR = locktestdir
+CTAGS = ctags
+CC = gcc
+LD = gcc
+
+CCFLAGS = -Wall -Wextra -Werror -O2 -c -g -pedantic
+LDFLAGS = -Wall -Wextra -Werror
+
+# For regular use, it's not necessary to modify anything below this line.
+
 COMMON_OBJS = environ.o genuuid.o io.o logfile.o rcfile.o sessvar.o string.o \
               tag.o uuid.o
 SUUID_OBJS  = suuid.o
@@ -18,14 +28,6 @@ SESS_HFILES  = sess.h common.h
 
 SUUID_DEPS = $(SUUID_HFILES) Makefile
 SESS_DEPS  = $(SESS_HFILES) $(SUUID_DEPS) Makefile
-
-LOCKTESTDIR = locktestdir
-CTAGS = ctags
-CC = gcc
-LD = gcc
-
-CCFLAGS = -Wall -Wextra -Werror -O2 -c -g -pedantic
-LDFLAGS = -Wall -Wextra -Werror
 
 default: $(SUUID_EXEC) $(SESS_EXEC)
 
