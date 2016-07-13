@@ -7,9 +7,9 @@ SESS_EXEC  = sess
 
 LOCKTESTDIR = locktestdir
 CTAGS = ctags
+
 CC = gcc
 LD = gcc
-
 CCFLAGS = -Wall -Wextra -Werror -O2 -c -g -pedantic
 LDFLAGS = -Wall -Wextra -Werror
 
