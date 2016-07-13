@@ -10,19 +10,19 @@
 
 .PHONY: default
 default:
-	cd src && make
+	cd src && $(MAKE)
 
 .PHONY: testnew
 testnew: test
-	cd src && make testnew
+	cd src && $(MAKE) testnew
 
 .PHONY: test
 test:
-	cd src && make test
-	cd tests && make
+	cd src && $(MAKE) test
+	cd tests && $(MAKE)
 
 .PHONY: test
 clean:
 	rm -fv synced.sqlite.20*.bck
-	cd src && make clean
-	cd tests && make clean
+	cd src && $(MAKE) clean
+	cd tests && $(MAKE) clean
