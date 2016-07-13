@@ -30,7 +30,7 @@ INSERT INTO "synced" VALUES('src/suuid.c','Lib/std/c/std.c','3721489ea544cf7985d
 INSERT INTO "synced" VALUES('src/suuid.h','Lib/std/c/std.h','3721489ea544cf7985dc45870d48e2b1ee60a0ed','2016-07-07 13:30:08');
 INSERT INTO "synced" VALUES('src/t/suuid.t','Lib/std/perl-tests','419ded4305b40d128560d85946e3ebd9745944d8','2016-07-07 11:59:49');
 INSERT INTO "synced" VALUES('tests/Add_test','Lib/std/Add_test','17bc73d79f068dfaf2655db1090f6b9206734555','2016-06-06 02:30:32');
-INSERT INTO "synced" VALUES('tests/Genlog','Lib/std/Genlog','17bc73d79f068dfaf2655db1090f6b9206734555','2016-06-06 02:30:32');
+INSERT INTO "synced" VALUES('tests/Genlog','Lib/std/Genlog','d1ebf8e7aaf89fd22baf628255bd698b95d7df29','2016-07-13 20:23:13');
 INSERT INTO "synced" VALUES('tests/conv-suuid.t','Lib/std/perl-tests','419ded4305b40d128560d85946e3ebd9745944d8','2016-07-07 11:59:49');
 INSERT INTO "synced" VALUES('tests/sess.t','Lib/std/perl-tests','ee75f42c8e84cc59c8b694417731b8130dbdc050','2016-07-07 18:01:45');
 CREATE TABLE todo (

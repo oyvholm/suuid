@@ -12,7 +12,7 @@
 #=======================================================================
 
 progname=Genlog
-VERSION=0.3.1
+VERSION=0.4.0
 
 if test "$1" = "--version"; then
     echo $progname $VERSION
@@ -50,7 +50,10 @@ END
     exit 0
 fi
 
-[ -z "$1" ] && { echo "Syntax: $0 testname [options] [testname [...]]" >&2; exit 1; }
+[ -z "$1" ] && {
+    echo "Syntax: $0 testname [options] [testname [...]]" >&2
+    exit 1
+}
 
 mkdir -p log
 maxlen=0
@@ -73,7 +76,8 @@ done
 for gf in "$@"; do
     testname=$gf
     printf "%${maxlen}s: " $testname
-    ./$testname $opt_str 2>&1 | remove_perltestnumbers >log/$testname.log
+    ./$testname $opt_str 2>&1 |
+        perl -pe 's/^((not )?ok)( \d+ )- /$1 - /;' >log/$testname.log
     not_ok_count=$(grep -a "^not ok" log/$testname.log | wc -l | tr -d ' ')
     if [ $not_ok_count -gt 0 ]; then
         not_ok_str=", $not_ok_count not ok"
@@ -91,12 +95,16 @@ for gf in "$@"; do
         echo
     }
     grep -a "^Bail out" log/$testname.log && retval=$(($retval | 2))
-    tot_bailout=$(($tot_bailout + $(grep -a "^Bail out" log/$testname.log | wc -l)))
+    tot_bailout=$((
+        $tot_bailout + $(grep -a "^Bail out" log/$testname.log | wc -l)
+    ))
 done
 echo
 unset tot_not_ok_str
 if test $tot_not_ok -gt 0; then
-    tot_not_ok_str=", $tot_not_ok not ok ($tot_not_ok/$(($tot_ok + $tot_not_ok)) FAIL)"
+    tot_not_ok_str=", $tot_not_ok not ok ($tot_not_ok/$((
+        $tot_ok + $tot_not_ok
+    )) FAIL)"
 fi
 printf "%${maxlen}s: %u ok%s\n" "total" "$tot_ok" "$tot_not_ok_str"
 if test $tot_bailout -gt 0; then
