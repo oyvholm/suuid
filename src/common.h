@@ -187,6 +187,7 @@ extern int read_rcfile(const char *rcfile, struct Rc *rc);
 /* sessvar.c */
 extern bool is_legal_desc_char(const unsigned char c);
 extern bool is_valid_desc_string(const char *s);
+extern char *get_desc_from_command(const char *cmd);
 extern int fill_sess(struct Entry *dest, const char *uuid,
                      const char *desc, const size_t desclen);
 extern int get_sess_info(struct Entry *entry);

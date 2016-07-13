@@ -269,6 +269,7 @@ int main(int argc, char *argv[])
 	struct uuid_result result;
 	size_t cmdsize = 0;
 	char *cmd = NULL;
+	char *cmd_desc = NULL;
 
 	progname = argv[0];
 #if PERL_COMPAT
@@ -330,6 +331,8 @@ int main(int argc, char *argv[])
 		retval = EXIT_ERROR;
 		goto cleanup;
 	}
+	cmd_desc = get_desc_from_command(cmd);
+	msg(2, "cmd_desc = \"%s\"", cmd_desc);
 
 	opt.count = 1;
 	result = create_and_log_uuids(&opt);
@@ -343,6 +346,7 @@ int main(int argc, char *argv[])
 	retval = system(cmd);
 
 cleanup:
+	free(cmd_desc);
 	free(cmd);
 
 	msg(3, "Returning from main() with value %d", retval);

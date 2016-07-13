@@ -52,6 +52,38 @@ bool is_valid_desc_string(const char *s)
 }
 
 /*
+ * get_desc_from_command() - Return pointer to allocated desc string extracted 
+ * from the command, used for the desc attribute in the sess string. If cmd is 
+ * NULL or empty, or if something fails, return NULL.
+ */
+
+char *get_desc_from_command(const char *cmd)
+{
+	char *ap, *p, *p2;
+
+	if (!cmd || !strlen(cmd))
+		return NULL;
+	ap = strdup(cmd);
+	if (!ap) {
+		myerror("get_desc_from_command(): Could not duplicate command "
+		        "string");
+		return NULL;
+	}
+	p = ap;
+	while (strchr("./", *p))
+		p++;
+	p2 = p;
+	while (*p2 && !isspace(*p2))
+		p2++;
+	if (p2 > p)
+		*p2 = '\0';
+	if (p > ap)
+		memmove(ap, p, strlen(p) + 1);
+
+	return ap;
+}
+
+/*
  * fill_sess() - Fill the first available dest->sess element with uuid and desc 
  * and increase the local counter. Return EXIT_OK if everything is ok, 
  * EXIT_ERROR if something failed.
