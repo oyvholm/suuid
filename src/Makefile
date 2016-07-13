@@ -2,6 +2,7 @@
 # File ID: 27e0d738-2b93-11e6-8668-02010e0a6634
 # Author: Øyvind A. Holm <sunny@sunbase.org>
 
+SUUID_EXEC   = suuid
 COMMON_OBJS  = environ.o genuuid.o io.o logfile.o rcfile.o sessvar.o string.o \
                tag.o uuid.o
 SUUID_OBJS   = suuid.o
@@ -17,10 +18,10 @@ LD = gcc
 CCFLAGS = -Wall -Wextra -Werror -O2 -c -g -pedantic
 LDFLAGS = -Wall -Wextra -Werror
 
-default: suuid sess
+default: $(SUUID_EXEC) sess
 
-suuid: $(SUUID_OBJS) $(COMMON_OBJS)
-	$(LD) -o suuid $(LDFLAGS) $(SUUID_OBJS) $(COMMON_OBJS)
+$(SUUID_EXEC): $(SUUID_OBJS) $(COMMON_OBJS)
+	$(LD) -o $(SUUID_EXEC) $(LDFLAGS) $(SUUID_OBJS) $(COMMON_OBJS)
 
 sess: $(SESS_OBJS) $(COMMON_OBJS)
 	$(LD) -o sess $(LDFLAGS) $(SESS_OBJS) $(COMMON_OBJS)
@@ -61,9 +62,9 @@ uuid.o: uuid.c $(SUUID_DEPS)
 .PHONY: clean
 clean:
 	rm -fv $(COMMON_OBJS)
-	rm -fv suuid $(SUUID_OBJS)
+	rm -fv $(SUUID_EXEC) $(SUUID_OBJS)
 	rm -fv sess $(SESS_OBJS)
-	rm -fv *~ core core.suuid tags
+	rm -fv *~ core core.$(SUUID_EXEC) tags
 	rm -frv locktestdir
 	cd t && $(MAKE) clean
 
@@ -72,12 +73,12 @@ edit: tags
 	$(EDITOR) *.c *.h Makefile t/*.t
 
 .PHONY: locktest
-locktest: suuid
+locktest: $(SUUID_EXEC)
 	rm -rf locktestdir
 	mkdir locktestdir
-	for f in $$(seq 1 500); do ./suuid -wn -l locktestdir; done &
-	for f in $$(seq 1 500); do ./suuid -wn -l locktestdir; done &
-	for f in $$(seq 1 500); do ./suuid -wn -l locktestdir; done
+	for f in $$(seq 1 500); do ./$(SUUID_EXEC) -wn -l locktestdir; done &
+	for f in $$(seq 1 500); do ./$(SUUID_EXEC) -wn -l locktestdir; done &
+	for f in $$(seq 1 500); do ./$(SUUID_EXEC) -wn -l locktestdir; done
 
 .PHONY: newtest
 newtest: test sess
@@ -87,5 +88,5 @@ tags: $(COMMON_C) suuid.c sess.c $(SUUID_HFILES) $(SESS_HFILES)
 	ctags $(COMMON_C) suuid.c sess.c $(SUUID_HFILES) $(SESS_HFILES)
 
 .PHONY: test
-test: suuid
+test: $(SUUID_EXEC)
 	cd t && $(MAKE)
