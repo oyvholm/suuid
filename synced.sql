@@ -26,8 +26,8 @@ INSERT INTO "synced" VALUES('src/Makefile','Lib/std/c/Makefile','c707e16461a3b37
 INSERT INTO "synced" VALUES('src/common.h','Lib/std/c/std.h','a4c18cda5d2ee2640fcfa27631312c6c651540e5','2016-07-12 01:57:35');
 INSERT INTO "synced" VALUES('src/sess.c','Lib/std/c/std.c','a4c18cda5d2ee2640fcfa27631312c6c651540e5','2016-07-12 01:57:35');
 INSERT INTO "synced" VALUES('src/sess.h','Lib/std/c/std.h','a4c18cda5d2ee2640fcfa27631312c6c651540e5','2016-07-12 01:57:35');
-INSERT INTO "synced" VALUES('src/suuid.c','Lib/std/c/std.c','3721489ea544cf7985dc45870d48e2b1ee60a0ed','2016-07-07 13:30:08');
-INSERT INTO "synced" VALUES('src/suuid.h','Lib/std/c/std.h','3721489ea544cf7985dc45870d48e2b1ee60a0ed','2016-07-07 13:30:08');
+INSERT INTO "synced" VALUES('src/suuid.c','Lib/std/c/std.c','d1ebf8e7aaf89fd22baf628255bd698b95d7df29','2016-07-13 20:23:13');
+INSERT INTO "synced" VALUES('src/suuid.h','Lib/std/c/std.h','d1ebf8e7aaf89fd22baf628255bd698b95d7df29','2016-07-13 20:23:13');
 INSERT INTO "synced" VALUES('src/t/suuid.t','Lib/std/perl-tests','419ded4305b40d128560d85946e3ebd9745944d8','2016-07-07 11:59:49');
 INSERT INTO "synced" VALUES('tests/Add_test','Lib/std/Add_test','17bc73d79f068dfaf2655db1090f6b9206734555','2016-06-06 02:30:32');
 INSERT INTO "synced" VALUES('tests/Genlog','Lib/std/Genlog','d1ebf8e7aaf89fd22baf628255bd698b95d7df29','2016-07-13 20:23:13');
