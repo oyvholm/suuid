@@ -12,6 +12,10 @@
 default:
 	cd src && $(MAKE)
 
+.PHONY: testlock
+testlock:
+	cd src && $(MAKE) testlock
+
 .PHONY: testnew
 testnew: test
 	cd src && $(MAKE) testnew
