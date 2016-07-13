@@ -12,6 +12,10 @@
 default:
 	cd src && make
 
+.PHONY: newtest
+newtest: test
+	cd src && make newtest
+
 .PHONY: test
 test:
 	cd src && make test

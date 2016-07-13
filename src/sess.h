@@ -1,6 +1,6 @@
 /*
- * suuid.h
- * File ID: 289a8d22-2b93-11e6-879f-02010e0a6634
+ * sess.h
+ * File ID: 4c971b52-459f-11e6-bee7-d32e100dee6b
  *
  * (C)opyleft 2016- Øyvind A. Holm <sunny@sunbase.org>
  *
@@ -18,23 +18,22 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SUUID_H
-#define _SUUID_H
+#ifndef _sess_H
+#define _sess_H
 
 /*
  * Defines
  */
 
-#define VERSION       "0.2.2"
-#define RELEASE_DATE  "2016-07-12"
+#define VERSION       "0.0.0"
+#define RELEASE_DATE  "2016-00-00"
 
-#define FAKE_HOST  0 /* Use "fake" as hostname to avoid conflicts with files 
+#define FAKE_HOST  1 /* Use "fake" as hostname to avoid conflicts with files 
                       * created by the Perl version
                       */
-#define TEST_FUNC  0 /* Send non-option arguments to a function for testing. 
-                      * Doesn't break anything, non-option arguments are 
-                      * ignored by the program.
-                      */
+#define PERL_COMPAT  1 /* Compile a version with some changes to make it 
+                        * compatible with the Perl version
+                        */
 
 #include "common.h"
 
@@ -44,7 +43,7 @@
 
 #if 1 /* Set to 0 to test without prototypes */
 
-/* suuid.c */
+/* sess.c */
 extern int verbose_level(const int action, ...);
 extern int msg(const int verbose, const char *format, ...);
 extern int myerror(const char *format, ...);
@@ -64,6 +63,6 @@ extern int parse_options(struct Options *dest,
 
 extern char *progname;
 
-#endif /* ifndef _SUUID_H */
+#endif /* ifndef _sess_H */
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */

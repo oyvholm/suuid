@@ -52,6 +52,38 @@ bool is_valid_desc_string(const char *s)
 }
 
 /*
+ * get_desc_from_command() - Return pointer to allocated desc string extracted 
+ * from the command, used for the desc attribute in the sess string. If cmd is 
+ * NULL or empty, or if something fails, return NULL.
+ */
+
+char *get_desc_from_command(const char *cmd)
+{
+	char *ap, *p, *p2;
+
+	if (!cmd || !strlen(cmd))
+		return NULL;
+	ap = strdup(cmd);
+	if (!ap) {
+		myerror("get_desc_from_command(): Could not duplicate command "
+		        "string");
+		return NULL;
+	}
+	p = ap;
+	while (strchr("./", *p))
+		p++;
+	p2 = p;
+	while (*p2 && !isspace(*p2))
+		p2++;
+	if (p2 > p)
+		*p2 = '\0';
+	if (p > ap)
+		memmove(ap, p, strlen(p) + 1);
+
+	return ap;
+}
+
+/*
  * fill_sess() - Fill the first available dest->sess element with uuid and desc 
  * and increase the local counter. Return EXIT_OK if everything is ok, 
  * EXIT_ERROR if something failed.
@@ -152,6 +184,98 @@ int get_sess_info(struct Entry *entry)
 	free(s);
 
 	return EXIT_OK;
+}
+
+/*
+ * concat_cmd_string() - Concatenate the command line arguments received in 
+ * argc and argv with a single space character between them. Return pointer to 
+ * allocated string containing the command, or NULL if anything fails.
+ */
+
+char *concat_cmd_string(const int argc, char * const argv[])
+{
+	int t;
+	size_t cmdsize = 0;
+	char *cmd = NULL;
+
+	for (t = optind; t < argc; t++) {
+		msg(3, "Non-option arg: %s", argv[t]);
+		cmdsize += strlen(argv[t]) + 1; /* Add one for space */
+	}
+	cmdsize += 1; /* Terminating '\0' */
+	cmd = malloc(cmdsize);
+	if (!cmd) {
+		myerror("Could not allocate %lu bytes for command string",
+		        cmdsize);
+		return NULL;
+	}
+	memset(cmd, 0, cmdsize);
+
+	for (t = optind; t < argc; t++) {
+		strcat(cmd, argv[t]);
+		strcat(cmd, " ");
+	}
+	if (strlen(cmd) && cmd[strlen(cmd) - 1] == ' ')
+		cmd[strlen(cmd) - 1] = '\0'; /* Remove added space */
+	if (!strlen(cmd)) {
+		fprintf(stderr, "%s: Command is empty\n", progname);
+		free(cmd);
+		return NULL;
+	}
+
+	return cmd;
+}
+
+/*
+ * run_session() - Execute a shell command and log it with start time, end time 
+ * and return value. If any error occurs, return -1. Otherwise, return with the 
+ * value from system(), which by a nice coincidence also return -1 on error or 
+ * the return value from the program.
+ */
+
+int run_session(const struct Options *orig_opt,
+                const int argc, char * const argv[])
+{
+	int retval = EXIT_OK;
+	struct Options opt = *orig_opt;
+	char *cmd = NULL;
+	char *start_uuid = NULL;
+	char *cmd_desc = NULL;
+	struct uuid_result result;
+
+	cmd = concat_cmd_string(argc, argv);
+	if (!cmd)
+		return -1;
+	cmd_desc = get_desc_from_command(cmd);
+	msg(2, "cmd_desc = \"%s\"", cmd_desc);
+
+	opt.count = 1;
+	result = create_and_log_uuids(&opt);
+	if (!result.success) {
+		myerror("Error generating UUID, session not started");
+		retval = -1;
+		goto cleanup;
+	}
+	start_uuid = strdup(result.lastuuid);
+	if (!start_uuid) {
+		myerror("Could not duplicate start UUID");
+		goto cleanup;
+	}
+	assert(valid_uuid(start_uuid, TRUE));
+
+	msg(1, "Executing \"%s\"", cmd);
+	retval = system(cmd); /* fixme: This value is shifted with 8 bits in 
+	                       * main(). Check if it's ok.
+	                       */
+	msg(2, "run_session(): retval from system() = %d (0x%x)",
+	       retval, retval);
+
+cleanup:
+	free(start_uuid);
+	free(cmd_desc);
+	free(cmd);
+
+	return(retval);
 }
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */
