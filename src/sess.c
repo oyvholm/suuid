@@ -269,6 +269,7 @@ int main(int argc, char *argv[])
 	struct uuid_result result;
 	size_t cmdsize = 0;
 	char *cmd = NULL;
+	char *start_uuid;
 	char *cmd_desc = NULL;
 
 	progname = argv[0];
@@ -341,6 +342,11 @@ int main(int argc, char *argv[])
 		retval = EXIT_ERROR;
 		goto cleanup;
 	}
+	start_uuid = strdup(result.lastuuid);
+	if (!start_uuid) {
+		myerror("Could not duplicate start UUID");
+	}
+	assert(valid_uuid(start_uuid, TRUE));
 
 	msg(1, "Executing \"%s\"", cmd);
 	retval = system(cmd);
