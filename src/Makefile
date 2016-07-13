@@ -15,6 +15,7 @@ SESS_HFILES  = sess.h common.h
 SUUID_DEPS   = $(SUUID_HFILES) Makefile
 SESS_DEPS    = $(SESS_HFILES) $(SUUID_DEPS) Makefile
 LOCKTESTDIR  = locktestdir
+CTAGS = ctags
 CC = gcc
 LD = gcc
 CCFLAGS = -Wall -Wextra -Werror -O2 -c -g -pedantic
@@ -87,7 +88,7 @@ newtest: test $(SESS_EXEC)
 	cd t && ./Genlog ./sess.t
 
 tags: $(COMMON_C) suuid.c sess.c $(SUUID_HFILES) $(SESS_HFILES)
-	ctags $(COMMON_C) suuid.c sess.c $(SUUID_HFILES) $(SESS_HFILES)
+	$(CTAGS) $(COMMON_C) suuid.c sess.c $(SUUID_HFILES) $(SESS_HFILES)
 
 .PHONY: test
 test: $(SUUID_EXEC)
