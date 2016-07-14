@@ -5,6 +5,7 @@
 SUUID_EXEC = suuid
 SESS_EXEC  = sess
 
+TESTADD_DIR = .testadd.tmp
 TESTLOCKDIR = testlockdir
 CTAGS = ctags
 
@@ -76,6 +77,7 @@ clean:
 	rm -fv $(SUUID_EXEC) $(SUUID_OBJS)
 	rm -fv $(SESS_EXEC) $(SESS_OBJS)
 	rm -fv *~ core core.$(SUUID_EXEC) tags
+	rm -rf $(TESTADD_DIR)
 	rm -frv $(TESTLOCKDIR)
 	cd t && $(MAKE) clean
 
