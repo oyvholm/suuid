@@ -6,6 +6,12 @@
 default:
 	cd src && $(MAKE)
 
+.PHONY: clean
+clean:
+	rm -fv synced.sqlite.20*.bck
+	cd src && $(MAKE) clean
+	cd tests && $(MAKE) clean
+
 .PHONY: testlock
 testlock:
 	cd src && $(MAKE) testlock
@@ -18,9 +24,3 @@ testnew: test
 test:
 	cd src && $(MAKE) test
 	cd tests && $(MAKE)
-
-.PHONY: test
-clean:
-	rm -fv synced.sqlite.20*.bck
-	cd src && $(MAKE) clean
-	cd tests && $(MAKE) clean
