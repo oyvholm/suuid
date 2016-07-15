@@ -2,8 +2,6 @@
 # File ID: c9f9bc1a-28d8-11e5-b53c-fefdb24f8e10
 # Author: Øyvind A. Holm <sunny@sunbase.org>
 
-TESTADD_DIR = .testadd.tmp
-
 .PHONY: default
 default:
 	cd src && $(MAKE)
@@ -11,7 +9,6 @@ default:
 .PHONY: clean
 clean:
 	rm -fv synced.sqlite.20*.bck
-	rm -rf $(TESTADD_DIR)
 	cd src && $(MAKE) clean
 	cd tests && $(MAKE) clean
 
