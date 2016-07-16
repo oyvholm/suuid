@@ -3,8 +3,8 @@
 # src/t/Makefile
 # File ID: f539e628-4346-11e6-9e79-02010e0a6634
 
-.PHONY: default
-default:
+.PHONY: test
+test:
 	./Genlog suuid.t
 
 .PHONY: all
