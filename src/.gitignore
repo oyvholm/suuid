@@ -1,5 +1,5 @@
 *.o
-/locktestdir/
 /sess
 /suuid
 /tags
+/testlockdir/
