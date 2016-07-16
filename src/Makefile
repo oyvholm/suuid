@@ -29,6 +29,7 @@ SESS_HFILES  = sess.h common.h
 SUUID_DEPS = $(SUUID_HFILES) Makefile
 SESS_DEPS  = $(SESS_HFILES) $(SUUID_DEPS) Makefile
 
+.PHONY: default
 default: $(SUUID_EXEC) $(SESS_EXEC)
 
 $(SUUID_EXEC): $(SUUID_OBJS) $(COMMON_OBJS)
@@ -100,4 +101,4 @@ tags: $(COMMON_C) suuid.c sess.c $(SUUID_HFILES) $(SESS_HFILES)
 
 .PHONY: test
 test: $(SUUID_EXEC)
-	cd t && $(MAKE)
+	cd t && $(MAKE) test

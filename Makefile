@@ -23,4 +23,4 @@ testnew: test
 .PHONY: test
 test:
 	cd src && $(MAKE) test
-	cd tests && $(MAKE)
+	cd tests && $(MAKE) test
