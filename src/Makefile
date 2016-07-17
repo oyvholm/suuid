@@ -84,6 +84,10 @@ clean:
 edit: tags
 	$(EDITOR) *.c *.h Makefile t/*.t
 
+.PHONY: test
+test: $(SUUID_EXEC)
+	cd t && $(MAKE) test
+
 .PHONY: testlock
 testlock: $(SUUID_EXEC)
 	rm -rf $(TESTLOCKDIR)
@@ -98,7 +102,3 @@ testnew: test $(SESS_EXEC)
 
 tags: $(COMMON_C) suuid.c sess.c $(SUUID_HFILES) $(SESS_HFILES)
 	$(CTAGS) $(COMMON_C) suuid.c sess.c $(SUUID_HFILES) $(SESS_HFILES)
-
-.PHONY: test
-test: $(SUUID_EXEC)
-	cd t && $(MAKE) test
