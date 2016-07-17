@@ -259,6 +259,7 @@ int run_session(const struct Options *orig_opt,
 	start_uuid = strdup(result.lastuuid);
 	if (!start_uuid) {
 		myerror("Could not duplicate start UUID");
+		retval = -1;
 		goto cleanup;
 	}
 	assert(valid_uuid(start_uuid, TRUE));
