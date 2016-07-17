@@ -18,8 +18,8 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _sess_H
-#define _sess_H
+#ifndef _SESS_H
+#define _SESS_H
 
 /*
  * Defines
@@ -63,6 +63,6 @@ extern int parse_options(struct Options *dest,
 
 extern char *progname;
 
-#endif /* ifndef _sess_H */
+#endif /* ifndef _SESS_H */
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */
