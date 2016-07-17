@@ -108,7 +108,8 @@ int parse_rc_line(const char *line, struct Rc *rc)
 }
 
 /*
- * Read contents of rcfile into rc. Return EXIT_OK or EXIT_ERROR.
+ * read_rcfile() - Read contents of rcfile into rc. Return EXIT_OK or 
+ * EXIT_ERROR.
  */
 
 int read_rcfile(const char *rcfile, struct Rc *rc)

@@ -52,7 +52,7 @@ bool valid_uuid(const char *u, const bool check_len)
 }
 
 /*
- * scramble_mac_address() - overwrite the last 12 characters of the received 
+ * scramble_mac_address() - Overwrite the last 12 characters of the received 
  * pointer to an UUID with random bytes as specified by RFC 4122. Return 
  * pointer to the UUID if successful, or NULL if an invalid UUID was received.
  */

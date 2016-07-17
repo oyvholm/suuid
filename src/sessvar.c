@@ -54,7 +54,7 @@ bool is_valid_desc_string(const char *s)
 /*
  * get_desc_from_command() - Return pointer to allocated desc string extracted 
  * from the command, used for the desc attribute in the sess string. If cmd is 
- * NULL or empty, or if something fails, return NULL.
+ * NULL or empty, or if something fails or cmd is NULL or empty, return NULL.
  */
 
 char *get_desc_from_command(const char *cmd)
