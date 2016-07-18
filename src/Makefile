@@ -88,6 +88,16 @@ edit: tags
 test: $(SUUID_EXEC)
 	cd t && $(MAKE) test
 
+.PHONY: testhist
+testhist: test
+	while :; do \
+		git checkout HEAD^; \
+		echo; \
+		GIT_PAGER=cat git log -1 \
+		--pretty=tformat:'%C(green)%h - %s%C(reset)'; \
+		$(MAKE) test || break; \
+	done
+
 .PHONY: testlock
 testlock: $(SUUID_EXEC)
 	rm -rf $(TESTLOCKDIR)
