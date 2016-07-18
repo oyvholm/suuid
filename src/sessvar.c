@@ -227,7 +227,7 @@ char *concat_cmd_string(const int argc, char * const argv[])
 }
 
 /*
- * clean_up_sessvar() - Modifies dest by removing trailing commas. 
+ * clean_up_sessvar() - Modifies dest by removing trailing and repeated commas. 
  * Returns dest.
  */
 
@@ -240,6 +240,7 @@ char *clean_up_sessvar(char *dest)
 		dest[i - 1] = '\0';
 		i--;
 	}
+	squeeze_chars(dest, ",");
 
 	return dest;
 }

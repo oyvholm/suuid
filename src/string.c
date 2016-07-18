@@ -39,6 +39,38 @@ char *check_hex(const char *hex, const size_t len)
 }
 
 /*
+ * squeeze_chars() - Modify s directly by replacing all repeated characters in 
+ * chars with a single char. Returns s if ok, NULL if error.
+ */
+
+char *squeeze_chars(char *s, const char *chars)
+{
+	char *p = s, *p2, *buf;
+
+	if (!s || !strlen(s))
+		return s;
+
+	buf = strdup(s);
+	if (!buf) {
+		myerror("squeeze_chars(): Could not duplicate string");
+		return NULL;
+	}
+	memset(buf, 0, strlen(buf));
+
+	p2 = buf;
+	while (*p) {
+		if (!strchr(chars, *p) || p2 == buf || *p != *(p2 - 1))
+			*p2++ = *p;
+		p++;
+	}
+
+	memcpy(s, buf, strlen(buf) + 1);
+	free(buf);
+
+	return s;
+}
+
+/*
  * trim_str_front() - Modify dest by removing initial whitespace. Returns dest.
  */
 

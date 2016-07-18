@@ -404,11 +404,13 @@ int main(int argc, char *argv[])
 
 		for (i = optind; i < argc; i++) {
 			char *a = argv[i];
-			char buf[DATE_LENGTH + 1];
+			char buf[1000];
 
-			msg(4, "Checking arg %d \"%s\"", i, a);
-			printf("uuid_date(\"%s\") = \"%s\"\n",
-			       a, uuid_date_from_uuid(buf, a));
+			msg(3, "Checking arg %d \"%s\"", i, a);
+			memset(buf, 0, 1000);
+			strncpy(buf, a, 999);
+			printf("squeeze_chars(\"%s\", \",\") = \"%s\"\n",
+			       a, squeeze_chars(buf, "e"));
 		}
 		return EXIT_OK;
 	}

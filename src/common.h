@@ -214,6 +214,7 @@ extern int run_session(const struct Options *orig_opt,
 
 /* string.c */
 extern char *check_hex(const char *hex, const size_t len);
+extern char *squeeze_chars(char *s, const char *chars);
 extern char *trim_str_front(char *dest);
 extern char *trim_str_end(char *dest);
 extern char *utf8_check(const char *text);
