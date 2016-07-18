@@ -227,6 +227,24 @@ char *concat_cmd_string(const int argc, char * const argv[])
 }
 
 /*
+ * clean_up_sessvar() - Modifies dest by removing trailing commas. 
+ * Returns dest.
+ */
+
+char *clean_up_sessvar(char *dest)
+{
+	unsigned int i;
+
+	i = strlen(dest);
+	while (i && dest[i - 1] == ',') {
+		dest[i - 1] = '\0';
+		i--;
+	}
+
+	return dest;
+}
+
+/*
  * add_to_sessvar() - Modify the session environment variable (defined in 
  * ENV_SESS) by adding ",desc/uuid," to the end of it. If desc is NULL or 
  * empty, only ",uuid," is added. Return EXIT_OK on success, or EXIT_ERROR if 
@@ -247,6 +265,7 @@ const char *add_to_sessvar(const char *desc, const char *uuid)
 		char *ap;
 
 		ap = strdup(getenv(ENV_SESS));
+		clean_up_sessvar(ap);
 		sessvar = strdup(ap);
 		free(ap);
 	} else
