@@ -55,7 +55,7 @@ char *squeeze_chars(char *s, const char *chars)
 		myerror("squeeze_chars(): Could not duplicate string");
 		return NULL;
 	}
-	memset(buf, 0, strlen(buf));
+	memset(buf, 0, strlen(s));
 
 	p2 = buf;
 	while (*p) {
