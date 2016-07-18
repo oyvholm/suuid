@@ -227,6 +227,66 @@ char *concat_cmd_string(const int argc, char * const argv[])
 }
 
 /*
+ * add_to_sessvar() - Modify the session environment variable (defined in 
+ * ENV_SESS) by adding ",desc/uuid," to the end of it. If desc is NULL or 
+ * empty, only ",uuid," is added. Return EXIT_OK on success, or EXIT_ERROR if 
+ * anything fails or uuid isn't a valid UUID.
+ */
+
+const char *add_to_sessvar(const char *desc, const char *uuid)
+{
+	size_t envlen; /* Length of the new string */
+	char *sessvar; /* Copy of the original envvar */
+	char *envbuf; /* Temporary buffer for the finished string */
+
+	assert(valid_uuid(uuid, TRUE));
+	if (!is_valid_desc_string(desc))
+		desc = NULL;
+
+	if (getenv(ENV_SESS)) {
+		char *ap;
+
+		ap = strdup(getenv(ENV_SESS));
+		sessvar = strdup(ap);
+		free(ap);
+	} else
+		sessvar = strdup("");
+	if (!sessvar) {
+		myerror("add_to_sessvar(): Could not duplicate %s "
+		        "environment variable", ENV_SESS);
+		return NULL;
+	}
+
+	envlen = strlen(ENV_SESS) + 1 + strlen(sessvar) + 1 +
+	         strlen(desc) + 1 + UUID_LENGTH + 1 + 1;
+	envbuf = malloc(envlen);
+	if (!envbuf) {
+		myerror("Could not allocate %lu bytes for %s buffer",
+		        envlen, ENV_SESS);
+		free(sessvar);
+		return NULL;
+	}
+
+	snprintf(envbuf, envlen,
+	         "%s=%s,%s%s%s,",
+	         ENV_SESS,
+	         sessvar ? sessvar : "",
+	         desc ? desc : "",
+	         desc ? "/" : "",
+	         uuid);
+
+	if (putenv(envbuf)) {
+		myerror("Could not set %s environment variable", ENV_SESS);
+		free(sessvar);
+		return NULL;
+	}
+
+	free(sessvar);
+
+	return getenv(ENV_SESS);
+}
+
+/*
  * run_session() - Execute a shell command and log it with start time, end time 
  * and return value. If any error occurs, return -1. Otherwise, return with the 
  * value from system(), which by a nice coincidence also return -1 on error or 
@@ -263,6 +323,9 @@ int run_session(const struct Options *orig_opt,
 		goto cleanup;
 	}
 	assert(valid_uuid(start_uuid, TRUE));
+	msg(3, "old %s: \"%s\"", ENV_SESS, getenv(ENV_SESS));
+	add_to_sessvar(cmd_desc, start_uuid);
+	msg(3, "new %s: \"%s\"", ENV_SESS, getenv(ENV_SESS));
 
 	msg(1, "Executing \"%s\"", cmd);
 	retval = system(cmd); /* fixme: This value is shifted with 8 bits in 
