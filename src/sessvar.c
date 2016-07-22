@@ -330,6 +330,7 @@ int run_session(const struct Options *orig_opt,
 	msg(2, "cmd_desc = \"%s\"", cmd_desc);
 
 	opt.count = 1;
+	opt.whereto = "e";
 	result = create_and_log_uuids(&opt);
 	if (!result.success) {
 		myerror("Error generating UUID, session not started");
