@@ -227,8 +227,8 @@ void sighandler(const int sig)
 {
 	if (sig == SIGHUP || sig == SIGINT ||
 	    sig == SIGQUIT || sig == SIGTERM) {
-		fprintf(stderr, "%s: Termination signal received, aborting\n",
-		                progname);
+		fprintf(stderr, "%s: Termination signal (%s) received, "
+		                "aborting\n", progname, strsignal(sig));
 		should_terminate = TRUE;
 	}
 }
