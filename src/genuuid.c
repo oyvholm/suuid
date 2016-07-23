@@ -225,8 +225,8 @@ char *process_uuid(FILE *logfp, const struct Rc *rc, const struct Options *opt,
 
 void sighandler(const int sig)
 {
-	if (sig == SIGHUP || sig == SIGINT ||
-	    sig == SIGQUIT || sig == SIGTERM) {
+	if (sig == SIGHUP || sig == SIGINT || sig == SIGQUIT ||
+	    sig == SIGPIPE || sig == SIGTERM) {
 		fprintf(stderr, "%s: Termination signal (%s) received, "
 		                "aborting\n", progname, strsignal(sig));
 		should_terminate = TRUE;
@@ -284,6 +284,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	signal(SIGHUP, sighandler);
 	signal(SIGINT, sighandler);
 	signal(SIGQUIT, sighandler);
+	signal(SIGPIPE, sighandler);
 	signal(SIGTERM, sighandler);
 
 	logfp = open_logfile(logfile);

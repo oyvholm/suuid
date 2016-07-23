@@ -42,7 +42,7 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s/^.*\/(.*?)$/$1/;
-our $VERSION = '0.2.3';
+our $VERSION = '0.2.4';
 
 my %descriptions = ();
 
@@ -754,6 +754,7 @@ sub test_suuid_executable {
 
     # }}}
     ok(unlink($Outfile), "Delete [Outfile]");
+    test_suuid_signal($Outfile);
     ok(rmdir($Outdir), "rmdir [Outdir]");
     return;
     # }}}
@@ -1191,6 +1192,28 @@ sub test_suuid_environment {
     return;
     # }}}
 } # test_suuid_environment()
+
+sub test_suuid_signal {
+    # {{{
+    my $Outfile = shift;
+    my $sigpipe_stderr = "$CMD_BASENAME-stderr.tmp";
+
+    diag("Receive SIGPIPE signal");
+    likecmd("$CMD -l $Outdir -n 1000 -wo 2>\"$sigpipe_stderr\" | true",
+        '/^$/s',
+        '/^\.\.\/suuid: Termination signal \(Broken pipe\) received, ' .
+            'aborting\n' .
+            '\.\.\/suuid: Generated only \d+ of 1000 UUIDs\n$/s',
+        0,
+        "Receive SIGPIPE",
+    );
+    like(file_data($Outfile),
+        '/ <\/suuid>\n<\/suuids>\n$/s',
+        "Logfile is not corrupted after SIGPIPE",
+    );
+    ok(unlink($Outfile), "Delete [Outfile]");
+    # }}}
+} # test_suuid_signal()
 
 sub s_top {
     # {{{
