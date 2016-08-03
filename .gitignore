@@ -1,3 +1,4 @@
 /synced.sqlite.20*.bck
+/tags
 /tests/log/
 /tests/sess-stderr.tmp

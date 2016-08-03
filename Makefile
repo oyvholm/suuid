@@ -24,3 +24,6 @@ testnew: test
 test:
 	cd src && $(MAKE) test
 	cd tests && $(MAKE) test
+
+tags: src/*.c src/*.h
+	ctags src/*.c src/*.h
