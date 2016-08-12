@@ -42,7 +42,7 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s/^.*\/(.*?)$/$1/;
-our $VERSION = '0.2.4';
+our $VERSION = '0.2.5';
 
 my %descriptions = ();
 
@@ -818,6 +818,23 @@ sub test_suuid_comment {
             s_suuid('txt' => 'Great test', 'tty' => ''),
         ),
         "Log contents OK after comment",
+    );
+
+    # }}}
+    ok(unlink($Outfile), "Delete [Outfile]");
+    likecmd("echo " . "a" x 82 . " | $CMD -t aa -c - -l $Outdir", # {{{
+        "/^$v1_templ\n\$/s",
+        '/^$/',
+        0,
+        "Read line with 82 bytes from stdin and use tag",
+    );
+
+    # }}}
+    like(file_data($Outfile), # {{{
+        s_top(
+            s_suuid('tag' => 'aa', 'tty' => '', 'txt' => 'a' x 82),
+        ),
+        "Log contents OK after 82 character line",
     );
 
     # }}}

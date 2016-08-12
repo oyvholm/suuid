@@ -25,8 +25,8 @@
  * Defines
  */
 
-#define VERSION       "0.2.4"
-#define RELEASE_DATE  "2016-07-23"
+#define VERSION       "0.2.5"
+#define RELEASE_DATE  "2016-08-12"
 
 #define FAKE_HOST  0 /* Use "fake" as hostname to avoid conflicts with files 
                       * created by the Perl version
