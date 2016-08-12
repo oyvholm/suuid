@@ -110,5 +110,6 @@ testlock: $(SUUID_EXEC)
 testnew: test $(SESS_EXEC)
 	cd t && ./Genlog ./sess.t
 
-tags: $(COMMON_C) suuid.c sess.c $(SUUID_HFILES) $(SESS_HFILES)
-	$(CTAGS) $(COMMON_C) suuid.c sess.c $(SUUID_HFILES) $(SESS_HFILES)
+tags: $(COMMON_C) suuid.c sess.c $(SUUID_HFILES) $(SESS_HFILES) t/suuid.t
+	$(CTAGS) $(COMMON_C) suuid.c sess.c $(SUUID_HFILES) $(SESS_HFILES) \
+	    t/suuid.t
