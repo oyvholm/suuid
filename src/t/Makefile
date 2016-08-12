@@ -3,6 +3,7 @@
 
 .PHONY: test
 test:
+	cd .. && $(MAKE)
 	./Genlog suuid.t
 
 .PHONY: all
