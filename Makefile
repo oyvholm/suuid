@@ -8,7 +8,7 @@ default:
 
 .PHONY: clean
 clean:
-	rm -fv synced.sqlite.20*.bck
+	rm -fv synced.sqlite.20*.bck tags
 	cd src && $(MAKE) clean
 	cd tests && $(MAKE) clean
 
