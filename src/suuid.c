@@ -385,10 +385,12 @@ int main(int argc, char *argv[])
 	if (opt.help) {
 		usage(EXIT_OK);
 		return EXIT_OK;
-	} else if (opt.version) {
+	}
+	if (opt.version) {
 		print_version();
 		return EXIT_OK;
-	} else if (opt.license) {
+	}
+	if (opt.license) {
 		print_license();
 		return EXIT_OK;
 	}
