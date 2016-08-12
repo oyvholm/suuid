@@ -30,10 +30,11 @@ char *read_from_fp(FILE *fp)
 	char *retval = NULL;
 	char *p = NULL;
 	size_t bytes_read = 0;
+	size_t bufsize = BUFSIZ;
 
 	do {
 		char *new_mem = realloc(retval,
-		                        BUFSIZ + bytes_read + 1);
+		                        bufsize + bytes_read + 1);
 		if (!new_mem) {
 			myerror("read_from_fp(): Cannot allocate memory for "
 			        "stream buffer");
@@ -42,7 +43,7 @@ char *read_from_fp(FILE *fp)
 		}
 		retval = new_mem;
 		p = retval + bytes_read;
-		bytes_read += fread(p, 1, BUFSIZ, fp);
+		bytes_read += fread(p, 1, bufsize, fp);
 		if (ferror(fp)) {
 			myerror("read_from_fp(): Read error");
 			free(retval);
