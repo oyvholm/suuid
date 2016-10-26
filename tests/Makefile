@@ -8,3 +8,4 @@ test:
 .PHONY: clean
 clean:
 	rm -rf tmp-*
+	cd conv-suuid-files && $(MAKE) clean
