@@ -10,8 +10,9 @@ CTAGS = ctags
 
 CC = gcc
 LD = gcc
-CCFLAGS = -Wall -Wextra -Werror -O2 -c -g -pedantic
+CCFLAGS = -Wall -Wextra -Werror -O0 -c -g
 LDFLAGS = -Wall -Wextra -Werror
+LIBS = -lpthread -ldl
 
 # For regular use, it's not necessary to modify anything below this line.
 
@@ -32,8 +33,9 @@ SESS_DEPS  = $(SESS_HFILES) $(SUUID_DEPS) Makefile
 .PHONY: default
 default: $(SUUID_EXEC) $(SESS_EXEC)
 
-$(SUUID_EXEC): $(SUUID_OBJS) $(COMMON_OBJS)
-	$(LD) -o $(SUUID_EXEC) $(LDFLAGS) $(SUUID_OBJS) $(COMMON_OBJS)
+$(SUUID_EXEC): $(SUUID_OBJS) $(COMMON_OBJS) sqlite3.o
+	$(LD) -o $(SUUID_EXEC) $(LDFLAGS) \
+	      $(SUUID_OBJS) $(COMMON_OBJS) sqlite3.o $(LIBS)
 
 $(SESS_EXEC): $(SESS_OBJS) $(COMMON_OBJS)
 	$(LD) -o $(SESS_EXEC) $(LDFLAGS) $(SESS_OBJS) $(COMMON_OBJS)
@@ -62,6 +64,9 @@ sess.o: sess.c $(SESS_DEPS)
 sessvar.o: sessvar.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) sessvar.c
 
+sqlite3.o: sqlite3.c Makefile
+	$(CC) $(CCFLAGS) sqlite3.c
+
 string.o: string.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) string.c
 
@@ -76,6 +81,7 @@ clean:
 	rm -fv $(COMMON_OBJS)
 	rm -fv $(SUUID_EXEC) $(SUUID_OBJS)
 	rm -fv $(SESS_EXEC) $(SESS_OBJS)
+	rm -fv sqlite3.o
 	rm -fv *~ core core.$(SUUID_EXEC) tags
 	rm -frv $(TESTLOCKDIR)
 	cd t && $(MAKE) clean
