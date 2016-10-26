@@ -438,93 +438,30 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 }
 
 /*
- * get_logdir() - Return pointer to allocated string with location of the log 
- * directory. Use the value of opt->logdir if it's defined, otherwise use the 
- * environment variable defined in ENV_LOGDIR, otherwise use "$HOME/uuids". If 
- * that also fails, return NULL.
- */
-
-char *get_logdir(const struct Options *opt)
-{
-	char *retval = NULL;
-
-	if (opt && opt->logdir) {
-		retval = strdup(opt->logdir);
-		if (!retval) {
-			myerror("get_logdir(): Could not duplicate "
-			        "-l/--logdir argument");
-			return NULL;
-		}
-	} else if (getenv(ENV_LOGDIR)) {
-		retval = strdup(getenv(ENV_LOGDIR));
-		if (!retval) {
-			myerror("get_logdir(): Could not duplicate %s "
-			        "environment variable", ENV_LOGDIR);
-			return NULL;
-		}
-	} else if (getenv("HOME")) {
-		int size = strlen(getenv("HOME")) +
-		           strlen("/uuids") + 1; /* fixme: slash */
-
-		retval = malloc(size + 1);
-		if (!retval) {
-			myerror("get_logdir(): Cannot allocate %lu bytes",
-			        size);
-			return NULL;
-		}
-		snprintf(retval, size, "%s/uuids", /* fixme: slash */
-		                       getenv("HOME"));
-	} else {
-		fprintf(stderr, "%s: $%s and $HOME environment "
-		                "variables are not defined, cannot "
-		                "create logdir path\n", progname, ENV_LOGDIR);
-		return NULL;
-	}
-
-	return retval;
-}
-
-/*
  * get_logfile_name() - Return pointer to an allocated string with log file 
  * name, or NULL if it can't be determined.
  */
 
 char *get_logfile_name(const struct Rc *rc, const struct Options *opt)
 {
-	char *logdir, *logfile = NULL, *hostname;
+	char *prefix, *logfile;
 	size_t fname_length; /* Total length of logfile name */
 
-	logdir = get_logdir(opt);
-	if (!logdir) {
-		fprintf(stderr, "%s: get_logfile_name(): Unable to find "
-		                "logdir location\n", progname);
+	prefix = get_log_prefix(rc, opt);
+	if (!prefix)
 		return NULL;
-	}
 
-	hostname = get_hostname(rc);
-	if (!hostname) {
-		myerror("get_logfile_name(): Cannot get hostname");
-		goto cleanup;
-	}
-	if (!valid_hostname(hostname)) {
-		myerror("get_logfile_name(): Got invalid hostname: \"%s\"",
-		        hostname);
-		goto cleanup;
-	}
-
-	fname_length = strlen(logdir) + strlen("/") + /* fixme: slash */
-	               strlen(hostname) + strlen(".xml") + 1;
+	fname_length = strlen(prefix) + strlen(".xml") + 1;
 	logfile = malloc(fname_length + 1);
 	if (!logfile) {
 		myerror("get_logfile_name(): Could not allocate %lu bytes for "
 		        "logfile filename", fname_length + 1);
 		goto cleanup;
 	}
-	/* fixme: Remove slash hardcoding, use some portable solution */
-	snprintf(logfile, fname_length, "%s/%s.xml", logdir, hostname);
+	snprintf(logfile, fname_length, "%s.xml", prefix);
 
 cleanup:
-	free(logdir);
+	free(prefix);
 
 	return logfile;
 }

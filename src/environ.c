@@ -104,6 +104,100 @@ char *get_hostname(const struct Rc *rc)
 }
 
 /*
+ * get_logdir() - Return pointer to allocated string with location of the log 
+ * directory. Use the value of opt->logdir if it's defined, otherwise use the 
+ * environment variable defined in ENV_LOGDIR, otherwise use "$HOME/uuids". If 
+ * that also fails, return NULL.
+ */
+
+char *get_logdir(const struct Options *opt)
+{
+	char *retval = NULL;
+
+	if (opt && opt->logdir) {
+		retval = strdup(opt->logdir);
+		if (!retval) {
+			myerror("get_logdir(): Could not duplicate "
+			        "-l/--logdir argument");
+			return NULL;
+		}
+	} else if (getenv(ENV_LOGDIR)) {
+		retval = strdup(getenv(ENV_LOGDIR));
+		if (!retval) {
+			myerror("get_logdir(): Could not duplicate %s "
+			        "environment variable", ENV_LOGDIR);
+			return NULL;
+		}
+	} else if (getenv("HOME")) {
+		int size = strlen(getenv("HOME")) +
+		           strlen("/uuids") + 1; /* fixme: slash */
+
+		retval = malloc(size + 1);
+		if (!retval) {
+			myerror("get_logdir(): Cannot allocate %lu bytes",
+			        size);
+			return NULL;
+		}
+		snprintf(retval, size, "%s/uuids", /* fixme: slash */
+		                       getenv("HOME"));
+	} else {
+		fprintf(stderr, "%s: $%s and $HOME environment "
+		                "variables are not defined, cannot "
+		                "create logdir path\n", progname, ENV_LOGDIR);
+		return NULL;
+	}
+
+	return retval;
+}
+
+/*
+ * get_log_prefix() - Return pointer to an allocated string with log or 
+ * database prefix (full path without the file extension), or NULL if it can't 
+ * be determined.
+ */
+
+char *get_log_prefix(const struct Rc *rc, const struct Options *opt)
+{
+	char *logdir, *hostname;
+	size_t prefix_length; /* Total length of prefix */
+	char *prefix = NULL;
+
+	logdir = get_logdir(opt);
+	if (!logdir) {
+		fprintf(stderr, "%s: get_log_prefix(): Unable to find "
+		                "log prefix\n", progname);
+		return NULL;
+	}
+
+	hostname = get_hostname(rc);
+	if (!hostname) {
+		myerror("get_log_prefix(): Cannot get hostname");
+		goto cleanup;
+	}
+	if (!valid_hostname(hostname)) {
+		myerror("get_log_prefix(): Got invalid hostname: \"%s\"",
+		        hostname);
+		goto cleanup;
+	}
+
+	prefix_length = strlen(logdir) + strlen("/") + /* fixme: slash */
+	                strlen(hostname) + 1;
+	prefix = malloc(prefix_length + 1);
+	if (!prefix) {
+		myerror("get_log_prefix(): Could not allocate %lu bytes for "
+		        "log prefix", prefix_length + 1);
+		goto cleanup;
+	}
+	/* fixme: Remove slash hardcoding, use some portable solution */
+	snprintf(prefix, prefix_length, "%s/%s", logdir, hostname);
+
+cleanup:
+	free(logdir);
+
+	return prefix;
+}
+
+/*
  * getpath() - Return pointer to string with full path to current directory, or 
  * NULL if error. Use free() on the pointer when it's not needed anymore.
  */
