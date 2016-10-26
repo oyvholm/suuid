@@ -10,7 +10,7 @@ CTAGS = ctags
 
 CC = gcc
 LD = gcc
-CCFLAGS = -Wall -Wextra -Werror -O2 -c -g -pedantic
+CCFLAGS = -Wall -Wextra -Werror -O2 -c -g
 LDFLAGS = -Wall -Wextra -Werror
 
 # For regular use, it's not necessary to modify anything below this line.
