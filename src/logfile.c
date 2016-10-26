@@ -438,16 +438,6 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 }
 
 /*
- * get_logfile_name() - Return pointer to an allocated string with log file 
- * name, or NULL if it can't be determined.
- */
-
-char *get_logfile_name(const struct Rc *rc, const struct Options *opt)
-{
-	return get_log_prefix(rc, opt, ".xml"); /* Oh yeah baby */
-}
-
-/*
  * lock_file() - Lock file associated with fp. If locking succeeds, return FILE 
  * pointer to the stream, otherwise return NULL.
  */

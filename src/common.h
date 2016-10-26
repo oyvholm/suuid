@@ -186,7 +186,6 @@ extern char *alloc_attr(const char *attr, const char *data);
 extern char *get_xml_tags(const struct Entry *entry);
 extern char *create_sess_xml(const struct Entry *entry);
 extern char *xml_entry(const struct Entry *entry, const bool raw);
-extern char *get_logfile_name(const struct Rc *rc, const struct Options *opt);
 extern FILE *lock_file(FILE *fp, const char *fname);
 extern FILE *write_xml_header(FILE *fp);
 extern FILE *seek_to_eof(FILE *fp, const char *fname);

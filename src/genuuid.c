@@ -274,7 +274,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 		goto cleanup;
 	}
 
-	logfile = get_logfile_name(&rc, opt);
+	logfile = get_log_prefix(&rc, opt, ".xml");
 	if (!logfile) {
 		myerror("get_logfile_name() failed");
 		retval.success = FALSE;
