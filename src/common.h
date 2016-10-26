@@ -153,6 +153,7 @@ extern char *get_editor(void);
 extern bool valid_hostname(const char *s);
 extern char *get_hostname(const struct Rc *rc);
 extern char *get_logdir(const struct Options *opt);
+extern char *get_log_prefix(const struct Rc *rc, const struct Options *opt);
 extern char *getpath(void);
 extern char *get_username(void);
 extern char *get_tty(void);
