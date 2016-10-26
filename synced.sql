@@ -31,7 +31,7 @@ INSERT INTO "synced" VALUES('src/suuid.h','Lib/std/c/std.h','d1ebf8e7aaf89fd22ba
 INSERT INTO "synced" VALUES('src/t/suuid.t','Lib/std/perl-tests','5d9a5b337cbc4997dfa181e3fd9a9484487b5605','2016-10-25 02:43:03');
 INSERT INTO "synced" VALUES('tests/Add_test','Lib/std/Add_test','5d9a5b337cbc4997dfa181e3fd9a9484487b5605','2016-10-25 02:43:03');
 INSERT INTO "synced" VALUES('tests/Genlog','Lib/std/Genlog','d1ebf8e7aaf89fd22baf628255bd698b95d7df29','2016-07-13 20:23:13');
-INSERT INTO "synced" VALUES('tests/conv-suuid.t','Lib/std/perl-tests','419ded4305b40d128560d85946e3ebd9745944d8','2016-07-07 11:59:49');
+INSERT INTO "synced" VALUES('tests/conv-suuid.t','Lib/std/perl-tests','5d9a5b337cbc4997dfa181e3fd9a9484487b5605','2016-10-25 02:43:03');
 INSERT INTO "synced" VALUES('tests/sess.t','Lib/std/perl-tests','5d9a5b337cbc4997dfa181e3fd9a9484487b5605','2016-10-25 02:43:03');
 CREATE TABLE todo (
   file TEXT
