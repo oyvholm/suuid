@@ -444,40 +444,24 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 
 char *get_logfile_name(const struct Rc *rc, const struct Options *opt)
 {
-	char *logdir, *logfile = NULL, *hostname;
+	char *prefix, *logfile;
 	size_t fname_length; /* Total length of logfile name */
 
-	logdir = get_logdir(opt);
-	if (!logdir) {
-		fprintf(stderr, "%s: get_logfile_name(): Unable to find "
-		                "logdir location\n", progname);
+	prefix = get_log_prefix(rc, opt);
+	if (!prefix)
 		return NULL;
-	}
 
-	hostname = get_hostname(rc);
-	if (!hostname) {
-		myerror("get_logfile_name(): Cannot get hostname");
-		goto cleanup;
-	}
-	if (!valid_hostname(hostname)) {
-		myerror("get_logfile_name(): Got invalid hostname: \"%s\"",
-		        hostname);
-		goto cleanup;
-	}
-
-	fname_length = strlen(logdir) + strlen("/") + /* fixme: slash */
-	               strlen(hostname) + strlen(".xml") + 1;
+	fname_length = strlen(prefix) + strlen(".xml") + 1;
 	logfile = malloc(fname_length + 1);
 	if (!logfile) {
 		myerror("get_logfile_name(): Could not allocate %lu bytes for "
 		        "logfile filename", fname_length + 1);
 		goto cleanup;
 	}
-	/* fixme: Remove slash hardcoding, use some portable solution */
-	snprintf(logfile, fname_length, "%s/%s.xml", logdir, hostname);
+	snprintf(logfile, fname_length, "%s.xml", prefix);
 
 cleanup:
-	free(logdir);
+	free(prefix);
 
 	return logfile;
 }
