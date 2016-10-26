@@ -16,8 +16,8 @@ LIBS = -lpthread -ldl
 
 # For regular use, it's not necessary to modify anything below this line.
 
-COMMON_OBJS = environ.o genuuid.o io.o logfile.o rcfile.o sessvar.o string.o \
-              tag.o uuid.o
+COMMON_OBJS = database.o environ.o genuuid.o io.o logfile.o \
+              rcfile.o sessvar.o string.o tag.o uuid.o
 SUUID_OBJS  = suuid.o
 SESS_OBJS   = sess.o
 
@@ -42,6 +42,9 @@ $(SESS_EXEC): $(SESS_OBJS) $(COMMON_OBJS)
 
 suuid.o: suuid.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) suuid.c
+
+database.o: database.c $(SUUID_DEPS)
+	$(CC) $(CCFLAGS) database.c
 
 environ.o: environ.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) environ.c

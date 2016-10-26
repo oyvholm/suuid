@@ -148,6 +148,8 @@ struct uuid_result {
 
 #if 1 /* Set to 0 to test without prototypes */
 
+/* database.c */
+
 /* environ.c */
 extern char *get_editor(void);
 extern bool valid_hostname(const char *s);
