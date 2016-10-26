@@ -153,10 +153,11 @@ char *get_logdir(const struct Options *opt)
 /*
  * get_log_prefix() - Return pointer to an allocated string with log or 
  * database prefix (full path without the file extension), or NULL if it can't 
- * be determined.
+ * be determined. The third "ext" argument is a file extension that will be 
+ * added to the returned string, it can be "", NULL or a string.
  */
 
-char *get_log_prefix(const struct Rc *rc, const struct Options *opt)
+char *get_log_prefix(const struct Rc *rc, const struct Options *opt, char *ext)
 {
 	char *logdir, *hostname;
 	size_t prefix_length; /* Total length of prefix */
@@ -180,8 +181,11 @@ char *get_log_prefix(const struct Rc *rc, const struct Options *opt)
 		goto cleanup;
 	}
 
+	if (!ext)
+		ext = "";
+
 	prefix_length = strlen(logdir) + strlen("/") + /* fixme: slash */
-	                strlen(hostname) + 1;
+	                strlen(hostname) + strlen(ext) + 1;
 	prefix = malloc(prefix_length + 1);
 	if (!prefix) {
 		myerror("get_log_prefix(): Could not allocate %lu bytes for "
@@ -189,7 +193,7 @@ char *get_log_prefix(const struct Rc *rc, const struct Options *opt)
 		goto cleanup;
 	}
 	/* fixme: Remove slash hardcoding, use some portable solution */
-	snprintf(prefix, prefix_length, "%s/%s", logdir, hostname);
+	snprintf(prefix, prefix_length, "%s/%s%s", logdir, hostname, ext);
 
 cleanup:
 	free(logdir);

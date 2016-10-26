@@ -444,26 +444,7 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 
 char *get_logfile_name(const struct Rc *rc, const struct Options *opt)
 {
-	char *prefix, *logfile;
-	size_t fname_length; /* Total length of logfile name */
-
-	prefix = get_log_prefix(rc, opt);
-	if (!prefix)
-		return NULL;
-
-	fname_length = strlen(prefix) + strlen(".xml") + 1;
-	logfile = malloc(fname_length + 1);
-	if (!logfile) {
-		myerror("get_logfile_name(): Could not allocate %lu bytes for "
-		        "logfile filename", fname_length + 1);
-		goto cleanup;
-	}
-	snprintf(logfile, fname_length, "%s.xml", prefix);
-
-cleanup:
-	free(prefix);
-
-	return logfile;
+	return get_log_prefix(rc, opt, ".xml"); /* Oh yeah baby */
 }
 
 /*
