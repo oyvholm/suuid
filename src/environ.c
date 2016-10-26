@@ -104,6 +104,53 @@ char *get_hostname(const struct Rc *rc)
 }
 
 /*
+ * get_logdir() - Return pointer to allocated string with location of the log 
+ * directory. Use the value of opt->logdir if it's defined, otherwise use the 
+ * environment variable defined in ENV_LOGDIR, otherwise use "$HOME/uuids". If 
+ * that also fails, return NULL.
+ */
+
+char *get_logdir(const struct Options *opt)
+{
+	char *retval = NULL;
+
+	if (opt && opt->logdir) {
+		retval = strdup(opt->logdir);
+		if (!retval) {
+			myerror("get_logdir(): Could not duplicate "
+			        "-l/--logdir argument");
+			return NULL;
+		}
+	} else if (getenv(ENV_LOGDIR)) {
+		retval = strdup(getenv(ENV_LOGDIR));
+		if (!retval) {
+			myerror("get_logdir(): Could not duplicate %s "
+			        "environment variable", ENV_LOGDIR);
+			return NULL;
+		}
+	} else if (getenv("HOME")) {
+		int size = strlen(getenv("HOME")) +
+		           strlen("/uuids") + 1; /* fixme: slash */
+
+		retval = malloc(size + 1);
+		if (!retval) {
+			myerror("get_logdir(): Cannot allocate %lu bytes",
+			        size);
+			return NULL;
+		}
+		snprintf(retval, size, "%s/uuids", /* fixme: slash */
+		                       getenv("HOME"));
+	} else {
+		fprintf(stderr, "%s: $%s and $HOME environment "
+		                "variables are not defined, cannot "
+		                "create logdir path\n", progname, ENV_LOGDIR);
+		return NULL;
+	}
+
+	return retval;
+}
+
+/*
  * getpath() - Return pointer to string with full path to current directory, or 
  * NULL if error. Use free() on the pointer when it's not needed anymore.
  */

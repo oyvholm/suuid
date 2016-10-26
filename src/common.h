@@ -152,6 +152,7 @@ struct uuid_result {
 extern char *get_editor(void);
 extern bool valid_hostname(const char *s);
 extern char *get_hostname(const struct Rc *rc);
+extern char *get_logdir(const struct Options *opt);
 extern char *getpath(void);
 extern char *get_username(void);
 extern char *get_tty(void);
@@ -181,7 +182,6 @@ extern char *alloc_attr(const char *attr, const char *data);
 extern char *get_xml_tags(const struct Entry *entry);
 extern char *create_sess_xml(const struct Entry *entry);
 extern char *xml_entry(const struct Entry *entry, const bool raw);
-extern char *get_logdir(const struct Options *opt);
 extern char *get_logfile_name(const struct Rc *rc, const struct Options *opt);
 extern FILE *lock_file(FILE *fp, const char *fname);
 extern FILE *write_xml_header(FILE *fp);
