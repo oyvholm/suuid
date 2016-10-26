@@ -130,6 +130,7 @@ void print_license(void)
 void print_version(void)
 {
 	printf("%s %s (%s)\n", progname, VERSION, RELEASE_DATE);
+	printf("Linked against SQLite %s\n", sqlite3_libversion());
 #if FAKE_HOST || TEST_FUNC
 	printf("\nThis version is compiled with the following conditional "
                "directives:\n");
