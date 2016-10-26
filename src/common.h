@@ -25,6 +25,7 @@
  * Standard header files
  */
 
+#include "sqlite3.h"
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>

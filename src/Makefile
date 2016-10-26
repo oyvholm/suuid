@@ -17,7 +17,7 @@ LIBS = -lpthread -ldl
 # For regular use, it's not necessary to modify anything below this line.
 
 COMMON_OBJS = database.o environ.o genuuid.o io.o logfile.o \
-              rcfile.o sessvar.o string.o tag.o uuid.o
+              rcfile.o sessvar.o sqlite3.o string.o tag.o uuid.o
 SUUID_OBJS  = suuid.o
 SESS_OBJS   = sess.o
 
@@ -33,12 +33,11 @@ SESS_DEPS  = $(SESS_HFILES) $(SUUID_DEPS) Makefile
 .PHONY: default
 default: $(SUUID_EXEC) $(SESS_EXEC)
 
-$(SUUID_EXEC): $(SUUID_OBJS) $(COMMON_OBJS) sqlite3.o
-	$(LD) -o $(SUUID_EXEC) $(LDFLAGS) \
-	      $(SUUID_OBJS) $(COMMON_OBJS) sqlite3.o $(LIBS)
+$(SUUID_EXEC): $(SUUID_OBJS) $(COMMON_OBJS)
+	$(LD) -o $(SUUID_EXEC) $(LDFLAGS) $(SUUID_OBJS) $(COMMON_OBJS) $(LIBS)
 
 $(SESS_EXEC): $(SESS_OBJS) $(COMMON_OBJS)
-	$(LD) -o $(SESS_EXEC) $(LDFLAGS) $(SESS_OBJS) $(COMMON_OBJS)
+	$(LD) -o $(SESS_EXEC) $(LDFLAGS) $(SESS_OBJS) $(COMMON_OBJS) $(LIBS)
 
 suuid.o: suuid.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) suuid.c
@@ -84,7 +83,6 @@ clean:
 	rm -fv $(COMMON_OBJS)
 	rm -fv $(SUUID_EXEC) $(SUUID_OBJS)
 	rm -fv $(SESS_EXEC) $(SESS_OBJS)
-	rm -fv sqlite3.o
 	rm -fv *~ core core.$(SUUID_EXEC) tags
 	rm -frv $(TESTLOCKDIR)
 	cd t && $(MAKE) clean

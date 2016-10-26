@@ -37,7 +37,6 @@
                       */
 
 #include "common.h"
-#include "sqlite3.h"
 
 /*
  * Function prototypes
