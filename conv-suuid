@@ -192,7 +192,7 @@ END
         print("\\.\n");
     }
 
-    return($Retval);
+    return $Retval;
     # }}}
 } # main()
 
