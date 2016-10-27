@@ -12,4 +12,4 @@ all:
 
 .PHONY: clean
 clean:
-	rm -rf tmp-*
+	rm -rf tmp-* *-stderr.tmp

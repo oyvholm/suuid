@@ -7,5 +7,5 @@ test:
 
 .PHONY: clean
 clean:
-	rm -rf tmp-*
+	rm -rf tmp-* *-stderr.tmp
 	cd conv-suuid-files && $(MAKE) clean
