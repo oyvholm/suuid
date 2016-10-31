@@ -72,10 +72,8 @@ char *read_from_file(const char *fname)
 		return NULL;
 	}
 	retval = read_from_fp(fp);
-	if (!retval) {
-		myerror("read_from_file(): read_from_fp() failed");
+	if (!retval)
 		return NULL;
-	}
 	fclose(fp);
 
 	return retval;
@@ -111,10 +109,8 @@ char *read_from_editor(const char *editor)
 		return NULL;
 	}
 	retval = read_from_file(tmpfile);
-	if (!retval) {
-		myerror("read_from_editor(): read_from_file() failed");
+	if (!retval)
 		return NULL;
-	}
 	if (remove(tmpfile) == -1)
 		myerror("Warning: Could not remove temporary file \"%s\"",
 		        tmpfile);

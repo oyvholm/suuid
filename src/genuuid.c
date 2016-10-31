@@ -91,13 +91,10 @@ char *process_comment_option(const char *cmt)
 		char *e;
 
 		e = get_editor();
-		if (!e) {
-			myerror("get_editor() failed");
+		if (!e)
 			return NULL;
-		}
 		retval = read_from_editor(e);
 		if (!retval) {
-			myerror("Could not read data from editor \"%s\"", e);
 			free(e);
 			return NULL;
 		}
