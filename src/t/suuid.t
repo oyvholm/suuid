@@ -1195,8 +1195,7 @@ sub test_suuid_environment {
         "../suuid: HOME environment variable not defined, cannot determine " .
             "name of rcfile\n" .
             "../suuid: \$SUUID_LOGDIR and \$HOME environment variables are " .
-            "not defined, cannot create logdir path\n" .
-            "../suuid: get_log_prefix(): Unable to find log prefix\n",
+            "not defined, cannot create logdir path\n",
         1,
         "Now it doesn't even have -l/--logdir",
     );
