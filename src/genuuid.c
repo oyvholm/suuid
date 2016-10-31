@@ -31,8 +31,11 @@ bool init_randomness(void)
 {
 	struct timeval tv;
 
-	if (gettimeofday(&tv, NULL) == -1)
+	if (gettimeofday(&tv, NULL) == -1) {
+		myerror("Could not initialiase randomness generator, "
+		        "gettimeofday() failed");
 		return EXIT_ERROR;
+	}
 
 	srandom((unsigned int)tv.tv_sec ^ (unsigned int)tv.tv_usec ^
 	        (unsigned int)getpid());
@@ -258,7 +261,6 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	init_xml_entry(&entry);
 
 	if (init_randomness() == EXIT_ERROR) {
-		myerror("Could not initialiase randomness generator");
 		retval.success = FALSE;
 		goto cleanup;
 	}
