@@ -20,4 +20,20 @@
 
 #include "suuid.h"
 
+/*
+ * run_self_tests() - Run internal testing to check that it works on the 
+ * current system. Executed if --self-test is used.
+ * Returns EXIT_ERROR if any tests fail, EXIT_OK otherwise.
+ */
+
+int run_self_tests(void)
+{
+	int retval = EXIT_OK;
+
+	printf("1..1\n");
+	printf("ok 1 - No tests created yet\n");
+
+	return retval;
+}
+
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */
