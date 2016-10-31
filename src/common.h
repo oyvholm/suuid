@@ -131,6 +131,7 @@ struct Options {
 	bool random_mac;
 	bool raw;
 	char *rcfile;
+	bool self_test;
 	char *tag[MAX_TAGS];
 	char *uuid;
 	int verbose;
@@ -202,6 +203,9 @@ extern char *get_rcfilename(const struct Options *opt);
 extern char *has_key(const char *line, const char *keyword);
 extern int parse_rc_line(const char *line, struct Rc *rc);
 extern int read_rcfile(const char *rcfile, struct Rc *rc);
+
+/* selftest.c */
+extern int run_self_tests(void);
 
 /* sessvar.c */
 extern bool is_legal_desc_char(const unsigned char c);

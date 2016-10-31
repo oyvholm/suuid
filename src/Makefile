@@ -17,12 +17,12 @@ LIBS = -lpthread -ldl
 # For regular use, it's not necessary to modify anything below this line.
 
 COMMON_OBJS = database.o environ.o genuuid.o io.o logfile.o \
-              rcfile.o sessvar.o sqlite3.o string.o tag.o uuid.o
+              rcfile.o selftest.o sessvar.o sqlite3.o string.o tag.o uuid.o
 SUUID_OBJS  = suuid.o
 SESS_OBJS   = sess.o
 
-COMMON_C = environ.c genuuid.c io.c logfile.c rcfile.c sessvar.c string.c \
-           tag.c uuid.c
+COMMON_C = environ.c genuuid.c io.c logfile.c rcfile.c \
+           selftest.c sessvar.c string.c tag.c uuid.c
 
 SUUID_HFILES = suuid.h common.h
 SESS_HFILES  = sess.h common.h
@@ -59,6 +59,9 @@ logfile.o: logfile.c $(SUUID_DEPS)
 
 rcfile.o: rcfile.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) rcfile.c
+
+selftest.o: selftest.c $(SUUID_DEPS)
+	$(CC) $(CCFLAGS) selftest.c
 
 sess.o: sess.c $(SESS_DEPS)
 	$(CC) $(CCFLAGS) sess.c
