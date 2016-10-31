@@ -214,6 +214,8 @@ void usage(const int retval)
 	printf("  --rcfile X\n"
 	       "    Use file X instead of '%s/%s'.\n",
 	       getenv("HOME"), STD_RCFILE);
+	printf("  --self-test\n"
+	       "    Run various internal self tests and exit.\n");
 	printf("  -t x, --tag x\n"
 	       "    Use x as tag (category).\n");
 	printf("  -v, --verbose\n"
@@ -269,6 +271,8 @@ int choose_opt_action(struct Options *dest,
 			dest->raw = TRUE;
 		else if (!strcmp(opts->name, "rcfile"))
 			dest->rcfile = optarg;
+		else if (!strcmp(opts->name, "self-test"))
+			dest->self_test = TRUE;
 		else if (!strcmp(opts->name, "version"))
 			dest->version = TRUE;
 		break;
@@ -335,6 +339,7 @@ int parse_options(struct Options *dest, const int argc, char * const argv[])
 			{"random-mac", no_argument, 0, 'm'},
 			{"raw", no_argument, 0, 0},
 			{"rcfile", required_argument, 0, 0},
+			{"self-test", no_argument, 0, 0},
 			{"tag", required_argument, 0, 't'},
 			{"verbose", no_argument, 0, 'v'},
 			{"version", no_argument, 0, 0},
@@ -387,6 +392,8 @@ int main(int argc, char *argv[])
 		usage(EXIT_OK);
 		return EXIT_OK;
 	}
+	if (opt.self_test)
+		return run_self_tests();
 	if (opt.version) {
 		print_version();
 		return EXIT_OK;

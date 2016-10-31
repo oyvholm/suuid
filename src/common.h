@@ -131,6 +131,7 @@ struct Options {
 	bool random_mac;
 	bool raw;
 	char *rcfile;
+	bool self_test;
 	char *tag[MAX_TAGS];
 	char *uuid;
 	int verbose;
