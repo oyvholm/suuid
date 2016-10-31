@@ -170,10 +170,8 @@ char *allocate_elem(const char *elem, const char *src)
 	}
 
 	ap = suuid_xml(src);
-	if (!ap) {
-		myerror("allocate_elem(): suuid_xml() failed");
+	if (!ap)
 		return NULL;
-	}
 	snprintf(retval, size, "<%s>%s</%s> ", elem, ap, elem);
 	free(ap);
 
@@ -255,7 +253,6 @@ char *get_xml_tags(const struct Entry *entry)
 
 			ap = suuid_xml(p);
 			if (!ap) {
-				myerror("get_xml_tags(): suuid_xml() failed");
 				free(tmpbuf);
 				free(buf);
 				return NULL;
@@ -352,15 +349,12 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 		return NULL;
 
 	e.uuid = alloc_attr("u", entry->uuid);
-	if (!e.uuid) {
-		myerror("xml_entry(): alloc_attr() for uuid failed");
+	if (!e.uuid)
 		return NULL;
-	}
 
 	if (entry->date) {
 		e.date = alloc_attr("t", entry->date);
 		if (!e.date) {
-			myerror("xml_entry(): alloc_attr() for date failed");
 			free(e.uuid);
 			return NULL;
 		}
@@ -368,7 +362,6 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 
 	tag_xml = get_xml_tags(entry);
 	if (!tag_xml) {
-		myerror("xml_entry(): get_xml_tags() failed");
 		free(e.date);
 		free(e.uuid);
 		return NULL;
@@ -376,7 +369,6 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 
 	sess_xml = create_sess_xml(entry);
 	if (!sess_xml) {
-		myerror("create_sess_xml() failed");
 		free(tag_xml);
 		free(e.date);
 		free(e.uuid);

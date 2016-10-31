@@ -161,7 +161,6 @@ int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
 	}
 
 	if (get_sess_info(entry) == EXIT_ERROR) {
-		myerror("fill_entry_struct(): get_sess_info() failed");
 		free(entry->txt);
 		return EXIT_ERROR;
 	}
@@ -201,10 +200,8 @@ char *process_uuid(FILE *logfp, const struct Rc *rc, const struct Options *opt,
 	if (!uuid_date_from_uuid(entry->date, entry->uuid))
 		return NULL;
 
-	if (add_to_logfile(logfp, entry, opt->raw) == EXIT_ERROR) {
-		myerror("process_uuid(): add_to_logfile() failed");
+	if (add_to_logfile(logfp, entry, opt->raw) == EXIT_ERROR)
 		return NULL;
-	}
 
 	if (!opt->whereto)
 		puts(entry->uuid);
