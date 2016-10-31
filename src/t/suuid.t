@@ -694,7 +694,6 @@ sub test_suuid_executable {
     likecmd("$CMD -l $Outdir", # {{{
         '/^$/s',
         '/^\.\.\/suuid: .*?\.xml: Could not open file for read\+write: Permission denied\n' .
-        '\.\.\/suuid: open_logfile\(\) failed, cannot open log file: Permission denied\n' .
         '$/s',
         1,
         "Unable to write to the log file",

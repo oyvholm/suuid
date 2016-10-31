@@ -290,7 +290,6 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 
 	logfp = open_logfile(logfile);
 	if (!logfp) {
-		myerror("open_logfile() failed, cannot open log file");
 		retval.success = FALSE;
 		goto cleanup;
 	}
