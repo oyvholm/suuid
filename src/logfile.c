@@ -648,18 +648,15 @@ int add_to_logfile(FILE *fp, const struct Entry *entry, const bool raw)
 	assert(entry);
 
 	ap = xml_entry(entry, raw);
-	if (!ap) {
-		myerror("add_to_logfile(): xml_entry() failed");
+	if (!ap)
 		return EXIT_ERROR;
-	}
-	if (fputs(ap, fp) < 0) {
-		myerror("add_to_logfile(): fputs() failed");
+	if (fputs(ap, fp) < 0)
 		retval = EXIT_ERROR;
-	}
-	if (fputc('\n', fp) == EOF) {
-		myerror("add_to_logfile(): fputc() failed");
+	if (fputc('\n', fp) == EOF)
 		retval = EXIT_ERROR;
-	}
+	if (retval == EXIT_ERROR)
+		myerror("add_to_logfile(): Cannot write to the log file");
+
 	free(ap);
 
 	return retval;

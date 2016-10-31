@@ -100,14 +100,16 @@ int fill_sess(struct Entry *dest, const char *uuid,
 
 	auuid = strndup(uuid, UUID_LENGTH);
 	if (!auuid) {
-		myerror("fill_sess(): Could not duplicate UUID");
+		myerror("fill_sess(): Memory allcation error, "
+		        "could not duplicate UUID");
 		return EXIT_ERROR;
 	}
 
 	if (desc && desclen) {
 		adesc = strndup(desc, desclen);
 		if (!adesc) {
-			myerror("get_sess_info(): Could not duplicate desc");
+			myerror("fill_sess(): Memory allocation error, "
+			        "could not duplicate desc");
 			free(auuid);
 			return EXIT_ERROR;
 		}

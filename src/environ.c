@@ -229,7 +229,7 @@ char *getpath(void)
 			 * problem that's not fixable by just allocating more 
 			 * memory.
 			 */
-			myerror("getpath(): getcwd() failed");
+			myerror("getpath(): Cannot get current directory");
 			free(retval);
 			return NULL;
 		}
