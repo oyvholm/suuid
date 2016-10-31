@@ -203,6 +203,8 @@ extern char *has_key(const char *line, const char *keyword);
 extern int parse_rc_line(const char *line, struct Rc *rc);
 extern int read_rcfile(const char *rcfile, struct Rc *rc);
 
+/* selftest.c */
+
 /* sessvar.c */
 extern bool is_legal_desc_char(const unsigned char c);
 extern bool is_valid_desc_string(const char *s);
