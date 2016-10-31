@@ -315,7 +315,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 		                progname, retval.count, opt->count);
 
 	if (close_logfile(logfp) == EXIT_ERROR)
-		myerror("close_logfile() failed");
+		retval.success = FALSE;
 
 cleanup:
 	free(logfile);

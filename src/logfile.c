@@ -683,6 +683,9 @@ int close_logfile(FILE *fp)
 	if (fclose(fp) == EOF)
 		retval = EXIT_ERROR;
 
+	if (retval == EXIT_ERROR)
+		myerror("Error when closing log file");
+
 	return retval;
 }
 
