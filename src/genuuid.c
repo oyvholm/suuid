@@ -31,8 +31,11 @@ bool init_randomness(void)
 {
 	struct timeval tv;
 
-	if (gettimeofday(&tv, NULL) == -1)
+	if (gettimeofday(&tv, NULL) == -1) {
+		myerror("Could not initialiase randomness generator, "
+		        "gettimeofday() failed");
 		return EXIT_ERROR;
+	}
 
 	srandom((unsigned int)tv.tv_sec ^ (unsigned int)tv.tv_usec ^
 	        (unsigned int)getpid());
@@ -88,13 +91,10 @@ char *process_comment_option(const char *cmt)
 		char *e;
 
 		e = get_editor();
-		if (!e) {
-			myerror("get_editor() failed");
+		if (!e)
 			return NULL;
-		}
 		retval = read_from_editor(e);
 		if (!retval) {
-			myerror("Could not read data from editor \"%s\"", e);
 			free(e);
 			return NULL;
 		}
@@ -161,7 +161,6 @@ int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
 	}
 
 	if (get_sess_info(entry) == EXIT_ERROR) {
-		myerror("fill_entry_struct(): get_sess_info() failed");
 		free(entry->txt);
 		return EXIT_ERROR;
 	}
@@ -201,10 +200,8 @@ char *process_uuid(FILE *logfp, const struct Rc *rc, const struct Options *opt,
 	if (!uuid_date_from_uuid(entry->date, entry->uuid))
 		return NULL;
 
-	if (add_to_logfile(logfp, entry, opt->raw) == EXIT_ERROR) {
-		myerror("process_uuid(): add_to_logfile() failed");
+	if (add_to_logfile(logfp, entry, opt->raw) == EXIT_ERROR)
 		return NULL;
-	}
 
 	if (!opt->whereto)
 		puts(entry->uuid);
@@ -258,7 +255,6 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	init_xml_entry(&entry);
 
 	if (init_randomness() == EXIT_ERROR) {
-		myerror("Could not initialiase randomness generator");
 		retval.success = FALSE;
 		goto cleanup;
 	}
@@ -277,7 +273,6 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 
 	logfile = get_log_prefix(&rc, opt, ".xml");
 	if (!logfile) {
-		myerror("get_logfile_name() failed");
 		retval.success = FALSE;
 		goto cleanup;
 	}
@@ -290,7 +285,6 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 
 	logfp = open_logfile(logfile);
 	if (!logfp) {
-		myerror("open_logfile() failed, cannot open log file");
 		retval.success = FALSE;
 		goto cleanup;
 	}
@@ -315,7 +309,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 		                progname, retval.count, opt->count);
 
 	if (close_logfile(logfp) == EXIT_ERROR)
-		myerror("close_logfile() failed");
+		retval.success = FALSE;
 
 cleanup:
 	free(logfile);

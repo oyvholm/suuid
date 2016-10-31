@@ -170,10 +170,8 @@ char *allocate_elem(const char *elem, const char *src)
 	}
 
 	ap = suuid_xml(src);
-	if (!ap) {
-		myerror("allocate_elem(): suuid_xml() failed");
+	if (!ap)
 		return NULL;
-	}
 	snprintf(retval, size, "<%s>%s</%s> ", elem, ap, elem);
 	free(ap);
 
@@ -255,7 +253,6 @@ char *get_xml_tags(const struct Entry *entry)
 
 			ap = suuid_xml(p);
 			if (!ap) {
-				myerror("get_xml_tags(): suuid_xml() failed");
 				free(tmpbuf);
 				free(buf);
 				return NULL;
@@ -352,15 +349,12 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 		return NULL;
 
 	e.uuid = alloc_attr("u", entry->uuid);
-	if (!e.uuid) {
-		myerror("xml_entry(): alloc_attr() for uuid failed");
+	if (!e.uuid)
 		return NULL;
-	}
 
 	if (entry->date) {
 		e.date = alloc_attr("t", entry->date);
 		if (!e.date) {
-			myerror("xml_entry(): alloc_attr() for date failed");
 			free(e.uuid);
 			return NULL;
 		}
@@ -368,7 +362,6 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 
 	tag_xml = get_xml_tags(entry);
 	if (!tag_xml) {
-		myerror("xml_entry(): get_xml_tags() failed");
 		free(e.date);
 		free(e.uuid);
 		return NULL;
@@ -376,7 +369,6 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 
 	sess_xml = create_sess_xml(entry);
 	if (!sess_xml) {
-		myerror("create_sess_xml() failed");
 		free(tag_xml);
 		free(e.date);
 		free(e.uuid);
@@ -648,18 +640,15 @@ int add_to_logfile(FILE *fp, const struct Entry *entry, const bool raw)
 	assert(entry);
 
 	ap = xml_entry(entry, raw);
-	if (!ap) {
-		myerror("add_to_logfile(): xml_entry() failed");
+	if (!ap)
 		return EXIT_ERROR;
-	}
-	if (fputs(ap, fp) < 0) {
-		myerror("add_to_logfile(): fputs() failed");
+	if (fputs(ap, fp) < 0)
 		retval = EXIT_ERROR;
-	}
-	if (fputc('\n', fp) == EOF) {
-		myerror("add_to_logfile(): fputc() failed");
+	if (fputc('\n', fp) == EOF)
 		retval = EXIT_ERROR;
-	}
+	if (retval == EXIT_ERROR)
+		myerror("add_to_logfile(): Cannot write to the log file");
+
 	free(ap);
 
 	return retval;
@@ -682,6 +671,9 @@ int close_logfile(FILE *fp)
 	flock(fileno(fp), LOCK_UN);
 	if (fclose(fp) == EOF)
 		retval = EXIT_ERROR;
+
+	if (retval == EXIT_ERROR)
+		myerror("Error when closing log file");
 
 	return retval;
 }

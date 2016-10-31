@@ -694,7 +694,6 @@ sub test_suuid_executable {
     likecmd("$CMD -l $Outdir", # {{{
         '/^$/s',
         '/^\.\.\/suuid: .*?\.xml: Could not open file for read\+write: Permission denied\n' .
-        '\.\.\/suuid: open_logfile\(\) failed, cannot open log file: Permission denied\n' .
         '$/s',
         1,
         "Unable to write to the log file",
@@ -1196,9 +1195,7 @@ sub test_suuid_environment {
         "../suuid: HOME environment variable not defined, cannot determine " .
             "name of rcfile\n" .
             "../suuid: \$SUUID_LOGDIR and \$HOME environment variables are " .
-            "not defined, cannot create logdir path\n" .
-            "../suuid: get_log_prefix(): Unable to find log prefix\n" .
-            "../suuid: get_logfile_name() failed\n",
+            "not defined, cannot create logdir path\n",
         1,
         "Now it doesn't even have -l/--logdir",
     );

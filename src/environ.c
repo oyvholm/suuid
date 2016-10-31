@@ -164,11 +164,8 @@ char *get_log_prefix(const struct Rc *rc, const struct Options *opt, char *ext)
 	char *prefix = NULL;
 
 	logdir = get_logdir(opt);
-	if (!logdir) {
-		fprintf(stderr, "%s: get_log_prefix(): Unable to find "
-		                "log prefix\n", progname);
+	if (!logdir)
 		return NULL;
-	}
 
 	hostname = get_hostname(rc);
 	if (!hostname) {
@@ -232,7 +229,7 @@ char *getpath(void)
 			 * problem that's not fixable by just allocating more 
 			 * memory.
 			 */
-			myerror("getpath(): getcwd() failed");
+			myerror("getpath(): Cannot get current directory");
 			free(retval);
 			return NULL;
 		}
