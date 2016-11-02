@@ -261,7 +261,6 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 
 	rcfile = get_rcfilename(opt);
 	if (read_rcfile(rcfile, &rc) == EXIT_ERROR) {
-		myerror("%s: Could not read rc file", opt->rcfile);
 		retval.success = FALSE;
 		goto cleanup;
 	}
