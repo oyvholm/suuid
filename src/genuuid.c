@@ -95,11 +95,9 @@ char *process_comment_option(const char *cmt)
 		if (!e)
 			return NULL;
 		retval = read_from_editor(e);
-		if (!retval) {
-			free(e);
-			return NULL;
-		}
 		free(e);
+		if (!retval)
+			return NULL;
 	} else {
 		retval = strdup(cmt);
 		if (!retval) {
