@@ -164,7 +164,7 @@ extern char *get_username(void);
 extern char *get_tty(void);
 
 /* genuuid.c */
-extern bool init_randomness(void);
+extern int init_randomness(void);
 extern void init_opt(struct Options *dest);
 extern char *process_comment_option(const char *cmt);
 extern int fill_entry_struct(struct Entry *entry, const struct Rc *rc,

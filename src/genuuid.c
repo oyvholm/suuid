@@ -27,7 +27,7 @@ bool should_terminate = FALSE;
  * or EXIT_ERROR.
  */
 
-bool init_randomness(void)
+int init_randomness(void)
 {
 	struct timeval tv;
 
