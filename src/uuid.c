@@ -35,7 +35,8 @@ bool valid_uuid(const char *u, const bool check_len)
 		if (strlen(u) != UUID_LENGTH)
 			return FALSE;
 
-	/* Check that it only contains lowercase hex and dashes at the right 
+	/*
+	 * Check that it only contains lowercase hex and dashes at the right 
 	 * places
 	 */
 	if (check_hex(u, 8) || u[8] != '-' || check_hex(u + 9, 4) ||
@@ -43,7 +44,8 @@ bool valid_uuid(const char *u, const bool check_len)
 	    check_hex(u + 19, 4) || u[23] != '-' || check_hex(u + 24, 12))
 		return FALSE;
 
-	/* At the moment only v1 UUIDs are allowed
+	/*
+	 * At the moment only v1 UUIDs are allowed
 	 */
 	if (u[14] != '1')
 		return FALSE;
@@ -96,7 +98,8 @@ char *generate_uuid(const struct Rc *rc, const bool random_mac)
 		return NULL;
 	}
 	if (!fgets(uuid, UUID_LENGTH + 1, fp)) {
-		/* Nevermind read errors, valid_uuid() checks if it's valid 
+		/*
+		 * Nevermind read errors, valid_uuid() checks if it's valid 
 		 * later.
 		 */
 	}

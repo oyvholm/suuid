@@ -310,7 +310,7 @@ const char *add_to_sessvar(const char *desc, const char *uuid)
 /*
  * run_session() - Execute a shell command and log it with start time, end time 
  * and return value. If any error occurs, return -1. Otherwise, return with the 
- * value from system(), which by a nice coincidence also return -1 on error or 
+ * value from system(), which by a nice coincidence also returns -1 on error or 
  * the return value from the program.
  */
 

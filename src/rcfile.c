@@ -73,7 +73,8 @@ char *has_key(const char *line, const char *keyword)
 	if (!strncmp(line, keyword, strlen(keyword))) {
 		if (!strchr(" =", line[strlen(keyword)]))
 			return NULL;
-		/* Move retval to the first character that is not a space 
+		/*
+		 * Move retval to the first character that is not a space 
 		 * (ASCII 32) after the first equal sign.
 		 */
 		retval = strchr(line, '=');
@@ -108,8 +109,9 @@ int parse_rc_line(const char *line, struct Rc *rc)
 }
 
 /*
- * read_rcfile() - Read contents of rcfile into rc. Return EXIT_OK or 
- * EXIT_ERROR.
+ * read_rcfile() - Read contents of rcfile into rc. rcfile is allowed to be 
+ * NULL, that means it wasn't found.
+ * Returns EXIT_OK or EXIT_ERROR.
  */
 
 int read_rcfile(const char *rcfile, struct Rc *rc)

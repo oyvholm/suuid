@@ -234,10 +234,11 @@ void sighandler(const int sig)
 /*
  * create_and_log_uuids() - Do everything in one place; Initialise the random 
  * number generator, read values from the rc file, environment and command 
- * line, generate the UUID(s) and write it to the log file. Returns a struct 
- * uuid_result with the number of UUIDs generated and a value indicating 
- * success or not. If opt->uuid contains an UUID, set count to 1 to avoid 
- * duplicates in the log file.
+ * line, generate the UUID(s) and write it to the log file.
+ *
+ * Returns a struct uuid_result with the number of UUIDs generated and a value 
+ * indicating success or not. If opt->uuid contains an UUID, set count to 1 to 
+ * avoid duplicates in the log file.
  */
 
 struct uuid_result create_and_log_uuids(const struct Options *opt)

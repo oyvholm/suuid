@@ -132,6 +132,7 @@ char *trim_str_end(char *dest)
  *
  *   2016-06-29 - Receive and return regular char * instead of unsigned char * 
  *                to avoid casting everywhere.
+ *   2016-07-04 - Add assert() to check that the text argument is not NULL.
  *   2016-07-09 - Add const modifier to text argument.
  */
 

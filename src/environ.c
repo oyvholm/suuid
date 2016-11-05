@@ -107,7 +107,8 @@ char *get_hostname(const struct Rc *rc)
  * get_logdir() - Return pointer to allocated string with location of the log 
  * directory. Use the value of opt->logdir if it's defined, otherwise use the 
  * environment variable defined in ENV_LOGDIR, otherwise use "$HOME/uuids". If 
- * that also fails, return NULL.
+ * that also fails, return NULL. opt is allowed to be NULL, it's called by 
+ * usage().
  */
 
 char *get_logdir(const struct Options *opt)
@@ -225,7 +226,8 @@ char *getpath(void)
 		}
 		p = getcwd(retval, size);
 		if (!p && errno != ERANGE) {
-			/* Avoid infinite loop in case there's another getcwd() 
+			/*
+			 * Avoid infinite loop in case there's another getcwd() 
 			 * problem that's not fixable by just allocating more 
 			 * memory.
 			 */
