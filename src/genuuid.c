@@ -231,11 +231,13 @@ char *process_uuid(FILE *logfp, const struct Rc *rc, const struct Options *opt,
 void sighandler(const int sig)
 {
 	if (sig == SIGHUP || sig == SIGINT || sig == SIGQUIT ||
-	    sig == SIGPIPE || sig == SIGTERM) {
+	    sig == SIGPIPE || sig == SIGTERM)
 		fprintf(stderr, "%s: Termination signal (%s) received, "
 		                "aborting\n", progname, strsignal(sig));
-		should_terminate = TRUE;
-	}
+	else
+		myerror("sighandler(): Unknown signal %d (%s) received, "
+		        "should not happen\n", sig, strsignal(sig));
+	should_terminate = TRUE;
 }
 
 /*
