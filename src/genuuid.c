@@ -81,6 +81,7 @@ char *process_comment_option(const char *cmt)
 	char *retval;
 
 	assert(cmt);
+
 	if (!strcmp(cmt, "-")) {
 		retval = read_from_fp(stdin);
 		if (!retval) {

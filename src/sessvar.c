@@ -260,6 +260,7 @@ const char *add_to_sessvar(const char *desc, const char *uuid)
 	char *envbuf; /* Temporary buffer for the finished string */
 
 	assert(valid_uuid(uuid, TRUE));
+
 	if (!is_valid_desc_string(desc))
 		desc = NULL;
 

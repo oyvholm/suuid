@@ -31,6 +31,7 @@ char *check_hex(const char *hex, const size_t len)
 	const char *p;
 
 	assert(hex);
+
 	for (p = hex; p < hex + len; p++)
 		if (!strchr("0123456789abcdef", *p))
 			return (char *)p;
@@ -80,6 +81,7 @@ char *trim_str_front(char *dest)
 	size_t size;
 
 	assert(dest);
+
 	size = strlen(dest);
 	while (p < dest + size && isspace(*p))
 		p++;
@@ -101,6 +103,7 @@ char *trim_str_end(char *dest)
 	size_t size;
 
 	assert(dest);
+
 	size = strlen(dest);
 	if (!size)
 		return dest;
