@@ -29,6 +29,8 @@
 
 bool valid_uuid(const char *u, const bool check_len)
 {
+	assert(check_len == FALSE || check_len == TRUE);
+
 	if (!u || strlen(u) < UUID_LENGTH)
 		return FALSE;
 	if (check_len)
@@ -63,6 +65,8 @@ char *scramble_mac_address(char *uuid)
 {
 	int i;
 
+	assert(uuid);
+
 	if (!valid_uuid(uuid, FALSE))
 		return NULL;
 
@@ -87,6 +91,9 @@ char *generate_uuid(const struct Rc *rc, const bool random_mac)
 	static char uuid[UUID_LENGTH + 2];
 	char *cmd = "uuid";
 	FILE *fp;
+
+	assert(rc);
+	assert(random_mac == FALSE || random_mac == TRUE);
 
 	if (rc->uuidcmd)
 		cmd = rc->uuidcmd;
@@ -126,6 +133,9 @@ char *uuid_date(char *dest, const char *uuid)
 	/* fixme: unfinished */
 	char hexbuf[16];
 
+	assert(dest);
+	assert(uuid);
+
 	if (!valid_uuid(uuid, FALSE))
 		return NULL;
 	if (uuid[14] != '1')
@@ -150,6 +160,9 @@ char *uuid_date(char *dest, const char *uuid)
 
 bool is_valid_date(const char *s, const bool check_len)
 {
+	assert(s);
+	assert(check_len == FALSE || check_len == TRUE);
+
 	if (check_len && strlen(s) != DATE_LENGTH)
 		return FALSE;
 
@@ -187,6 +200,7 @@ char *uuid_date_from_uuid(char *dest, const char *uuid)
 	char *ap, *p;
 
 	assert(dest);
+	assert(uuid);
 
 	if (!valid_uuid(uuid, FALSE))
 		return NULL;
@@ -241,6 +255,8 @@ char *uuid_date_from_uuid(char *dest, const char *uuid)
 char *scan_for_uuid(const char *s)
 {
 	const char *p = s;
+
+	assert(s);
 
 	while (strlen(p) >= UUID_LENGTH) {
 		if (valid_uuid(p, FALSE))

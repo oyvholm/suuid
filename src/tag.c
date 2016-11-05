@@ -42,6 +42,10 @@ bool tag_exists(const struct Entry *entry, const char *tag)
 {
 	unsigned int i;
 
+	assert(entry);
+	assert(entry->tag);
+	assert(tag);
+
 	for (i = 0; i < tag_count; i++)
 		if (!strcmp(tag, entry->tag[i]))
 			return TRUE;
@@ -56,6 +60,9 @@ bool tag_exists(const struct Entry *entry, const char *tag)
 
 char *get_next_tag(const struct Entry *entry)
 {
+	assert(entry);
+	assert(entry->tag);
+
 	if (tag_list_ind < MAX_TAGS)
 		return entry->tag[tag_list_ind++];
 	else
@@ -70,6 +77,9 @@ char *get_next_tag(const struct Entry *entry)
 char *store_tag(struct Entry *entry, const char *arg)
 {
 	char *tag, *p;
+
+	assert(entry);
+	assert(arg);
 
 	tag = strdup(arg); /* Don't modify the source */
 	if (!tag) {

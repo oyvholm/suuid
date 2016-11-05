@@ -32,6 +32,8 @@ char *read_from_fp(FILE *fp)
 	size_t bytes_read = 0, total_bytes_read = 0;
 	size_t bufsize = BUFSIZ;
 
+	assert(fp);
+
 	do {
 		char *new_mem = realloc(retval,
 		                        bufsize + total_bytes_read + 1);
@@ -66,6 +68,9 @@ char *read_from_file(const char *fname)
 	FILE *fp;
 	char *retval;
 
+	assert(fname);
+	assert(strlen(fname));
+
 	fp = fopen(fname, "rb");
 	if (!fp) {
 		myerror("read_from_file(): Could not open file for read");
@@ -90,6 +95,9 @@ char *read_from_editor(const char *editor)
 	     tmpfile[] = ".tmp-suuid.XXXXXX",
 	     *cmdbuf;
 	size_t size;
+
+	assert(editor);
+	assert(strlen(editor));
 
 	if (mkstemp(tmpfile) == -1) {
 		myerror("read_from_editor(): Could not create file name for"

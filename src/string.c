@@ -48,6 +48,9 @@ char *squeeze_chars(char *s, const char *chars)
 {
 	char *p = s, *p2, *buf;
 
+	assert(chars);
+	assert(strlen(chars));
+
 	if (!s || !strlen(s))
 		return s;
 

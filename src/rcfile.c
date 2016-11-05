@@ -30,6 +30,8 @@ char *get_rcfilename(const struct Options *opt)
 	char *retval = NULL, *env;
 	size_t size;
 
+	assert(opt);
+
 	if (opt && opt->rcfile) {
 		retval = strdup(opt->rcfile);
 		if (!retval) {
@@ -65,6 +67,7 @@ char *has_key(const char *line, const char *keyword)
 {
 	char *retval;
 
+	assert(line);
 	assert(keyword);
 	assert(strlen(keyword));
 
@@ -94,6 +97,9 @@ char *has_key(const char *line, const char *keyword)
 
 int parse_rc_line(const char *line, struct Rc *rc)
 {
+	assert(line);
+	assert(rc);
+
 	if (has_key(line, "hostname")) {
 		rc->hostname = strdup(has_key(line, "hostname"));
 		if (!rc->hostname)
@@ -118,6 +124,8 @@ int read_rcfile(const char *rcfile, struct Rc *rc)
 {
 	FILE *fp;
 	char buf[BUFSIZ];
+
+	assert(rc);
 
 	rc->hostname = NULL;
 	rc->uuidcmd = NULL;

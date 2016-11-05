@@ -137,6 +137,10 @@ int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
 {
 	unsigned int i;
 
+	assert(entry);
+	assert(rc);
+	assert(opt);
+
 	entry->host = get_hostname(rc);
 	if (!entry->host) {
 		myerror("fill_entry_struct(): Cannot get hostname");
@@ -178,8 +182,12 @@ int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
 char *process_uuid(FILE *logfp, const struct Rc *rc, const struct Options *opt,
                    struct Entry *entry)
 {
+	assert(logfp);
+	assert(rc);
+	assert(opt);
+	assert(entry);
+
 	if (opt->uuid) {
-		assert(valid_uuid(opt->uuid, TRUE));
 		if (!valid_uuid(opt->uuid, TRUE)) {
 			fprintf(stderr, "process_uuid(): UUID \"%s\" is not "
 			                "valid.", opt->uuid);
@@ -247,10 +255,13 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	struct uuid_result retval;
 	char *rcfile = NULL, *logfile = NULL;
 	FILE *logfp;
-	unsigned int i, count = opt->count;
+	unsigned int i, count;
 	struct Rc rc;
 	struct Entry entry;
 
+	assert(opt);
+
+	count = opt->count;
 	retval.count = 0;
 	memset(retval.lastuuid, 0, UUID_LENGTH + 1);
 	retval.success = TRUE;

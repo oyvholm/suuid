@@ -89,6 +89,8 @@ char *get_hostname(const struct Rc *rc)
 	static char buf[HOST_NAME_MAX + 1];
 	char *retval = buf;
 
+	assert(rc);
+
 	if (getenv(ENV_HOSTNAME))
 		strncpy(buf, getenv(ENV_HOSTNAME), HOST_NAME_MAX);
 	else if (rc->hostname)
@@ -163,6 +165,9 @@ char *get_log_prefix(const struct Rc *rc, const struct Options *opt, char *ext)
 	char *logdir, *hostname;
 	size_t prefix_length; /* Total length of prefix */
 	char *prefix = NULL;
+
+	assert(rc);
+	assert(opt);
 
 	logdir = get_logdir(opt);
 	if (!logdir)

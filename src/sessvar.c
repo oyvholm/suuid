@@ -39,6 +39,8 @@ bool is_valid_desc_string(const char *s)
 {
 	const char *p = s;
 
+	assert(s);
+
 	while (*p) {
 		if (!is_legal_desc_char(*p))
 			return FALSE;
@@ -199,6 +201,8 @@ char *concat_cmd_string(const int argc, char * const argv[])
 	size_t cmdsize = 0;
 	char *cmd = NULL;
 
+	assert(argv);
+
 	for (t = optind; t < argc; t++) {
 		msg(3, "Non-option arg: %s", argv[t]);
 		cmdsize += strlen(argv[t]) + 1; /* Add one for space */
@@ -235,6 +239,8 @@ char *concat_cmd_string(const int argc, char * const argv[])
 char *clean_up_sessvar(char *dest)
 {
 	unsigned int i;
+
+	assert(dest);
 
 	i = strlen(dest);
 	while (i && dest[i - 1] == ',') {
@@ -324,6 +330,9 @@ int run_session(const struct Options *orig_opt,
 	char *start_uuid = NULL;
 	char *cmd_desc = NULL;
 	struct uuid_result result;
+
+	assert(orig_opt);
+	assert(argv);
 
 	cmd = concat_cmd_string(argc, argv);
 	if (!cmd)

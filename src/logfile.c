@@ -35,6 +35,8 @@ bool valid_xml_chars(const char *s)
 {
 	unsigned char *p = (unsigned char *)s;
 
+	assert(s);
+
 	if (utf8_check(s))
 		return FALSE;
 	while (*p) {
@@ -56,10 +58,13 @@ bool valid_xml_chars(const char *s)
 char *suuid_xml(const char *text)
 {
 	char *retval;
-	size_t size = strlen(text);
+	size_t size;
 	const char *p;
 	char *destp;
 
+	assert(text);
+
+	size = strlen(text);
 	retval = malloc(size * MAX_GROWTH + 1);
 	if (!retval) {
 		myerror("Cannot allocate %lu bytes for XML",
@@ -215,6 +220,8 @@ char *get_xml_tags(const struct Entry *entry)
 	char *p, *buf, *tmpbuf;
 	size_t size = 0, tmpsize = 0;
 
+	assert(entry);
+
 	rewind_tag();
 	do {
 		p = get_next_tag(entry);
@@ -342,6 +349,7 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 	size_t size;
 
 	assert(entry);
+	assert(raw == FALSE || raw == TRUE);
 
 	init_xml_entry(&e);
 
@@ -480,6 +488,8 @@ FILE *write_xml_header(FILE *fp)
 	                "<!DOCTYPE suuids SYSTEM \"dtd/suuids.dtd\">\n"
 	                "<suuids>\n";
 
+	assert(fp);
+
 	if (fputs(header, fp) == EOF) {
 		myerror("Cannot write header to the log file");
 		return NULL;
@@ -497,6 +507,9 @@ FILE *write_xml_header(FILE *fp)
 
 FILE *seek_to_eof(FILE *fp, const char *fname)
 {
+	assert(fp);
+	assert(fname);
+
 	if (fseek(fp, 0, SEEK_END) == -1) {
 		myerror("%s: Cannot seek to end of file", fname);
 		return NULL;
@@ -514,6 +527,9 @@ FILE *seek_to_eof(FILE *fp, const char *fname)
 
 FILE *unknown_end_line(FILE *fp, const char *fname)
 {
+	assert(fp);
+	assert(fname);
+
 	fprintf(stderr, "%s: %s: Unknown end line, adding to end of file\n",
 	                progname, fname);
 
@@ -532,6 +548,9 @@ FILE *check_last_log_line(FILE *fp, const char *fname)
 {
 	long filepos;
 	char check_line[12];
+
+	assert(fp);
+	assert(fname);
 
 	if (fseek(fp, -10, SEEK_END) == -1) {
 		myerror("%s: Could not seek in log file", fname);
@@ -567,6 +586,9 @@ FILE *check_last_log_line(FILE *fp, const char *fname)
 FILE *seek_to_entry_pos(FILE *fp, const char *fname)
 {
 	long filepos;
+
+	assert(fp);
+	assert(fname);
 
 	if (!seek_to_eof(fp, fname))
 		return NULL;
@@ -637,7 +659,9 @@ int add_to_logfile(FILE *fp, const struct Entry *entry, const bool raw)
 	char *ap;
 	int retval = EXIT_OK;
 
+	assert(fp);
 	assert(entry);
+	assert(raw == FALSE || raw == TRUE);
 
 	ap = xml_entry(entry, raw);
 	if (!ap)
@@ -663,6 +687,8 @@ int add_to_logfile(FILE *fp, const struct Entry *entry, const bool raw)
 int close_logfile(FILE *fp)
 {
 	int retval = EXIT_OK;
+
+	assert(fp);
 
 	if (fprintf(fp, "</suuids>\n") != 10)
 		retval = EXIT_ERROR;
