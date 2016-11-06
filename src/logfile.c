@@ -177,7 +177,12 @@ char *allocate_elem(const char *elem, const char *src)
 	ap = suuid_xml(src);
 	if (!ap)
 		return NULL;
-	snprintf(retval, size, "<%s>%s</%s> ", elem, ap, elem);
+
+	if (strlen(ap))
+		snprintf(retval, size, "<%s>%s</%s> ", elem, ap, elem);
+	else
+		retval[0] = '\0';
+
 	free(ap);
 
 	return retval;

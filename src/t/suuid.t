@@ -821,6 +821,32 @@ sub test_suuid_comment {
 
     # }}}
     ok(unlink($Outfile), "Delete [Outfile]");
+    likecmd("$CMD -c - -l $Outdir </dev/null", # {{{
+        "/^$v1_templ\n\$/s",
+        '/^$/',
+        0,
+        "Read empty comment from stdin",
+    );
+
+    # }}}
+    likecmd("$CMD --comment '' -l $Outdir", # {{{
+        "/^$v1_templ\n\$/s",
+        '/^$/',
+        0,
+        "Enter empty comment with --comment",
+    );
+
+    # }}}
+    like(file_data($Outfile), # {{{
+        s_top(
+            s_suuid('tty' => '') .
+            s_suuid(),
+        ),
+        "Log contents OK after empty comments",
+    );
+
+    # }}}
+    ok(unlink($Outfile), "Delete [Outfile]");
     likecmd("echo " . "a" x 82 . " | $CMD -t aa -c - -l $Outdir", # {{{
         "/^$v1_templ\n\$/s",
         '/^$/',
