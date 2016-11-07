@@ -21,6 +21,8 @@
 #ifndef _COMMON_H
 #define _COMMON_H
 
+#undef NDEBUG
+
 /*
  * Standard header files
  */
