@@ -39,7 +39,7 @@ bool valid_uuid(const char *u, const bool check_len)
 
 	/*
 	 * Check that it only contains lowercase hex and dashes at the right 
-	 * places
+	 * places.
 	 */
 	if (check_hex(u, 8) || u[8] != '-' || check_hex(u + 9, 4) ||
 	    u[13] != '-' || check_hex(u + 14, 4) || u[18] != '-' ||
@@ -47,7 +47,7 @@ bool valid_uuid(const char *u, const bool check_len)
 		return FALSE;
 
 	/*
-	 * At the moment only v1 UUIDs are allowed
+	 * At the moment only v1 UUIDs are allowed.
 	 */
 	if (u[14] != '1')
 		return FALSE;

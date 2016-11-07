@@ -104,6 +104,7 @@ char *read_from_editor(const char *editor)
 		        "temporary file");
 		return NULL;
 	}
+
 	size = strlen(editor) + strlen(tmpfile) + 5;
 	cmdbuf = malloc(size);
 	if (!cmdbuf) {
@@ -112,13 +113,16 @@ char *read_from_editor(const char *editor)
 		return NULL;
 	}
 	snprintf(cmdbuf, size, "%s %s", editor, tmpfile);
+
 	if (system(cmdbuf) == -1) {
 		myerror("read_from_editor(): Cannot execute \"%s\"", cmdbuf);
 		return NULL;
 	}
+
 	retval = read_from_file(tmpfile);
 	if (!retval)
 		return NULL;
+
 	if (remove(tmpfile) == -1)
 		myerror("Warning: Could not remove temporary file \"%s\"",
 		        tmpfile);

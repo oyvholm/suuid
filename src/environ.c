@@ -30,6 +30,10 @@ char *get_editor(void)
 	char *retval;
 
 	if (getenv(ENV_EDITOR)) {
+		/*
+		 * Use the editor specified in an environment variable used 
+		 * only by this program.
+		 */
 		retval = strdup(getenv(ENV_EDITOR));
 		if (!retval) {
 			myerror("get_editor(): Could not duplicate "
@@ -37,6 +41,9 @@ char *get_editor(void)
 			return NULL;
 		}
 	} else if (getenv("EDITOR")) {
+		/*
+		 * Use the default environment variable all programs use.
+		 */
 		retval = strdup(getenv("EDITOR"));
 		if (!retval) {
 			myerror("get_editor(): Could not duplicate "
@@ -44,7 +51,11 @@ char *get_editor(void)
 			return NULL;
 		}
 	} else {
-		retval = strdup(STD_EDITOR); /* In case it's free()'ed later */
+		/*
+		 * Unable to get path to the editor from the environment, use a 
+		 * hardcoded value.
+		 */
+		retval = strdup(STD_EDITOR); /* It's free()'ed later */
 		if (!retval) {
 			myerror("get_editor(): Could not duplicate \"%s\"",
 			        STD_EDITOR);
@@ -70,6 +81,15 @@ bool valid_hostname(const char *s)
 
 	p = (unsigned char *)s;
 	while (*p) {
+		/*
+		 * Fixme: Check up on some RFC or something so the correct 
+		 * rules are enforced, don't just invent something. Have only 
+		 * included characters here that look like they shouldn't be 
+		 * allowed. Like, in these wonderful modern times, are 
+		 * characters above U+007F allowed? Or even if it isn't, should 
+		 * it be allowed here? In the end it ends up as a file name 
+		 * anyway.
+		 */
 		if (strchr("!\"#$%&'()*+,/:;<=>?@[\\]^`{|}~", *p) ||
 		    *p < '!' || *p >= '\x7f')
 			return FALSE;
@@ -92,14 +112,24 @@ char *get_hostname(const struct Rc *rc)
 	assert(rc);
 
 	if (getenv(ENV_HOSTNAME))
+		/*
+		 * Use hostname from a special environment variable.
+		 */
 		strncpy(buf, getenv(ENV_HOSTNAME), HOST_NAME_MAX);
 	else if (rc->hostname)
+		/*
+		 * Use hostname from the rc file.
+		 */
 		strncpy(buf, rc->hostname, HOST_NAME_MAX);
 #if FAKE_HOST
 	else if (1)
 		retval = "fake";
 #endif
 	else if (gethostname(buf, HOST_NAME_MAX) == -1)
+		/*
+		 * Use the computer's real hostname or fail. No UUID is created 
+		 * without a valid hostname.
+		 */
 		return NULL;
 
 	return retval;
@@ -118,6 +148,9 @@ char *get_logdir(const struct Options *opt)
 	char *retval = NULL;
 
 	if (opt && opt->logdir) {
+		/*
+		 * The log directory is specified via the -l/--logdir argument.
+		 */
 		retval = strdup(opt->logdir);
 		if (!retval) {
 			myerror("get_logdir(): Could not duplicate "
@@ -125,6 +158,9 @@ char *get_logdir(const struct Options *opt)
 			return NULL;
 		}
 	} else if (getenv(ENV_LOGDIR)) {
+		/*
+		 * Read logdir name from a dedicated environment variable.
+		 */
 		retval = strdup(getenv(ENV_LOGDIR));
 		if (!retval) {
 			myerror("get_logdir(): Could not duplicate %s "
@@ -132,6 +168,9 @@ char *get_logdir(const struct Options *opt)
 			return NULL;
 		}
 	} else if (getenv("HOME")) {
+		/*
+		 * Use default hardcoded value.
+		 */
 		int size = strlen(getenv("HOME")) +
 		           strlen("/uuids") + 1; /* fixme: slash */
 
@@ -169,9 +208,19 @@ char *get_log_prefix(const struct Rc *rc, const struct Options *opt, char *ext)
 	assert(rc);
 	assert(opt);
 
+	/*
+	 * Get full path to the log directory.
+	 */
+
 	logdir = get_logdir(opt);
 	if (!logdir)
 		return NULL;
+
+	/*
+	 * Get the host name from the environment, rc file, or use the real 
+	 * hostname for the computer. This name is used as the part of the file 
+	 * name before the file extension.
+	 */
 
 	hostname = get_hostname(rc);
 	if (!hostname) {
@@ -186,6 +235,11 @@ char *get_log_prefix(const struct Rc *rc, const struct Options *opt, char *ext)
 
 	if (!ext)
 		ext = "";
+
+	/*
+	 * Build the full log file path with extension if provided and 
+	 * return it as an allocated string.
+	 */
 
 	prefix_length = strlen(logdir) + strlen("/") + /* fixme: slash */
 	                strlen(hostname) + strlen(ext) + 1;
@@ -205,8 +259,9 @@ cleanup:
 }
 
 /*
- * getpath() - Return pointer to string with full path to current directory, or 
- * NULL if error. Use free() on the pointer when it's not needed anymore.
+ * getpath() - Return pointer to allocated string with full path to current 
+ * directory, or NULL if error. Use free() on the pointer when it's not needed 
+ * anymore.
  */
 
 char *getpath(void)

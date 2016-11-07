@@ -227,6 +227,15 @@ char *get_xml_tags(const struct Entry *entry)
 
 	assert(entry);
 
+	/*
+	 * Loop through the tags and find the total size of the tags. Multiply 
+	 * the size to make up for any worst case scenario (only ampersands) 
+	 * and include space for the XML tags. Also find the length of the 
+	 * longest tag, this is used to allocate a temporary work buffer where 
+	 * each tag is converted to escaped XML before it's appended to the 
+	 * returned string.
+	 */
+
 	rewind_tag();
 	do {
 		p = get_next_tag(entry);
@@ -255,6 +264,11 @@ char *get_xml_tags(const struct Entry *entry)
 		free(buf);
 		return NULL;
 	}
+
+	/*
+	 * Loop through each tag, convert it to XML and write it to a temporary 
+	 * buffer which is appended to the final string.
+	 */
 
 	rewind_tag();
 	do {
@@ -294,6 +308,12 @@ char *create_sess_xml(const struct Entry *entry)
 
 	assert(entry);
 
+	/*
+	 * Loop through the sess array and find the total length of all sess 
+	 * elements. Also find the length of the longest element, it's used to 
+	 * allocate a temporary work buffer.
+	 */
+
 	i = 0;
 	while (entry->sess[i].uuid) {
 		size_t len;
@@ -307,12 +327,17 @@ char *create_sess_xml(const struct Entry *entry)
 		i++;
 	}
 
+	/*
+	 * Allocate space for the final string and a temporary work buffer.
+	 */
+
 	buf = malloc(size);
 	if (!buf) {
 		myerror("create_sess_xml(): Cannot allocate %lu bytes for buf",
 		        size);
 		return NULL;
 	}
+
 	tmpbuf = malloc(tmpsize);
 	if (!tmpbuf) {
 		myerror("create_sess_xml(): Cannot allocate %lu bytes for "
@@ -320,8 +345,15 @@ char *create_sess_xml(const struct Entry *entry)
 		free(buf);
 		return NULL;
 	}
+
 	buf[0] = '\0';
 	i = 0;
+
+	/*
+	 * Loop through each element in the sess array, convert it to XML, 
+	 * write it to a temporary buffer and append it to the final string.
+	 */
+
 	while (entry->sess[i].uuid) {
 		char *u, *d;
 
@@ -361,6 +393,10 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 	if (!entry->uuid)
 		return NULL;
 
+	/*
+	 * Allocate space for the UUID and timestamp attributes.
+	 */
+
 	e.uuid = alloc_attr("u", entry->uuid);
 	if (!e.uuid)
 		return NULL;
@@ -372,6 +408,10 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 			return NULL;
 		}
 	}
+
+	/*
+	 * Allocate space for XML tags and sess elements.
+	 */
 
 	tag_xml = get_xml_tags(entry);
 	if (!tag_xml) {
@@ -389,6 +429,14 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 	}
 
 	if (raw) {
+		/*
+		 * Write unescaped XML surrounded by <txt> elements to the 
+		 * allocated buffer. This is for programs that need to output 
+		 * an XML structure, and it's their responsibility to turn it 
+		 * into valid XML. If the XML isn't well-formed, the XML log 
+		 * file won't validate. The XML doesn't need to have a single 
+		 * root, as it will be enclosed inside the <txt> element.
+		 */
 		int size;
 		char *txt_space;
 
@@ -408,11 +456,19 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 		snprintf(e.txt, size, "<txt>%s%s%s</txt> ",
 		                      txt_space, entry->txt, txt_space);
 	} else
+		/*
+		 * Write escaped XML to the buffer.
+		 */
 		e.txt = allocate_elem("txt", entry->txt);
+
 	e.host = allocate_elem("host", entry->host);
 	e.cwd = allocate_elem("cwd", entry->cwd);
 	e.user = allocate_elem("user", entry->user);
 	e.tty = allocate_elem("tty", entry->tty);
+
+	/*
+	 * Allocate space for the final XML string.
+	 */
 
 	size = DATE_LENGTH + UUID_LENGTH + strlen(tag_xml) + strlen(e.txt) +
 	       strlen(e.host) + strlen(e.cwd) + strlen(e.user) +
@@ -428,6 +484,11 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 		free(e.uuid);
 		return NULL;
 	}
+
+	/*
+	 * Write the XML to the return buffer. Undefined values are skipped, 
+	 * the only required data is the UUID and extracted timestamp.
+	 */
 
 	snprintf(retval, size, "<suuid%s%s> " /* date, uuid */
 	                       "%s" /* tag */
@@ -626,10 +687,19 @@ FILE *open_logfile(const char *fname)
 	assert(strlen(fname));
 
 	/*
-	 * fixme: Make the existence check/file creation atomic. See the log 
-	 * message for commit a0c635c ("Get rid of create_logfile() and 
+	 * Fixme: Make the existence check/file creation atomic. See the log 
+	 * message for commit a0c635c3aba8 ("Get rid of create_logfile() and 
 	 * set_up_logfile(), move into open_logfile()", 2016-07-06) for more 
-	 * info.
+	 * info. ... OK, because I feel generous today, here it is:
+	 *
+	 * Trying to get rid of a small race condition when the log file is 
+	 * created. In some situations it can create an extra header when two 
+	 * processes create the file at the same time. The creation isn't 
+	 * atomic, there's a small gap between the existence check and when 
+	 * it's opened and locked. It's hard to reproduce, and it's maybe a 
+	 * non-problem because it only happens when the file is created and 
+	 * lots of processes is hammering on it, that's an unlikely scenario. 
+	 * Nevertheless, I'll look into it because it's kind of annoying.
 	 */
 
 	if (access(fname, F_OK) != -1) {

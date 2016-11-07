@@ -83,12 +83,19 @@ char *process_comment_option(const char *cmt)
 	assert(cmt);
 
 	if (!strcmp(cmt, "-")) {
+		/*
+		 * Read comment from stdin.
+		 */
 		retval = read_from_fp(stdin);
 		if (!retval) {
 			myerror("Could not read data from stdin");
 			return NULL;
 		}
 	} else if (!strcmp(cmt, "--")) {
+		/*
+		 * Open the user's favourite editor and edit the comment there 
+		 * in a temporary file.
+		 */
 		char *e;
 
 		e = get_editor();
@@ -99,6 +106,10 @@ char *process_comment_option(const char *cmt)
 		if (!retval)
 			return NULL;
 	} else {
+		/*
+		 * The comment was stored as a plain string in the -c/--comment 
+		 * argument.
+		 */
 		retval = strdup(cmt);
 		if (!retval) {
 			myerror("%s: Cannot allocate memory for comment, "
@@ -139,6 +150,14 @@ int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
 	assert(rc);
 	assert(opt);
 
+	/*
+	 * Get information about the environment; hostname, current directory, 
+	 * login name and tty.
+	 *
+	 * Fixme: Add check so this and the session info thing are run only 
+	 * once. Only has some effect if creating many UUIDs.
+	 */
+
 	entry->host = get_hostname(rc);
 	if (!entry->host) {
 		myerror("fill_entry_struct(): Cannot get hostname");
@@ -153,6 +172,10 @@ int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
 	entry->user = get_username();
 	entry->tty = get_tty();
 
+	/*
+	 * Store tags and comment in entry.
+	 */
+
 	for (i = 0; i < MAX_TAGS && opt->tag[i]; i++)
 		if (!store_tag(entry, opt->tag[i]))
 			return EXIT_ERROR;
@@ -163,6 +186,10 @@ int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
 			return EXIT_ERROR;
 	}
 
+	/*
+	 * Store session information from the environment variable.
+	 */
+
 	if (get_sess_info(entry) == EXIT_ERROR) {
 		free(entry->txt);
 		return EXIT_ERROR;
@@ -172,9 +199,9 @@ int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
 }
 
 /*
- * process_uuid() - Generate UUID and write it to the log file.
- * If no errors, send it to stdout and/or stderr and return a pointer to the 
- * UUID. Otherwise return NULL.
+ * process_uuid() - Generate one UUID and write it to the log file. If no 
+ * errors, send it to stdout and/or stderr and return a pointer to the UUID. 
+ * Otherwise return NULL.
  */
 
 char *process_uuid(FILE *logfp, const struct Rc *rc, const struct Options *opt,
@@ -184,6 +211,11 @@ char *process_uuid(FILE *logfp, const struct Rc *rc, const struct Options *opt,
 	assert(rc);
 	assert(opt);
 	assert(entry);
+
+	/*
+	 * Generate the UUID or use an already generated UUID stored in 
+	 * opt->uuid.
+	 */
 
 	if (opt->uuid) {
 		if (!valid_uuid(opt->uuid, TRUE)) {
@@ -198,6 +230,12 @@ char *process_uuid(FILE *logfp, const struct Rc *rc, const struct Options *opt,
 		fprintf(stderr, "%s: UUID generation failed\n", progname);
 		return NULL;
 	}
+
+	/*
+	 * Extract the time stamp from the UUID and store it in an allocated 
+	 * buffer.
+	 */
+
 	entry->date = malloc(DATE_LENGTH + 1);
 	if (!entry->date) {
 		myerror("process_uuid(): Could not allocate %lu bytes for "
@@ -209,6 +247,11 @@ char *process_uuid(FILE *logfp, const struct Rc *rc, const struct Options *opt,
 
 	if (add_to_logfile(logfp, entry, opt->raw) == EXIT_ERROR)
 		return NULL;
+
+	/*
+	 * Write the UUID to stdout and/or stderr, or not, depending on the 
+	 * -w/--whereto argument.
+	 */
 
 	if (!opt->whereto)
 		puts(entry->uuid);
@@ -267,6 +310,11 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	retval.success = TRUE;
 	init_xml_entry(&entry);
 
+	/*
+	 * Get information about the environment; hostname, current directory, 
+	 * tty, location of rc file and log directory, etc.
+	 */
+
 	if (init_randomness() == EXIT_ERROR) {
 		retval.success = FALSE;
 		goto cleanup;
@@ -295,11 +343,19 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	signal(SIGPIPE, sighandler);
 	signal(SIGTERM, sighandler);
 
+	/*
+	 * Open the log file. If it's missing, create it.
+	 */
+
 	logfp = open_logfile(logfile);
 	if (!logfp) {
 		retval.success = FALSE;
 		goto cleanup;
 	}
+
+	/*
+	 * Generate the UUIDs and write them to the log file.
+	 */
 
 	if (opt->uuid)
 		count = 1;
@@ -316,9 +372,17 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	if (valid_uuid(entry.uuid, TRUE))
 		strncpy(retval.lastuuid, entry.uuid, UUID_LENGTH + 1);
 
+	/*
+	 * Check that the correct amount of UUIDs were created.
+	 */
+
 	if (retval.count < opt->count)
 		fprintf(stderr, "%s: Generated only %u of %u UUIDs\n",
 		                progname, retval.count, opt->count);
+
+	/*
+	 * Close up the shop and go home.
+	 */
 
 	if (close_logfile(logfp) == EXIT_ERROR)
 		retval.success = FALSE;

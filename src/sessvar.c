@@ -148,6 +148,10 @@ int get_sess_info(struct Entry *entry)
 	}
 
 	if (!scan_for_uuid(s)) {
+		/*
+		 * The environment variable exists, but contains no valid 
+		 * UUIDs. Not much to do about that, so just return gracefully.
+		 */
 		free(s);
 		return EXIT_OK;
 	}
