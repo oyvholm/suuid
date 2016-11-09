@@ -220,7 +220,7 @@ char *process_uuid(FILE *logfp, const struct Rc *rc, const struct Options *opt,
 	if (opt->uuid) {
 		if (!valid_uuid(opt->uuid, TRUE)) {
 			fprintf(stderr, "process_uuid(): UUID \"%s\" is not "
-			                "valid.", opt->uuid);
+			                "valid.\n", opt->uuid);
 			return NULL;
 		}
 		entry->uuid = opt->uuid;
