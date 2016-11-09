@@ -200,6 +200,23 @@ int get_sess_info(struct Entry *entry)
 }
 
 /*
+ * free_sess() - Deallocate all sess entries in the entry->sess[].{desc,uuid} 
+ * arrays.
+ */
+
+void free_sess(struct Entry *entry)
+{
+	unsigned int i;
+
+	assert(entry);
+
+	for (i = 0; entry->sess[i].desc && i < MAX_SESS; i++)
+		free(entry->sess[i].desc);
+	for (i = 0; entry->sess[i].uuid && i < MAX_SESS; i++)
+		free(entry->sess[i].uuid);
+}
+
+/*
  * concat_cmd_string() - Concatenate the command line arguments received in 
  * argc and argv with a single space character between them. Return pointer to 
  * allocated string containing the command, or NULL if anything fails.

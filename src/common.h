@@ -216,6 +216,7 @@ extern char *get_desc_from_command(const char *cmd);
 extern int fill_sess(struct Entry *dest, const char *uuid,
                      const char *desc, const size_t desclen);
 extern int get_sess_info(struct Entry *entry);
+extern void free_sess(struct Entry *entry);
 extern char *concat_cmd_string(const int argc, char * const argv[]);
 extern char *clean_up_sessvar(char *dest);
 extern const char *add_to_sessvar(const char *desc, const char *uuid);
