@@ -140,6 +140,7 @@ int read_rcfile(const char *rcfile, struct Rc *rc)
 	do {
 		if (!fgets(buf, BUFSIZ, fp) && errno) {
 			myerror("%s: Could not read from rcfile", rcfile);
+			fclose(fp);
 			return EXIT_ERROR;
 		}
 		trim_str_front(buf);
@@ -147,10 +148,13 @@ int read_rcfile(const char *rcfile, struct Rc *rc)
 		if (parse_rc_line(buf, rc) == EXIT_ERROR) {
 			myerror("Could not allocate memory for line from "
 			        "rc file \"%s\"", rcfile);
+			fclose(fp);
 			return EXIT_ERROR;
 		}
 		*buf = '\0';
 	} while (!feof(fp));
+
+	fclose(fp);
 
 	return EXIT_OK;
 }
