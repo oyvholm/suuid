@@ -21,8 +21,8 @@
 #include "suuid.h"
 
 /*
- * get_rcfilename() - Return pointer to a string with name of rcfile. If 
- * neither opt->rcfile or HOME is defined, return NULL.
+ * get_rcfilename() - Return pointer to an allocated string with name of 
+ * rcfile. If neither opt->rcfile or HOME is defined, return NULL.
  */
 
 char *get_rcfilename(const struct Options *opt)
