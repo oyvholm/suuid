@@ -248,6 +248,17 @@ char *get_xml_tags(const struct Entry *entry)
 		}
 	} while (p);
 
+	if (!size) {
+		/*
+		 * No tags found, return empty string,
+		 */
+		buf = strdup("");
+		if (!buf)
+			myerror("get_xml_tags(): Could not duplicate "
+			        "empty string");
+		return buf;
+	}
+
 	buf = malloc(size);
 	if (!buf) {
 		myerror("get_xml_tags(): Could not allocate %lu bytes for buf",
