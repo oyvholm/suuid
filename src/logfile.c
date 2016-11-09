@@ -338,6 +338,17 @@ char *create_sess_xml(const struct Entry *entry)
 		i++;
 	}
 
+	if (!size) {
+		/*
+		 * No elements in the sess array, return empty string.
+		 */
+		buf = strdup("");
+		if (!buf)
+			myerror("create_sess_xml(): Cannot duplicate empty "
+			        "string");
+		return buf;
+	}
+
 	/*
 	 * Allocate space for the final string and a temporary work buffer.
 	 */
