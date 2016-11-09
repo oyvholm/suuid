@@ -100,6 +100,12 @@ int fill_sess(struct Entry *dest, const char *uuid,
 	assert(dest);
 	assert(valid_uuid(uuid, FALSE));
 
+	if (sessind >= MAX_SESS) {
+		fprintf(stderr, "%s: Maximum number of sess entries (%u) "
+		                "exceeded\n", progname, MAX_SESS);
+		return EXIT_ERROR;
+	}
+
 	auuid = strndup(uuid, UUID_LENGTH);
 	if (!auuid) {
 		myerror("fill_sess(): Memory allcation error, "
