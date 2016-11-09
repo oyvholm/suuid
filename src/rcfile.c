@@ -34,10 +34,8 @@ char *get_rcfilename(const struct Options *opt)
 
 	if (opt && opt->rcfile) {
 		retval = strdup(opt->rcfile);
-		if (!retval) {
+		if (!retval)
 			myerror("Cannot duplicate --rcfile argument");
-			return NULL;
-		}
 		return retval;
 	}
 	env = getenv("HOME");
