@@ -236,7 +236,8 @@ char *process_uuid(FILE *logfp, const struct Rc *rc, const struct Options *opt,
 	 * buffer.
 	 */
 
-	entry->date = malloc(DATE_LENGTH + 1);
+	if (!entry->date)
+		entry->date = malloc(DATE_LENGTH + 1);
 	if (!entry->date) {
 		myerror("process_uuid(): Could not allocate %lu bytes for "
 		        "date string", DATE_LENGTH + 1);
