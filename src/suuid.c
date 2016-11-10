@@ -165,12 +165,16 @@ int print_version(void)
 
 int usage(const int retval)
 {
+	char *logdir;
+
 	if (retval != EXIT_SUCCESS) {
 		fprintf(stderr, "\nType \"%s --help\" for help screen. "
 		                "Returning with value %d.\n",
 		                progname, retval);
 		return retval;
 	}
+
+	logdir = get_logdir(NULL);
 
 	puts("");
 	if (verbose_level(0) >= 1) {
@@ -207,7 +211,7 @@ int usage(const int retval)
 	       "    If the %s environment variable is defined, "
 	       "that value is \n"
 	       "    used. Otherwise the value \"$HOME/uuids\" is used.\n"
-	       "    Current default: %s\n", ENV_LOGDIR, get_logdir(NULL));
+	       "    Current default: %s\n", ENV_LOGDIR, logdir);
 	printf("  -m, --random-mac\n"
 	       "    Don’t use the hardware MAC address, generate a random "
 	       "address field.\n");
@@ -258,6 +262,8 @@ int usage(const int retval)
 	       "\"hostname = xxx\".\n",
 	       ENV_HOSTNAME, getenv("HOME"), STD_RCFILE);
 	printf("\n");
+
+	free(logdir);
 
 	return retval;
 }
