@@ -35,6 +35,7 @@ our %Opt = (
     'help' => 0,
     'quiet' => 0,
     'todo' => 0,
+    'valgrind' => 0,
     'verbose' => 0,
     'version' => 0,
 
@@ -53,6 +54,7 @@ GetOptions(
     'help|h' => \$Opt{'help'},
     'quiet|q+' => \$Opt{'quiet'},
     'todo|t' => \$Opt{'todo'},
+    'valgrind' => \$Opt{'valgrind'},
     'verbose|v+' => \$Opt{'verbose'},
     'version' => \$Opt{'version'},
 
@@ -78,6 +80,11 @@ my $xml_header = join("",
 );
 
 my $Outdir = "tmp-suuid-t-$$-" . substr(rand, 2, 8);
+
+if ($Opt{'valgrind'}) {
+    $CMD = "valgrind -q --leak-check=full --show-leak-kinds=all -- " .
+           "../$CMD_BASENAME";
+}
 
 exit(main());
 
@@ -1493,6 +1500,9 @@ Options:
     Be more quiet. Can be repeated to increase silence.
   -t, --todo
     Run only the TODO tests.
+  --valgrind
+    Run all tests under Valgrind to check for memory leaks and other 
+    problems.
   -v, --verbose
     Increase level of verbosity. Can be repeated.
   --version
