@@ -126,6 +126,14 @@ int store_tag(struct Entry *entry, const char *arg)
 		retval = EXIT_FAILURE;
 		goto cleanup;
 	}
+
+	if (tag_count >= MAX_TAGS) {
+		fprintf(stderr, "%s: Maximum number of tags (%u) exceeded\n",
+		                progname, MAX_TAGS);
+		retval = EXIT_FAILURE;
+		goto cleanup;
+	}
+
 	if (!(entry->tag[tag_count++] = strdup(tag))) {
 		myerror("store_tag(): Could not allocate memory for "
 		        "return value");

@@ -319,6 +319,11 @@ int choose_opt_action(struct Options *dest,
 		dest->verbose--;
 		break;
 	case 't':
+		if (tag_count >= MAX_TAGS) {
+			fprintf(stderr, "%s: Maximum number of tags (%u) "
+			                "exceeded\n", progname, MAX_TAGS);
+			retval = EXIT_FAILURE;
+		}
 		dest->tag[tag_count++] = optarg;
 		break;
 	case 'v':
