@@ -138,6 +138,10 @@ cleanup:
 	return retval;
 }
 
+/*
+ * free_tags() - Free all allocated strings in the tag array.
+ */
+
 void free_tags(struct Entry *entry)
 {
 	unsigned int i;
