@@ -177,7 +177,7 @@ int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
 	 */
 
 	for (i = 0; i < MAX_TAGS && opt->tag[i]; i++)
-		if (!store_tag(entry, opt->tag[i]))
+		if (store_tag(entry, opt->tag[i]) == EXIT_FAILURE)
 			return EXIT_FAILURE;
 
 	if (opt->comment) {

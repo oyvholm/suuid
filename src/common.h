@@ -231,7 +231,7 @@ extern char *utf8_check(const char *text);
 extern void rewind_tag(void);
 extern bool tag_exists(const struct Entry *entry, const char *tag);
 extern char *get_next_tag(const struct Entry *entry);
-extern char *store_tag(struct Entry *entry, const char *arg);
+extern int store_tag(struct Entry *entry, const char *arg);
 
 /* uuid.c */
 extern bool valid_uuid(const char *u, const bool check_len);

@@ -70,11 +70,12 @@ char *get_next_tag(const struct Entry *entry)
 }
 
 /*
- * store_tag() - Store a new tag in the array. If ok, return pointer to the tag 
- * name, otherwise NULL.
+ * store_tag() - Store a new tag in the array. Return EXIT_SUCCESS if the tag 
+ * was successfully added or it existed from before, or EXIT_FAILURE if 
+ * something failed.
  */
 
-char *store_tag(struct Entry *entry, const char *arg)
+int store_tag(struct Entry *entry, const char *arg)
 {
 	char *tag, *p;
 
@@ -84,7 +85,7 @@ char *store_tag(struct Entry *entry, const char *arg)
 	tag = strdup(arg); /* Don't modify the source */
 	if (!tag) {
 		myerror("store_tag(): Could not duplicate arg string");
-		return NULL;
+		return EXIT_FAILURE;
 	}
 
 	while ((p = strchr(tag, ','))) {
@@ -95,14 +96,14 @@ char *store_tag(struct Entry *entry, const char *arg)
 	trim_str_front(tag);
 	trim_str_end(tag);
 	if (tag_exists(entry, tag) || !strlen(tag))
-		return tag;
+		return EXIT_SUCCESS;
 	if (utf8_check(tag)) {
 		fprintf(stderr, "%s: Tags have to be in UTF-8\n", progname);
-		return NULL;
+		return EXIT_FAILURE;
 	}
 	entry->tag[tag_count++] = strdup(tag);
 
-	return tag;
+	return EXIT_SUCCESS;
 }
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */
