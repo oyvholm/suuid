@@ -17,3 +17,7 @@ build:
 clean:
 	rm -rf tmp-* *-stderr.tmp
 	if test ! -e log/.git; then rm -rfv log; fi
+
+.PHONY: valgrind
+valgrind: build
+	./suuid.t --valgrind

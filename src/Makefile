@@ -123,3 +123,7 @@ testnew: test $(SESS_EXEC)
 tags: $(COMMON_C) suuid.c sess.c $(SUUID_HFILES) $(SESS_HFILES) t/suuid.t
 	$(CTAGS) $(COMMON_C) suuid.c sess.c $(SUUID_HFILES) $(SESS_HFILES) \
 	    t/suuid.t
+
+.PHONY: valgrind
+valgrind:
+	cd t && $(MAKE) valgrind
