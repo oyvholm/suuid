@@ -232,6 +232,7 @@ extern void rewind_tag(void);
 extern bool tag_exists(const struct Entry *entry, const char *tag);
 extern char *get_next_tag(const struct Entry *entry);
 extern int store_tag(struct Entry *entry, const char *arg);
+extern void free_tags(struct Entry *entry);
 
 /* uuid.c */
 extern bool valid_uuid(const char *u, const bool check_len);

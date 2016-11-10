@@ -78,6 +78,7 @@ char *get_next_tag(const struct Entry *entry)
 int store_tag(struct Entry *entry, const char *arg)
 {
 	char *tag, *p;
+	int retval = EXIT_SUCCESS;
 
 	assert(entry);
 	assert(arg);
@@ -90,20 +91,59 @@ int store_tag(struct Entry *entry, const char *arg)
 
 	while ((p = strchr(tag, ','))) {
 		*p++ = '\0';
-		store_tag(entry, tag);
-		tag = p;
+		if (store_tag(entry, tag) == EXIT_FAILURE) {
+			retval = EXIT_FAILURE;
+			goto cleanup;
+		}
+		if (p && strlen(p)) {
+			/*
+			 * This whole thing could be replaced by a single 
+			 * strcpy(tag, p), but Valgrind complains about source 
+			 * and destination overlap. It's better to uglify the 
+			 * source a bit than having Valgrind errors, so live 
+			 * with it for now.
+			 */
+			char *tag2;
+
+			tag2 = malloc(strlen(p) + 1);
+			if (!tag2) {
+				myerror("store_tag(): Could not allocate "
+				        "%u bytes for new tag", strlen(p) + 1);
+				retval = EXIT_FAILURE;
+				goto cleanup;
+			}
+			strcpy(tag2, p);
+			free(tag);
+			tag = tag2;
+		}
 	}
 	trim_str_front(tag);
 	trim_str_end(tag);
 	if (tag_exists(entry, tag) || !strlen(tag))
-		return EXIT_SUCCESS;
+		goto cleanup;
 	if (utf8_check(tag)) {
 		fprintf(stderr, "%s: Tags have to be in UTF-8\n", progname);
-		return EXIT_FAILURE;
+		retval = EXIT_FAILURE;
+		goto cleanup;
 	}
-	entry->tag[tag_count++] = strdup(tag);
+	if (!(entry->tag[tag_count++] = strdup(tag))) {
+		myerror("store_tag(): Could not allocate memory for "
+		        "return value");
+		retval = EXIT_FAILURE;
+	}
 
-	return EXIT_SUCCESS;
+cleanup:
+	free(tag);
+
+	return retval;
+}
+
+void free_tags(struct Entry *entry)
+{
+	unsigned int i;
+
+	for (i = 0; entry->tag[i]; i++)
+		free(entry->tag[i]);
 }
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */
