@@ -87,8 +87,8 @@ char *get_desc_from_command(const char *cmd)
 
 /*
  * fill_sess() - Fill the first available dest->sess element with uuid and desc 
- * and increase the local counter. Return EXIT_OK if everything is ok, 
- * EXIT_ERROR if something failed.
+ * and increase the local counter. Return EXIT_SUCCESS if everything is ok, 
+ * EXIT_FAILURE if something failed.
  */
 
 int fill_sess(struct Entry *dest, const char *uuid,
@@ -103,14 +103,14 @@ int fill_sess(struct Entry *dest, const char *uuid,
 	if (sessind >= MAX_SESS) {
 		fprintf(stderr, "%s: Maximum number of sess entries (%u) "
 		                "exceeded\n", progname, MAX_SESS);
-		return EXIT_ERROR;
+		return EXIT_FAILURE;
 	}
 
 	auuid = strndup(uuid, UUID_LENGTH);
 	if (!auuid) {
 		myerror("fill_sess(): Memory allcation error, "
 		        "could not duplicate UUID");
-		return EXIT_ERROR;
+		return EXIT_FAILURE;
 	}
 
 	if (desc && desclen) {
@@ -119,7 +119,7 @@ int fill_sess(struct Entry *dest, const char *uuid,
 			myerror("fill_sess(): Memory allocation error, "
 			        "could not duplicate desc");
 			free(auuid);
-			return EXIT_ERROR;
+			return EXIT_FAILURE;
 		}
 		if (!is_valid_desc_string(adesc))
 			free(adesc);
@@ -129,12 +129,12 @@ int fill_sess(struct Entry *dest, const char *uuid,
 	dest->sess[sessind].uuid = auuid;
 	sessind++;
 
-	return EXIT_OK;
+	return EXIT_SUCCESS;
 }
 
 /*
  * get_sess_info() - Read sess information from the environment variable and 
- * insert it into the entry.sess array. Returns EXIT_OK or EXIT_ERROR.
+ * insert it into the entry.sess array. Returns EXIT_SUCCESS or EXIT_FAILURE.
  */
 
 int get_sess_info(struct Entry *entry)
@@ -144,13 +144,13 @@ int get_sess_info(struct Entry *entry)
 	assert(entry);
 
 	if (!getenv(ENV_SESS))
-		return EXIT_OK;
+		return EXIT_SUCCESS;
 
 	s = strdup(getenv(ENV_SESS));
 	if (!s) {
 		myerror("get_sess_info(): Could not duplicate %s environment "
 		        "variable", ENV_SESS);
-		return EXIT_ERROR;
+		return EXIT_FAILURE;
 	}
 
 	if (!scan_for_uuid(s)) {
@@ -159,7 +159,7 @@ int get_sess_info(struct Entry *entry)
 		 * UUIDs. Not much to do about that, so just return gracefully.
 		 */
 		free(s);
-		return EXIT_OK;
+		return EXIT_SUCCESS;
 	}
 
 	p = s;
@@ -177,9 +177,9 @@ int get_sess_info(struct Entry *entry)
 				desclen = desc_end - desc_found;
 
 			if (fill_sess(entry, p,
-				      desc_found, desclen) == EXIT_ERROR) {
+				      desc_found, desclen) == EXIT_FAILURE) {
 				free(s);
-				return EXIT_ERROR;
+				return EXIT_FAILURE;
 			}
 
 			p += UUID_LENGTH - 1;
@@ -196,7 +196,7 @@ int get_sess_info(struct Entry *entry)
 	}
 	free(s);
 
-	return EXIT_OK;
+	return EXIT_SUCCESS;
 }
 
 /*
@@ -282,8 +282,8 @@ char *clean_up_sessvar(char *dest)
 /*
  * add_to_sessvar() - Modify the session environment variable (defined in 
  * ENV_SESS) by adding ",desc/uuid," to the end of it. If desc is NULL or 
- * empty, only ",uuid," is added. Return EXIT_OK on success, or EXIT_ERROR if 
- * anything fails or uuid isn't a valid UUID.
+ * empty, only ",uuid," is added. Return EXIT_SUCCESS on success, or 
+ * EXIT_FAILURE if anything fails or uuid isn't a valid UUID.
  */
 
 const char *add_to_sessvar(const char *desc, const char *uuid)
@@ -351,7 +351,7 @@ const char *add_to_sessvar(const char *desc, const char *uuid)
 int run_session(const struct Options *orig_opt,
                 const int argc, char * const argv[])
 {
-	int retval = EXIT_OK;
+	int retval = EXIT_SUCCESS;
 	struct Options opt = *orig_opt;
 	char *cmd = NULL;
 	char *start_uuid = NULL;

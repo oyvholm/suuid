@@ -23,8 +23,8 @@
 bool should_terminate = FALSE;
 
 /*
- * init_randomness() - Initialise the random number generator. Returns EXIT_OK 
- * or EXIT_ERROR.
+ * init_randomness() - Initialise the random number generator. Returns 
+ * EXIT_SUCCESS or EXIT_FAILURE.
  */
 
 int init_randomness(void)
@@ -34,13 +34,13 @@ int init_randomness(void)
 	if (gettimeofday(&tv, NULL) == -1) {
 		myerror("Could not initialiase randomness generator, "
 		        "gettimeofday() failed");
-		return EXIT_ERROR;
+		return EXIT_FAILURE;
 	}
 
 	srandom((unsigned int)tv.tv_sec ^ (unsigned int)tv.tv_usec ^
 	        (unsigned int)getpid());
 
-	return EXIT_OK;
+	return EXIT_SUCCESS;
 }
 
 /*
@@ -138,7 +138,7 @@ char *process_comment_option(const char *cmt)
 /*
  * fill_entry_struct() - Fill the entry struct with information from the opt 
  * struct and the environment, like current directory, hostname, comment, etc.
- * Returns EXIT_OK if no errors, EXIT_ERROR if errors.
+ * Returns EXIT_SUCCESS if no errors, EXIT_FAILURE if errors.
  */
 
 int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
@@ -161,12 +161,12 @@ int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
 	entry->host = get_hostname(rc);
 	if (!entry->host) {
 		myerror("fill_entry_struct(): Cannot get hostname");
-		return EXIT_ERROR;
+		return EXIT_FAILURE;
 	}
 	if (!valid_hostname(entry->host)) {
 		myerror("fill_entry_struct(): Got invalid hostname: \"%s\"",
 		        entry->host);
-		return EXIT_ERROR;
+		return EXIT_FAILURE;
 	}
 	entry->cwd = getpath();
 	entry->user = get_username();
@@ -178,24 +178,24 @@ int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
 
 	for (i = 0; i < MAX_TAGS && opt->tag[i]; i++)
 		if (!store_tag(entry, opt->tag[i]))
-			return EXIT_ERROR;
+			return EXIT_FAILURE;
 
 	if (opt->comment) {
 		entry->txt = process_comment_option(opt->comment);
 		if (!entry->txt)
-			return EXIT_ERROR;
+			return EXIT_FAILURE;
 	}
 
 	/*
 	 * Store session information from the environment variable.
 	 */
 
-	if (get_sess_info(entry) == EXIT_ERROR) {
+	if (get_sess_info(entry) == EXIT_FAILURE) {
 		free(entry->txt);
-		return EXIT_ERROR;
+		return EXIT_FAILURE;
 	}
 
-	return EXIT_OK;
+	return EXIT_SUCCESS;
 }
 
 /*
@@ -245,7 +245,7 @@ char *process_uuid(FILE *logfp, const struct Rc *rc, const struct Options *opt,
 	if (!uuid_date_from_uuid(entry->date, entry->uuid))
 		return NULL;
 
-	if (add_to_logfile(logfp, entry, opt->raw) == EXIT_ERROR)
+	if (add_to_logfile(logfp, entry, opt->raw) == EXIT_FAILURE)
 		return NULL;
 
 	/*
@@ -315,18 +315,18 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	 * tty, location of rc file and log directory, etc.
 	 */
 
-	if (init_randomness() == EXIT_ERROR) {
+	if (init_randomness() == EXIT_FAILURE) {
 		retval.success = FALSE;
 		goto cleanup;
 	}
 
 	rcfile = get_rcfilename(opt);
-	if (read_rcfile(rcfile, &rc) == EXIT_ERROR) {
+	if (read_rcfile(rcfile, &rc) == EXIT_FAILURE) {
 		retval.success = FALSE;
 		goto cleanup;
 	}
 
-	if (fill_entry_struct(&entry, &rc, opt) == EXIT_ERROR) {
+	if (fill_entry_struct(&entry, &rc, opt) == EXIT_FAILURE) {
 		retval.success = FALSE;
 		goto cleanup;
 	}
@@ -384,7 +384,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	 * Close up the shop and go home.
 	 */
 
-	if (close_logfile(logfp) == EXIT_ERROR)
+	if (close_logfile(logfp) == EXIT_FAILURE)
 		retval.success = FALSE;
 
 cleanup:

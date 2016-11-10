@@ -748,13 +748,13 @@ FILE *open_logfile(const char *fname)
 
 /*
  * add_to_logfile() - Add the contents of *entry to the logfile stream. Return 
- * EXIT_OK or EXIT_ERROR.
+ * EXIT_SUCCESS or EXIT_FAILURE.
  */
 
 int add_to_logfile(FILE *fp, const struct Entry *entry, const bool raw)
 {
 	char *ap;
-	int retval = EXIT_OK;
+	int retval = EXIT_SUCCESS;
 
 	assert(fp);
 	assert(entry);
@@ -762,12 +762,12 @@ int add_to_logfile(FILE *fp, const struct Entry *entry, const bool raw)
 
 	ap = xml_entry(entry, raw);
 	if (!ap)
-		return EXIT_ERROR;
+		return EXIT_FAILURE;
 	if (fputs(ap, fp) < 0)
-		retval = EXIT_ERROR;
+		retval = EXIT_FAILURE;
 	if (fputc('\n', fp) == EOF)
-		retval = EXIT_ERROR;
-	if (retval == EXIT_ERROR)
+		retval = EXIT_FAILURE;
+	if (retval == EXIT_FAILURE)
 		myerror("add_to_logfile(): Cannot write to the log file");
 
 	free(ap);
@@ -777,25 +777,25 @@ int add_to_logfile(FILE *fp, const struct Entry *entry, const bool raw)
 
 /*
  * close_logfile() - Do the finishing changes on FILE stream fp, add end tag 
- * and close the stream. Return EXIT_OK if no errors, if any errors were 
- * detected, return EXIT_ERROR.
+ * and close the stream. Return EXIT_SUCCESS if no errors, if any errors were 
+ * detected, return EXIT_FAILURE.
  */
 
 int close_logfile(FILE *fp)
 {
-	int retval = EXIT_OK;
+	int retval = EXIT_SUCCESS;
 
 	assert(fp);
 
 	if (fprintf(fp, "</suuids>\n") != 10)
-		retval = EXIT_ERROR;
+		retval = EXIT_FAILURE;
 	if (fflush(fp) == EOF)
-		retval = EXIT_ERROR;
+		retval = EXIT_FAILURE;
 	flock(fileno(fp), LOCK_UN);
 	if (fclose(fp) == EOF)
-		retval = EXIT_ERROR;
+		retval = EXIT_FAILURE;
 
-	if (retval == EXIT_ERROR)
+	if (retval == EXIT_FAILURE)
 		myerror("Error when closing log file");
 
 	return retval;

@@ -90,7 +90,7 @@ char *has_key(const char *line, const char *keyword)
 /*
  * parse_rc_line() - Receive a line from the rcfile and check for each keyword 
  * by sending it to check_rc() which will set the struct variable accordingly. 
- * If ok, return EXIT_OK. If strdup() failed, return EXIT_ERROR.
+ * If ok, return EXIT_SUCCESS. If strdup() failed, return EXIT_FAILURE.
  */
 
 int parse_rc_line(const char *line, struct Rc *rc)
@@ -101,21 +101,21 @@ int parse_rc_line(const char *line, struct Rc *rc)
 	if (has_key(line, "hostname")) {
 		rc->hostname = strdup(has_key(line, "hostname"));
 		if (!rc->hostname)
-			return EXIT_ERROR;
+			return EXIT_FAILURE;
 	}
 	if (has_key(line, "uuidcmd")) {
 		rc->uuidcmd = strdup(has_key(line, "uuidcmd"));
 		if (!rc->uuidcmd)
-			return EXIT_ERROR;
+			return EXIT_FAILURE;
 	}
 
-	return EXIT_OK;
+	return EXIT_SUCCESS;
 }
 
 /*
  * read_rcfile() - Read contents of rcfile into rc. rcfile is allowed to be 
  * NULL, that means it wasn't found.
- * Returns EXIT_OK or EXIT_ERROR.
+ * Returns EXIT_SUCCESS or EXIT_FAILURE.
  */
 
 int read_rcfile(const char *rcfile, struct Rc *rc)
@@ -129,34 +129,35 @@ int read_rcfile(const char *rcfile, struct Rc *rc)
 	rc->uuidcmd = NULL;
 
 	if (!rcfile)
-		return EXIT_OK;
+		return EXIT_SUCCESS;
 
 	fp = fopen(rcfile, "r");
 	if (!fp)
-		return EXIT_OK; /* It's perfectly fine if it's not readable, 
-		                 * that probably means it doesn't exist.
-		                 */
+		return EXIT_SUCCESS; /* It's perfectly fine if it's not 
+		                      * readable, that probably means it 
+		                      * doesn't exist.
+		                      */
 
 	do {
 		if (!fgets(buf, BUFSIZ, fp) && errno) {
 			myerror("%s: Could not read from rcfile", rcfile);
 			fclose(fp);
-			return EXIT_ERROR;
+			return EXIT_FAILURE;
 		}
 		trim_str_front(buf);
 		trim_str_end(buf);
-		if (parse_rc_line(buf, rc) == EXIT_ERROR) {
+		if (parse_rc_line(buf, rc) == EXIT_FAILURE) {
 			myerror("Could not allocate memory for line from "
 			        "rc file \"%s\"", rcfile);
 			fclose(fp);
-			return EXIT_ERROR;
+			return EXIT_FAILURE;
 		}
 		*buf = '\0';
 	} while (!feof(fp));
 
 	fclose(fp);
 
-	return EXIT_OK;
+	return EXIT_SUCCESS;
 }
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */

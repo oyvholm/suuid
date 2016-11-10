@@ -102,7 +102,7 @@ int myerror(const char *format, ...)
 }
 
 /*
- * print_license() - Display the program license. Returns EXIT_OK.
+ * print_license() - Display the program license. Returns EXIT_SUCCESS.
  */
 
 int print_license(void)
@@ -128,11 +128,11 @@ int print_license(void)
 	     "with this program. If not, see "
 	     "<http://www.gnu.org/licenses/>.");
 
-	return EXIT_OK;
+	return EXIT_SUCCESS;
 }
 
 /*
- * print_version() - Print version information on stdout. Returns EXIT_OK.
+ * print_version() - Print version information on stdout. Returns EXIT_SUCCESS.
  */
 
 int print_version(void)
@@ -156,7 +156,7 @@ int print_version(void)
 #  endif
 #endif
 
-	return EXIT_OK;
+	return EXIT_SUCCESS;
 }
 
 /*
@@ -165,7 +165,7 @@ int print_version(void)
 
 int usage(const int retval)
 {
-	if (retval != EXIT_OK) {
+	if (retval != EXIT_SUCCESS) {
 		fprintf(stderr, "\nType \"%s --help\" for help screen. "
 		                "Returning with value %d.\n",
 		                progname, retval);
@@ -266,13 +266,13 @@ int usage(const int retval)
  * choose_opt_action() - Decide what to do when option c is found. Store 
  * changes in dest. opts is the struct with the definitions for the long 
  * options.
- * Return EXIT_OK if ok, EXIT_ERROR if c is unknown or anything fails.
+ * Return EXIT_SUCCESS if ok, EXIT_FAILURE if c is unknown or anything fails.
  */
 
 int choose_opt_action(struct Options *dest,
                       const int c, const struct option *opts)
 {
-	int retval = EXIT_OK;
+	int retval = EXIT_SUCCESS;
 	static unsigned int tag_count = 0;
 
 	assert(dest);
@@ -306,7 +306,7 @@ int choose_opt_action(struct Options *dest,
 	case 'n':
 		if (!sscanf(optarg, "%u", &dest->count)) {
 			myerror("Error in -n/--count argument");
-			retval = EXIT_ERROR;
+			retval = EXIT_FAILURE;
 		}
 		break;
 	case 'q':
@@ -323,7 +323,7 @@ int choose_opt_action(struct Options *dest,
 		break;
 	default:
 		msg(3, "getopt_long() returned character code %d", c);
-		retval = EXIT_ERROR;
+		retval = EXIT_FAILURE;
 		break;
 	}
 
@@ -332,12 +332,12 @@ int choose_opt_action(struct Options *dest,
 
 /*
  * parse_options() - Parse command line options.
- * Returns EXIT_OK if ok, EXIT_ERROR if error.
+ * Returns EXIT_SUCCESS if ok, EXIT_FAILURE if error.
  */
 
 int parse_options(struct Options *dest, const int argc, char * const argv[])
 {
-	int retval = EXIT_OK;
+	int retval = EXIT_SUCCESS;
 	int c;
 
 	assert(dest);
@@ -345,7 +345,7 @@ int parse_options(struct Options *dest, const int argc, char * const argv[])
 
 	init_opt(dest);
 
-	while (retval == EXIT_OK) {
+	while (retval == EXIT_SUCCESS) {
 		int option_index = 0;
 		static struct option long_options[] = {
 			{"comment", required_argument, 0, 'c'},
@@ -401,15 +401,15 @@ int main(int argc, char *argv[])
 	progname = argv[0];
 
 	retval = parse_options(&opt, argc, argv);
-	if (retval != EXIT_OK) {
+	if (retval != EXIT_SUCCESS) {
 		fprintf(stderr, "%s: Option error\n", progname);
-		return EXIT_ERROR;
+		return EXIT_FAILURE;
 	}
 
 	msg(3, "Using verbose level %d", verbose_level(0));
 
 	if (opt.help)
-		return usage(EXIT_OK);
+		return usage(EXIT_SUCCESS);
 	if (opt.self_test)
 		return run_self_tests();
 	if (opt.version)
@@ -436,13 +436,13 @@ int main(int argc, char *argv[])
 			printf("squeeze_chars(\"%s\", \",\") = \"%s\"\n",
 			       a, squeeze_chars(buf, "e"));
 		}
-		return EXIT_OK;
+		return EXIT_SUCCESS;
 	}
 #endif
 
 	result = create_and_log_uuids(&opt);
 	if (!result.success)
-		retval = EXIT_ERROR;
+		retval = EXIT_FAILURE;
 
 	msg(3, "Returning from main() with value %d", retval);
 	return retval;

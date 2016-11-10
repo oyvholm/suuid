@@ -23,12 +23,12 @@
 /*
  * run_self_tests() - Run internal testing to check that it works on the 
  * current system. Executed if --self-test is used.
- * Returns EXIT_ERROR if any tests fail, EXIT_OK otherwise.
+ * Returns EXIT_FAILURE if any tests fail, EXIT_SUCCESS otherwise.
  */
 
 int run_self_tests(void)
 {
-	int retval = EXIT_OK;
+	int retval = EXIT_SUCCESS;
 
 	printf("1..1\n");
 	printf("ok 1 - No tests created yet\n");
