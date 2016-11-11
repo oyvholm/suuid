@@ -138,7 +138,9 @@ int print_license(void)
 int print_version(void)
 {
 	printf("%s %s (%s)\n", progname, VERSION, RELEASE_DATE);
+#ifndef NO_SQLITE
 	printf("Linked against SQLite %s\n", sqlite3_libversion());
+#endif
 	printf("\n*** THIS PROGRAM IS UNFINISHED, DON'T USE ***\n");
 #if FAKE_HOST || PERL_COMPAT
 	printf("\nThis version is compiled with the following conditional "

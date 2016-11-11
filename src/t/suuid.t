@@ -134,8 +134,7 @@ END
     # }}}
     diag('Testing --version option...');
     likecmd("$CMD --version", # {{{
-        '/^\S+ \d+\.\d+\.\d+ \(\d\d\d\d-\d\d-\d\d\)\n' .
-            'Linked against SQLite 3\.15\.1\n/',
+        '/^\S+ \d+\.\d+\.\d+ \(\d\d\d\d-\d\d-\d\d\)\n/',
         '/^$/',
         0,
         'Option --version returns version number',
