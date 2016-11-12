@@ -23,7 +23,7 @@ LDFLAGS = -Wall -Wextra -Werror
 # FreeBSD (clang): -lpthread
 LIBS =
 
-# If compiling without -DNO_SQLITE, add sqlite.o to COMMON_OBJS
+# If compiling without -DNO_SQLITE, add sqlite3.o to COMMON_OBJS
 COMMON_OBJS = database.o environ.o genuuid.o io.o logfile.o \
               rcfile.o selftest.o sessvar.o string.o tag.o uuid.o
 
