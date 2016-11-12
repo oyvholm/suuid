@@ -10,14 +10,24 @@ CTAGS = ctags
 
 CC = cc
 LD = cc
+
+# sqlite3.h uses long long, and gcc 4.8.4 and 4.9.2 (probably all other 
+# versions too) abort when using -pedantic because it's not defined by ISO C90. 
+# If you still want to use -pedantic with gcc, add -Wno-long-long to CCFLAGS. 
+# Clang 3.8.0 on FreeBSD 11.0 works with -pedantic.
 CCFLAGS = -Wall -Wextra -Werror -pedantic -O0 -c -g -DNO_SQLITE
 LDFLAGS = -Wall -Wextra -Werror
+
+# When compiling with SQLite, add these libraries to LIBS:
+# Linux (gcc)    : -lpthread -ldl
+# FreeBSD (clang): -lpthread
 LIBS =
 
-# For regular use, it's not necessary to modify anything below this line.
-
+# If compiling without -DNO_SQLITE, add sqlite.o to COMMON_OBJS
 COMMON_OBJS = database.o environ.o genuuid.o io.o logfile.o \
               rcfile.o selftest.o sessvar.o string.o tag.o uuid.o
+
+# For regular use, it's not necessary to modify anything below this line.
 
 SUUID_OBJS  = suuid.o
 SESS_OBJS   = sess.o
