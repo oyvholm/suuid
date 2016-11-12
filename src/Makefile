@@ -2,34 +2,22 @@
 # File ID: 27e0d738-2b93-11e6-8668-02010e0a6634
 # Author: Øyvind A. Holm <sunny@sunbase.org>
 
-# Temporary until the database functions work
-NO_SQLITE = 1
-
 SUUID_EXEC = suuid
 SESS_EXEC  = sess
 
 TESTLOCKDIR = testlockdir
 CTAGS = ctags
 
-CC = gcc
-LD = gcc
-CCFLAGS = -Wall -Wextra -Werror -O0 -c -g
-ifeq ($(NO_SQLITE), 1)
-	CCFLAGS += -DNO_SQLITE
-endif
+CC = cc
+LD = cc
+CCFLAGS = -Wall -Wextra -Werror -O0 -c -g -DNO_SQLITE
 LDFLAGS = -Wall -Wextra -Werror
 LIBS =
-ifneq ($(NO_SQLITE), 1)
-	LIBS += -lpthread -ldl
-endif
 
 # For regular use, it's not necessary to modify anything below this line.
 
 COMMON_OBJS = database.o environ.o genuuid.o io.o logfile.o \
               rcfile.o selftest.o sessvar.o string.o tag.o uuid.o
-ifneq ($(NO_SQLITE), 1)
-	COMMON_OBJS += sqlite3.o
-endif
 
 SUUID_OBJS  = suuid.o
 SESS_OBJS   = sess.o

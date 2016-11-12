@@ -93,6 +93,18 @@
                     LEGAL_UTF8_CHARS /* Legal chars in sess descriptions */
 
 /*
+ * FreeBSD doesn't have HOST_NAME_MAX, try to use something else.
+ */
+
+#ifndef HOST_NAME_MAX
+#  ifdef _POSIX_HOST_NAME_MAX
+#    define HOST_NAME_MAX  _POSIX_HOST_NAME_MAX
+#  else
+#    define HOST_NAME_MAX  255
+#  endif
+#endif
+
+/*
  * Macros
  */
 
