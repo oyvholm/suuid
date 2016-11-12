@@ -33,6 +33,7 @@ our %Opt = (
     'help' => 0,
     'quiet' => 0,
     'todo' => 0,
+    'valgrind' => 0,
     'verbose' => 0,
     'version' => 0,
 
@@ -51,6 +52,7 @@ GetOptions(
     'help|h' => \$Opt{'help'},
     'quiet|q+' => \$Opt{'quiet'},
     'todo|t' => \$Opt{'todo'},
+    'valgrind' => \$Opt{'valgrind'},
     'verbose|v+' => \$Opt{'verbose'},
     'version' => \$Opt{'version'},
 
@@ -69,8 +71,18 @@ sub main {
     # {{{
     my $Retval = 0;
     my $logdir = "logdir";
-    my $CMD = "SUUID_LOGDIR=$logdir ../sess";
+    my $CMD;
+    my $valgrind_str;
+
     $ENV{'SESS_UUID'} = '';
+
+    if ($Opt{'valgrind'}) {
+        $valgrind_str = " valgrind -q " .
+                        "--leak-check=full --show-leak-kinds=all --";
+    } else {
+        $valgrind_str = "";
+    }
+    $CMD = "SUUID_LOGDIR=$logdir$valgrind_str ../$CMD_BASENAME";
 
     diag(sprintf('========== Executing %s v%s ==========',
                  $progname, $VERSION));
@@ -317,6 +329,9 @@ Options:
     Be more quiet. Can be repeated to increase silence.
   -t, --todo
     Run only the TODO tests.
+  --valgrind
+    Run all tests under Valgrind to check for memory leaks and other 
+    problems.
   -v, --verbose
     Increase level of verbosity. Can be repeated.
   --version
