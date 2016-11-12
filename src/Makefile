@@ -11,8 +11,8 @@ SESS_EXEC  = sess
 TESTLOCKDIR = testlockdir
 CTAGS = ctags
 
-CC = gcc
-LD = gcc
+CC = cc
+LD = cc
 CCFLAGS = -Wall -Wextra -Werror -O0 -c -g
 ifeq ($(NO_SQLITE), 1)
 	CCFLAGS += -DNO_SQLITE
