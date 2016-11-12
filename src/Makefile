@@ -10,7 +10,7 @@ CTAGS = ctags
 
 CC = cc
 LD = cc
-CCFLAGS = -Wall -Wextra -Werror -O0 -c -g -DNO_SQLITE
+CCFLAGS = -Wall -Wextra -Werror -pedantic -O0 -c -g -DNO_SQLITE
 LDFLAGS = -Wall -Wextra -Werror
 LIBS =
 
