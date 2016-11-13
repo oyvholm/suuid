@@ -164,7 +164,13 @@ END
 
     # }}}
     diag('Testing Postgres database...');
-    testcmd("createdb $tmpdb", '', '', 0, "Create test database");
+    my $createdb_result = system("createdb $tmpdb") >> 8;
+    if ($createdb_result) {
+        diag("NOTICE: $progname: Can't create database, " .
+             "skipping Postgres tests");
+        done_testing(22);
+        return 0;
+    };
     likecmd("../$CMD --pg-table -o postgres test.xml | psql -X -d $tmpdb", # {{{
         '/^' .
             'CREATE TABLE\n' .
@@ -240,6 +246,7 @@ END
         # TODO tests }}}
     }
 
+    done_testing(37);
     diag('Testing finished.');
     return $Retval;
     # }}}
