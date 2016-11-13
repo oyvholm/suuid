@@ -68,6 +68,7 @@ exit(main());
 sub main {
     # {{{
     my $Retval = 0;
+    my $logdir = "tmp-fileid-t-logdir";
 
     diag(sprintf('========== Executing %s v%s ==========',
         $progname,
@@ -119,9 +120,10 @@ END
     );
 
     # }}}
-    ok(mkdir("tmpuuids"), 'mkdir tmpuuids');
+    system("rm -rf $logdir");
+    ok(mkdir($logdir), 'mkdir $logdir');
     diag("Testing -t/--type option...");
-    likecmd("SUUID_LOGDIR=tmpuuids $CMD -t erlang kadusei", # {{{
+    likecmd("SUUID_LOGDIR=$logdir $CMD -t erlang kadusei", # {{{
         "/^% File ID: $Templ\\n\$/",
         '/^$/',
         0,
@@ -129,7 +131,7 @@ END
     );
 
     # }}}
-    likecmd("SUUID_LOGDIR=tmpuuids $CMD -t latex jawohl", # {{{
+    likecmd("SUUID_LOGDIR=$logdir $CMD -t latex jawohl", # {{{
         "/^% File ID: $Templ\\n\$/",
         '/^$/',
         0,
@@ -137,7 +139,7 @@ END
     );
 
     # }}}
-    likecmd("SUUID_LOGDIR=tmpuuids $CMD -t perl ohyes", # {{{
+    likecmd("SUUID_LOGDIR=$logdir $CMD -t perl ohyes", # {{{
         "/^# File ID: $Templ\\n\$/",
         '/^$/',
         0,
@@ -145,7 +147,7 @@ END
     );
 
     # }}}
-    likecmd("SUUID_LOGDIR=tmpuuids $CMD -t tex indeed", # {{{
+    likecmd("SUUID_LOGDIR=$logdir $CMD -t tex indeed", # {{{
         "/^% File ID: $Templ\\n\$/",
         '/^$/',
         0,
@@ -153,12 +155,12 @@ END
     );
 
     # }}}
-    my $uuid_tmpfile = glob("tmpuuids/*");
+    my $uuid_tmpfile = glob("$logdir/*");
     ok(-f $uuid_tmpfile, "uuid file exists");
 
     diag("Cleaning up...");
     ok(unlink($uuid_tmpfile), "Remove [uuid_tmpfile]");
-    ok(rmdir("tmpuuids"), 'rmdir tmpuuids');
+    ok(rmdir($logdir), 'rmdir $logdir');
 
     todo_section:
     ;

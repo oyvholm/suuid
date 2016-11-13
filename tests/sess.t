@@ -70,7 +70,7 @@ exit(main());
 sub main {
     # {{{
     my $Retval = 0;
-    my $logdir = "logdir";
+    my $logdir = "tmp-sess-t-logdir";
     my $CMD;
     my $valgrind_str;
 
@@ -145,6 +145,7 @@ END
         '<suuids>\n',
     );
 
+    system("rm -rf $logdir");
     ok(!-d $logdir, "$logdir doesn't exist");
     ok(mkdir($logdir), "mkdir $logdir") or die("$progname: $logdir: Cannot create directory, skipping tests");
     testcmd("$CMD", # {{{
