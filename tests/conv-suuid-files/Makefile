@@ -9,4 +9,4 @@ test:
 
 .PHONY: clean
 clean:
-	rm -fv conv-suuid-stderr.tmp
+	rm -f conv-suuid-stderr.tmp

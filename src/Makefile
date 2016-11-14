@@ -94,11 +94,11 @@ uuid.o: uuid.c $(SUUID_DEPS)
 
 .PHONY: clean
 clean:
-	rm -fv $(COMMON_OBJS)
-	rm -fv $(SUUID_EXEC) $(SUUID_OBJS)
-	rm -fv $(SESS_EXEC) $(SESS_OBJS)
-	rm -fv *~ core core.$(SUUID_EXEC) tags
-	rm -frv $(TESTLOCKDIR)
+	rm -f $(COMMON_OBJS)
+	rm -f $(SUUID_EXEC) $(SUUID_OBJS)
+	rm -f $(SESS_EXEC) $(SESS_OBJS)
+	rm -f *~ core core.$(SUUID_EXEC) tags
+	rm -fr $(TESTLOCKDIR)
 	cd t && $(MAKE) clean
 
 .PHONY: edit
