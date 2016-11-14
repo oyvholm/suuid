@@ -66,6 +66,7 @@ exit(main());
 sub main {
     # {{{
     my $Retval = 0;
+    $ENV{'PATH'} = "..:$ENV{'PATH'}";
 
     diag(sprintf('========== Executing %s v%s ==========',
         $progname,
