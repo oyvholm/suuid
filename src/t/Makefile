@@ -16,7 +16,7 @@ build:
 .PHONY: clean
 clean:
 	rm -rf tmp-* *-stderr.tmp
-	if test ! -e log/.git; then rm -rfv log; fi
+	if test ! -e log/.git; then rm -rf log; fi
 
 .PHONY: valgrind
 valgrind: build
