@@ -298,7 +298,7 @@ sub time_period {
 	$secs -= $Min * 60;
 
 	$Sec = sprintf("%.7f", $secs);
-    $Sec =~ s/^(\d\..*)/0$1/; # WTF. %02.7f in sprintf() dosn’t work, so this is necessary ATM.
+    $Sec =~ s/^(\d\..*)/0$1/; # WTF. %02.7f in sprintf() dosn't work, so this is necessary ATM.
 
 	return(
         ($Day

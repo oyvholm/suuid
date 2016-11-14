@@ -215,14 +215,14 @@ int usage(const int retval)
 	       "    used. Otherwise the value \"$HOME/uuids\" is used.\n"
 	       "    Current default: %s\n", ENV_LOGDIR, logdir);
 	printf("  -m, --random-mac\n"
-	       "    Don’t use the hardware MAC address, generate a random "
+	       "    Don't use the hardware MAC address, generate a random "
 	       "address field.\n");
 	printf("  -n x, --count x\n"
 	       "    Print and store x UUIDs.\n");
 	printf("  -q, --quiet\n"
 	       "    Be more quiet. Can be repeated to increase silence.\n");
 	printf("  --raw\n"
-	       "    Don’t convert <txt> element to XML. When using this "
+	       "    Don't convert <txt> element to XML. When using this "
 	       "option, it is \n"
 	       "    expected that the value of the -c/--comment option is "
 	       "valid XML, \n"
@@ -251,7 +251,7 @@ int usage(const int retval)
 	       "      a\n"
 	       "        Synonym for eo.\n"
 	       "      n\n"
-	       "        Don’t output anything.\n"
+	       "        Don't output anything.\n"
 	       "    Default: \"o\"\n");
 	printf("\n");
 	printf("If the %s environment variable is defined by "

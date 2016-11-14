@@ -141,7 +141,7 @@ Sort lines based on the first time-based UUID on every line.
 Options:
 
   -a, --all
-    Print all lines, also those without a time-based UUID. They’re 
+    Print all lines, also those without a time-based UUID. They're 
     listed unsorted after all the lines with time UUIDs.
   -h, --help
     Show this help.
