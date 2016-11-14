@@ -276,6 +276,8 @@ sub test_test_functions {
 
 sub test_suuid_executable {
     # {{{
+    chomp(my $osname = `uname`);
+
     if (-e $Outdir) {
         die("$progname: $Outdir: WTF?? Directory element already exists.");
     }
@@ -887,7 +889,11 @@ sub test_suuid_executable {
 
     # }}}
     ok(unlink($Outfile), "Delete [Outfile]");
-    test_suuid_signal($Outfile);
+    if ($osname eq "OpenBSD") {
+        diag("NOTICE: SIGPIPE test hangs on OpenBSD, skipping test");
+    } else {
+        test_suuid_signal($Outfile);
+    }
     ok(rmdir($Outdir), "rmdir [Outdir]");
     return;
     # }}}
