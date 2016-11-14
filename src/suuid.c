@@ -260,9 +260,12 @@ int usage(const int retval)
 	printf("\n");
 	printf("A different hostname can be specified in the environment "
 	       "variable \n"
-	       "%s, or in the file %s/%s with the format \n"
+	       "%s, or in the rc file %s/%s with the format \n"
 	       "\"hostname = xxx\".\n",
 	       ENV_HOSTNAME, getenv("HOME"), STD_RCFILE);
+	printf("To use a specific MAC address all the time, add it to the rc "
+	       "file using \n"
+	       "the format \"macaddr = xxxxxxxxxxxx\".\n");
 	printf("\n");
 
 	free(logdir);

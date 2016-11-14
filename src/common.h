@@ -118,6 +118,7 @@
 typedef unsigned char bool;
 struct Rc {
 	char *hostname;
+	char *macaddr;
 	char *uuidcmd;
 };
 struct Sess {
@@ -237,6 +238,7 @@ extern int run_session(const struct Options *orig_opt,
 /* string.c */
 extern char *check_hex(const char *hex, const size_t len);
 extern char *squeeze_chars(char *s, const char *chars);
+extern char *string_to_lower(char *str);
 extern char *trim_str_front(char *dest);
 extern char *trim_str_end(char *dest);
 extern char *utf8_check(const char *text);
@@ -249,6 +251,7 @@ extern int store_tag(struct Entry *entry, const char *arg);
 extern void free_tags(struct Entry *entry);
 
 /* uuid.c */
+extern bool valid_macaddr(const char *macaddr);
 extern bool valid_uuid(const char *u, const bool check_len);
 extern char *scramble_mac_address(char *uuid);
 extern char *generate_uuid(const struct Rc *rc, const bool random_mac);

@@ -393,6 +393,7 @@ cleanup:
 	free_sess(&entry);
 	free_tags(&entry);
 	free(rc.uuidcmd);
+	free(rc.macaddr);
 	free(rc.hostname);
 	free(entry.txt);
 	free(entry.date);

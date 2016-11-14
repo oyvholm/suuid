@@ -21,6 +21,33 @@
 #include "suuid.h"
 
 /*
+ * valid_macaddr() - Check that macaddr is a valid MAC address.
+ * Return TRUE if OK, FALSE if something is wrong.
+ */
+
+bool valid_macaddr(const char *macaddr)
+{
+	if (check_hex(macaddr, 12)) {
+		fprintf(stderr, "%s: MAC address contains illegal characters, "
+		        "can only contain hex digits\n", progname);
+		return FALSE;
+	}
+	if (strlen(macaddr) != 12) {
+		fprintf(stderr, "%s: Wrong MAC address length, "
+		        "must be exactly 12 hex digits\n", progname);
+		return FALSE;
+	}
+	if (!strchr("37bf", macaddr[1])) {
+		fprintf(stderr, "%s: MAC address doesn't follow RFC 4122, the "
+		                "second hex digit must be one of \"37bf\"\n",
+		                progname);
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+/*
  * valid_uuid() - Check that the UUID pointed to by u is a valid UUID. If 
  * check_len is TRUE, also check that the string length is exactly the same as 
  * a standard UUID, UUID_LENGTH chars.
@@ -113,11 +140,17 @@ char *generate_uuid(const struct Rc *rc, const bool random_mac)
 	uuid[UUID_LENGTH] = '\0';
 	pclose(fp);
 
+	if (!valid_uuid(uuid, TRUE))
+		return NULL;
+
+	if (rc->macaddr) {
+		assert(valid_macaddr(rc->macaddr)); /* Should be valid now */
+		strncpy(uuid + 24, rc->macaddr, 12);
+	}
 	if (random_mac && !scramble_mac_address(uuid))
 		return NULL;
 
-	if (!valid_uuid(uuid, TRUE))
-		return NULL;
+	assert(valid_uuid(uuid, TRUE));
 
 	return uuid;
 }

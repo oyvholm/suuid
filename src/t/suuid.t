@@ -459,6 +459,134 @@ sub test_suuid_executable {
 
     # }}}
     ok(unlink($host_outfile), "Delete [host_outfile]");
+    my $mac = "1b460a166a4d";
+    create_file("rc-macaddr", "macaddr=$mac\n");
+    likecmd("$CMD --rcfile rc-macaddr -l $Outdir", # {{{
+        "/^$v1_templ\\n\$/s",
+        '/^$/s',
+        0,
+        "rc file with valid macaddr",
+    );
+
+    # }}}
+    like(file_data($Outfile), # {{{
+        s_top(s_suuid('suuid_u' => "........-....-....-....-$mac")),
+        "MAC address from the rc file is in the log file",
+    );
+
+    # }}}
+    ok(unlink($Outfile), "Delete [Outfile]");
+    create_file("rc-macaddr", "macaddr=" . uc($mac) . "\n");
+    likecmd("$CMD --rcfile rc-macaddr -l $Outdir", # {{{
+        "/^$v1_templ\\n\$/s",
+        '/^$/s',
+        0,
+        "rc file with valid macaddr, upper case",
+    );
+
+    # }}}
+    like(file_data($Outfile), # {{{
+        s_top(s_suuid('suuid_u' => "........-....-....-....-$mac")),
+        "MAC address from the rc file is in the log file",
+    );
+
+    # }}}
+    ok(unlink($Outfile), "Delete [Outfile]");
+    create_file("rc-macaddr", "   macaddr     =       $mac      \n");
+    likecmd("$CMD --rcfile rc-macaddr -l $Outdir", # {{{
+        "/^$v1_templ\\n\$/s",
+        '/^$/s',
+        0,
+        "rc file with valid macaddr and lots of spaces",
+    );
+
+    # }}}
+    like(file_data($Outfile), # {{{
+        s_top(s_suuid('suuid_u' => "........-....-....-....-$mac")),
+        "MAC address from the rc file is in the log file",
+    );
+
+    # }}}
+    ok(unlink($Outfile), "Delete [Outfile]");
+    create_file("rc-macaddr", "macaddr=$mac");
+    likecmd("$CMD --rcfile rc-macaddr -l $Outdir", # {{{
+        "/^$v1_templ\\n\$/s",
+        '/^$/s',
+        0,
+        "rc file with valid macaddr and no \\n at EOF",
+    );
+
+    # }}}
+    like(file_data($Outfile), # {{{
+        s_top(s_suuid('suuid_u' => "........-....-....-....-$mac")),
+        "MAC address from the rc file is in the log file",
+    );
+
+    # }}}
+    ok(unlink($Outfile), "Delete [Outfile]");
+    create_file("rc-macaddr", "macaddr =\n");
+    likecmd("$CMD --rcfile rc-macaddr -l $Outdir", # {{{
+        "/^$v1_templ\\n\$/s",
+        '/^$/s',
+        0,
+        "rc file with macaddr keyword but no value, that's ok",
+    );
+
+    # }}}
+    like(file_data($Outfile), s_top(s_suuid()), "One entry created");
+    ok(unlink($Outfile), "Delete [Outfile]");
+    create_file("rc-macaddr", "macaddr =   \n");
+    likecmd("$CMD --rcfile rc-macaddr -l $Outdir", # {{{
+        "/^$v1_templ\\n\$/s",
+        '/^$/s',
+        0,
+        "rc file with macaddr keyword and no value but spaces, that's ok",
+    );
+
+    # }}}
+    like(file_data($Outfile), s_top(s_suuid()), "One entry created");
+    ok(unlink($Outfile), "Delete [Outfile]");
+    invalid_macaddr_in_rcfile($Outdir, $Outfile,
+                              "10460a166a4d", 'macaddr-rfc-fail',
+                              "rc file with invalid macaddr, " .
+                              "doesn't follow the RFC");
+    invalid_macaddr_in_rcfile($Outdir, $Outfile,
+                              "1b460a166a4", 'macaddr-wrong-length',
+                              "rc file with invalid macaddr, " .
+                              "one digit too short");
+    invalid_macaddr_in_rcfile($Outdir, $Outfile,
+                              "${mac}a", 'macaddr-wrong-length',
+                              "rc file with invalid macaddr, " .
+                              "one digit too long");
+    invalid_macaddr_in_rcfile($Outdir, $Outfile,
+                              "${mac}y", 'macaddr-wrong-length',
+                              "rc file with invalid macaddr, " .
+                              "extra invalid character");
+    invalid_macaddr_in_rcfile($Outdir, $Outfile,
+                              "iiiiiiiiiiii", 'macaddr-invalid-digit',
+                              "rc file with invalid macaddr, " .
+                              "correct length, invalid hex digits");
+    invalid_macaddr_in_rcfile($Outdir, $Outfile,
+                              "invalid", 'macaddr-invalid-digit',
+                              "rc file with invalid macaddr, " .
+                              "not a hex number at all");
+    invalid_macaddr_in_rcfile($Outdir, $Outfile,
+                              "'$mac'", 'macaddr-invalid-digit',
+                              "rc file with valid macaddr, " .
+                              "but it's inside ''");
+    invalid_macaddr_in_rcfile($Outdir, $Outfile,
+                              "\"$mac\"", 'macaddr-invalid-digit',
+                              "rc file with valid macaddr, " .
+                              "but it's inside \"\"");
+    invalid_macaddr_in_rcfile($Outdir, $Outfile,
+                              "= \"$mac\"", 'macaddr-invalid-digit',
+                              "rc file with valid macaddr, " .
+                              "but extra equal sign");
+    invalid_macaddr_in_rcfile($Outdir, $Outfile,
+                              " = \"$mac\"", 'macaddr-invalid-digit',
+                              "rc file with valid macaddr, " .
+                              "but extra equal sign with space");
+    ok(unlink("rc-macaddr"), "Delete rc-macaddr");
     diag("Testing -t (--tag) option...");
     likecmd("$CMD -t snaddertag -l $Outdir", # {{{
         "/^$v1_templ\n\$/s",
@@ -1260,6 +1388,55 @@ sub test_suuid_signal {
     ok(unlink($Outfile), "Delete [Outfile]");
     # }}}
 } # test_suuid_signal()
+
+# src(): Generate various types of output, avoid repeating it over and over 
+# again.
+#
+# The first argument is a text label defining the type of message, and 
+# variables are delivered via %Var.
+#
+# Always returns text output, no errors returned. The only error is an unknown 
+# $label, in which case it aborts.
+sub src {
+        # {{{
+        my ($label, %Var) = @_;
+
+        if ($label eq "empty") {
+            return "";
+        }
+        if ($label eq "macaddr-invalid-digit") {
+                return "$Var{cmd}: MAC address contains illegal characters, " .
+                       "can only contain hex digits\n";
+        }
+        if ($label eq "macaddr-rfc-fail") {
+                return "$Var{cmd}: MAC address doesn't follow RFC 4122, the " .
+                       "second hex digit must be one of \"37bf\"\n";
+        }
+        if ($label eq "macaddr-wrong-length") {
+                return "$Var{cmd}: Wrong MAC address length, must be " .
+                       "exactly 12 hex digits\n";
+        }
+
+        BAIL_OUT("src(): $label: Unknown label");
+        # }}}
+}
+
+# invalid_macaddr_in_rcfile(): Test various variants of invalid MAC address in 
+# the rc file.
+sub invalid_macaddr_in_rcfile {
+    # {{{
+    my ($Outdir, $Outfile, $mac, $errmsg, $desc) = @_;
+
+    create_file("rc-macaddr", "macaddr =$mac\n");
+    testcmd("../$CMD_BASENAME --rcfile rc-macaddr -l $Outdir",
+        "",
+        src($errmsg, ('cmd' => "../$CMD_BASENAME")),
+        1,
+        $desc,
+    );
+    ok(!-f $Outfile, "Log file wasn't created");
+    # }}}
+}
 
 sub s_top {
     # {{{

@@ -75,6 +75,26 @@ char *squeeze_chars(char *s, const char *chars)
 }
 
 /*
+ * string_to_lower() - Convert all characters in str to lower case.
+ * Returns str.
+ */
+
+char *string_to_lower(char *str)
+{
+	char *p = str;
+
+	if (!p)
+		return p;
+
+	while (*p) {
+		*p = tolower(*p);
+		p++;
+	}
+
+	return str;
+}
+
+/*
  * trim_str_front() - Modify dest by removing initial whitespace. Returns dest.
  */
 

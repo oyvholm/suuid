@@ -103,6 +103,12 @@ int parse_rc_line(const char *line, struct Rc *rc)
 		if (!rc->hostname)
 			return EXIT_FAILURE;
 	}
+	if (has_key(line, "macaddr")) {
+		rc->macaddr = strdup(has_key(line, "macaddr"));
+		string_to_lower(rc->macaddr);
+		if (!rc->macaddr)
+			return EXIT_FAILURE;
+	}
 	if (has_key(line, "uuidcmd")) {
 		rc->uuidcmd = strdup(has_key(line, "uuidcmd"));
 		if (!rc->uuidcmd)
@@ -126,6 +132,7 @@ int read_rcfile(const char *rcfile, struct Rc *rc)
 	assert(rc);
 
 	rc->hostname = NULL;
+	rc->macaddr = NULL;
 	rc->uuidcmd = NULL;
 
 	if (!rcfile)
@@ -156,6 +163,14 @@ int read_rcfile(const char *rcfile, struct Rc *rc)
 	} while (!feof(fp));
 
 	fclose(fp);
+
+	if (rc->macaddr && !strlen(rc->macaddr)) {
+		/* Keyword with no value, that's ok */
+		free(rc->macaddr);
+		rc->macaddr = NULL;
+	}
+	if (rc->macaddr && !valid_macaddr(rc->macaddr))
+		return EXIT_FAILURE;
 
 	return EXIT_SUCCESS;
 }
