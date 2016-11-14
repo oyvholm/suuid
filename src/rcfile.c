@@ -105,9 +105,9 @@ int parse_rc_line(const char *line, struct Rc *rc)
 	}
 	if (has_key(line, "macaddr")) {
 		rc->macaddr = strdup(has_key(line, "macaddr"));
-		string_to_lower(rc->macaddr);
 		if (!rc->macaddr)
 			return EXIT_FAILURE;
+		string_to_lower(rc->macaddr);
 	}
 	if (has_key(line, "uuidcmd")) {
 		rc->uuidcmd = strdup(has_key(line, "uuidcmd"));
