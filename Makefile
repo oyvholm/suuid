@@ -28,3 +28,8 @@ test:
 
 tags: src/*.c src/*.h
 	ctags src/*.c src/*.h
+
+.PHONY: valgrind
+valgrind:
+	cd src && $(MAKE) valgrind
+	cd tests && $(MAKE) test
