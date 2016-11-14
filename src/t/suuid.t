@@ -322,28 +322,8 @@ sub test_suuid_executable {
     );
 
     # }}}
-    likecmd("seq 1 20000 | $CMD -l $Outdir -c -", # {{{
-        "/^$v1_templ\n\$/s",
-        '/^$/',
-        0,
-        "Read long text from stdin, 108894 chars",
-    );
-
-    # }}}
-    like(file_data($Outfile), # {{{
-        s_top(
-             s_suuid() .
-             s_suuid() .
-             s_suuid(
-                'txt' => '1\\\\n2\\\\n3\\\\n[\d\\\\n]+19998\\\\n19999\\\\n20000',
-                'tty' => '',
-             ),
-        ),
-        "Monster entry was added to the log file",
-    );
-
-    # }}}
     ok(unlink($Outfile), "Delete [Outfile]");
+    read_long_text_from_stdin($CMD, $Outdir, $Outfile);
     testcmd("$CMD --rcfile rcfile-inv-uuidcmd -l $Outdir", # {{{
         '',
         "../suuid: UUID generation failed\n",
@@ -1441,6 +1421,39 @@ sub invalid_macaddr_in_rcfile {
         $desc,
     );
     ok(!-f $Outfile, "Log file wasn't created");
+    # }}}
+}
+
+sub read_long_text_from_stdin {
+    # {{{
+    my ($CMD, $Outdir, $Outfile) = @_;
+    my ($fp, $i);
+    my $tmpfile = "tmp-longtext";
+
+    ok(open($fp, ">$tmpfile"), "Open $tmpfile for writing") or return;
+    for $i (1..20000) {
+        print($fp "$i\n");
+    }
+    ok(close($fp), "Close $tmpfile");
+    likecmd("$CMD -l $Outdir -c - <$tmpfile",
+        "/^$v1_templ\n\$/s",
+        '/^$/',
+        0,
+        "Read long text from stdin, 108894 chars",
+    );
+    ok(unlink($tmpfile), "Delete $tmpfile");
+    like(file_data($Outfile), # {{{
+        s_top(
+             s_suuid(
+                'txt' => '1\\\\n2\\\\n3\\\\n[\d\\\\n]+19998\\\\n19999\\\\n20000',
+                'tty' => '',
+             ),
+        ),
+        "Monster entry was added to the log file",
+    );
+
+    # }}}
+    ok(unlink($Outfile), "Delete [Outfile]");
     # }}}
 }
 
