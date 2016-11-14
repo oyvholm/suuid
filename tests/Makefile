@@ -3,6 +3,7 @@
 
 .PHONY: test
 test:
+	cd ../src && $(MAKE)
 	./Genlog *.t
 
 .PHONY: clean

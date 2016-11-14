@@ -75,6 +75,7 @@ sub main {
     my $valgrind_str;
 
     $ENV{'SESS_UUID'} = '';
+    $ENV{'PATH'} = "../src:$ENV{'PATH'}";
 
     if ($Opt{'valgrind'}) {
         $valgrind_str = " valgrind -q " .

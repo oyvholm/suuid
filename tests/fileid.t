@@ -69,6 +69,7 @@ sub main {
     # {{{
     my $Retval = 0;
     my $logdir = "tmp-fileid-t-logdir";
+    $ENV{'PATH'} = "../src:$ENV{'PATH'}";
 
     diag(sprintf('========== Executing %s v%s ==========',
         $progname,
