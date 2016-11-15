@@ -459,7 +459,7 @@ sub test_remove_option {
 	my $CMD = shift;
 
 	diag("--remove option");
-	testcmd("$CMD -l finduuid-files/textfile --remove", # {{{
+	testcmd("$CMD --remove finduuid-files/textfile", # {{{
 	        join("\n",
 	             "1 dsfv sdfJada",
 	             "2 kldfjnvdsv",
@@ -482,7 +482,7 @@ sub test_remove_option {
 	);
 
 	# }}}
-	testcmd("$CMD -l finduuid-files/compact --remove", # {{{
+	testcmd("$CMD finduuid-files/compact --remove", # {{{
 	        "",
 	        "",
 	        0,
