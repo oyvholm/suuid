@@ -23,6 +23,7 @@ our %Opt = (
 
 	'date' => 0,
 	'filenames' => 0,
+	'first' => 0,
 	'help' => 0,
 	'line' => 0,
 	'quiet' => 0,
@@ -42,6 +43,7 @@ GetOptions(
 
 	'date|d' => \$Opt{'date'},
 	'filenames|f' => \$Opt{'filenames'},
+	'first|1' => \$Opt{'first'},
 	'help|h' => \$Opt{'help'},
 	'line|l' => \$Opt{'line'},
 	'quiet|q+' => \$Opt{'quiet'},
@@ -80,6 +82,7 @@ sub main {
 		chomp(my $Line = $_);
 		if (/$Templ/) {
 			process_line($Line);
+			$Opt{'first'} && return $exit_value;
 		}
 	}
 
@@ -219,6 +222,8 @@ Usage: $progname [options] [file [files [...]]]
 
 Options:
 
+  -1, --first
+    Stop after the first UUID is found.
   -d, --date
     Display timestamp in parantheses after the UUID. Example:
       b5bf6012-4bb6-11e2-bdd3-0016d364066c(2012-12-21T21:38:07.9885330Z)

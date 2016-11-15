@@ -115,6 +115,7 @@ sub test_executable {
 	test_without_options($CMD);
 	test_date_option($CMD);
 	test_file_option($CMD);
+	test_first_option($CMD);
 	test_line_option($CMD);
 	test_remove_option($CMD);
 	test_unique_option($CMD);
@@ -241,6 +242,82 @@ END
 	        "",
 	        0,
 	        "List file name when reading from stdin",
+	);
+
+	# }}}
+
+	return;
+}
+
+sub test_first_option {
+	my $CMD = shift;
+
+	diag("Testing -1 (--first) option...");
+	testcmd("$CMD -1 finduuid-files/textfile", # {{{
+	        "9829c1a8-88d5-11dd-9a24-000475e441b9\n",
+	        "",
+	        0,
+	        "Read from file, stop after the first UUID with -1",
+	);
+
+	# }}}
+	testcmd("$CMD --first finduuid-files/textfile", # {{{
+	        "9829c1a8-88d5-11dd-9a24-000475e441b9\n",
+	        "",
+	        0,
+	        "Read from file, stop after the first UUID with --first",
+	);
+
+	# }}}
+	testcmd("$CMD -1 <finduuid-files/textfile", # {{{
+	        "9829c1a8-88d5-11dd-9a24-000475e441b9\n",
+	        "",
+	        0,
+	        "Read from stdin, stop after the first UUID with -1",
+	);
+
+	# }}}
+	testcmd("$CMD --first <finduuid-files/textfile", # {{{
+	        "9829c1a8-88d5-11dd-9a24-000475e441b9\n",
+	        "",
+	        0,
+	        "Read from stdin, stop after the first UUID with --first",
+	);
+
+	# }}}
+	testcmd("$CMD finduuid-files/textfile -1 finduuid-files/text2", # {{{
+	        "9829c1a8-88d5-11dd-9a24-000475e441b9\n",
+	        "",
+	        0,
+	        "Several files, still returns only one UUID",
+	);
+
+	# }}}
+	testcmd("$CMD finduuid-files/textfile finduuid-files/doesntexist -1", # {{{
+	        "9829c1a8-88d5-11dd-9a24-000475e441b9\n",
+	        "",
+	        0,
+	        "Ignore non-existing second file, one UUID is already found",
+	);
+
+	# }}}
+	testcmd("$CMD -l1 finduuid-files/textfile", # {{{
+	        <<END,
+4 dfv dsf 9829c1a8-88d5-11dd-9a24-000475e441b9
+END
+	        "",
+	        0,
+	        "-l (--line) and -1 (--first), print only one line",
+	);
+
+	# }}}
+	testcmd("$CMD -l1f finduuid-files/textfile finduuid-files/text2", # {{{
+	        <<END,
+finduuid-files/textfile:4 dfv dsf 9829c1a8-88d5-11dd-9a24-000475e441b9
+END
+	        "",
+	        0,
+	        "-l1f with two files, return only the first line",
 	);
 
 	# }}}
