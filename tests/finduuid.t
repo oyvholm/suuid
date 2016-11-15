@@ -76,6 +76,50 @@ sub main {
 	}
 
 	test_standard_options();
+	test_executable($CMD);
+
+	todo_section:
+	;
+
+	if ($Opt{'all'} || $Opt{'todo'}) {
+		diag('Running TODO tests...');
+		TODO: {
+			local $TODO = '';
+			# Insert TODO tests here.
+		}
+	}
+
+	diag('Testing finished.');
+
+	return $Retval;
+}
+
+sub test_standard_options {
+	diag('Testing -h (--help) option...');
+	likecmd("$CMD -h",
+	        '/  Show this help/i',
+	        '/^$/',
+	        0,
+	        'Option -h prints help screen');
+
+	diag('Testing -v (--verbose) option...');
+	likecmd("$CMD -hv",
+	        '/^\n\S+ \d+\.\d+\.\d+/s',
+	        '/^$/',
+	        0,
+	        'Option -v with -h returns version number and help screen');
+
+	diag('Testing --version option...');
+	likecmd("$CMD --version",
+	        '/^\S+ \d+\.\d+\.\d+/',
+	        '/^$/',
+	        0,
+	        'Option --version returns version number');
+	return;
+}
+
+sub test_executable {
+	my $CMD = shift;
 
 	testcmd("$CMD </dev/null", # {{{
 	        "",
@@ -410,43 +454,6 @@ END
 
 	# }}}
 
-	todo_section:
-	;
-
-	if ($Opt{'all'} || $Opt{'todo'}) {
-		diag('Running TODO tests...');
-		TODO: {
-			local $TODO = '';
-			# Insert TODO tests here.
-		}
-	}
-
-	diag('Testing finished.');
-
-	return $Retval;
-}
-
-sub test_standard_options {
-	diag('Testing -h (--help) option...');
-	likecmd("$CMD -h",
-	        '/  Show this help/i',
-	        '/^$/',
-	        0,
-	        'Option -h prints help screen');
-
-	diag('Testing -v (--verbose) option...');
-	likecmd("$CMD -hv",
-	        '/^\n\S+ \d+\.\d+\.\d+/s',
-	        '/^$/',
-	        0,
-	        'Option -v with -h returns version number and help screen');
-
-	diag('Testing --version option...');
-	likecmd("$CMD --version",
-	        '/^\S+ \d+\.\d+\.\d+/',
-	        '/^$/',
-	        0,
-	        'Option --version returns version number');
 	return;
 }
 
