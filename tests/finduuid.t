@@ -122,6 +122,20 @@ sub test_standard_options {
 sub test_executable {
 	my $CMD = shift;
 
+	test_without_options($CMD);
+	test_date_option($CMD);
+	test_file_option($CMD);
+	test_line_option($CMD);
+	test_remove_option($CMD);
+	test_unique_option($CMD);
+	test_multiple_options($CMD);
+
+	return;
+}
+
+sub test_without_options {
+	my $CMD = shift;
+
 	testcmd("$CMD </dev/null", # {{{
 	        "",
 	        "",
@@ -169,6 +183,13 @@ END
 	);
 
 	# }}}
+
+	return;
+}
+
+sub test_date_option {
+	my $CMD = shift;
+
 	diag("Testing -d (--date) option...");
 	testcmd("$CMD -d finduuid-files/text2", # {{{
 	        "08CCB59A-88E1-11DD-A80C-000475E441B9" .
@@ -188,6 +209,13 @@ END
 	);
 
 	# }}}
+
+	return;
+}
+
+sub test_file_option {
+	my $CMD = shift;
+
 	diag("Testing -f (--file) option...");
 	testcmd("$CMD -f finduuid-files/std-random " .
 	        "finduuid-files/textfile", # {{{
@@ -226,6 +254,13 @@ END
 	);
 
 	# }}}
+
+	return;
+}
+
+sub test_line_option {
+	my $CMD = shift;
+
 	diag("Testing -l (--line) option...");
 	testcmd("$CMD -l finduuid-files/textfile", # {{{
 	        join("\n",
@@ -335,6 +370,13 @@ END
 	);
 
 	# }}}
+
+	return;
+}
+
+sub test_remove_option {
+	my $CMD = shift;
+
 	diag("Testing --remove option...");
 	testcmd("$CMD -l finduuid-files/textfile --remove", # {{{
 	        join("\n",
@@ -367,6 +409,13 @@ END
 	);
 
 	# }}}
+
+	return;
+}
+
+sub test_unique_option {
+	my $CMD = shift;
+
 	diag("Testing -u (--unique) option...");
 	testcmd("$CMD --unique -l finduuid-files/textfile", # {{{
 	        join("\n",
@@ -408,6 +457,13 @@ END
 	);
 
 	# }}}
+
+	return;
+}
+
+sub test_multiple_options {
+	my $CMD = shift;
+
 	testcmd("$CMD -u -lf finduuid-files/textfile " .
 	        "finduuid-files/text2", # {{{
 	        join("\n",
