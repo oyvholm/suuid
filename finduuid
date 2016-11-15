@@ -26,7 +26,7 @@ our %Opt = (
 	'help' => 0,
 	'line' => 0,
 	'quiet' => 0,
-	'reverse' => 0,
+	'remove' => 0,
 	'unique' => 0,
 	'verbose' => 0,
 	'version' => 0,
@@ -45,7 +45,7 @@ GetOptions(
 	'help|h' => \$Opt{'help'},
 	'line|l' => \$Opt{'line'},
 	'quiet|q+' => \$Opt{'quiet'},
-	'reverse|r' => \$Opt{'reverse'},
+	'remove' => \$Opt{'remove'},
 	'unique|u' => \$Opt{'unique'},
 	'verbose|v+' => \$Opt{'verbose'},
 	'version' => \$Opt{'version'},
@@ -70,7 +70,7 @@ exit(main());
 sub main {
 	my $Retval = 0;
 
-	if ($Opt{'reverse'}) {
+	if ($Opt{'remove'}) {
 		while (<>) {
 			s/$Templ//g;
 			print;
@@ -232,6 +232,8 @@ Options:
     Print the whole line where UUIDs are found.
   -q, --quiet
     Be more quiet. Can be repeated to increase silence.
+  --remove
+    Remove all UUIDs from the input.
   -u, --unique
     Print only the first occurence of every uuid.
   -v, --verbose

@@ -290,8 +290,8 @@ END
 	);
 
 	# }}}
-	diag("Testing -r (--reverse) option...");
-	testcmd("$CMD -l finduuid-files/textfile -r", # {{{
+	diag("Testing --remove option...");
+	testcmd("$CMD -l finduuid-files/textfile --remove", # {{{
 	        join("\n",
 	             "1 dsfv sdfJada",
 	             "2 kldfjnvdsv",
@@ -314,11 +314,11 @@ END
 	);
 
 	# }}}
-	testcmd("$CMD -l finduuid-files/compact --reverse", # {{{
+	testcmd("$CMD -l finduuid-files/compact --remove", # {{{
 	        "",
 	        "",
 	        0,
-	        "Nothing left from compact when using --reverse",
+	        "Nothing left from compact when using --remove",
 	);
 
 	# }}}
