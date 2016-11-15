@@ -73,13 +73,14 @@ sub main {
 
 	if ($Opt{'todo'} && !$Opt{'all'}) {
 		ok(1, "No todo tests here");
+		done_testing(1);
 		return 0;
 	}
 
 	test_standard_options($CMD);
 	test_executable($CMD);
-
 	diag('Testing finished.');
+	done_testing(90);
 
 	return $Retval;
 }
