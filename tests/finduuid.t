@@ -399,6 +399,14 @@ sub test_remove_option {
 	);
 
 	# }}}
+	testcmd("echo Nothing here | $CMD --remove", # {{{
+	        "Nothing here\n",
+	        "",
+	        1,
+	        "No UUIDs in the input, exit with 1",
+	);
+
+	# }}}
 
 	return;
 }

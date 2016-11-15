@@ -68,14 +68,12 @@ my $exit_value = 1;
 exit(main());
 
 sub main {
-	my $Retval = 0;
-
 	if ($Opt{'remove'}) {
 		while (<>) {
-			s/$Templ//g;
+			s/$Templ//g && ($exit_value = 0);
 			print;
 		}
-		return $Retval;
+		return $exit_value;
 	}
 
 	while (<>) {
@@ -233,7 +231,8 @@ Options:
   -q, --quiet
     Be more quiet. Can be repeated to increase silence.
   --remove
-    Remove all UUIDs from the input.
+    Remove all UUIDs from the input. If any UUIDs were removed, exit 
+    with 0. If no UUIDs were found, exit with 1.
   -u, --unique
     Print only the first occurence of every uuid.
   -v, --verbose
