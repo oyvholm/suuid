@@ -25,7 +25,6 @@ use Getopt::Long;
 local $| = 1;
 
 our $CMD_BASENAME = "finduuid";
-our $CMD = "../$CMD_BASENAME";
 
 our %Opt = (
 
@@ -67,6 +66,7 @@ exit(main());
 
 sub main {
 	my $Retval = 0;
+	my $CMD = "../$CMD_BASENAME";
 
 	diag(sprintf('========== Executing %s v%s ==========',
 	             $progname, $VERSION));
@@ -75,7 +75,7 @@ sub main {
 		goto todo_section;
 	}
 
-	test_standard_options();
+	test_standard_options($CMD);
 	test_executable($CMD);
 
 	todo_section:
@@ -95,6 +95,7 @@ sub main {
 }
 
 sub test_standard_options {
+	my $CMD = shift;
 	diag('Testing -h (--help) option...');
 	likecmd("$CMD -h",
 	        '/  Show this help/i',
