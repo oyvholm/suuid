@@ -80,7 +80,7 @@ sub main {
 	test_standard_options($CMD);
 	test_executable($CMD);
 	diag('Testing finished.');
-	done_testing(90);
+	done_testing(96);
 
 	return $Retval;
 }
@@ -94,6 +94,11 @@ sub test_standard_options {
 	        '/^$/',
 	        0,
 	        'Option -h prints help screen');
+	likecmd("$CMD --help",
+	        '/  Show this help/i',
+	        '/^$/',
+	        0,
+	        'Option --help prints help screen');
 
 	diag('-v/--verbose option');
 	likecmd("$CMD -hv",
@@ -101,6 +106,12 @@ sub test_standard_options {
 	        '/^$/',
 	        0,
 	        'Option -v with -h returns version number and help screen');
+	likecmd("$CMD --help --verbose",
+	        '/^\n\S+ \d+\.\d+\.\d+/s',
+	        '/^$/',
+	        0,
+	        'Option --verbose with --help returns version number ' .
+	        'and help screen');
 
 	diag('--version option');
 	likecmd("$CMD --version",
@@ -190,16 +201,16 @@ sub test_date_option {
 	          "(2008-09-22T19:59:58.7635610Z)\n",
 	        "",
 	        0,
-	        "Option --date lists timestamp after UUID",
+	        "Option -d lists timestamp after UUID",
 	);
 
 	# }}}
-	testcmd("$CMD -dl finduuid-files/text2", # {{{
+	testcmd("$CMD --date -l finduuid-files/text2", # {{{
 	        "here 08CCB59A-88E1-11DD-A80C-000475E441B9" .
 	          "(2008-09-22T19:59:58.7635610Z)blabla\n",
 	        "",
 	        0,
-	        "Option --date works witk --line",
+	        "Option --date works with -l",
 	);
 
 	# }}}
@@ -234,17 +245,17 @@ finduuid-files/textfile:062edbf6-9b6d-11df-9e48-0d35319cdba1
 END
 	        "",
 	        0,
-	        "Option --filenames lists file name",
+	        "Option -f lists file name",
 	);
 
 	# }}}
-	testcmd("$CMD -f <finduuid-files/std-random", # {{{
+	testcmd("$CMD --filenames <finduuid-files/std-random", # {{{
 	        <<END,
 -:2bd76352-88d5-11dd-8848-000475e441b9
 END
 	        "",
 	        0,
-	        "List file name when reading from stdin",
+	        "--filenames shows \"-\" as file name when reading from stdin",
 	);
 
 	# }}}
@@ -354,11 +365,11 @@ sub test_line_option {
 	       ),
 	        "",
 	        0,
-	        "Print whole line with UUID",
+	        "-l, print whole line with UUID",
 	);
 
 	# }}}
-	testcmd("$CMD -l <finduuid-files/textfile", # {{{
+	testcmd("$CMD --line <finduuid-files/textfile", # {{{
 	        join("\n",
 	             "4 dfv dsf 9829c1a8-88d5-11dd-9a24-000475e441b9",
 	             "6 fd5d1200-88da-11dd-b7cf-000475e441b9",
@@ -380,7 +391,7 @@ sub test_line_option {
 	        ),
 	        "",
 	        0,
-	        "Read from stdin and print whole line with UUID",
+	        "--line, read from stdin and print whole line with UUID",
 	);
 
 	# }}}
@@ -420,7 +431,7 @@ sub test_line_option {
 	);
 
 	# }}}
-	testcmd("$CMD -l finduuid-files/compact", # {{{
+	testcmd("$CMD finduuid-files/compact --line", # {{{
 	        join("",
 	             "daa9b45c-88d5-11dd-be73-000475e441b9",
 	             "c2680b68-144e-4f4e-9c1c-3fbb758a94d2",
@@ -436,7 +447,7 @@ sub test_line_option {
 	        ),
 	        "",
 	        0,
-	        "Print whole line containg many UUIDs",
+	        "--line, print whole line containg many UUIDs",
 	);
 
 	# }}}
