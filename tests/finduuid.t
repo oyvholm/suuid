@@ -72,22 +72,12 @@ sub main {
 	             $progname, $VERSION));
 
 	if ($Opt{'todo'} && !$Opt{'all'}) {
-		goto todo_section;
+		ok(1, "No todo tests here");
+		return 0;
 	}
 
 	test_standard_options($CMD);
 	test_executable($CMD);
-
-	todo_section:
-	;
-
-	if ($Opt{'all'} || $Opt{'todo'}) {
-		diag('Running TODO tests...');
-		TODO: {
-			local $TODO = '';
-			# Insert TODO tests here.
-		}
-	}
 
 	diag('Testing finished.');
 
