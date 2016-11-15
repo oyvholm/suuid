@@ -87,21 +87,22 @@ sub main {
 
 sub test_standard_options {
 	my $CMD = shift;
-	diag('Testing -h (--help) option...');
+
+	diag('-h/--help option');
 	likecmd("$CMD -h",
 	        '/  Show this help/i',
 	        '/^$/',
 	        0,
 	        'Option -h prints help screen');
 
-	diag('Testing -v (--verbose) option...');
+	diag('-v/--verbose option');
 	likecmd("$CMD -hv",
 	        '/^\n\S+ \d+\.\d+\.\d+/s',
 	        '/^$/',
 	        0,
 	        'Option -v with -h returns version number and help screen');
 
-	diag('Testing --version option...');
+	diag('--version option');
 	likecmd("$CMD --version",
 	        '/^\S+ \d+\.\d+\.\d+/',
 	        '/^$/',
@@ -128,6 +129,7 @@ sub test_executable {
 sub test_without_options {
 	my $CMD = shift;
 
+	diag("Without options");
 	testcmd("$CMD </dev/null", # {{{
 	        "",
 	        "",
@@ -182,7 +184,7 @@ END
 sub test_date_option {
 	my $CMD = shift;
 
-	diag("Testing -d (--date) option...");
+	diag("-d/--date option");
 	testcmd("$CMD -d finduuid-files/text2", # {{{
 	        "08CCB59A-88E1-11DD-A80C-000475E441B9" .
 	          "(2008-09-22T19:59:58.7635610Z)\n",
@@ -208,7 +210,7 @@ sub test_date_option {
 sub test_file_option {
 	my $CMD = shift;
 
-	diag("Testing -f (--file) option...");
+	diag("-f/--filenames option");
 	testcmd("$CMD -f finduuid-files/std-random " .
 	        "finduuid-files/textfile", # {{{
 	        <<END,
@@ -253,7 +255,7 @@ END
 sub test_first_option {
 	my $CMD = shift;
 
-	diag("Testing -1 (--first) option...");
+	diag("-1/--first option");
 	testcmd("$CMD -1 finduuid-files/textfile", # {{{
 	        "9829c1a8-88d5-11dd-9a24-000475e441b9\n",
 	        "",
@@ -329,7 +331,7 @@ END
 sub test_line_option {
 	my $CMD = shift;
 
-	diag("Testing -l (--line) option...");
+	diag("-l/--line option");
 	testcmd("$CMD -l finduuid-files/textfile", # {{{
 	        join("\n",
 	             "4 dfv dsf 9829c1a8-88d5-11dd-9a24-000475e441b9",
@@ -445,7 +447,7 @@ sub test_line_option {
 sub test_remove_option {
 	my $CMD = shift;
 
-	diag("Testing --remove option...");
+	diag("--remove option");
 	testcmd("$CMD -l finduuid-files/textfile --remove", # {{{
 	        join("\n",
 	             "1 dsfv sdfJada",
@@ -492,7 +494,7 @@ sub test_remove_option {
 sub test_unique_option {
 	my $CMD = shift;
 
-	diag("Testing -u (--unique) option...");
+	diag("-u/--unique option");
 	testcmd("$CMD --unique -l finduuid-files/textfile", # {{{
 	        join("\n",
 	             "4 dfv dsf 9829c1a8-88d5-11dd-9a24-000475e441b9",
