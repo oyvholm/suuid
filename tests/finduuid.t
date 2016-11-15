@@ -116,7 +116,7 @@ sub test_executable {
 
 	test_without_options($CMD);
 	test_date_option($CMD);
-	test_file_option($CMD);
+	test_filenames_option($CMD);
 	test_first_option($CMD);
 	test_line_option($CMD);
 	test_remove_option($CMD);
@@ -207,7 +207,7 @@ sub test_date_option {
 	return;
 }
 
-sub test_file_option {
+sub test_filenames_option {
 	my $CMD = shift;
 
 	diag("-f/--filenames option");
