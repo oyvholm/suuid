@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-#=======================================================================
+#==============================================================================
 # finduuid.t
 # File ID: 008facd0-f988-11dd-bf3b-000475e441b9
 #
@@ -8,32 +8,33 @@
 #
 # Character set: UTF-8
 # ©opyleft 2008– Øyvind A. Holm <sunny@sunbase.org>
-# License: GNU General Public License version 2 or later, see end of 
-# file for legal stuff.
-#=======================================================================
+# License: GNU General Public License version 2 or later, see end of file for 
+# legal stuff.
+#==============================================================================
 
 use strict;
 use warnings;
 
 BEGIN {
-    # push(@INC, "$ENV{'HOME'}/bin/STDlibdirDTS");
-    use Test::More qw{no_plan};
-    # use_ok() goes here
+	use Test::More qw{no_plan};
+	# use_ok() goes here
 }
 
 use Getopt::Long;
 
 local $| = 1;
 
-our $CMD = '../finduuid';
+our $CMD_BASENAME = "finduuid";
+our $CMD = "../$CMD_BASENAME";
 
 our %Opt = (
 
-    'all' => 0,
-    'help' => 0,
-    'todo' => 0,
-    'verbose' => 0,
-    'version' => 0,
+	'all' => 0,
+	'help' => 0,
+	'quiet' => 0,
+	'todo' => 0,
+	'verbose' => 0,
+	'version' => 0,
 
 );
 
@@ -46,106 +47,66 @@ my %descriptions = ();
 Getopt::Long::Configure('bundling');
 GetOptions(
 
-    'all|a' => \$Opt{'all'},
-    'help|h' => \$Opt{'help'},
-    'todo|t' => \$Opt{'todo'},
-    'verbose|v+' => \$Opt{'verbose'},
-    'version' => \$Opt{'version'},
+	'all|a' => \$Opt{'all'},
+	'help|h' => \$Opt{'help'},
+	'quiet|q+' => \$Opt{'quiet'},
+	'todo|t' => \$Opt{'todo'},
+	'verbose|v+' => \$Opt{'verbose'},
+	'version' => \$Opt{'version'},
 
 ) || die("$progname: Option error. Use -h for help.\n");
 
+$Opt{'verbose'} -= $Opt{'quiet'};
 $Opt{'help'} && usage(0);
 if ($Opt{'version'}) {
-    print_version();
-    exit(0);
+	print_version();
+	exit(0);
 }
 
 exit(main());
 
 sub main {
-    # {{{
-    my $Retval = 0;
+	my $Retval = 0;
 
-    diag(sprintf('========== Executing %s v%s ==========',
-        $progname,
-        $VERSION));
+	diag(sprintf('========== Executing %s v%s ==========',
+	             $progname, $VERSION));
 
-    if ($Opt{'todo'} && !$Opt{'all'}) {
-        goto todo_section;
-    }
+	if ($Opt{'todo'} && !$Opt{'all'}) {
+		goto todo_section;
+	}
 
-=pod
+	test_standard_options();
 
-    testcmd("$CMD command", # {{{
-        <<'END',
-[expected stdout]
-END
-        '',
-        0,
-        'description',
-    );
+	testcmd("$CMD </dev/null", # {{{
+	        "",
+	        "",
+	        1,
+	        "Read empty input",
+	);
 
-    # }}}
-
-=cut
-
-    diag('Testing -h (--help) option...');
-    likecmd("$CMD -h", # {{{
-        '/  Show this help\./',
-        '/^$/',
-        0,
-        'Option -h prints help screen',
-    );
-
-    # }}}
-    diag('Testing -v (--verbose) option...');
-    likecmd("$CMD -hv", # {{{
-        '/^\n\S+ \d+\.\d+\.\d+(\+git)?\n/s',
-        '/^$/',
-        0,
-        'Option -v with -h returns version number and help screen',
-    );
-
-    # }}}
-    diag('Testing --version option...');
-    likecmd("$CMD --version", # {{{
-        '/^\S+ \d+\.\d+\.\d+(\+git)?\n/',
-        '/^$/',
-        0,
-        'Option --version returns version number',
-    );
-
-    # }}}
-    testcmd("$CMD </dev/null", # {{{
-        "",
-        "",
-        1,
-        "Read empty input",
-    );
-
-    # }}}
-    testcmd("$CMD finduuid-files/std-random", # {{{
-        <<END,
+	# }}}
+	testcmd("$CMD finduuid-files/std-random", # {{{
+	        <<END,
 2bd76352-88d5-11dd-8848-000475e441b9
 END
-        "",
-        0,
-        "Find UUID inside random data",
-    );
+	        "",
+	        0,
+	        "Find UUID inside random data",
+	);
 
-    # }}}
-    testcmd("$CMD <finduuid-files/std-random", # {{{
-        <<END,
+	# }}}
+	testcmd("$CMD <finduuid-files/std-random", # {{{
+	        <<END,
 2bd76352-88d5-11dd-8848-000475e441b9
 END
-        "",
-        0,
-        "Read random data from stdin",
-    );
+	        "",
+	        0,
+	        "Read random data from stdin",
+	);
 
-    # }}}
-    testcmd("$CMD finduuid-files/compact", # {{{
-        <<END,
+	# }}}
+	testcmd("$CMD finduuid-files/compact", # {{{
+	        <<END,
 daa9b45c-88d5-11dd-be73-000475e441b9
 c2680b68-144e-4f4e-9c1c-3fbb758a94d2
 db3b0506-88d5-11dd-8e5b-000475e441b9
@@ -157,32 +118,35 @@ dc6d9380-88d5-11dd-beb6-000475e441b9
 dd293036-88d5-11dd-84ca-000475e441b9
 6396c79f-859a-404b-b285-b71288973b3b
 END
-        "",
-        0,
-        "Search file with many UUIDs stacked toghether",
-    );
+	        "",
+	        0,
+	        "Search file with many UUIDs stacked toghether",
+	);
 
-    # }}}
-    diag("Testing -d (--date) option...");
-    testcmd("$CMD -d finduuid-files/text2", # {{{
-        "08CCB59A-88E1-11DD-A80C-000475E441B9(2008-09-22T19:59:58.7635610Z)\n",
-        "",
-        0,
-        "Option --date lists timestamp after UUID",
-    );
+	# }}}
+	diag("Testing -d (--date) option...");
+	testcmd("$CMD -d finduuid-files/text2", # {{{
+	        "08CCB59A-88E1-11DD-A80C-000475E441B9" .
+	          "(2008-09-22T19:59:58.7635610Z)\n",
+	        "",
+	        0,
+	        "Option --date lists timestamp after UUID",
+	);
 
-    # }}}
-    testcmd("$CMD -dl finduuid-files/text2", # {{{
-        "here 08CCB59A-88E1-11DD-A80C-000475E441B9(2008-09-22T19:59:58.7635610Z)blabla\n",
-        "",
-        0,
-        "Option --date works witk --line",
-    );
+	# }}}
+	testcmd("$CMD -dl finduuid-files/text2", # {{{
+	        "here 08CCB59A-88E1-11DD-A80C-000475E441B9" .
+	          "(2008-09-22T19:59:58.7635610Z)blabla\n",
+	        "",
+	        0,
+	        "Option --date works witk --line",
+	);
 
-    # }}}
-    diag("Testing -f (--file) option...");
-    testcmd("$CMD -f finduuid-files/std-random finduuid-files/textfile", # {{{
-        <<END,
+	# }}}
+	diag("Testing -f (--file) option...");
+	testcmd("$CMD -f finduuid-files/std-random " .
+	        "finduuid-files/textfile", # {{{
+	        <<END,
 finduuid-files/std-random:2bd76352-88d5-11dd-8848-000475e441b9
 finduuid-files/textfile:9829c1a8-88d5-11dd-9a24-000475e441b9
 finduuid-files/textfile:fd5d1200-88da-11dd-b7cf-000475e441b9
@@ -201,162 +165,234 @@ finduuid-files/textfile:0629cc60-9b6d-11df-867d-bde64fd0a5c7
 finduuid-files/textfile:062c7a0a-9b6d-11df-94d2-638823d95bf3
 finduuid-files/textfile:062edbf6-9b6d-11df-9e48-0d35319cdba1
 END
-        "",
-        0,
-        "Option --filenames lists file name",
-    );
+	        "",
+	        0,
+	        "Option --filenames lists file name",
+	);
 
-    # }}}
-    testcmd("$CMD -f <finduuid-files/std-random", # {{{
-        <<END,
+	# }}}
+	testcmd("$CMD -f <finduuid-files/std-random", # {{{
+	        <<END,
 -:2bd76352-88d5-11dd-8848-000475e441b9
 END
-        "",
-        0,
-        "List file name when reading from stdin",
-    );
+	        "",
+	        0,
+	        "List file name when reading from stdin",
+	);
 
-    # }}}
-    diag("Testing -l (--line) option...");
-    testcmd("$CMD -l finduuid-files/textfile", # {{{
-        <<END,
-4 dfv dsf 9829c1a8-88d5-11dd-9a24-000475e441b9
-6 fd5d1200-88da-11dd-b7cf-000475e441b9
-8 once more 9829C1A8-88D5-11DD-9A24-000475E441B9
-9 yet another one 9829C1A8-88D5-11DD-9A24-000475E441B9
-10 unique + dup 4e4e8d08-9b38-11df-9954-3793b0cfdf88 9829C1A8-88D5-11DD-9A24-000475E441B9
-11 dup + unique fd5d1200-88da-11dd-b7cf-000475e441b9 ced8e04e-9b57-11df-9b37-d97f703ed9b7
-12 four uniques 0625e3ca-9b6d-11df-bc5b-f1285fef4db2 0629cc60-9b6d-11df-867d-bde64fd0a5c7 062c7a0a-9b6d-11df-94d2-638823d95bf3 062edbf6-9b6d-11df-9e48-0d35319cdba1
-13 four dups 0625e3ca-9b6d-11df-bc5b-f1285fef4db2 0629cc60-9b6d-11df-867d-bde64fd0a5c7 062c7a0a-9b6d-11df-94d2-638823d95bf3 062edbf6-9b6d-11df-9e48-0d35319cdba1
-END
-        "",
-        0,
-        "Print whole line with UUID",
-    );
+	# }}}
+	diag("Testing -l (--line) option...");
+	testcmd("$CMD -l finduuid-files/textfile", # {{{
+	        join("\n",
+	             "4 dfv dsf 9829c1a8-88d5-11dd-9a24-000475e441b9",
+	             "6 fd5d1200-88da-11dd-b7cf-000475e441b9",
+	             "8 once more 9829C1A8-88D5-11DD-9A24-000475E441B9",
+	             "9 yet another one 9829C1A8-88D5-11DD-9A24-000475E441B9",
+	             "10 unique + dup 4e4e8d08-9b38-11df-9954-3793b0cfdf88 " .
+	               "9829C1A8-88D5-11DD-9A24-000475E441B9",
+	             "11 dup + unique fd5d1200-88da-11dd-b7cf-000475e441b9 " .
+	               "ced8e04e-9b57-11df-9b37-d97f703ed9b7",
+	             "12 four uniques 0625e3ca-9b6d-11df-bc5b-f1285fef4db2 " .
+	               "0629cc60-9b6d-11df-867d-bde64fd0a5c7 " .
+	               "062c7a0a-9b6d-11df-94d2-638823d95bf3 " .
+	               "062edbf6-9b6d-11df-9e48-0d35319cdba1",
+	             "13 four dups 0625e3ca-9b6d-11df-bc5b-f1285fef4db2 " .
+	               "0629cc60-9b6d-11df-867d-bde64fd0a5c7 " .
+	               "062c7a0a-9b6d-11df-94d2-638823d95bf3 " .
+	               "062edbf6-9b6d-11df-9e48-0d35319cdba1",
+	             "",
+	       ),
+	        "",
+	        0,
+	        "Print whole line with UUID",
+	);
 
-    # }}}
-    testcmd("$CMD -l <finduuid-files/textfile", # {{{
-        <<END,
-4 dfv dsf 9829c1a8-88d5-11dd-9a24-000475e441b9
-6 fd5d1200-88da-11dd-b7cf-000475e441b9
-8 once more 9829C1A8-88D5-11DD-9A24-000475E441B9
-9 yet another one 9829C1A8-88D5-11DD-9A24-000475E441B9
-10 unique + dup 4e4e8d08-9b38-11df-9954-3793b0cfdf88 9829C1A8-88D5-11DD-9A24-000475E441B9
-11 dup + unique fd5d1200-88da-11dd-b7cf-000475e441b9 ced8e04e-9b57-11df-9b37-d97f703ed9b7
-12 four uniques 0625e3ca-9b6d-11df-bc5b-f1285fef4db2 0629cc60-9b6d-11df-867d-bde64fd0a5c7 062c7a0a-9b6d-11df-94d2-638823d95bf3 062edbf6-9b6d-11df-9e48-0d35319cdba1
-13 four dups 0625e3ca-9b6d-11df-bc5b-f1285fef4db2 0629cc60-9b6d-11df-867d-bde64fd0a5c7 062c7a0a-9b6d-11df-94d2-638823d95bf3 062edbf6-9b6d-11df-9e48-0d35319cdba1
-END
-        "",
-        0,
-        "Read from stdin and print whole line with UUID",
-    );
+	# }}}
+	testcmd("$CMD -l <finduuid-files/textfile", # {{{
+	        join("\n",
+	             "4 dfv dsf 9829c1a8-88d5-11dd-9a24-000475e441b9",
+	             "6 fd5d1200-88da-11dd-b7cf-000475e441b9",
+	             "8 once more 9829C1A8-88D5-11DD-9A24-000475E441B9",
+	             "9 yet another one 9829C1A8-88D5-11DD-9A24-000475E441B9",
+	             "10 unique + dup 4e4e8d08-9b38-11df-9954-3793b0cfdf88 " .
+	               "9829C1A8-88D5-11DD-9A24-000475E441B9",
+	             "11 dup + unique fd5d1200-88da-11dd-b7cf-000475e441b9 " .
+	               "ced8e04e-9b57-11df-9b37-d97f703ed9b7",
+	             "12 four uniques 0625e3ca-9b6d-11df-bc5b-f1285fef4db2 " .
+	               "0629cc60-9b6d-11df-867d-bde64fd0a5c7 " .
+	               "062c7a0a-9b6d-11df-94d2-638823d95bf3 " .
+	               "062edbf6-9b6d-11df-9e48-0d35319cdba1",
+	             "13 four dups 0625e3ca-9b6d-11df-bc5b-f1285fef4db2 " .
+	               "0629cc60-9b6d-11df-867d-bde64fd0a5c7 " .
+	               "062c7a0a-9b6d-11df-94d2-638823d95bf3 " .
+	               "062edbf6-9b6d-11df-9e48-0d35319cdba1",
+	             "",
+	        ),
+	        "",
+	        0,
+	        "Read from stdin and print whole line with UUID",
+	);
 
-    # }}}
-    testcmd("$CMD -lf finduuid-files/textfile finduuid-files/text2", # {{{
-        <<END,
-finduuid-files/textfile:4 dfv dsf 9829c1a8-88d5-11dd-9a24-000475e441b9
-finduuid-files/textfile:6 fd5d1200-88da-11dd-b7cf-000475e441b9
-finduuid-files/textfile:8 once more 9829C1A8-88D5-11DD-9A24-000475E441B9
-finduuid-files/textfile:9 yet another one 9829C1A8-88D5-11DD-9A24-000475E441B9
-finduuid-files/textfile:10 unique + dup 4e4e8d08-9b38-11df-9954-3793b0cfdf88 9829C1A8-88D5-11DD-9A24-000475E441B9
-finduuid-files/textfile:11 dup + unique fd5d1200-88da-11dd-b7cf-000475e441b9 ced8e04e-9b57-11df-9b37-d97f703ed9b7
-finduuid-files/textfile:12 four uniques 0625e3ca-9b6d-11df-bc5b-f1285fef4db2 0629cc60-9b6d-11df-867d-bde64fd0a5c7 062c7a0a-9b6d-11df-94d2-638823d95bf3 062edbf6-9b6d-11df-9e48-0d35319cdba1
-finduuid-files/textfile:13 four dups 0625e3ca-9b6d-11df-bc5b-f1285fef4db2 0629cc60-9b6d-11df-867d-bde64fd0a5c7 062c7a0a-9b6d-11df-94d2-638823d95bf3 062edbf6-9b6d-11df-9e48-0d35319cdba1
-finduuid-files/text2:here 08CCB59A-88E1-11DD-A80C-000475E441B9blabla
-END
-        "",
-        0,
-        "Print filename and whole line with UUID",
-    );
+	# }}}
+	testcmd("$CMD -lf finduuid-files/textfile finduuid-files/text2", # {{{
+	        join("\n",
+	             "finduuid-files/textfile:4 dfv dsf " .
+	               "9829c1a8-88d5-11dd-9a24-000475e441b9",
+	             "finduuid-files/textfile:6 " .
+	               "fd5d1200-88da-11dd-b7cf-000475e441b9",
+	             "finduuid-files/textfile:8 once more " .
+	               "9829C1A8-88D5-11DD-9A24-000475E441B9",
+	             "finduuid-files/textfile:9 yet another one " .
+	               "9829C1A8-88D5-11DD-9A24-000475E441B9",
+	             "finduuid-files/textfile:10 unique + dup " .
+	               "4e4e8d08-9b38-11df-9954-3793b0cfdf88 " .
+	               "9829C1A8-88D5-11DD-9A24-000475E441B9",
+	             "finduuid-files/textfile:11 dup + unique " .
+	               "fd5d1200-88da-11dd-b7cf-000475e441b9 " .
+	               "ced8e04e-9b57-11df-9b37-d97f703ed9b7",
+	             "finduuid-files/textfile:12 four uniques " .
+	               "0625e3ca-9b6d-11df-bc5b-f1285fef4db2 " .
+	               "0629cc60-9b6d-11df-867d-bde64fd0a5c7 " .
+	               "062c7a0a-9b6d-11df-94d2-638823d95bf3 " .
+	               "062edbf6-9b6d-11df-9e48-0d35319cdba1",
+	             "finduuid-files/textfile:13 four dups " .
+	               "0625e3ca-9b6d-11df-bc5b-f1285fef4db2 " .
+	               "0629cc60-9b6d-11df-867d-bde64fd0a5c7 " .
+	               "062c7a0a-9b6d-11df-94d2-638823d95bf3 " .
+	               "062edbf6-9b6d-11df-9e48-0d35319cdba1",
+	             "finduuid-files/text2:here " .
+	               "08CCB59A-88E1-11DD-A80C-000475E441B9blabla",
+	             "",
+	        ),
+	        "",
+	        0,
+	        "Print filename and whole line with UUID",
+	);
 
-    # }}}
-    testcmd("$CMD -l finduuid-files/compact", # {{{
-        <<END,
-daa9b45c-88d5-11dd-be73-000475e441b9c2680b68-144e-4f4e-9c1c-3fbb758a94d2db3b0506-88d5-11dd-8e5b-000475e441b98b592e20-245f-4860-8ebf-0cbd5e2cf072dbbee448-88d5-11dd-bf1c-000475e441b907370456-ea42-4808-bc74-e24602e52172dc6d9380-88d5-11dd-beb6-000475e441b907ac5c92-f413-4fb3-b0c5-fa9d25cac4ffdd293036-88d5-11dd-84ca-000475e441b96396c79f-859a-404b-b285-b71288973b3b
-END
-        "",
-        0,
-        "Print whole line containg many UUIDs",
-    );
+	# }}}
+	testcmd("$CMD -l finduuid-files/compact", # {{{
+	        join("",
+	             "daa9b45c-88d5-11dd-be73-000475e441b9",
+	             "c2680b68-144e-4f4e-9c1c-3fbb758a94d2",
+	             "db3b0506-88d5-11dd-8e5b-000475e441b9",
+	             "8b592e20-245f-4860-8ebf-0cbd5e2cf072",
+	             "dbbee448-88d5-11dd-bf1c-000475e441b9",
+	             "07370456-ea42-4808-bc74-e24602e52172",
+	             "dc6d9380-88d5-11dd-beb6-000475e441b9",
+	             "07ac5c92-f413-4fb3-b0c5-fa9d25cac4ff",
+	             "dd293036-88d5-11dd-84ca-000475e441b9",
+	             "6396c79f-859a-404b-b285-b71288973b3b",
+	             "\n",
+	        ),
+	        "",
+	        0,
+	        "Print whole line containg many UUIDs",
+	);
 
-    # }}}
-    diag("Testing -r (--reverse) option...");
-    testcmd("$CMD -l finduuid-files/textfile -r", # {{{
-        <<END,
-1 dsfv sdfJada
-2 kldfjnvdsv
-3 dsfv dsfv dsf
-4 dfv dsf 
-5 dsfv dsf qw weqd
-6 
-7 i ksjn klasjdnc
-8 once more 
-9 yet another one 
-10 unique + dup  
-11 dup + unique  
-12 four uniques    
-13 four dups    
-END
-        "",
-        0,
-        "Strip UUIDs from input",
-    );
+	# }}}
+	diag("Testing -r (--reverse) option...");
+	testcmd("$CMD -l finduuid-files/textfile -r", # {{{
+	        join("\n",
+	             "1 dsfv sdfJada",
+	             "2 kldfjnvdsv",
+	             "3 dsfv dsfv dsf",
+	             "4 dfv dsf ",
+	             "5 dsfv dsf qw weqd",
+	             "6 ",
+	             "7 i ksjn klasjdnc",
+	             "8 once more ",
+	             "9 yet another one ",
+	             "10 unique + dup  ",
+	             "11 dup + unique  ",
+	             "12 four uniques    ",
+	             "13 four dups    ",
+	             "",
+	        ),
+	        "",
+	        0,
+	        "Strip UUIDs from input",
+	);
 
-    # }}}
-    testcmd("$CMD -l finduuid-files/compact --reverse", # {{{
-        "",
-        "",
-        0,
-        "Nothing left from compact when using --reverse",
-    );
+	# }}}
+	testcmd("$CMD -l finduuid-files/compact --reverse", # {{{
+	        "",
+	        "",
+	        0,
+	        "Nothing left from compact when using --reverse",
+	);
 
-    # }}}
-    diag("Testing -u (--unique) option...");
-    testcmd("$CMD --unique -l finduuid-files/textfile", # {{{
-        <<END,
-4 dfv dsf 9829c1a8-88d5-11dd-9a24-000475e441b9
-6 fd5d1200-88da-11dd-b7cf-000475e441b9
-10 unique + dup 4e4e8d08-9b38-11df-9954-3793b0cfdf88 9829C1A8-88D5-11DD-9A24-000475E441B9
-11 dup + unique fd5d1200-88da-11dd-b7cf-000475e441b9 ced8e04e-9b57-11df-9b37-d97f703ed9b7
-12 four uniques 0625e3ca-9b6d-11df-bc5b-f1285fef4db2 0629cc60-9b6d-11df-867d-bde64fd0a5c7 062c7a0a-9b6d-11df-94d2-638823d95bf3 062edbf6-9b6d-11df-9e48-0d35319cdba1
-END
-        "",
-        0,
-        "Print whole line with only one UUID + --unique works",
-    );
+	# }}}
+	diag("Testing -u (--unique) option...");
+	testcmd("$CMD --unique -l finduuid-files/textfile", # {{{
+	        join("\n",
+	             "4 dfv dsf 9829c1a8-88d5-11dd-9a24-000475e441b9",
+	             "6 fd5d1200-88da-11dd-b7cf-000475e441b9",
+	             "10 unique + dup 4e4e8d08-9b38-11df-9954-3793b0cfdf88 " .
+	               "9829C1A8-88D5-11DD-9A24-000475E441B9",
+	             "11 dup + unique fd5d1200-88da-11dd-b7cf-000475e441b9 " .
+	               "ced8e04e-9b57-11df-9b37-d97f703ed9b7",
+	             "12 four uniques 0625e3ca-9b6d-11df-bc5b-f1285fef4db2 " .
+	               "0629cc60-9b6d-11df-867d-bde64fd0a5c7 " .
+	               "062c7a0a-9b6d-11df-94d2-638823d95bf3 " .
+	               "062edbf6-9b6d-11df-9e48-0d35319cdba1",
+	             "",
+	        ),
+	        "",
+	        0,
+	        "Print whole line with only one UUID + --unique works",
+	);
 
-    # }}}
-    testcmd("$CMD -u -l <finduuid-files/textfile", # {{{
-        <<END,
-4 dfv dsf 9829c1a8-88d5-11dd-9a24-000475e441b9
-6 fd5d1200-88da-11dd-b7cf-000475e441b9
-10 unique + dup 4e4e8d08-9b38-11df-9954-3793b0cfdf88 9829C1A8-88D5-11DD-9A24-000475E441B9
-11 dup + unique fd5d1200-88da-11dd-b7cf-000475e441b9 ced8e04e-9b57-11df-9b37-d97f703ed9b7
-12 four uniques 0625e3ca-9b6d-11df-bc5b-f1285fef4db2 0629cc60-9b6d-11df-867d-bde64fd0a5c7 062c7a0a-9b6d-11df-94d2-638823d95bf3 062edbf6-9b6d-11df-9e48-0d35319cdba1
-END
-        "",
-        0,
-        "Read from stdin and print unique uuids",
-    );
+	# }}}
+	testcmd("$CMD -u -l <finduuid-files/textfile", # {{{
+	        join("\n",
+	             "4 dfv dsf 9829c1a8-88d5-11dd-9a24-000475e441b9",
+	             "6 fd5d1200-88da-11dd-b7cf-000475e441b9",
+	             "10 unique + dup 4e4e8d08-9b38-11df-9954-3793b0cfdf88 " .
+	               "9829C1A8-88D5-11DD-9A24-000475E441B9",
+	             "11 dup + unique fd5d1200-88da-11dd-b7cf-000475e441b9 " .
+	               "ced8e04e-9b57-11df-9b37-d97f703ed9b7",
+	             "12 four uniques 0625e3ca-9b6d-11df-bc5b-f1285fef4db2 " .
+	               "0629cc60-9b6d-11df-867d-bde64fd0a5c7 " .
+	               "062c7a0a-9b6d-11df-94d2-638823d95bf3 " .
+	               "062edbf6-9b6d-11df-9e48-0d35319cdba1",
+	             "",
+	        ),
+	        "",
+	        0,
+	        "Read from stdin and print unique uuids",
+	);
 
-    # }}}
-    testcmd("$CMD -u -lf finduuid-files/textfile finduuid-files/text2", # {{{
-        <<END,
-finduuid-files/textfile:4 dfv dsf 9829c1a8-88d5-11dd-9a24-000475e441b9
-finduuid-files/textfile:6 fd5d1200-88da-11dd-b7cf-000475e441b9
-finduuid-files/textfile:10 unique + dup 4e4e8d08-9b38-11df-9954-3793b0cfdf88 9829C1A8-88D5-11DD-9A24-000475E441B9
-finduuid-files/textfile:11 dup + unique fd5d1200-88da-11dd-b7cf-000475e441b9 ced8e04e-9b57-11df-9b37-d97f703ed9b7
-finduuid-files/textfile:12 four uniques 0625e3ca-9b6d-11df-bc5b-f1285fef4db2 0629cc60-9b6d-11df-867d-bde64fd0a5c7 062c7a0a-9b6d-11df-94d2-638823d95bf3 062edbf6-9b6d-11df-9e48-0d35319cdba1
-finduuid-files/text2:here 08CCB59A-88E1-11DD-A80C-000475E441B9blabla
-END
-        "",
-        0,
-        "Print filename and whole line with unique uuids",
-    );
+	# }}}
+	testcmd("$CMD -u -lf finduuid-files/textfile " .
+	        "finduuid-files/text2", # {{{
+	        join("\n",
+	             "finduuid-files/textfile:4 dfv dsf " .
+	               "9829c1a8-88d5-11dd-9a24-000475e441b9",
+	             "finduuid-files/textfile:6 " .
+	               "fd5d1200-88da-11dd-b7cf-000475e441b9",
+	             "finduuid-files/textfile:10 unique + dup " .
+	               "4e4e8d08-9b38-11df-9954-3793b0cfdf88 " .
+	               "9829C1A8-88D5-11DD-9A24-000475E441B9",
+	             "finduuid-files/textfile:11 dup + unique " .
+	               "fd5d1200-88da-11dd-b7cf-000475e441b9 " .
+	               "ced8e04e-9b57-11df-9b37-d97f703ed9b7",
+	             "finduuid-files/textfile:12 four uniques " .
+	               "0625e3ca-9b6d-11df-bc5b-f1285fef4db2 " .
+	               "0629cc60-9b6d-11df-867d-bde64fd0a5c7 " .
+	               "062c7a0a-9b6d-11df-94d2-638823d95bf3 " .
+	               "062edbf6-9b6d-11df-9e48-0d35319cdba1",
+	             "finduuid-files/text2:here " .
+	               "08CCB59A-88E1-11DD-A80C-000475E441B9blabla",
+	             "",
+	        ),
+	        "",
+	        0,
+	        "Print filename and whole line with unique uuids",
+	);
 
-    # }}}
-    testcmd("$CMD -u finduuid-files/textfile finduuid-files/text2", # {{{
-        <<END,
+	# }}}
+	testcmd("$CMD -u finduuid-files/textfile finduuid-files/text2", # {{{
+	        <<END,
 9829c1a8-88d5-11dd-9a24-000475e441b9
 fd5d1200-88da-11dd-b7cf-000475e441b9
 4e4e8d08-9b38-11df-9954-3793b0cfdf88
@@ -367,129 +403,154 @@ ced8e04e-9b57-11df-9b37-d97f703ed9b7
 062edbf6-9b6d-11df-9e48-0d35319cdba1
 08CCB59A-88E1-11DD-A80C-000475E441B9
 END
-        "",
-        0,
-        "Several files, -u only",
-    );
+	        "",
+	        0,
+	        "Several files, -u only",
+	);
 
-    # }}}
+	# }}}
 
-    todo_section:
-    ;
+	todo_section:
+	;
 
-    if ($Opt{'all'} || $Opt{'todo'}) {
-        diag('Running TODO tests...'); # {{{
+	if ($Opt{'all'} || $Opt{'todo'}) {
+		diag('Running TODO tests...');
+		TODO: {
+			local $TODO = '';
+			# Insert TODO tests here.
+		}
+	}
 
-        TODO: {
+	diag('Testing finished.');
 
-            local $TODO = '';
-            # Insert TODO tests here.
+	return $Retval;
+}
 
-        }
-        # TODO tests }}}
-    }
+sub test_standard_options {
+	diag('Testing -h (--help) option...');
+	likecmd("$CMD -h",
+	        '/  Show this help/i',
+	        '/^$/',
+	        0,
+	        'Option -h prints help screen');
 
-    diag('Testing finished.');
-    # }}}
-} # main()
+	diag('Testing -v (--verbose) option...');
+	likecmd("$CMD -hv",
+	        '/^\n\S+ \d+\.\d+\.\d+/s',
+	        '/^$/',
+	        0,
+	        'Option -v with -h returns version number and help screen');
+
+	diag('Testing --version option...');
+	likecmd("$CMD --version",
+	        '/^\S+ \d+\.\d+\.\d+/',
+	        '/^$/',
+	        0,
+	        'Option --version returns version number');
+	return;
+}
 
 sub testcmd {
-    # {{{
-    my ($Cmd, $Exp_stdout, $Exp_stderr, $Exp_retval, $Desc) = @_;
-    defined($descriptions{$Desc}) && BAIL_OUT("testcmd(): '$Desc' description is used twice");
-    $descriptions{$Desc} = 1;
-    my $stderr_cmd = '';
-    my $Txt = join('',
-        "\"$Cmd\"",
-        defined($Desc)
-            ? " - $Desc"
-            : ''
-    );
-    my $TMP_STDERR = 'finduuid-stderr.tmp';
-    my $retval = 1;
+	my ($Cmd, $Exp_stdout, $Exp_stderr, $Exp_retval, $Desc) = @_;
+	defined($descriptions{$Desc}) &&
+		BAIL_OUT("testcmd(): '$Desc' description is used twice");
+	$descriptions{$Desc} = 1;
+	my $stderr_cmd = '';
+	my $cmd_outp_str = $Opt{'verbose'} >= 1 ? "\"$Cmd\" - " : '';
+	my $Txt = join('', $cmd_outp_str, defined($Desc) ? $Desc : '');
+	my $TMP_STDERR = "$CMD_BASENAME-stderr.tmp";
+	my $retval = 1;
 
-    if (defined($Exp_stderr)) {
-        $stderr_cmd = " 2>$TMP_STDERR";
-    }
-    $retval &= is(`$Cmd$stderr_cmd`, $Exp_stdout, "$Txt (stdout)");
-    my $ret_val = $?;
-    if (defined($Exp_stderr)) {
-        $retval &= is(file_data($TMP_STDERR), $Exp_stderr, "$Txt (stderr)");
-        unlink($TMP_STDERR);
-    } else {
-        diag("Warning: stderr not defined for '$Txt'");
-    }
-    $retval &= is($ret_val >> 8, $Exp_retval, "$Txt (retval)");
-    return($retval);
-    # }}}
-} # testcmd()
+	if (defined($Exp_stderr)) {
+		$stderr_cmd = " 2>$TMP_STDERR";
+	}
+	$retval &= is(`$Cmd$stderr_cmd`, $Exp_stdout, "$Txt (stdout)");
+	my $ret_val = $?;
+	if (defined($Exp_stderr)) {
+		$retval &= is(file_data($TMP_STDERR),
+		              $Exp_stderr, "$Txt (stderr)");
+		unlink($TMP_STDERR);
+	} else {
+		diag("Warning: stderr not defined for '$Txt'");
+	}
+	$retval &= is($ret_val >> 8, $Exp_retval, "$Txt (retval)");
+
+	return $retval;
+}
 
 sub likecmd {
-    # {{{
-    my ($Cmd, $Exp_stdout, $Exp_stderr, $Exp_retval, $Desc) = @_;
-    defined($descriptions{$Desc}) && BAIL_OUT("likecmd(): '$Desc' description is used twice");
-    $descriptions{$Desc} = 1;
-    my $stderr_cmd = '';
-    my $Txt = join('',
-        "\"$Cmd\"",
-        defined($Desc)
-            ? " - $Desc"
-            : ''
-    );
-    my $TMP_STDERR = 'finduuid-stderr.tmp';
-    my $retval = 1;
+	my ($Cmd, $Exp_stdout, $Exp_stderr, $Exp_retval, $Desc) = @_;
+	defined($descriptions{$Desc}) &&
+		BAIL_OUT("likecmd(): '$Desc' description is used twice");
+	$descriptions{$Desc} = 1;
+	my $stderr_cmd = '';
+	my $cmd_outp_str = $Opt{'verbose'} >= 1 ? "\"$Cmd\" - " : '';
+	my $Txt = join('', $cmd_outp_str, defined($Desc) ? $Desc : '');
+	my $TMP_STDERR = "$CMD_BASENAME-stderr.tmp";
+	my $retval = 1;
 
-    if (defined($Exp_stderr)) {
-        $stderr_cmd = " 2>$TMP_STDERR";
-    }
-    $retval &= like(`$Cmd$stderr_cmd`, $Exp_stdout, "$Txt (stdout)");
-    my $ret_val = $?;
-    if (defined($Exp_stderr)) {
-        $retval &= like(file_data($TMP_STDERR), $Exp_stderr, "$Txt (stderr)");
-        unlink($TMP_STDERR);
-    } else {
-        diag("Warning: stderr not defined for '$Txt'");
-    }
-    $retval &= is($ret_val >> 8, $Exp_retval, "$Txt (retval)");
-    return($retval);
-    # }}}
-} # likecmd()
+	if (defined($Exp_stderr)) {
+		$stderr_cmd = " 2>$TMP_STDERR";
+	}
+	$retval &= like(`$Cmd$stderr_cmd`, $Exp_stdout, "$Txt (stdout)");
+	my $ret_val = $?;
+	if (defined($Exp_stderr)) {
+		$retval &= like(file_data($TMP_STDERR),
+		                $Exp_stderr, "$Txt (stderr)");
+		unlink($TMP_STDERR);
+	} else {
+		diag("Warning: stderr not defined for '$Txt'");
+	}
+	$retval &= is($ret_val >> 8, $Exp_retval, "$Txt (retval)");
+
+	return $retval;
+}
 
 sub file_data {
-    # Return file content as a string {{{
-    my $File = shift;
-    my $Txt;
-    if (open(my $fp, '<', $File)) {
-        local $/ = undef;
-        $Txt = <$fp>;
-        close($fp);
-        return($Txt);
-    } else {
-        return;
-    }
-    # }}}
-} # file_data()
+	# Return file content as a string
+	my $File = shift;
+	my $Txt;
+
+	open(my $fp, '<', $File) or return undef;
+	local $/ = undef;
+	$Txt = <$fp>;
+	close($fp);
+	return $Txt;
+}
+
+sub create_file {
+	# Create new file and fill it with data
+	my ($file, $text) = @_;
+	my $retval = 0;
+
+	open(my $fp, ">$file") or return 0;
+	print($fp $text);
+	close($fp);
+	$retval = is(file_data($file), $text,
+	             "$file was successfully created");
+
+	return $retval; # 0 if error, 1 if ok
+}
 
 sub print_version {
-    # Print program version {{{
-    print("$progname $VERSION\n");
-    return;
-    # }}}
-} # print_version()
+	# Print program version
+	print("$progname $VERSION\n");
+	return;
+}
 
 sub usage {
-    # Send the help message to stdout {{{
-    my $Retval = shift;
+	# Send the help message to stdout
+	my $Retval = shift;
 
-    if ($Opt{'verbose'}) {
-        print("\n");
-        print_version();
-    }
-    print(<<"END");
+	if ($Opt{'verbose'}) {
+		print("\n");
+		print_version();
+	}
+	print(<<"END");
 
-Usage: $progname [options] [file [files [...]]]
+Usage: $progname [options]
 
-Contains tests for the finduuid(1) program.
+Contains tests for the $CMD_BASENAME(1) program.
 
 Options:
 
@@ -497,6 +558,8 @@ Options:
     Run all tests, also TODOs.
   -h, --help
     Show this help.
+  -q, --quiet
+    Be more quiet. Can be repeated to increase silence.
   -t, --todo
     Run only the TODO tests.
   -v, --verbose
@@ -505,94 +568,32 @@ Options:
     Print version information.
 
 END
-    exit($Retval);
-    # }}}
-} # usage()
+	exit($Retval);
+}
 
 sub msg {
-    # Print a status message to stderr based on verbosity level {{{
-    my ($verbose_level, $Txt) = @_;
+	# Print a status message to stderr based on verbosity level
+	my ($verbose_level, $Txt) = @_;
 
-    if ($Opt{'verbose'} >= $verbose_level) {
-        print(STDERR "$progname: $Txt\n");
-    }
-    return;
-    # }}}
-} # msg()
+	$verbose_level > $Opt{'verbose'} && return;
+	print(STDERR "$progname: $Txt\n");
+	return;
+}
 
 __END__
 
-# Plain Old Documentation (POD) {{{
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License as published by the Free Software 
+# Foundation; either version 2 of the License, or (at your option) any later 
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT 
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+# FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with 
+# this program.
+# If not, see L<http://www.gnu.org/licenses/>.
 
-=pod
-
-=head1 NAME
-
-run-tests.pl
-
-=head1 SYNOPSIS
-
-finduuid.t [options] [file [files [...]]]
-
-=head1 DESCRIPTION
-
-Contains tests for the finduuid(1) program.
-
-=head1 OPTIONS
-
-=over 4
-
-=item B<-a>, B<--all>
-
-Run all tests, also TODOs.
-
-=item B<-h>, B<--help>
-
-Print a brief help summary.
-
-=item B<-t>, B<--todo>
-
-Run only the TODO tests.
-
-=item B<-v>, B<--verbose>
-
-Increase level of verbosity. Can be repeated.
-
-=item B<--version>
-
-Print version information.
-
-=back
-
-=head1 AUTHOR
-
-Made by Øyvind A. Holm S<E<lt>sunny@sunbase.orgE<gt>>.
-
-=head1 COPYRIGHT
-
-Copyleft © Øyvind A. Holm E<lt>sunny@sunbase.orgE<gt>
-This is free software; see the file F<COPYING> for legalese stuff.
-
-=head1 LICENCE
-
-This program is free software; you can redistribute it and/or modify it 
-under the terms of the GNU General Public License as published by the 
-Free Software Foundation; either version 2 of the License, or (at your 
-option) any later version.
-
-This program is distributed in the hope that it will be useful, but 
-WITHOUT ANY WARRANTY; without even the implied warranty of 
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along 
-with this program.
-If not, see L<http://www.gnu.org/licenses/>.
-
-=head1 SEE ALSO
-
-=cut
-
-# }}}
-
-# vim: set fenc=UTF-8 ft=perl fdm=marker ts=4 sw=4 sts=4 et fo+=w :
+# vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 :

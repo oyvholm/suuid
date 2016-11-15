@@ -20,6 +20,7 @@ CREATE TABLE synced (
       CHECK (date IS NULL OR datetime(date) IS NOT NULL)
 );
 INSERT INTO "synced" VALUES('conv-suuid','Lib/std/perl','5d9a5b337cbc4997dfa181e3fd9a9484487b5605','2016-10-25 02:43:03');
+INSERT INTO "synced" VALUES('finduuid','Lib/std/perl-tab','c58b81b5652b062928cc7bde7153bda48f2474a8','2016-11-15 00:26:12');
 INSERT INTO "synced" VALUES('needuuid','Lib/std/perl-tab','c6365e55b0510bc1a385dc497ff4d958b003c012','2016-11-11 21:46:30');
 INSERT INTO "synced" VALUES('obsolete/suuid.pl','','273d6f5b1b1e7eb6c8553cd2cb3b176c5678ac7c','2016-05-17 14:10:28');
 INSERT INTO "synced" VALUES('src/COPYING','Lib/std/COPYING','17bc73d79f068dfaf2655db1090f6b9206734555','2016-06-06 03:02:53');
@@ -33,6 +34,7 @@ INSERT INTO "synced" VALUES('src/t/suuid.t','Lib/std/perl-tests','5d9a5b337cbc49
 INSERT INTO "synced" VALUES('tests/Add_test','Lib/std/Add_test','b1c0c1047fda193d2ac42d9de96dc08cfd864704','2016-11-12 23:54:40');
 INSERT INTO "synced" VALUES('tests/Genlog','Lib/std/Genlog','b1c0c1047fda193d2ac42d9de96dc08cfd864704','2016-11-12 23:54:40');
 INSERT INTO "synced" VALUES('tests/conv-suuid.t','Lib/std/perl-tests','5d9a5b337cbc4997dfa181e3fd9a9484487b5605','2016-10-25 02:43:03');
+INSERT INTO "synced" VALUES('tests/finduuid.t','Lib/std/perl-tests-tab','c58b81b5652b062928cc7bde7153bda48f2474a8','2016-11-15 00:26:12');
 INSERT INTO "synced" VALUES('tests/sess.t','Lib/std/perl-tests','5d9a5b337cbc4997dfa181e3fd9a9484487b5605','2016-10-25 02:43:03');
 CREATE TABLE todo (
   file TEXT
