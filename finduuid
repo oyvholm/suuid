@@ -75,7 +75,7 @@ sub main {
 			s/$Templ//g;
 			print;
 		}
-		return($Retval);
+		return $Retval;
 	}
 
 	while (<>) {
@@ -85,7 +85,7 @@ sub main {
 		}
 	}
 
-	return($exit_value);
+	return $exit_value;
 }
 
 sub process_line {
@@ -130,7 +130,7 @@ sub process_line {
 sub print_uuid {
 	my $uuid = shift;
 	my $lc_uuid = lc($uuid);
-	$Opt{'unique'} && defined($uuid_list{$lc_uuid}) && return("");
+	$Opt{'unique'} && defined($uuid_list{$lc_uuid}) && return "";
 	$Opt{'date'} && ($uuid =~ s{
 	    ($v1_templ)
 	}{
@@ -139,13 +139,13 @@ sub print_uuid {
 	printf("%s%s\n", ($Opt{'filenames'} ? "$ARGV:" : ""), $uuid);
 	$uuid_list{$lc_uuid} = 1;
 	$exit_value = 0;
-	return("");
+	return "";
 }
 
 sub uuid_time2 {
 	my $uuid = shift;
 	my $Retval = "";
-	($uuid =~ /^$v1_templ$/) || return("");
+	($uuid =~ /^$v1_templ$/) || return "";
 	my $hex_string = uuid_hex_date($uuid);
 	my $val = bighex($hex_string);
 	my $nano = sprintf("%07u", $val % 10_000_000);
@@ -154,7 +154,7 @@ sub uuid_time2 {
 	$Retval = sprintf("%04u-%02u-%02uT%02u:%02u:%02u.%sZ",
 		$TA[5]+1900, $TA[4]+1, $TA[3],
 		$TA[2], $TA[1], $TA[0], $nano);
-	return($Retval);
+	return $Retval;
 }
 
 sub uuid_hex_date {
@@ -180,7 +180,7 @@ sub uuid_hex_date {
 	# }}}
 	my $Retval = "$time_hi$time_mid$time_low";
 	# D("uuid_hex_date('$uuid') returns '$Retval'");
-	return($Retval);
+	return $Retval;
 }
 
 sub bighex {
@@ -195,7 +195,7 @@ sub bighex {
 		"";
 	}gsex;
 	length($Hex) && ($Retval = NaN());
-	return($Retval);
+	return $Retval;
 }
 
 sub print_version {
