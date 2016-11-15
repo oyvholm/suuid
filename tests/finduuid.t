@@ -132,7 +132,6 @@ sub test_executable {
 	test_line_option($CMD);
 	test_remove_option($CMD);
 	test_unique_option($CMD);
-	test_multiple_options($CMD);
 
 	return;
 }
@@ -546,6 +545,24 @@ sub test_unique_option {
 	);
 
 	# }}}
+	testcmd("$CMD finduuid-files/textfile -u finduuid-files/text2", # {{{
+	        <<END,
+9829c1a8-88d5-11dd-9a24-000475e441b9
+fd5d1200-88da-11dd-b7cf-000475e441b9
+4e4e8d08-9b38-11df-9954-3793b0cfdf88
+ced8e04e-9b57-11df-9b37-d97f703ed9b7
+0625e3ca-9b6d-11df-bc5b-f1285fef4db2
+0629cc60-9b6d-11df-867d-bde64fd0a5c7
+062c7a0a-9b6d-11df-94d2-638823d95bf3
+062edbf6-9b6d-11df-9e48-0d35319cdba1
+08CCB59A-88E1-11DD-A80C-000475E441B9
+END
+	        "",
+	        0,
+	        "Several files, -u only",
+	);
+
+	# }}}
 	my $tmpf = "tmp-finduuid-unique1";
 	create_file($tmpf, <<END); # {{{
 00000000-0000-11e6-ba2e-030000000000
@@ -575,13 +592,6 @@ END
 
 	# }}}
 	ok(unlink($tmpf), "Delete $tmpf");
-
-	return;
-}
-
-sub test_multiple_options {
-	my $CMD = shift;
-
 	testcmd("$CMD -u -lf finduuid-files/textfile " .
 	        "finduuid-files/text2", # {{{
 	        join("\n",
@@ -607,24 +617,6 @@ sub test_multiple_options {
 	        "",
 	        0,
 	        "Print filename and whole line with unique uuids",
-	);
-
-	# }}}
-	testcmd("$CMD -u finduuid-files/textfile finduuid-files/text2", # {{{
-	        <<END,
-9829c1a8-88d5-11dd-9a24-000475e441b9
-fd5d1200-88da-11dd-b7cf-000475e441b9
-4e4e8d08-9b38-11df-9954-3793b0cfdf88
-ced8e04e-9b57-11df-9b37-d97f703ed9b7
-0625e3ca-9b6d-11df-bc5b-f1285fef4db2
-0629cc60-9b6d-11df-867d-bde64fd0a5c7
-062c7a0a-9b6d-11df-94d2-638823d95bf3
-062edbf6-9b6d-11df-9e48-0d35319cdba1
-08CCB59A-88E1-11DD-A80C-000475E441B9
-END
-	        "",
-	        0,
-	        "Several files, -u only",
 	);
 
 	# }}}
