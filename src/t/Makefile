@@ -3,11 +3,12 @@
 
 .PHONY: test
 test: build
-	./Genlog suuid.t
+	./suuid.t
 
 .PHONY: all
 all:
-	./Genlog *.t
+	./suuid.t
+	./sess.t
 
 .PHONY: build
 build:

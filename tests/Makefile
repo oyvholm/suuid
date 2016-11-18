@@ -3,8 +3,19 @@
 
 .PHONY: test
 test:
-	cd ../src && $(MAKE)
-	./Genlog *.t
+	./add-missing-dates.t
+	./conv-old-suuid.t
+	./conv-suuid.t
+	./fileid.t
+	./finduuid.t
+	./needuuid.t
+	./sess.t
+	./sortuuid.t
+	./ti.t
+	./tjah.t
+	./uuiddate.t
+	./v.t
+	./wi.t
 
 .PHONY: clean
 clean:
