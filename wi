@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-#=======================================================================
+#==============================================================================
 # wi
 # File ID: afcf3af0-27a5-11e1-b643-4b2592583869
 #
@@ -8,33 +8,33 @@
 #
 # Author: Øyvind A. Holm <sunny@sunbase.org>
 # License: GNU General Public License version 2 or later.
-#=======================================================================
+#==============================================================================
 
 progname=wi
-VERSION=0.1.1
+VERSION=0.2.0
 
 unset test_simul
 if test "$1" = "--test-simul"; then
-    test_simul=1
-    shift
+	test_simul=1
+	shift
 fi
 unset opt_sql
 if test "$1" = "--sql"; then
-    opt_sql=1
-    shift
+	opt_sql=1
+	shift
 fi
 if test -n "$test_simul" -a -n "$opt_sql"; then
-    echo $progname: Cannot mix --sql and --test-simul >&2
-    exit 1
+	echo $progname: Cannot mix --sql and --test-simul >&2
+	exit 1
 fi
 
 if test "$1" = "--version"; then
-    echo $progname $VERSION
-    exit 0
+	echo $progname $VERSION
+	exit 0
 fi
 
 if test "$1" = "-h" -o "$1" = "--help"; then
-    cat <<END
+	cat <<END
 
 Search the suuids database and send results to stdout.
 
@@ -96,18 +96,18 @@ For example:
         Find (the above UUID in column 'u') OR (lower-case abc).
 
 END
-    exit 0
+	exit 0
 fi
 
 msg() {
-    echo $* >&2
+	echo $* >&2
 }
 
 is_uuid() {
-    local x="[[:xdigit:]]"
-    echo "$1" | grep -q -E "^$x{8}-$x{4}-$x{4}-$x{4}-$x{12}\$" &&
-        echo 1 ||
-        echo 0
+	local x="[[:xdigit:]]"
+	echo "$1" | grep -q -E "^$x{8}-$x{4}-$x{4}-$x{4}-$x{12}\$" &&
+		echo 1 ||
+		echo 0
 }
 
 search_str=
@@ -115,59 +115,61 @@ stdin=
 andor=OR
 
 if test ! -t 0; then
-    stdin="`finduuid -u`"
+	stdin="`finduuid -u`"
 fi
 
 unset add_str
 like_str=LIKE
 for f in "$@" $stdin; do
-    test -n "$test_simul" && msg "f = '$f'"
-    case "$f" in
-        (-I)
-            like_str=LIKE
-            ;;
-        (-U)
-            unset next_is_uuid
-            ;;
-        (-a)
-            andor=AND
-            ;;
-        (-i)
-            like_str=ILIKE
-            ;;
-        (-o)
-            andor=OR
-            ;;
-        (-u)
-            next_is_uuid="1"
-            ;;
-        (*)
-            test -n "$add_str" && or_str="$andor "
-            if test "$next_is_uuid" = "1" -a "$(is_uuid "$f")" = "1"; then
-                search_str="$search_str ${or_str}u = '$f'"
-            else
-                search_str="$search_str ${or_str}s::varchar $like_str '%$f%'"
-            fi
-            add_str="1"
-            ;;
-    esac
+	test -n "$test_simul" && msg "f = '$f'"
+	case "$f" in
+	(-I)
+		like_str=LIKE
+		;;
+	(-U)
+		unset next_is_uuid
+		;;
+	(-a)
+		andor=AND
+		;;
+	(-i)
+		like_str=ILIKE
+		;;
+	(-o)
+		andor=OR
+		;;
+	(-u)
+		next_is_uuid="1"
+		;;
+	(*)
+		test -n "$add_str" && or_str="$andor "
+		if test "$next_is_uuid" = "1" -a "$(is_uuid "$f")" = "1"; then
+			search_str="$search_str ${or_str}u = '$f'"
+		else
+			search_str="$search_str ${or_str}s::varchar $like_str '%$f%'"
+		fi
+		add_str="1"
+		;;
+	esac
 done
 
 test -z "$search_str" && {
-    echo $progname: No search strings found >&2
-    exit 1
+	echo $progname: No search strings found >&2
+	exit 1
 }
 
 sql_str="COPY (SELECT s FROM uuids WHERE$search_str) TO STDOUT;"
 
 if test -n "$test_simul" -o -n "$opt_sql"; then
-    # --test-simul or --sql is specified as $1, only output what 
-    # would've been done
-    echo "$sql_str"
+	# --test-simul or --sql is specified as $1, only output what would've 
+	# been done
+	echo "$sql_str"
 else
-    echo "$sql_str" |
-    psql -X -q suuids |
-    perl -pe 's/\\\\/\\/g; s/\x27\x27/\x27/g;' |
-    sort -u |
-    less
+	echo "$sql_str" |
+	psql -X -q suuids |
+	perl -pe 's/\\\\/\\/g; s/\x27\x27/\x27/g;' |
+	sort -u |
+	less
 fi
+
+# vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 :
