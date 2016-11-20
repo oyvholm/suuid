@@ -22,3 +22,6 @@ clean:
 	rm -rf tmp-* *-stderr.tmp
 	if test ! -e log/.git; then rm -rf log; fi
 	cd conv-suuid-files && $(MAKE) clean
+
+.PHONY: testall
+testall: test

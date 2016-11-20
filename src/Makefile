@@ -123,6 +123,15 @@ edit: tags
 test: $(SUUID_EXEC)
 	cd t && $(MAKE) test
 
+.PHONY: testall
+testall: clean test
+	@echo
+	@echo Test with NO_SQLITE=0
+	$(MAKE) clean test NO_SQLITE=0
+	@echo
+	@echo Test with NO_SQLITE=1
+	$(MAKE) clean test NO_SQLITE=1
+
 .PHONY: testhist
 testhist: test
 	while :; do \
@@ -152,3 +161,12 @@ tags: $(COMMON_C) suuid.c sess.c $(SUUID_HFILES) $(SESS_HFILES) t/suuid.t
 .PHONY: valgrind
 valgrind:
 	cd t && $(MAKE) valgrind
+
+.PHONY: valgrindall
+valgrindall: clean test
+	@echo
+	@echo Test with NO_SQLITE=0
+	$(MAKE) clean valgrind NO_SQLITE=0
+	@echo
+	@echo Test with NO_SQLITE=1
+	$(MAKE) clean valgrind NO_SQLITE=1

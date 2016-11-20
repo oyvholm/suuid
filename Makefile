@@ -26,6 +26,11 @@ test:
 	cd src && $(MAKE) test
 	cd tests && $(MAKE) test
 
+.PHONY: testall
+testall:
+	cd src && $(MAKE) testall
+	cd tests && $(MAKE) testall
+
 tags: src/*.c src/*.h
 	ctags src/*.c src/*.h
 
@@ -33,3 +38,8 @@ tags: src/*.c src/*.h
 valgrind:
 	cd src && $(MAKE) valgrind
 	cd tests && $(MAKE) test
+
+.PHONY: valgrindall
+valgrindall:
+	cd src && $(MAKE) valgrindall
+	cd tests && $(MAKE) testall
