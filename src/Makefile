@@ -80,7 +80,7 @@ sess.o: sess.c $(SESS_DEPS)
 sessvar.o: sessvar.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) sessvar.c
 
-sqlite3.o: sqlite3.c Makefile
+sqlite3.o: sqlite3.c
 	$(CC) $(CCFLAGS) sqlite3.c
 
 string.o: string.c $(SUUID_DEPS)
