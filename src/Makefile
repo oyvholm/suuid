@@ -129,7 +129,7 @@ testlock: $(SUUID_EXEC)
 
 .PHONY: testnew
 testnew: test $(SESS_EXEC)
-	cd t && ./Genlog ./sess.t
+	cd t && ./sess.t
 
 tags: $(COMMON_C) suuid.c sess.c $(SUUID_HFILES) $(SESS_HFILES) t/suuid.t
 	$(CTAGS) $(COMMON_C) suuid.c sess.c $(SUUID_HFILES) $(SESS_HFILES) \
