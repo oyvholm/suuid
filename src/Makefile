@@ -104,7 +104,8 @@ clean:
 
 .PHONY: edit
 edit: tags
-	$(EDITOR) *.c *.h Makefile t/*.t
+	$(EDITOR) $$(git ls-files | grep -v -e ^COPYING -e ^sqlite3 \
+	                                    -e \\.gitignore)
 
 .PHONY: test
 test: $(SUUID_EXEC)
