@@ -36,6 +36,7 @@ INSERT INTO "synced" VALUES('tests/Genlog','Lib/std/Genlog','54a033402a020bf69f0
 INSERT INTO "synced" VALUES('tests/conv-suuid.t','Lib/std/perl-tests','5d9a5b337cbc4997dfa181e3fd9a9484487b5605','2016-10-25 02:43:03');
 INSERT INTO "synced" VALUES('tests/finduuid.t','Lib/std/perl-tests-tab','c58b81b5652b062928cc7bde7153bda48f2474a8','2016-11-15 00:26:12');
 INSERT INTO "synced" VALUES('tests/sess.t','Lib/std/perl-tests','5d9a5b337cbc4997dfa181e3fd9a9484487b5605','2016-10-25 02:43:03');
+INSERT INTO "synced" VALUES('ti','Lib/std/sh','53d7643de23eed270013018ef12e7e80b2eb3f63','2016-11-20 16:04:29');
 CREATE TABLE todo (
   file TEXT
     CONSTRAINT todo_file_length
