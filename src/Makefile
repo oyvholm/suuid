@@ -81,7 +81,7 @@ sessvar.o: sessvar.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) sessvar.c
 
 sqlite3.o: sqlite3.c
-	$(CC) $(CCFLAGS) sqlite3.c
+	$(CC) $(CCFLAGS) -DSQLITE_ENABLE_JSON1 sqlite3.c
 
 string.o: string.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) string.c
