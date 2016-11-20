@@ -37,9 +37,9 @@ if test "$opt_help" = "1"; then
 	test $opt_verbose -gt 0 && { echo; echo $progname $VERSION; }
 	cat <<END
 
-Display various status messages about the current tty with sess information and 
-optionally enter a comment into the suuid history with the tag "ti". Used for 
-various off-hand comments and notes.
+Display various status messages about the current tty with sess 
+information and optionally enter a comment into the suuid history with 
+the tag "ti". Used for various off-hand comments and notes.
 
 Usage: $progname [options] [comment]
 
@@ -62,10 +62,15 @@ test -z "$*" || suuid -t ti -c "$*" || { echo ti: suuid error >&2; exit 1; }
 LC_ALL=C stty -a | grep speed
 echo -n "`date -Iseconds` "
 tty
-test -z "$SESS_UUID" || printf 'SESS_UUID = \n%s\n' "$(echo $SESS_UUID | tjah | sed 's/,/\n    ,/g' | sortuuid)"
+test -z "$SESS_UUID" || \
+	printf 'SESS_UUID = \n%s\n' \
+	       "$(echo $SESS_UUID | tjah | sed 's/,/\n    ,/g' | sortuuid)"
 test -z "$LOGGING_UUID" || {
 	echo LOGGING_UUID = $LOGGING_UUID
-	cd $HOME/log/script || { echo ti: $HOME/log/script: Cannot chdir >&2; exit 1; }
+	cd $HOME/log/script || {
+		echo ti: $HOME/log/script: Cannot chdir >&2
+		exit 1
+	}
 	ls | grep $LOGGING_UUID | grep scrlog
 }
 
