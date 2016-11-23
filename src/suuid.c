@@ -141,21 +141,21 @@ int print_version(void)
 #ifndef NO_SQLITE
 	printf("Linked against SQLite %s\n", sqlite3_libversion());
 #endif
-#if FAKE_HOST || TEST_FUNC
+#if defined(FAKE_HOST) || defined(TEST_FUNC)
 	printf("\nThis version is compiled with the following conditional "
                "directives:\n");
-#  if FAKE_HOST
+#endif
+#ifdef FAKE_HOST
 	printf("\nFAKE_HOST: Always return \"fake\" as hostname. This is to "
 	       "make sure it \n"
 	       "doesn't write to the real log file.\n");
-#  endif
-#  if TEST_FUNC
+#endif
+#ifdef TEST_FUNC
 	printf("\nTEST_FUNC: Send non-option command line arguments to "
 	       "various functions \n"
 	       "for testing. This doesn't break anything, as the program only "
 	       "checks for \n"
 	       "options. Non-option arguments are ignored.\n");
-#  endif
 #endif
 
 	return EXIT_SUCCESS;
@@ -433,7 +433,7 @@ int main(int argc, char *argv[])
 	if (opt.license)
 		return print_license();
 
-#if TEST_FUNC
+#ifdef TEST_FUNC
 	/*
 	 * Send non-option command line arguments to various functions for 
 	 * testing. This doesn't break anything, as the program only checks for 

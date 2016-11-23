@@ -121,7 +121,7 @@ char *get_hostname(const struct Rc *rc)
 		 * Use hostname from the rc file.
 		 */
 		strncpy(buf, rc->hostname, HOST_NAME_MAX);
-#if FAKE_HOST
+#ifdef FAKE_HOST
 	else if (1)
 		retval = "fake";
 #endif

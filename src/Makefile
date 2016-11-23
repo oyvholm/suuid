@@ -13,21 +13,44 @@ CTAGS = ctags
 CC = cc
 LD = cc
 
+LINKED_STR = 'Linked against SQLite'
+
 # sqlite3.h uses long long, and gcc 4.8.4 and 4.9.2 (probably all other 
 # versions too) abort when using -pedantic because it's not defined by ISO C90. 
 # If you still want to use -pedantic with gcc, add -Wno-long-long to CCFLAGS. 
 # Clang 3.8.0 on FreeBSD 11.0 works with -pedantic.
 CCFLAGS = -Wall -Wextra -Werror -O0 -c -g
-ifeq ($(NO_SQLITE), 1)
+
+# FAKE_HOST: Use "fake" as hostname to avoid conflicts with files created by 
+# the Perl version.
+ifdef FAKE_HOST
+	CCFLAGS += -DFAKE_HOST
+endif
+
+# NO_SQLITE: Compile without SQLite.
+ifdef NO_SQLITE
 	CCFLAGS += -pedantic -DNO_SQLITE
 endif
+
+# PERL_COMPAT: Compile a version with some changes to make it compatible with 
+# the Perl version
+ifdef PERL_COMPAT
+	CCFLAGS += -DPERL_COMPAT
+endif
+
+# TEST_FUNC: Send non-option arguments to a function for testing. Doesn't break 
+# anything, non-option arguments are ignored by the program.
+ifdef TEST_FUNC
+	CCFLAGS += -DTEST_FUNC
+endif
+
 LDFLAGS = -Wall -Wextra -Werror
 
 # When compiling with SQLite, add these libraries to LIBS:
 # Linux (gcc)    : -lpthread -ldl
 # FreeBSD (clang): -lpthread
 LIBS =
-ifneq ($(NO_SQLITE), 1)
+ifndef NO_SQLITE
 	LIBS += -lpthread -ldl
 endif
 
@@ -36,7 +59,7 @@ endif
 # If compiling without -DNO_SQLITE, add sqlite3.o to COMMON_OBJS
 COMMON_OBJS = database.o environ.o genuuid.o io.o logfile.o \
               rcfile.o selftest.o sessvar.o string.o tag.o uuid.o
-ifneq ($(NO_SQLITE), 1)
+ifndef NO_SQLITE
 	COMMON_OBJS += sqlite3.o
 endif
 
@@ -124,13 +147,122 @@ test: $(SUUID_EXEC)
 	cd t && $(MAKE) test
 
 .PHONY: testall
-testall: clean test
-	@echo
-	@echo Test with NO_SQLITE=0
-	$(MAKE) clean test NO_SQLITE=0
-	@echo
-	@echo Test with NO_SQLITE=1
-	$(MAKE) clean test NO_SQLITE=1
+testall:
+	$(MAKE) testcomb WHAT=test
+
+.PHONY: testcomb
+testcomb: clean $(WHAT)
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
+	test -z "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
+	# FAKE_HOST=
+	$(MAKE) clean $(WHAT) FAKE_HOST=
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
+	test -z "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
+	$(MAKE) clean $(WHAT) FAKE_HOST= NO_SQLITE=
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
+	test -n "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
+	$(MAKE) clean $(WHAT) FAKE_HOST= NO_SQLITE=1
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
+	test -z "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
+	# FAKE_HOST=1
+	$(MAKE) clean $(WHAT) FAKE_HOST=1
+	test -n "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
+	test -z "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
+	$(MAKE) clean $(WHAT) FAKE_HOST=1 NO_SQLITE=
+	test -n "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
+	test -n "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
+	$(MAKE) clean $(WHAT) FAKE_HOST=1 NO_SQLITE=1
+	test -n "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
+	test -z "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
+	# NO_SQLITE
+	$(MAKE) clean $(WHAT) NO_SQLITE=
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
+	test -n "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
+	$(MAKE) clean $(WHAT) NO_SQLITE=1
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
+	test -z "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
+	# PERL_COMPAT=
+	$(MAKE) clean $(WHAT) PERL_COMPAT=
+	test -n "$$(./$(SESS_EXEC) --version | grep 'FAKE_HOST:')"
+	test -z "$$(./$(SESS_EXEC) --version | grep $(LINKED_STR))"
+	test -n "$$(./$(SESS_EXEC) --version | grep 'PERL_COMPAT:')"
+	test -z "$$(./$(SESS_EXEC) --version | grep 'TEST_FUNC:')"
+	$(MAKE) clean $(WHAT) PERL_COMPAT= NO_SQLITE=
+	test -n "$$(./$(SESS_EXEC) --version | grep 'FAKE_HOST:')"
+	test -n "$$(./$(SESS_EXEC) --version | grep $(LINKED_STR))"
+	test -n "$$(./$(SESS_EXEC) --version | grep 'PERL_COMPAT:')"
+	test -z "$$(./$(SESS_EXEC) --version | grep 'TEST_FUNC:')"
+	$(MAKE) clean $(WHAT) PERL_COMPAT= NO_SQLITE=1
+	test -n "$$(./$(SESS_EXEC) --version | grep 'FAKE_HOST:')"
+	test -z "$$(./$(SESS_EXEC) --version | grep $(LINKED_STR))"
+	test -n "$$(./$(SESS_EXEC) --version | grep 'PERL_COMPAT:')"
+	test -z "$$(./$(SESS_EXEC) --version | grep 'TEST_FUNC:')"
+	# PERL_COMPAT=1
+	$(MAKE) clean $(WHAT) PERL_COMPAT=1
+	test -n "$$(./$(SESS_EXEC) --version | grep 'FAKE_HOST:')"
+	test -z "$$(./$(SESS_EXEC) --version | grep $(LINKED_STR))"
+	test -n "$$(./$(SESS_EXEC) --version | grep 'PERL_COMPAT:')"
+	test -z "$$(./$(SESS_EXEC) --version | grep 'TEST_FUNC:')"
+	$(MAKE) clean $(WHAT) PERL_COMPAT=1 NO_SQLITE=
+	test -n "$$(./$(SESS_EXEC) --version | grep 'FAKE_HOST:')"
+	test -n "$$(./$(SESS_EXEC) --version | grep $(LINKED_STR))"
+	test -n "$$(./$(SESS_EXEC) --version | grep 'PERL_COMPAT:')"
+	test -z "$$(./$(SESS_EXEC) --version | grep 'TEST_FUNC:')"
+	$(MAKE) clean $(WHAT) PERL_COMPAT=1 NO_SQLITE=1
+	test -n "$$(./$(SESS_EXEC) --version | grep 'FAKE_HOST:')"
+	test -z "$$(./$(SESS_EXEC) --version | grep $(LINKED_STR))"
+	test -n "$$(./$(SESS_EXEC) --version | grep 'PERL_COMPAT:')"
+	test -z "$$(./$(SESS_EXEC) --version | grep 'TEST_FUNC:')"
+	# TEST_FUNC=
+	$(MAKE) clean $(WHAT) TEST_FUNC=
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
+	test -z "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
+	$(MAKE) clean $(WHAT) TEST_FUNC= NO_SQLITE=
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
+	test -n "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
+	$(MAKE) clean $(WHAT) TEST_FUNC= NO_SQLITE=1
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
+	test -z "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
+	# TEST_FUNC=1
+	$(MAKE) clean $(WHAT) TEST_FUNC=1
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
+	test -z "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
+	test -n "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
+	$(MAKE) clean $(WHAT) TEST_FUNC=1 NO_SQLITE=
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
+	test -n "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
+	test -n "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
+	$(MAKE) clean $(WHAT) TEST_FUNC=1 NO_SQLITE=1
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
+	test -z "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
+	test -n "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
 
 .PHONY: testhist
 testhist: test
@@ -163,10 +295,5 @@ valgrind:
 	cd t && $(MAKE) valgrind
 
 .PHONY: valgrindall
-valgrindall: clean test
-	@echo
-	@echo Test with NO_SQLITE=0
-	$(MAKE) clean valgrind NO_SQLITE=0
-	@echo
-	@echo Test with NO_SQLITE=1
-	$(MAKE) clean valgrind NO_SQLITE=1
+valgrindall:
+	$(MAKE) testcomb WHAT=valgrind

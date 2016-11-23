@@ -142,19 +142,19 @@ int print_version(void)
 	printf("Linked against SQLite %s\n", sqlite3_libversion());
 #endif
 	printf("\n*** THIS PROGRAM IS UNFINISHED, DON'T USE ***\n");
-#if FAKE_HOST || PERL_COMPAT
+#if defined(FAKE_HOST) || defined(PERL_COMPAT)
 	printf("\nThis version is compiled with the following conditional "
                "directives:\n");
-#  if FAKE_HOST
+#endif
+#ifdef FAKE_HOST
 	printf("\nFAKE_HOST: Always return \"fake\" as hostname. This is to "
 	       "make sure it \n"
 	       "doesn't write to the real log file.\n");
-#  endif
-#  if PERL_COMPAT
+#endif
+#ifdef PERL_COMPAT
 	printf("\nPERL_COMPAT: Suppress the new and better behaviour, behave "
 	       "just like the \n"
 	       "original Perl version to make the tests succeed.\n");
-#  endif
 #endif
 
 	return EXIT_SUCCESS;
@@ -290,7 +290,7 @@ int main(int argc, char *argv[])
 	struct Options opt;
 
 	progname = argv[0];
-#if PERL_COMPAT
+#ifdef PERL_COMPAT
 	progname = "sess";
 #endif
 
@@ -310,7 +310,7 @@ int main(int argc, char *argv[])
 		return print_license();
 
 	if (optind == argc) {
-#if PERL_COMPAT
+#ifdef PERL_COMPAT
 		fprintf(stderr, "%s: No command specified. "
 		                "Use -h for help.\n", progname);
 #else

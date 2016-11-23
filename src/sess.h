@@ -28,12 +28,12 @@
 #define VERSION       "0.0.0"
 #define RELEASE_DATE  "2016-00-00"
 
-#define FAKE_HOST  1 /* Use "fake" as hostname to avoid conflicts with files 
-                      * created by the Perl version
-                      */
-#define PERL_COMPAT  1 /* Compile a version with some changes to make it 
-                        * compatible with the Perl version
-                        */
+#ifndef FAKE_HOST
+#  define FAKE_HOST  1
+#endif
+#ifndef PERL_COMPAT
+#  define PERL_COMPAT  1
+#endif
 
 #include "common.h"
 
