@@ -1,0 +1,77 @@
+"make testall" fails on NetBSD 7.0.2:
+
+gmake clean test FAKE_HOST= NO_SQLITE=
+gmake[3]: Entering directory '/home/sunny/src/git/suuid/src'
+rm -f database.o environ.o genuuid.o io.o logfile.o rcfile.o selftest.o sessvar.o string.o tag.o uuid.o sqlite3.o
+rm -f suuid suuid.o
+rm -f sess sess.o
+rm -f sqlite3.o
+rm -f *~ core core.suuid tags
+rm -fr testlockdir
+cd t && gmake clean
+gmake[4]: Entering directory '/home/sunny/src/git/suuid/src/t'
+rm -rf tmp-* *-stderr.tmp
+if test ! -e log/.git; then rm -rf log; fi
+gmake[4]: Leaving directory '/home/sunny/src/git/suuid/src/t'
+cc -Wall -Wextra -Werror -O0 -c -g suuid.c
+cc -Wall -Wextra -Werror -O0 -c -g database.c
+cc -Wall -Wextra -Werror -O0 -c -g environ.c
+cc -Wall -Wextra -Werror -O0 -c -g genuuid.c
+cc -Wall -Wextra -Werror -O0 -c -g io.c
+cc -Wall -Wextra -Werror -O0 -c -g logfile.c
+cc -Wall -Wextra -Werror -O0 -c -g rcfile.c
+cc -Wall -Wextra -Werror -O0 -c -g selftest.c
+cc -Wall -Wextra -Werror -O0 -c -g sessvar.c
+cc -Wall -Wextra -Werror -O0 -c -g string.c
+cc -Wall -Wextra -Werror -O0 -c -g tag.c
+cc -Wall -Wextra -Werror -O0 -c -g uuid.c
+cc -Wall -Wextra -Werror -O0 -c -g -DSQLITE_ENABLE_JSON1 sqlite3.c
+sqlite3.c: In function ‘sqlite3OsFetch’:
+sqlite3.c:19929:49: error: unused parameter ‘id’ [-Werror=unused-parameter]
+ SQLITE_PRIVATE int sqlite3OsFetch(sqlite3_file *id, i64 iOff, int iAmt, void **pp){
+                                                 ^
+sqlite3.c:19929:57: error: unused parameter ‘iOff’ [-Werror=unused-parameter]
+ SQLITE_PRIVATE int sqlite3OsFetch(sqlite3_file *id, i64 iOff, int iAmt, void **pp){
+                                                         ^
+sqlite3.c:19929:67: error: unused parameter ‘iAmt’ [-Werror=unused-parameter]
+ SQLITE_PRIVATE int sqlite3OsFetch(sqlite3_file *id, i64 iOff, int iAmt, void **pp){
+                                                                   ^
+sqlite3.c: In function ‘sqlite3OsUnfetch’:
+sqlite3.c:19933:51: error: unused parameter ‘id’ [-Werror=unused-parameter]
+ SQLITE_PRIVATE int sqlite3OsUnfetch(sqlite3_file *id, i64 iOff, void *p){
+                                                   ^
+sqlite3.c:19933:59: error: unused parameter ‘iOff’ [-Werror=unused-parameter]
+ SQLITE_PRIVATE int sqlite3OsUnfetch(sqlite3_file *id, i64 iOff, void *p){
+                                                           ^
+sqlite3.c:19933:71: error: unused parameter ‘p’ [-Werror=unused-parameter]
+ SQLITE_PRIVATE int sqlite3OsUnfetch(sqlite3_file *id, i64 iOff, void *p){
+                                                                       ^
+sqlite3.c: In function ‘unixFetch’:
+sqlite3.c:34242:36: error: unused parameter ‘fd’ [-Werror=unused-parameter]
+ static int unixFetch(sqlite3_file *fd, i64 iOff, int nAmt, void **pp){
+                                    ^
+sqlite3.c:34242:44: error: unused parameter ‘iOff’ [-Werror=unused-parameter]
+ static int unixFetch(sqlite3_file *fd, i64 iOff, int nAmt, void **pp){
+                                            ^
+sqlite3.c:34242:54: error: unused parameter ‘nAmt’ [-Werror=unused-parameter]
+ static int unixFetch(sqlite3_file *fd, i64 iOff, int nAmt, void **pp){
+                                                      ^
+sqlite3.c: In function ‘pagerFixMaplimit’:
+sqlite3.c:49798:37: error: unused parameter ‘pPager’ [-Werror=unused-parameter]
+ static void pagerFixMaplimit(Pager *pPager){
+                                     ^
+cc1: all warnings being treated as errors
+Makefile:119: recipe for target 'sqlite3.o' failed
+gmake[3]: *** [sqlite3.o] Error 1
+gmake[3]: Leaving directory '/home/sunny/src/git/suuid/src'
+Makefile:155: recipe for target 'testcomb' failed
+gmake[2]: *** [testcomb] Error 2
+gmake[2]: Leaving directory '/home/sunny/src/git/suuid/src'
+Makefile:151: recipe for target 'testall' failed
+gmake[1]: *** [testall] Error 2
+gmake[1]: Leaving directory '/home/sunny/src/git/suuid/src'
+Makefile:31: recipe for target 'testall' failed
+gmake: *** [testall] Error 2
+sess.end:gmake/ff3f5888-b196-11e6-b7dd-6711e8bb1b6b -- 00:03:23.4872630, exit code '512'.
+2016-11-23 17:07:56 sunny@netbsd702-qemu:~/src/git/suuid
+$
