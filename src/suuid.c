@@ -137,7 +137,7 @@ int print_license(void)
 
 int print_version(void)
 {
-	printf("%s %s (%s)\n", progname, VERSION, RELEASE_DATE);
+	printf("%s %s (%s)\n", progname, SUUID_VERSION, SUUID_DATE);
 #ifndef NO_SQLITE
 	printf("Linked against SQLite %s\n", sqlite3_libversion());
 #endif

@@ -24,6 +24,7 @@ INSERT INTO "synced" VALUES('finduuid','Lib/std/perl-tab','c58b81b5652b062928cc7
 INSERT INTO "synced" VALUES('needuuid','Lib/std/perl-tab','c6365e55b0510bc1a385dc497ff4d958b003c012','2016-11-11 21:46:30');
 INSERT INTO "synced" VALUES('obsolete/suuid.pl','','273d6f5b1b1e7eb6c8553cd2cb3b176c5678ac7c','2016-05-17 14:10:28');
 INSERT INTO "synced" VALUES('src/COPYING','Lib/std/COPYING','17bc73d79f068dfaf2655db1090f6b9206734555','2016-06-06 03:02:53');
+INSERT INTO "synced" VALUES('src/Gen-version','Lib/std/sh','4f9d95911fd2ae01ab5f189b1a5f6ef7ecfe3694','2016-11-25 13:18:18');
 INSERT INTO "synced" VALUES('src/Makefile','Lib/std/c/Makefile','5d9a5b337cbc4997dfa181e3fd9a9484487b5605','2016-10-25 02:43:03');
 INSERT INTO "synced" VALUES('src/common.h','Lib/std/c/std.h','e51fd07fe8a4d3a95c20ab339534707c2faf5d38','2016-11-10 10:58:31');
 INSERT INTO "synced" VALUES('src/sess.c','Lib/std/c/std.c','e51fd07fe8a4d3a95c20ab339534707c2faf5d38','2016-11-10 10:58:31');

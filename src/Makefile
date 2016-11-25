@@ -80,8 +80,14 @@ SUUID_DEPS = $(SUUID_HFILES) Makefile
 SESS_DEPS  = $(SESS_HFILES) $(SUUID_DEPS) Makefile
 
 DEFAULT_DEPS = $(SUUID_EXEC) $(SESS_EXEC)
+
 .PHONY: default
 default: $(DEFAULT_DEPS)
+
+SUUID-VERSION: Gen-version suuid.c $(COMMON_C) $(SUUID_DEPS)
+	./Gen-version
+
+-include SUUID-VERSION
 
 $(SUUID_EXEC): $(SUUID_OBJS) $(COMMON_OBJS)
 	$(LD) -o $(SUUID_EXEC) $(LDFLAGS) $(SUUID_OBJS) $(COMMON_OBJS) $(LIBS)
@@ -89,8 +95,9 @@ $(SUUID_EXEC): $(SUUID_OBJS) $(COMMON_OBJS)
 $(SESS_EXEC): $(SESS_OBJS) $(COMMON_OBJS)
 	$(LD) -o $(SESS_EXEC) $(LDFLAGS) $(SESS_OBJS) $(COMMON_OBJS) $(LIBS)
 
-suuid.o: suuid.c $(SUUID_DEPS)
-	$(CC) $(CCFLAGS) suuid.c
+suuid.o: SUUID-VERSION suuid.c $(SUUID_DEPS)
+	$(CC) $(CCFLAGS) suuid.c \
+	    '-DSUUID_VERSION="$(SUUID_VERSION)"' '-DSUUID_DATE="$(SUUID_DATE)"'
 
 database.o: database.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) database.c
@@ -133,6 +140,7 @@ uuid.o: uuid.c $(SUUID_DEPS)
 
 .PHONY: clean
 clean:
+	rm -f SUUID-VERSION
 	rm -f $(COMMON_OBJS)
 	rm -f $(SUUID_EXEC) $(SUUID_OBJS)
 	rm -f $(SESS_EXEC) $(SESS_OBJS)

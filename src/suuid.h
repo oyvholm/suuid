@@ -21,13 +21,6 @@
 #ifndef _SUUID_H
 #define _SUUID_H
 
-/*
- * Defines
- */
-
-#define VERSION       "0.3.0"
-#define RELEASE_DATE  "2016-11-14"
-
 #include "common.h"
 
 /*

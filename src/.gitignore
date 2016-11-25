@@ -1,4 +1,5 @@
 *.o
+/SUUID-VERSION
 /sess
 /suuid
 /tags

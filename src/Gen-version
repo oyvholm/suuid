@@ -1,0 +1,91 @@
+#!/bin/sh
+
+#==============================================================================
+# Gen-version
+# File ID: a0ae4d34-b311-11e6-8b72-279c2a0468a3
+#
+# Generate SUUID-VERSION.
+#
+# Author: Øyvind A. Holm <sunny@sunbase.org>
+# License: GNU General Public License version 2 or later.
+#==============================================================================
+
+progname=Gen-version
+VERSION=0.1.0
+
+suuid_version=0.3.0
+suuid_date=2016-11-14
+
+opt_help=0
+opt_quiet=0
+opt_verbose=0
+while test -n "$1"; do
+	case "$1" in
+	-h|--help) opt_help=1; shift ;;
+	-q|--quiet) opt_quiet=$(($opt_quiet + 1)); shift ;;
+	-v|--verbose) opt_verbose=$(($opt_verbose + 1)); shift ;;
+	--version) echo $progname $VERSION; exit 0 ;;
+	--) shift; break ;;
+	*)
+		if printf '%s\n' "$1" | grep -q ^-; then
+			echo "$progname: $1: Unknown option" >&2
+			exit 1
+		else
+			break
+		fi
+	break ;;
+	esac
+done
+opt_verbose=$(($opt_verbose - $opt_quiet))
+
+if test "$opt_help" = "1"; then
+	test $opt_verbose -gt 0 && { echo; echo $progname $VERSION; }
+	cat <<END
+
+Generate SUUID-VERSION.
+
+Usage: $progname [options]
+
+Options:
+
+  -h, --help
+    Show this help.
+  -q, --quiet
+    Be more quiet. Can be repeated to increase silence.
+  -v, --verbose
+    Increase level of verbosity. Can be repeated.
+  --version
+    Print version information.
+
+END
+	exit 0
+fi
+
+if test -d ../.git; then
+	numsince=$(
+	    git log --format=%h suuid-v$suuid_version.. | wc -l | tr -d '\t '
+	)
+	if test "$numsince" = "0"; then
+		suuid_fullversion=$suuid_version
+	else
+		gitsha=$(git rev-parse --short=12 HEAD)
+		test -n "$(git diff-index --name-only HEAD)" &&
+			gitsha="$gitsha-dirty"
+		suuid_fullversion="$suuid_version+$numsince.git-$gitsha"
+		suuid_date=$(git log -1 --format=%ci | cut -c -10)
+	fi
+else
+	suuid_fullversion=$suuid_version
+fi
+
+suuid_ver_output="SUUID_VERSION = $suuid_fullversion"
+suuid_date_output="SUUID_DATE = $suuid_date"
+
+if test "$suuid_ver_output" != "$(cat SUUID-VERSION 2>/dev/null)"; then
+	echo $suuid_ver_output >SUUID-VERSION
+	echo $suuid_date_output >>SUUID-VERSION
+fi
+
+exit 0
+
+# vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 :
