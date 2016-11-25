@@ -14,6 +14,7 @@ CC = cc
 LD = cc
 
 LINKED_STR = 'Linked against SQLite'
+UNAME := $(shell uname)
 
 # sqlite3.h uses long long, and gcc 4.8.4 and 4.9.2 (probably all other 
 # versions too) abort when using -pedantic because it's not defined by ISO C90. 
@@ -51,7 +52,10 @@ LDFLAGS = -Wall -Wextra -Werror
 # FreeBSD (clang): -lpthread
 LIBS =
 ifndef NO_SQLITE
-	LIBS += -lpthread -ldl
+	LIBS += -lpthread
+	ifeq ($(UNAME), Linux)
+		LIBS += -ldl
+	endif
 endif
 
 # For regular use, it's not necessary to modify anything below this line.
