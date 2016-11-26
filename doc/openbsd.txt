@@ -1,0 +1,42 @@
+Same thing in OpenBSD as in NetBSD, warnings about some unused parameter:
+
+$ gmake clean test NO_SQLITE=
+rm -f SUUID-VERSION
+rm -f database.o environ.o genuuid.o io.o logfile.o rcfile.o selftest.o sessvar.o string.o tag.o uuid.o sqlite3.o
+rm -f suuid suuid.o
+rm -f sess sess.o
+rm -f sqlite3.o
+rm -f *~ core core.suuid tags
+rm -fr testlockdir
+cd t && gmake clean
+gmake[1]: Entering directory '/home/sunny/src/git/suuid/src/t'
+rm -rf tmp-* *-stderr.tmp
+if test ! -e log/.git; then rm -rf log; fi
+gmake[1]: Leaving directory '/home/sunny/src/git/suuid/src/t'
+cc -Wall -Wextra -Werror -O0 -c -g suuid.c \
+    '-DSUUID_VERSION="0.3.0+39.git-ef856ebd2b18"' '-DSUUID_DATE="2016-11-25"'
+cc -Wall -Wextra -Werror -O0 -c -g database.c
+cc -Wall -Wextra -Werror -O0 -c -g environ.c
+cc -Wall -Wextra -Werror -O0 -c -g genuuid.c
+cc -Wall -Wextra -Werror -O0 -c -g io.c
+cc -Wall -Wextra -Werror -O0 -c -g logfile.c
+cc -Wall -Wextra -Werror -O0 -c -g rcfile.c
+cc -Wall -Wextra -Werror -O0 -c -g selftest.c
+cc -Wall -Wextra -Werror -O0 -c -g sessvar.c
+cc -Wall -Wextra -Werror -O0 -c -g string.c
+cc -Wall -Wextra -Werror -O0 -c -g tag.c
+cc -Wall -Wextra -Werror -O0 -c -g uuid.c
+cc -Wall -Wextra -Werror -O0 -c -g -DSQLITE_ENABLE_JSON1 sqlite3.c
+cc1: warnings being treated as errors
+sqlite3.c:19929: warning: unused parameter 'id'
+sqlite3.c:19929: warning: unused parameter 'iOff'
+sqlite3.c:19929: warning: unused parameter 'iAmt'
+sqlite3.c:19933: warning: unused parameter 'id'
+sqlite3.c:19933: warning: unused parameter 'iOff'
+sqlite3.c:19933: warning: unused parameter 'p'
+sqlite3.c:34242: warning: unused parameter 'fd'
+sqlite3.c:34242: warning: unused parameter 'iOff'
+sqlite3.c:34242: warning: unused parameter 'nAmt'
+sqlite3.c:49798: warning: unused parameter 'pPager'
+gmake: *** [Makefile:130: sqlite3.o] Error 1
+$
