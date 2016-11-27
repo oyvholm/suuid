@@ -9,7 +9,7 @@
 #==============================================================================
 
 progname=ti
-VERSION=0.1.0
+VERSION=0.1.1
 
 opt_help=0
 opt_quiet=0
@@ -20,6 +20,7 @@ while test -n "$1"; do
 	-q|--quiet) opt_quiet=$(($opt_quiet + 1)); shift ;;
 	-v|--verbose) opt_verbose=$(($opt_verbose + 1)); shift ;;
 	--version) echo $progname $VERSION; exit 0 ;;
+	-) break ;;
 	--) shift; break ;;
 	*)
 		if printf '%s\n' "$1" | grep -q ^-; then
