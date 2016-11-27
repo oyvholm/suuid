@@ -22,6 +22,11 @@ UNAME := $(shell uname)
 # Clang 3.8.0 on FreeBSD 11.0 works with -pedantic.
 CCFLAGS = -Wall -Wextra -Werror -O0 -c -g
 
+# sqlite3.c gives warnings on NetBSD and OpenBSD, as described in 
+# ../doc/netbsd.txt and ../doc/openbsd.txt. Temporarily disable -Werror for 
+# sqlite3.c until this is sorted out.
+SQLITE_CCFLAGS = -Wall -Wextra -O0 -c -g
+
 # FAKE_HOST: Use "fake" as hostname to avoid conflicts with files created by 
 # the Perl version.
 ifdef FAKE_HOST
@@ -127,7 +132,7 @@ sessvar.o: sessvar.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) sessvar.c
 
 sqlite3.o: sqlite3.c
-	$(CC) $(CCFLAGS) -DSQLITE_ENABLE_JSON1 sqlite3.c
+	$(CC) $(SQLITE_CCFLAGS) -DSQLITE_ENABLE_JSON1 sqlite3.c
 
 string.o: string.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) string.c
