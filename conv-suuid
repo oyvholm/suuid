@@ -117,7 +117,22 @@ sub main {
             $suuid =~ s/>\s+</> </g;
             msg(3, "Left in suuid: '$suuid'");
             msg(3, "tag: '" . join('|', @tag) . "'");
-            if ($Opt{'output-format'} eq 'postgres') {
+            if ($Opt{'output-format'} eq 'sqlite') {
+                print(
+                    join("\t",
+                        $date,
+                        $uuid,
+                        scalar(@tag) ? ("{'" . join("','", @tag) . "'}") : '\N',
+                        safe_sql($host, 1),
+                        safe_sql($cwd, 1),
+                        safe_sql($username, 1),
+                        safe_sql($tty, 1),
+                        scalar(@sess) ? ("{'" . join("','", @sess) . "'}") : '\N',
+                        safe_sql($txt, 1),
+                        safe_sql($line, 1),
+                    ) . "\n",
+                );
+            } elsif ($Opt{'output-format'} eq 'postgres') {
                 print(
                     join("\t",
                         $date,
