@@ -87,6 +87,8 @@ sub main {
 
     diag(sprintf('========== Executing %s v%s ==========',
                  $progname, $VERSION));
+    diag(`$CMD --version`);
+    diag('');
 
     if ($Opt{'todo'} && !$Opt{'all'}) {
         goto todo_section;
