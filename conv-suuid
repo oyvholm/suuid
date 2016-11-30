@@ -20,9 +20,9 @@ local $| = 1;
 
 our %Opt = (
 
+    'create-table' => 0,
     'help' => 0,
     'output-format' => 'xml',
-    'pg-table' => 0,
     'quiet' => 0,
     'verbose' => 0,
     'version' => 0,
@@ -31,14 +31,14 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s/^.*\/(.*?)$/$1/;
-our $VERSION = '0.1.2';
+our $VERSION = '0.2.0';
 
 Getopt::Long::Configure('bundling');
 GetOptions(
 
+    'create-table' => \$Opt{'create-table'},
     'help|h' => \$Opt{'help'},
     'output-format|o=s' => \$Opt{'output-format'},
-    'pg-table' => \$Opt{'pg-table'},
     'quiet|q+' => \$Opt{'quiet'},
     'verbose|v+' => \$Opt{'verbose'},
     'version' => \$Opt{'version'},
@@ -63,59 +63,21 @@ sub main {
     my $v1_templ = "$Lh\{8}-$Lh\{4}-1$Lh\{3}-$Lh\{4}-$Lh\{12}";
     my $v1rand_templ = "$Lh\{8}-$Lh\{4}-1$Lh\{3}-$Lh\{4}-$Lh\[37bf]$Lh\{10}";
 
-    if ($Opt{'pg-table'}) {
-        print(<<END);
-CREATE TABLE uuids (
-    t timestamp,
-    u uuid,
-    tag varchar[],
-    host varchar,
-    cwd varchar,
-    username varchar,
-    tty varchar,
-    sess varchar[],
-    txt varchar,
-    s xml
-);
-CREATE TABLE new AS
-    SELECT * FROM uuids LIMIT 0;
-CREATE TABLE new_rej AS
-    SELECT * FROM uuids LIMIT 0;
-
-CREATE OR REPLACE FUNCTION loop_new() RETURNS trigger AS \$\$
-DECLARE
-    curr_id uuid;
-BEGIN
-    LOOP
-        curr_id = (SELECT u FROM new LIMIT 1);
-        IF curr_id IS NOT NULL THEN
-            IF (SELECT u FROM uuids WHERE u = curr_id LIMIT 1) IS NOT NULL THEN
-                INSERT INTO new_rej SELECT * FROM new WHERE u = curr_id;
-            ELSE
-                INSERT INTO uuids SELECT * FROM new WHERE u = curr_id;
-            END IF;
-            DELETE FROM new WHERE u = curr_id;
-        ELSE
-            EXIT;
-        END IF;
-    END LOOP;
-    RETURN NULL;
-END;
-\$\$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_insert_new AFTER INSERT
-    ON new
-    EXECUTE PROCEDURE loop_new();
-
-CREATE INDEX idx_uuids_u ON uuids (u);
-CREATE INDEX idx_uuids_t ON uuids (t);
-CREATE INDEX idx_new_u ON new (u);
-
-END
+    if ($Opt{'create-table'}) {
+        if ($Opt{'output-format'} eq "postgres") {
+            print_pg_table();
+        } elsif ($Opt{'output-format'} eq "sqlite") {
+            print_sqlite_table();
+        } else {
+            warn("$progname: $Opt{'output-format'}: Unknown output format\n");
+            return 1;
+        }
     }
 
     if ($Opt{'output-format'} eq 'postgres') {
         print("COPY new (t, u, tag, host, cwd, username, tty, sess, txt, s) FROM stdin;\n");
+    } elsif ($Opt{'output-format'} eq 'sqlite') {
+        print("BEGIN TRANSACTION;\n");
     }
     while (my $line = <>) {
         chomp($line);
@@ -164,7 +126,32 @@ END
             $suuid =~ s/>\s+</> </g;
             msg(3, "Left in suuid: '$suuid'");
             msg(3, "tag: '" . join('|', @tag) . "'");
-            if ($Opt{'output-format'} eq 'postgres') {
+            if ($Opt{'output-format'} eq 'sqlite') {
+                $txt =~ s/&amp;/&/gs;
+                $txt =~ s/&lt;/</gs;
+                $txt =~ s/&gt;/>/gs;
+                $txt =~ s/\\n/\n/gs;
+                print("INSERT INTO uuids " .
+                    "(t,u,tag,host,cwd,username,tty,sess,txt,s) " .
+                    "VALUES(",
+                    join(",",
+                        "'$date'",
+                        "'$uuid'",
+                        scalar(@tag) ? ("'{\"" . join('","', @tag) . "\"}'")
+                                     : 'NULL',
+                        "'" . doublequote($host) . "'",
+                        "'" . doublequote($cwd) . "'",
+                        "'" . doublequote($username) . "'",
+                        "'" . doublequote($tty) . "'",
+                        "'" . scalar(@sess) ? ("'[\"" .
+                                                join('","', @sess) .
+                                              "\"]'")
+                                            : 'NULL',
+                        "'" . doublequote($txt) . "'",
+                        "'" . doublequote($line) . "'",
+                    ) . ");\n",
+                );
+            } elsif ($Opt{'output-format'} eq 'postgres') {
                 print(
                     join("\t",
                         $date,
@@ -190,11 +177,95 @@ END
     }
     if ($Opt{'output-format'} eq 'postgres') {
         print("\\.\n");
+    } elsif ($Opt{'output-format'} eq 'sqlite') {
+        print("COMMIT;\n");
     }
 
     return $Retval;
     # }}}
 } # main()
+
+sub print_pg_table {
+        print(<<END);
+CREATE TABLE uuids (
+    t timestamp,
+    u uuid,
+    tag varchar[],
+    host varchar,
+    cwd varchar,
+    username varchar,
+    tty varchar,
+    sess varchar[],
+    txt varchar,
+    s xml
+);
+CREATE TABLE new AS
+    SELECT * FROM uuids LIMIT 0;
+CREATE TABLE new_rej AS
+    SELECT * FROM uuids LIMIT 0;
+
+CREATE OR REPLACE FUNCTION loop_new() RETURNS trigger AS \$\$
+DECLARE
+    curr_id uuid;
+BEGIN
+    LOOP
+        curr_id = (SELECT u FROM new LIMIT 1);
+        IF curr_id IS NOT NULL THEN
+            IF (SELECT u FROM uuids WHERE u = curr_id LIMIT 1) IS NOT NULL THEN
+                INSERT INTO new_rej SELECT * FROM new WHERE u = curr_id;
+            ELSE
+                INSERT INTO uuids SELECT * FROM new WHERE u = curr_id;
+            END IF;
+            DELETE FROM new WHERE u = curr_id;
+        ELSE
+            EXIT;
+        END IF;
+    END LOOP;
+    RETURN NULL;
+END;
+\$\$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_insert_new AFTER INSERT
+    ON new
+    EXECUTE PROCEDURE loop_new();
+
+CREATE INDEX idx_uuids_u ON uuids (u);
+CREATE INDEX idx_uuids_t ON uuids (t);
+CREATE INDEX idx_new_u ON new (u);
+
+END
+    return;
+}
+
+sub print_sqlite_table {
+        print(<<END);
+CREATE TABLE uuids (
+    t TEXT,
+    u TEXT,
+    tag JSON,
+    host TEXT,
+    cwd TEXT,
+    username TEXT,
+    tty TEXT,
+    sess JSON,
+    txt TEXT,
+    s TEXT
+);
+CREATE TABLE new AS
+    SELECT * FROM uuids LIMIT 0;
+CREATE TABLE new_rej AS
+    SELECT * FROM uuids LIMIT 0;
+
+END
+    return;
+}
+
+sub doublequote {
+    my $txt = shift;
+
+    $txt =~ s/'/''/gs;
+    return $txt;
+}
 
 sub safe_sql {
     # {{{
@@ -230,17 +301,18 @@ Usage: $progname [options] [file [files [...]]]
 
 Options:
 
+  --create-table
+    Output SQL commands for creating the necessary tables and indexes.
   -h, --help
     Show this help.
   -o X, --output-format X
     Use X as output format. Currently supported:
       - postgres
+      - sqlite
       - xml
         This is the standard format it's been using for years.
   -q, --quiet
     Be more quiet. Can be repeated to increase silence.
-  --pg-table
-    Output Postgres commands for creating the necessary tables.
   -v, --verbose
     Increase level of verbosity. Can be repeated.
   --version
