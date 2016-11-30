@@ -151,7 +151,13 @@ END
         gen_output('test', 'sqlite', 'copy-to-uuids-from-stdin create-table'),
         "",
         0,
-        "Output SQLite SQL from test.xml",
+        "Output SQLite tables and inserts from test.xml",
+    );
+    testcmd("../$CMD --output-format sqlite test.xml",
+        gen_output('test', 'sqlite', 'copy-to-uuids-from-stdin'),
+        "",
+        0,
+        "Output SQLite inserts from test.xml",
     );
     diag("Postgres output");
     testcmd("../$CMD --output-format postgres --verbose -vv test.xml", # {{{
@@ -262,7 +268,7 @@ END
         # TODO tests }}}
     }
 
-    done_testing(43);
+    done_testing(46);
     diag('Testing finished.');
     return $Retval;
     # }}}
