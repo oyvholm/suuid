@@ -155,8 +155,8 @@ END
     );
 
     # }}}
-    testcmd("../$CMD --pg-table --output-format postgres test.xml", # {{{
-        gen_output('test', 'postgres', 'copy-to-uuids-from-stdin pg-table'),
+    testcmd("../$CMD --create-table --output-format postgres test.xml", # {{{
+        gen_output('test', 'postgres', 'copy-to-uuids-from-stdin create-table'),
         '',
         0,
         'Output Postgres tables and format',
@@ -171,7 +171,7 @@ END
         done_testing(22);
         return 0;
     };
-    likecmd("../$CMD --pg-table -o postgres test.xml | psql -X -d $tmpdb", # {{{
+    likecmd("../$CMD --create-table -o postgres test.xml | psql -X -d $tmpdb", # {{{
         '/^' .
             'CREATE TABLE\n' .
             'SELECT 0\n' .
@@ -197,7 +197,7 @@ END
     );
 
     # }}}
-    likecmd("../$CMD --pg-table -o postgres test2.xml | psql -X -d $tmpdb", # {{{
+    likecmd("../$CMD --create-table -o postgres test2.xml | psql -X -d $tmpdb", # {{{
         '/^' .
             'CREATE FUNCTION\n' .
             '(COPY 3\n)?' .
@@ -321,7 +321,7 @@ sub gen_output {
     my ($file, $format, $flags) = @_;
     my $fl_copy_to_uuids = 0;
     my $retval = '';
-    if ($flags =~ /pg-table/) {
+    if ($flags =~ /create-table/) {
         $retval .= <<END;
 CREATE TABLE uuids (
     t timestamp,

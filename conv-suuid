@@ -20,9 +20,9 @@ local $| = 1;
 
 our %Opt = (
 
+    'create-table' => 0,
     'help' => 0,
     'output-format' => 'xml',
-    'pg-table' => 0,
     'quiet' => 0,
     'verbose' => 0,
     'version' => 0,
@@ -36,9 +36,9 @@ our $VERSION = '0.1.2';
 Getopt::Long::Configure('bundling');
 GetOptions(
 
+    'create-table' => \$Opt{'create-table'},
     'help|h' => \$Opt{'help'},
     'output-format|o=s' => \$Opt{'output-format'},
-    'pg-table' => \$Opt{'pg-table'},
     'quiet|q+' => \$Opt{'quiet'},
     'verbose|v+' => \$Opt{'verbose'},
     'version' => \$Opt{'version'},
@@ -63,7 +63,7 @@ sub main {
     my $v1_templ = "$Lh\{8}-$Lh\{4}-1$Lh\{3}-$Lh\{4}-$Lh\{12}";
     my $v1rand_templ = "$Lh\{8}-$Lh\{4}-1$Lh\{3}-$Lh\{4}-$Lh\[37bf]$Lh\{10}";
 
-    if ($Opt{'pg-table'}) {
+    if ($Opt{'create-table'}) {
         print_pg_table();
     }
 
@@ -302,6 +302,8 @@ Usage: $progname [options] [file [files [...]]]
 
 Options:
 
+  --create-table
+    Output SQL commands for creating the necessary tables and indexes.
   -h, --help
     Show this help.
   -o X, --output-format X
@@ -311,8 +313,6 @@ Options:
         This is the standard format it's been using for years.
   -q, --quiet
     Be more quiet. Can be repeated to increase silence.
-  --pg-table
-    Output Postgres commands for creating the necessary tables.
   -v, --verbose
     Increase level of verbosity. Can be repeated.
   --version
