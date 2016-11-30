@@ -140,13 +140,19 @@ END
     # }}}
     diag("SQLite output");
     testcmd("../$CMD --create-table -o sqlite </dev/null", # {{{
-        gen_output('test', 'sqlite', 'copy-to-uuids-from-stdin create-table'),
+        gen_output('', 'sqlite', 'copy-to-uuids-from-stdin create-table'),
         "",
         0,
         "Create SQLite table",
     );
 
     # }}}
+    testcmd("../$CMD --create-table --output-format sqlite test.xml",
+        gen_output('test', 'sqlite', 'copy-to-uuids-from-stdin create-table'),
+        "",
+        0,
+        "Output SQLite SQL from test.xml",
+    );
     diag("Postgres output");
     testcmd("../$CMD --output-format postgres --verbose -vv test.xml", # {{{
         gen_output('test', 'postgres', 'copy-to-uuids-from-stdin'),
@@ -256,7 +262,7 @@ END
         # TODO tests }}}
     }
 
-    done_testing(40);
+    done_testing(43);
     diag('Testing finished.');
     return $Retval;
     # }}}
@@ -403,8 +409,6 @@ CREATE TABLE new AS
 CREATE TABLE new_rej AS
     SELECT * FROM uuids LIMIT 0;
 
-BEGIN TRANSACTION;
-COMMIT;
 END
             # }}}
         } else {
@@ -417,6 +421,7 @@ END
                        "(t, u, tag, host, cwd, username, tty, sess, txt, s) " .
                        "FROM stdin;\n";
         } elsif ($format eq "sqlite") {
+            $retval .= "BEGIN TRANSACTION;\n";
         } else {
             BAIL_OUT("gen_output(): $format: Unkown format");
         }
@@ -486,6 +491,13 @@ END
             if ($fl_copy_to_uuids) {
                 $retval .= "\\.\n";
             }
+        } elsif ($format eq "sqlite") {
+            $retval .= file_data("test.xml.sqlite.sql");
+        }
+    }
+    if ($fl_copy_to_uuids) {
+        if ($format eq "sqlite") {
+            $retval .= "COMMIT;\n";
         }
     }
     return($retval);
