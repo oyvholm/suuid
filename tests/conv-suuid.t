@@ -147,30 +147,38 @@ END
     );
 
     # }}}
-    testcmd("../$CMD --create-table --output-format sqlite test.xml",
+    testcmd("../$CMD --create-table --output-format sqlite test.xml", # {{{
         gen_output('test', 'sqlite', 'copy-to-uuids-from-stdin create-table'),
         "",
         0,
         "Output SQLite tables and inserts from test.xml",
     );
-    testcmd("../$CMD --output-format sqlite test.xml",
+
+    # }}}
+    testcmd("../$CMD --output-format sqlite test.xml", # {{{
         gen_output('test', 'sqlite', 'copy-to-uuids-from-stdin'),
         "",
         0,
         "Output SQLite inserts from test.xml",
     );
-    testcmd("../$CMD --create-table --output-format sqlite test2.xml",
+
+    # }}}
+    testcmd("../$CMD --create-table --output-format sqlite test2.xml", # {{{
         gen_output('test2', 'sqlite', 'copy-to-uuids-from-stdin create-table'),
         "",
         0,
         "Output SQLite tables and inserts from test2.xml",
     );
-    testcmd("../$CMD --output-format sqlite test2.xml",
+
+    # }}}
+    testcmd("../$CMD --output-format sqlite test2.xml", # {{{
         gen_output('test2', 'sqlite', 'copy-to-uuids-from-stdin'),
         "",
         0,
         "Output SQLite inserts from test2.xml",
     );
+
+    # }}}
     diag("Postgres output");
     testcmd("../$CMD --output-format postgres --verbose -vv test.xml", # {{{
         gen_output('test', 'postgres', 'copy-to-uuids-from-stdin'),
