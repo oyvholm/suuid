@@ -40,7 +40,7 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s/^.*\/(.*?)$/$1/;
-our $VERSION = '0.2.0';
+our $VERSION = '0.2.1';
 
 my %descriptions = ();
 
@@ -445,6 +445,7 @@ CREATE TABLE uuids (
     sess JSON,
     txt TEXT,
     s TEXT
+      UNIQUE
 );
 CREATE TABLE new AS
     SELECT * FROM uuids LIMIT 0;
