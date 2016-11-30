@@ -25,3 +25,6 @@ clean:
 
 .PHONY: testall
 testall: test
+
+.PHONY: testboth
+testboth: test

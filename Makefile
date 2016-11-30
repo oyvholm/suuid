@@ -31,6 +31,11 @@ testall:
 	cd src && $(MAKE) testall
 	cd tests && $(MAKE) testall
 
+.PHONY: testboth
+testboth:
+	cd src && $(MAKE) testboth
+	cd tests && $(MAKE) testboth
+
 tags: src/*.c src/*.h
 	ctags src/*.c src/*.h
 

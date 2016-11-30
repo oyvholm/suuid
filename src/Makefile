@@ -167,6 +167,11 @@ test: $(SUUID_EXEC)
 testall:
 	$(MAKE) testcomb WHAT=test
 
+.PHONY: testboth
+testboth:
+	$(MAKE) clean test NO_SQLITE=1
+	$(MAKE) clean test NO_SQLITE=
+
 .PHONY: testcomb
 testcomb: clean $(WHAT)
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
