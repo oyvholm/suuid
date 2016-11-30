@@ -76,6 +76,8 @@ sub main {
 
     if ($Opt{'output-format'} eq 'postgres') {
         print("COPY new (t, u, tag, host, cwd, username, tty, sess, txt, s) FROM stdin;\n");
+    } elsif ($Opt{'output-format'} eq 'sqlite') {
+        print("BEGIN TRANSACTION;\n");
     }
     while (my $line = <>) {
         chomp($line);
@@ -125,19 +127,25 @@ sub main {
             msg(3, "Left in suuid: '$suuid'");
             msg(3, "tag: '" . join('|', @tag) . "'");
             if ($Opt{'output-format'} eq 'sqlite') {
-                print(
-                    join("\t",
-                        $date,
-                        $uuid,
-                        scalar(@tag) ? ("{'" . join("','", @tag) . "'}") : '\N',
-                        safe_sql($host, 1),
-                        safe_sql($cwd, 1),
-                        safe_sql($username, 1),
-                        safe_sql($tty, 1),
-                        scalar(@sess) ? ("{'" . join("','", @sess) . "'}") : '\N',
-                        safe_sql($txt, 1),
-                        safe_sql($line, 1),
-                    ) . "\n",
+                print("INSERT INTO uuids " .
+                    "(t,u,tag,host,cwd,username,tty,sess,txt,s) " .
+                    "VALUES(",
+                    join(",",
+                        "'$date'",
+                        "'$uuid'",
+                        scalar(@tag) ? ("'{\"" . join('","', @tag) . "\"}'")
+                                     : 'NULL',
+                        "'" . doublequote($host) . "'",
+                        "'" . doublequote($cwd) . "'",
+                        "'" . doublequote($username) . "'",
+                        "'" . doublequote($tty) . "'",
+                        "'" . scalar(@sess) ? ("'[\"" .
+                                                join('","', @sess) .
+                                              "\"]'")
+                                            : 'NULL',
+                        "'" . doublequote($txt) . "'",
+                        "'" . doublequote($line) . "'",
+                    ) . ");\n",
                 );
             } elsif ($Opt{'output-format'} eq 'postgres') {
                 print(
@@ -165,6 +173,8 @@ sub main {
     }
     if ($Opt{'output-format'} eq 'postgres') {
         print("\\.\n");
+    } elsif ($Opt{'output-format'} eq 'sqlite') {
+        print("COMMIT;\n");
     }
 
     return $Retval;
@@ -242,12 +252,15 @@ CREATE TABLE new AS
 CREATE TABLE new_rej AS
     SELECT * FROM uuids LIMIT 0;
 
-CREATE INDEX idx_uuids_u ON uuids (u);
-CREATE INDEX idx_uuids_t ON uuids (t);
-CREATE INDEX idx_new_u ON new (u);
-
 END
     return;
+}
+
+sub doublequote {
+    my $txt = shift;
+
+    $txt =~ s/'/''/gs;
+    return $txt;
 }
 
 sub safe_sql {
