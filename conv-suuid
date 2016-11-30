@@ -64,54 +64,7 @@ sub main {
     my $v1rand_templ = "$Lh\{8}-$Lh\{4}-1$Lh\{3}-$Lh\{4}-$Lh\[37bf]$Lh\{10}";
 
     if ($Opt{'pg-table'}) {
-        print(<<END);
-CREATE TABLE uuids (
-    t timestamp,
-    u uuid,
-    tag varchar[],
-    host varchar,
-    cwd varchar,
-    username varchar,
-    tty varchar,
-    sess varchar[],
-    txt varchar,
-    s xml
-);
-CREATE TABLE new AS
-    SELECT * FROM uuids LIMIT 0;
-CREATE TABLE new_rej AS
-    SELECT * FROM uuids LIMIT 0;
-
-CREATE OR REPLACE FUNCTION loop_new() RETURNS trigger AS \$\$
-DECLARE
-    curr_id uuid;
-BEGIN
-    LOOP
-        curr_id = (SELECT u FROM new LIMIT 1);
-        IF curr_id IS NOT NULL THEN
-            IF (SELECT u FROM uuids WHERE u = curr_id LIMIT 1) IS NOT NULL THEN
-                INSERT INTO new_rej SELECT * FROM new WHERE u = curr_id;
-            ELSE
-                INSERT INTO uuids SELECT * FROM new WHERE u = curr_id;
-            END IF;
-            DELETE FROM new WHERE u = curr_id;
-        ELSE
-            EXIT;
-        END IF;
-    END LOOP;
-    RETURN NULL;
-END;
-\$\$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_insert_new AFTER INSERT
-    ON new
-    EXECUTE PROCEDURE loop_new();
-
-CREATE INDEX idx_uuids_u ON uuids (u);
-CREATE INDEX idx_uuids_t ON uuids (t);
-CREATE INDEX idx_new_u ON new (u);
-
-END
+        print_pg_table();
     }
 
     if ($Opt{'output-format'} eq 'postgres') {
@@ -195,6 +148,58 @@ END
     return $Retval;
     # }}}
 } # main()
+
+sub print_pg_table {
+        print(<<END);
+CREATE TABLE uuids (
+    t timestamp,
+    u uuid,
+    tag varchar[],
+    host varchar,
+    cwd varchar,
+    username varchar,
+    tty varchar,
+    sess varchar[],
+    txt varchar,
+    s xml
+);
+CREATE TABLE new AS
+    SELECT * FROM uuids LIMIT 0;
+CREATE TABLE new_rej AS
+    SELECT * FROM uuids LIMIT 0;
+
+CREATE OR REPLACE FUNCTION loop_new() RETURNS trigger AS \$\$
+DECLARE
+    curr_id uuid;
+BEGIN
+    LOOP
+        curr_id = (SELECT u FROM new LIMIT 1);
+        IF curr_id IS NOT NULL THEN
+            IF (SELECT u FROM uuids WHERE u = curr_id LIMIT 1) IS NOT NULL THEN
+                INSERT INTO new_rej SELECT * FROM new WHERE u = curr_id;
+            ELSE
+                INSERT INTO uuids SELECT * FROM new WHERE u = curr_id;
+            END IF;
+            DELETE FROM new WHERE u = curr_id;
+        ELSE
+            EXIT;
+        END IF;
+    END LOOP;
+    RETURN NULL;
+END;
+\$\$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_insert_new AFTER INSERT
+    ON new
+    EXECUTE PROCEDURE loop_new();
+
+CREATE INDEX idx_uuids_u ON uuids (u);
+CREATE INDEX idx_uuids_t ON uuids (t);
+CREATE INDEX idx_new_u ON new (u);
+
+END
+    return;
+}
 
 sub safe_sql {
     # {{{
