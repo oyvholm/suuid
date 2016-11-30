@@ -179,6 +179,14 @@ END
     );
 
     # }}}
+    testcmd("../$CMD -o sqlite lots.xml", # {{{
+        file_data("lots.xml.sqlite.sql"),
+        "",
+        0,
+        "Output SQLite inserts from lots.xml",
+    );
+
+    # }}}
     diag("Postgres output");
     testcmd("../$CMD --output-format postgres --verbose -vv test.xml", # {{{
         gen_output('test', 'postgres', 'copy-to-uuids-from-stdin'),
@@ -202,6 +210,14 @@ END
         '',
         0,
         'Output Postgres tables and format',
+    );
+
+    # }}}
+    testcmd("../$CMD -o postgres lots.xml", # {{{
+        file_data("lots.xml.pg.sql"),
+        "",
+        0,
+        "Output Postgres SQL from lots.xml",
     );
 
     # }}}
@@ -288,7 +304,7 @@ END
         # TODO tests }}}
     }
 
-    done_testing(52);
+    done_testing(58);
     diag('Testing finished.');
     return $Retval;
     # }}}
