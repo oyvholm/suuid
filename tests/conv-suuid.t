@@ -159,6 +159,18 @@ END
         0,
         "Output SQLite inserts from test.xml",
     );
+    testcmd("../$CMD --create-table --output-format sqlite test2.xml",
+        gen_output('test2', 'sqlite', 'copy-to-uuids-from-stdin create-table'),
+        "",
+        0,
+        "Output SQLite tables and inserts from test2.xml",
+    );
+    testcmd("../$CMD --output-format sqlite test2.xml",
+        gen_output('test2', 'sqlite', 'copy-to-uuids-from-stdin'),
+        "",
+        0,
+        "Output SQLite inserts from test2.xml",
+    );
     diag("Postgres output");
     testcmd("../$CMD --output-format postgres --verbose -vv test.xml", # {{{
         gen_output('test', 'postgres', 'copy-to-uuids-from-stdin'),
@@ -268,7 +280,7 @@ END
         # TODO tests }}}
     }
 
-    done_testing(46);
+    done_testing(52);
     diag('Testing finished.');
     return $Retval;
     # }}}
@@ -500,6 +512,12 @@ END
         } elsif ($format eq "sqlite") {
             $retval .= file_data("test.xml.sqlite.sql");
         }
+    } elsif ($file eq 'test2') {
+        if ($format eq "sqlite") {
+            $retval .= file_data("test2.xml.sqlite.sql");
+        }
+    } else {
+        BAIL_OUT("gen_output(): $file: Unknown file") if (length($file));
     }
     if ($fl_copy_to_uuids) {
         if ($format eq "sqlite") {
