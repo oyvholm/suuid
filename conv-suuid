@@ -64,7 +64,14 @@ sub main {
     my $v1rand_templ = "$Lh\{8}-$Lh\{4}-1$Lh\{3}-$Lh\{4}-$Lh\[37bf]$Lh\{10}";
 
     if ($Opt{'create-table'}) {
-        print_pg_table();
+        if ($Opt{'output-format'} eq "postgres") {
+            print_pg_table();
+        } elsif ($Opt{'output-format'} eq "sqlite") {
+            print_sqlite_table();
+        } else {
+            warn("$progname: $Opt{'output-format'}: Unknown output format\n");
+            return 1;
+        }
     }
 
     if ($Opt{'output-format'} eq 'postgres') {
@@ -219,46 +226,21 @@ END
 sub print_sqlite_table {
         print(<<END);
 CREATE TABLE uuids (
-    t timestamp,
-    u uuid,
-    tag varchar[],
-    host varchar,
-    cwd varchar,
-    username varchar,
-    tty varchar,
-    sess varchar[],
-    txt varchar,
-    s xml
+    t TEXT,
+    u TEXT,
+    tag JSON,
+    host TEXT,
+    cwd TEXT,
+    username TEXT,
+    tty TEXT,
+    sess JSON,
+    txt TEXT,
+    s TEXT
 );
 CREATE TABLE new AS
     SELECT * FROM uuids LIMIT 0;
 CREATE TABLE new_rej AS
     SELECT * FROM uuids LIMIT 0;
-
-CREATE OR REPLACE FUNCTION loop_new() RETURNS trigger AS \$\$
-DECLARE
-    curr_id uuid;
-BEGIN
-    LOOP
-        curr_id = (SELECT u FROM new LIMIT 1);
-        IF curr_id IS NOT NULL THEN
-            IF (SELECT u FROM uuids WHERE u = curr_id LIMIT 1) IS NOT NULL THEN
-                INSERT INTO new_rej SELECT * FROM new WHERE u = curr_id;
-            ELSE
-                INSERT INTO uuids SELECT * FROM new WHERE u = curr_id;
-            END IF;
-            DELETE FROM new WHERE u = curr_id;
-        ELSE
-            EXIT;
-        END IF;
-    END LOOP;
-    RETURN NULL;
-END;
-\$\$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_insert_new AFTER INSERT
-    ON new
-    EXECUTE PROCEDURE loop_new();
 
 CREATE INDEX idx_uuids_u ON uuids (u);
 CREATE INDEX idx_uuids_t ON uuids (t);
@@ -309,6 +291,7 @@ Options:
   -o X, --output-format X
     Use X as output format. Currently supported:
       - postgres
+      - sqlite
       - xml
         This is the standard format it's been using for years.
   -q, --quiet
