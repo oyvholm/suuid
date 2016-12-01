@@ -226,7 +226,7 @@ END
     if ($createdb_result) {
         diag("NOTICE: $progname: Can't create database, " .
              "skipping Postgres tests");
-        done_testing(22);
+        done_testing(43);
         return 0;
     };
     likecmd("../$CMD --create-table -o postgres test.xml | psql -X -d $tmpdb", # {{{
