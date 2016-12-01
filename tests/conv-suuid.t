@@ -40,7 +40,7 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s/^.*\/(.*?)$/$1/;
-our $VERSION = '0.2.3';
+our $VERSION = '0.2.4';
 
 my %descriptions = ();
 
@@ -434,7 +434,7 @@ END
         } elsif ($format eq "sqlite") {
             # CREATE TABLE, etc for SQLite {{{
             $retval .= <<END;
-CREATE TABLE uuids (
+CREATE TABLE IF NOT EXISTS uuids (
     t TEXT,
     u TEXT,
     tag JSON,
