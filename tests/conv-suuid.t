@@ -40,7 +40,7 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s/^.*\/(.*?)$/$1/;
-our $VERSION = '0.2.1';
+our $VERSION = '0.2.2';
 
 my %descriptions = ();
 
@@ -447,10 +447,6 @@ CREATE TABLE uuids (
     s TEXT
       UNIQUE
 );
-CREATE TABLE new AS
-    SELECT * FROM uuids LIMIT 0;
-CREATE TABLE new_rej AS
-    SELECT * FROM uuids LIMIT 0;
 
 END
             # }}}
