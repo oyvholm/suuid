@@ -31,7 +31,7 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s/^.*\/(.*?)$/$1/;
-our $VERSION = '0.2.4';
+our $VERSION = '0.2.5';
 
 Getopt::Long::Configure('bundling');
 GetOptions(
@@ -127,10 +127,10 @@ sub main {
             msg(3, "Left in suuid: '$suuid'");
             msg(3, "tag: '" . join('|', @tag) . "'");
             if ($Opt{'output-format'} eq 'sqlite') {
-                $txt =~ s/&amp;/&/gs;
-                $txt =~ s/&lt;/</gs;
-                $txt =~ s/&gt;/>/gs;
-                $txt =~ s/\\n/\n/gs;
+                $txt =~ s/&amp;/&/g;
+                $txt =~ s/&lt;/</g;
+                $txt =~ s/&gt;/>/g;
+                $txt =~ s/(\\[\\nt])/unescape($1)/eg;
                 print("INSERT INTO uuids " .
                     "(t,u,tag,host,cwd,username,tty,sess,txt,s) " .
                     "VALUES(",
@@ -184,6 +184,18 @@ sub main {
     return $Retval;
     # }}}
 } # main()
+
+sub unescape {
+    my $char = shift;
+
+    if ($char eq '\\\\') {
+        return '\\';
+    } elsif ($char eq '\\n') {
+        return "\n";
+    } elsif ($char eq '\\t') {
+        return "\t";
+    }
+}
 
 sub print_pg_table {
         print(<<END);
