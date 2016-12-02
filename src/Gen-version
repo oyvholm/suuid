@@ -13,8 +13,8 @@
 progname=Gen-version
 VERSION=0.1.0
 
-suuid_version=0.3.0
-suuid_date=2016-11-14
+suuid_version=0.4.0
+suuid_date=2016-12-02
 
 opt_help=0
 opt_quiet=0

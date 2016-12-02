@@ -33,7 +33,7 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s/^.*\/(.*?)$/$1/;
-our $VERSION = '0.0.0';
+our $VERSION = '0.2.0';
 my $cmdline_str = join(" ", @ARGV);
 
 Getopt::Long::Configure('bundling');
@@ -252,7 +252,6 @@ sub suuid_xml {
     }
     $Str =~ s/\\/\\\\/gs;
     $Str =~ s/\n/\\n/gs;
-    $Str =~ s/\r/\\r/gs;
     $Str =~ s/\t/\\t/gs;
     return($Str);
     # }}}

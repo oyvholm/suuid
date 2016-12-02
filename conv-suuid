@@ -31,7 +31,7 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s/^.*\/(.*?)$/$1/;
-our $VERSION = '0.2.5';
+our $VERSION = '0.3.0';
 
 Getopt::Long::Configure('bundling');
 GetOptions(
@@ -283,7 +283,6 @@ sub safe_sql {
     $Text =~ s/\\/\\\\/g;
     $Text =~ s/'/''/g;
     $Text =~ s/\n/\\n/g;
-    $Text =~ s/\r/\\r/g;
     $Text =~ s/\t/\\t/g;
     $use_null && !length($Text) && ($Text = '\N');
     return($Text);

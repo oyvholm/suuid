@@ -40,7 +40,7 @@ bool valid_xml_chars(const char *s)
 	if (utf8_check(s))
 		return FALSE;
 	while (*p) {
-		if (*p < ' ' && !strchr("\n\r\t", *p))
+		if (*p < ' ' && !strchr("\n\t", *p))
 			return FALSE;
 		if (*p == 127)
 			return FALSE;
@@ -93,10 +93,6 @@ char *suuid_xml(const char *text)
 			break;
 		case '\n':
 			strcpy(destp, "\\n");
-			destp += 2;
-			break;
-		case '\r':
-			strcpy(destp, "\\r");
 			destp += 2;
 			break;
 		case '\t':

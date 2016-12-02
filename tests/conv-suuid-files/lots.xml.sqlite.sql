@@ -6,5 +6,6 @@ tab	here
 < & >
 \
 ''
-"in\valid\','<suuid t="2016-11-30T08:49:39.2512000Z" u="eda46800-b6d9-11e6-96f0-279c2a0468a3"> <txt>Lots of stuff!\nNew line.\n\ntab\there\n&lt; &amp; &gt;\n\\\n''\n"in\valid\</txt> </suuid>');
+car\riage
+"in\valid\','<suuid t="2016-11-30T08:49:39.2512000Z" u="eda46800-b6d9-11e6-96f0-279c2a0468a3"> <txt>Lots of stuff!\nNew line.\n\ntab\there\n&lt; &amp; &gt;\n\\\n''\ncar\riage\n"in\valid\</txt> </suuid>');
 COMMIT;
