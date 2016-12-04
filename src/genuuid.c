@@ -204,10 +204,12 @@ int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
  * Otherwise return NULL.
  */
 
-char *process_uuid(FILE *logfp, const struct Rc *rc, const struct Options *opt,
+char *process_uuid(struct Logs *logs,
+                   const struct Rc *rc, const struct Options *opt,
                    struct Entry *entry)
 {
-	assert(logfp);
+	assert(logs);
+	assert(logs->logfp);
 	assert(rc);
 	assert(opt);
 	assert(entry);
@@ -246,7 +248,7 @@ char *process_uuid(FILE *logfp, const struct Rc *rc, const struct Options *opt,
 	if (!uuid_date_from_uuid(entry->date, entry->uuid))
 		return NULL;
 
-	if (add_to_logfile(logfp, entry, opt->raw) == EXIT_FAILURE)
+	if (add_to_logfile(logs->logfp, entry, opt->raw) == EXIT_FAILURE)
 		return NULL;
 
 	/*
@@ -298,13 +300,14 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 {
 	struct uuid_result retval;
 	char *rcfile = NULL, *logfile = NULL;
-	FILE *logfp = NULL;
 	unsigned int i, count;
 	struct Rc rc;
 	struct Entry entry;
+	struct Logs logs;
 
 	assert(opt);
 
+	logs.logfp = NULL;
 	count = opt->count;
 	retval.count = 0;
 	memset(retval.lastuuid, 0, UUID_LENGTH + 1);
@@ -348,8 +351,8 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	 * Open the log file. If it's missing, create it.
 	 */
 
-	logfp = open_logfile(logfile);
-	if (!logfp) {
+	logs.logfp = open_logfile(logfile);
+	if (!logs.logfp) {
 		retval.success = FALSE;
 		goto cleanup;
 	}
@@ -361,7 +364,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	if (opt->uuid)
 		count = 1;
 	for (i = 0; i < count; i++) {
-		if (!process_uuid(logfp, &rc, opt, &entry)) {
+		if (!process_uuid(&logs, &rc, opt, &entry)) {
 			retval.success = FALSE;
 			goto cleanup;
 		}
@@ -385,7 +388,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	 */
 
 cleanup:
-	if (logfp && (close_logfile(logfp) == EXIT_FAILURE))
+	if (logs.logfp && (close_logfile(logs.logfp) == EXIT_FAILURE))
 		retval.success = FALSE;
 
 	free(logfile);

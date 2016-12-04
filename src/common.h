@@ -137,6 +137,9 @@ struct Entry {
 	char *tty;
 	struct Sess sess[MAX_SESS];
 };
+struct Logs {
+	FILE *logfp;
+};
 struct Options {
 	char *comment;
 	unsigned int count;
@@ -184,7 +187,7 @@ extern void init_opt(struct Options *dest);
 extern char *process_comment_option(const char *cmt);
 extern int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
                              const struct Options *opt);
-extern char *process_uuid(FILE *logfp, const struct Rc *rc,
+extern char *process_uuid(struct Logs *logs, const struct Rc *rc,
                           const struct Options *opt, struct Entry *entry);
 extern void sighandler(const int sig);
 extern struct uuid_result create_and_log_uuids(const struct Options *opt);
