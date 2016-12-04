@@ -48,3 +48,8 @@ valgrind:
 valgrindall:
 	cd src && $(MAKE) valgrindall
 	cd tests && $(MAKE) testall
+
+.PHONY: valgrindboth
+valgrindboth:
+	cd src && $(MAKE) valgrindboth
+	cd tests && $(MAKE) testall

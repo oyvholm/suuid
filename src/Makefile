@@ -319,3 +319,8 @@ valgrind:
 .PHONY: valgrindall
 valgrindall:
 	$(MAKE) testcomb WHAT=valgrind
+
+.PHONY: valgrindboth
+valgrindboth:
+	$(MAKE) clean valgrind NO_SQLITE=1
+	$(MAKE) clean valgrind NO_SQLITE=
