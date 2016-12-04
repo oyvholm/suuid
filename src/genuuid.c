@@ -298,7 +298,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 {
 	struct uuid_result retval;
 	char *rcfile = NULL, *logfile = NULL;
-	FILE *logfp;
+	FILE *logfp = NULL;
 	unsigned int i, count;
 	struct Rc rc;
 	struct Entry entry;
@@ -362,7 +362,6 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 		count = 1;
 	for (i = 0; i < count; i++) {
 		if (!process_uuid(logfp, &rc, opt, &entry)) {
-			close_logfile(logfp);
 			retval.success = FALSE;
 			goto cleanup;
 		}
@@ -385,10 +384,10 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	 * Close up the shop and go home.
 	 */
 
-	if (close_logfile(logfp) == EXIT_FAILURE)
+cleanup:
+	if (logfp && (close_logfile(logfp) == EXIT_FAILURE))
 		retval.success = FALSE;
 
-cleanup:
 	free(logfile);
 	free_sess(&entry);
 	free_tags(&entry);
