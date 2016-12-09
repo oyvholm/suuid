@@ -36,7 +36,7 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s/^.*\/(.*?)$/$1/;
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 Getopt::Long::Configure('bundling');
 GetOptions(
@@ -147,7 +147,7 @@ sub main {
     # Execute the command, log start and end time with sub-second 
     # precision
     $begin_time = Time::HiRes::time();
-    $retval = system(@Cmd);
+    $retval = system(@Cmd) >> 8;
     $end_time = Time::HiRes::time();
 
     # Finish up by writing the end entry to the log file and then exit

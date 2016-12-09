@@ -41,7 +41,7 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s/^.*\/(.*?)$/$1/;
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 my $cdata = '[^<]+';
 my $Lh = "[0-9a-fA-F]";
@@ -208,6 +208,14 @@ END
 
     # }}}
 
+    diag("Test exit values");
+    test_exit_value($CMD, 0);
+    test_exit_value($CMD, 1);
+    test_exit_value($CMD, 7);
+    test_exit_value($CMD, 63);
+    test_exit_value($CMD, 120);
+    test_exit_value($CMD, 255);
+
     ok(unlink($logfile), "rm $logfile");
     ok(rmdir($logdir), "rmdir $logdir");
     ok(!-d $logdir, "$logdir is gone");
@@ -231,6 +239,21 @@ END
     return $Retval;
     # }}}
 } # main()
+
+sub test_exit_value {
+    my ($cmd, $val) = @_;
+
+    likecmd("$cmd ./retval.sh $val",
+        "/^Exit value $val\\n\$/",
+        "/^sess.begin:retval\\.sh/$v1_templ\\n" .
+            "sess.end:retval\\.sh/$v1_templ -- 00:00:\\d\\d.\\d+, " .
+            "exit code '$val'\\.\\n\$/",
+            $val,
+            "Exit value $val"
+    );
+
+    return;
+}
 
 sub testcmd {
     # {{{
