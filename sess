@@ -121,7 +121,8 @@ sub main {
     # Make sure there's no illegal characters in the -d/--description 
     # argument
     $descname = $Opt{'description'};
-    ($descname =~ /[^$legal_descchars]/) && die("$progname: $descname: Invalid characters in description\n");
+    ($descname =~ /[^$legal_descchars]/) &&
+        die("$progname: $descname: Invalid characters in description\n");
 
     # Remove all full stops from the beginning of the command to avoid 
     # setting $descname to '.' when './command' is specified
@@ -130,7 +131,8 @@ sub main {
 
     # If -d/--description is used, set $descname to the first sequence 
     # of legal characters
-    (!length($Opt{'description'}) && $stripstr =~ /^[^$legal_descchars]*([$legal_descchars]+).*/)
+    (!length($Opt{'description'})
+        && $stripstr =~ /^[^$legal_descchars]*([$legal_descchars]+).*/)
         && ($descname = $1);
     msg(1, "descname = '$descname'");
 
@@ -167,7 +169,8 @@ sub remove_last_uuid {
 sub write_end_entry {
     # {{{
     my $end_cmd = sprintf(
-        "suuid --raw%s -c \"<sess_end> <finished>%s</finished> <cmd>%s</cmd>%s <duration>%s </duration>%s </sess_end>\"",
+        "suuid --raw%s -c \"<sess_end> <finished>%s</finished> " .
+            "<cmd>%s</cmd>%s <duration>%s </duration>%s </sess_end>\"",
         (length($Opt{'tag'})
             ? " --tag $Opt{'tag'}"
             : ""
@@ -297,7 +300,8 @@ sub time_period {
 	$secs -= $Min * 60;
 
 	$Sec = sprintf("%.7f", $secs);
-    $Sec =~ s/^(\d\..*)/0$1/; # WTF. %02.7f in sprintf() dosn't work, so this is necessary ATM.
+    $Sec =~ s/^(\d\..*)/0$1/; # WTF. %02.7f in sprintf() dosn't work, so this 
+                              # is necessary ATM.
 
 	return(
         ($Day
