@@ -9,13 +9,15 @@
 #==============================================================================
 
 progname=ti
-VERSION=0.1.1
+VERSION=0.2.0
 
+opt_edit=0
 opt_help=0
 opt_quiet=0
 opt_verbose=0
 while test -n "$1"; do
 	case "$1" in
+	-e|--edit) opt_edit=1; shift ;;
 	-h|--help) opt_help=1; shift ;;
 	-q|--quiet) opt_quiet=$(($opt_quiet + 1)); shift ;;
 	-v|--verbose) opt_verbose=$(($opt_verbose + 1)); shift ;;
@@ -46,6 +48,8 @@ Usage: $progname [options] [comment]
 
 Options:
 
+  -e, --edit
+    Edit the comment with the default text editor used by suuid(1).
   -h, --help
     Show this help.
   -q, --quiet
@@ -59,7 +63,16 @@ END
 	exit 0
 fi
 
-test -z "$*" || suuid -t ti -c "$*" || { echo ti: suuid error >&2; exit 1; }
+if test "$opt_edit" = "1"; then
+	cmt="--"
+else
+	cmt="$*"
+fi
+
+test -z "$cmt" || suuid -t ti -c "$cmt" || {
+	echo ti: suuid error >&2
+	exit 1
+}
 LC_ALL=C stty -a | grep speed
 echo -n "$(date +"%Y-%m-%d %H:%M:%S %z") "
 tty
