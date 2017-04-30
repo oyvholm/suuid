@@ -70,7 +70,7 @@ else
 fi
 
 test -z "$cmt" || suuid -t ti -c "$cmt" || {
-	echo ti: suuid error >&2
+	echo $progname: suuid error >&2
 	exit 1
 }
 LC_ALL=C stty -a | grep speed
@@ -82,7 +82,7 @@ test -z "$SESS_UUID" || \
 test -z "$LOGGING_UUID" || {
 	echo LOGGING_UUID = $LOGGING_UUID
 	cd $HOME/log/script || {
-		echo ti: $HOME/log/script: Cannot chdir >&2
+		echo $progname: $HOME/log/script: Cannot chdir >&2
 		exit 1
 	}
 	ls | grep $LOGGING_UUID | grep scrlog
