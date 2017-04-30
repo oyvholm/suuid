@@ -35,6 +35,7 @@ while test -n "$1"; do
 	esac
 done
 opt_verbose=$(($opt_verbose - $opt_quiet))
+tag=ti
 
 if test "$opt_help" = "1"; then
 	test $opt_verbose -gt 0 && { echo; echo $progname $VERSION; }
@@ -42,7 +43,7 @@ if test "$opt_help" = "1"; then
 
 Display various status messages about the current tty with sess 
 information and optionally enter a comment into the suuid history with 
-the tag "ti". Used for various off-hand comments and notes.
+the tag "$tag". Used for various off-hand comments and notes.
 
 Usage: $progname [options] [comment]
 
@@ -69,7 +70,7 @@ else
 	cmt="$*"
 fi
 
-test -z "$cmt" || suuid -t ti -c "$cmt" || {
+test -z "$cmt" || suuid -t $tag -c "$cmt" || {
 	echo $progname: suuid error >&2
 	exit 1
 }
