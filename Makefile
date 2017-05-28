@@ -13,6 +13,9 @@ clean:
 	cd src && $(MAKE) clean
 	cd tests && $(MAKE) clean
 
+.PHONY: distclean
+distclean: clean
+
 .PHONY: testlock
 testlock:
 	cd src && $(MAKE) testlock
