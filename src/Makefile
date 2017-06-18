@@ -102,7 +102,7 @@ $(SESS_EXEC): $(SESS_OBJS) $(COMMON_OBJS)
 
 suuid.o: SUUID-VERSION suuid.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) suuid.c \
-	    '-DSUUID_VERSION="$(SUUID_VERSION)"' '-DSUUID_DATE="$(SUUID_DATE)"'
+	    '-DSUUID_VERSION=$(SUUID_VERSION)' '-DSUUID_DATE=$(SUUID_DATE)'
 
 database.o: database.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) database.c

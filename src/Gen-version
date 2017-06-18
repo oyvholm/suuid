@@ -11,7 +11,7 @@
 #==============================================================================
 
 progname=Gen-version
-VERSION=0.1.0
+VERSION=0.2.0
 
 suuid_version=0.4.0
 suuid_date=2016-12-02
@@ -78,8 +78,8 @@ else
 	suuid_fullversion=$suuid_version
 fi
 
-suuid_ver_output="SUUID_VERSION = $suuid_fullversion"
-suuid_date_output="SUUID_DATE = $suuid_date"
+suuid_ver_output="SUUID_VERSION=\"$suuid_fullversion\""
+suuid_date_output="SUUID_DATE=\"$suuid_date\""
 
 if test "$suuid_ver_output" != "$(cat SUUID-VERSION 2>/dev/null)"; then
 	echo $suuid_ver_output >SUUID-VERSION
