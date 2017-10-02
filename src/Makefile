@@ -150,7 +150,6 @@ clean:
 	rm -f $(SUUID_EXEC) $(SUUID_OBJS)
 	rm -f $(SESS_EXEC) $(SESS_OBJS)
 	rm -f sqlite3.o
-	rm -f *~ core core.$(SUUID_EXEC) tags
 	rm -fr $(TESTLOCKDIR)
 	cd t && $(MAKE) clean
 
