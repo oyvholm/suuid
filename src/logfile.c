@@ -716,7 +716,7 @@ FILE *open_logfile(const char *fname)
 	 * atomic, there's a small gap between the existence check and when 
 	 * it's opened and locked. It's hard to reproduce, and it's maybe a 
 	 * non-problem because it only happens when the file is created and 
-	 * lots of processes is hammering on it, that's an unlikely scenario. 
+	 * lots of processes are hammering on it, that's an unlikely scenario. 
 	 * Nevertheless, I'll look into it because it's kind of annoying.
 	 */
 
