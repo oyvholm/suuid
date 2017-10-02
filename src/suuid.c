@@ -56,13 +56,13 @@ int verbose_level(const int action, ...)
 
 int msg(const int verbose, const char *format, ...)
 {
-	va_list ap;
 	int retval = 0;
 
 	assert(format);
 	assert(strlen(format));
 
 	if (verbose_level(0) >= verbose) {
+		va_list ap;
 		va_start(ap, format);
 		retval = fprintf(stddebug, "%s: ", progname);
 		retval += vfprintf(stddebug, format, ap);
@@ -354,7 +354,6 @@ int choose_opt_action(struct Options *dest,
 int parse_options(struct Options *dest, const int argc, char * const argv[])
 {
 	int retval = EXIT_SUCCESS;
-	int c;
 
 	assert(dest);
 	assert(argv);
@@ -362,6 +361,7 @@ int parse_options(struct Options *dest, const int argc, char * const argv[])
 	init_opt(dest);
 
 	while (retval == EXIT_SUCCESS) {
+		int c;
 		int option_index = 0;
 		static struct option long_options[] = {
 			{"comment", required_argument, 0, 'c'},

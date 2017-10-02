@@ -28,15 +28,17 @@
 char *read_from_fp(FILE *fp)
 {
 	char *retval = NULL;
-	char *p = NULL;
-	size_t bytes_read = 0, total_bytes_read = 0;
+	size_t total_bytes_read = 0;
 	size_t bufsize = BUFSIZ;
 
 	assert(fp);
 
 	do {
+		char *p = NULL;
 		char *new_mem = realloc(retval,
 		                        bufsize + total_bytes_read + 1);
+		size_t bytes_read;
+
 		if (!new_mem) {
 			myerror("read_from_fp(): Cannot allocate memory for "
 			        "stream buffer");
