@@ -94,8 +94,6 @@ default: $(DEFAULT_DEPS)
 SUUID-VERSION: Gen-version suuid.c $(COMMON_C) $(SUUID_DEPS)
 	./Gen-version
 
--include SUUID-VERSION
-
 $(SUUID_EXEC): $(SUUID_OBJS) $(COMMON_OBJS)
 	$(LD) -o $(SUUID_EXEC) $(LDFLAGS) $(SUUID_OBJS) $(COMMON_OBJS) $(LIBS)
 
@@ -104,7 +102,8 @@ $(SESS_EXEC): $(SESS_OBJS) $(COMMON_OBJS)
 
 suuid.o: SUUID-VERSION suuid.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) suuid.c \
-	    '-DSUUID_VERSION=$(SUUID_VERSION)' '-DSUUID_DATE=$(SUUID_DATE)'
+	    -D$$(grep SUUID_VERSION SUUID-VERSION) \
+	    -D$$(grep SUUID_DATE SUUID-VERSION)
 
 database.o: database.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) database.c
