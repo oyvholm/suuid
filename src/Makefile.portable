@@ -112,6 +112,10 @@ edit: tags
 	$(EDITOR) $$(git ls-files | grep -v -e ^COPYING -e ^sqlite3 \
 	                                    -e \\.gitignore)
 
+.PHONY: gdb
+gdb: $(SUUID_EXEC)
+	gdb -tui -x gdbrc $$(cat gdbopts 2>/dev/null) $(SUUID_EXEC)
+
 .PHONY: test
 test: $(SUUID_EXEC)
 	cd t && $(MAKE) test
