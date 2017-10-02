@@ -15,7 +15,7 @@ progname=Gen-version
 suuid_version=0.4.0
 suuid_date=2016-12-02
 
-tag_prefix="v$suuid_version"
+tag_prefix="suuid-v$suuid_version"
 
 if test -d ../.git; then
 	if git tag | grep -q ^$tag_prefix; then
