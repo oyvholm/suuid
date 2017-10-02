@@ -60,9 +60,8 @@ bool valid_uuid(const char *u, const bool check_len)
 
 	if (!u || strlen(u) < UUID_LENGTH)
 		return FALSE;
-	if (check_len)
-		if (strlen(u) != UUID_LENGTH)
-			return FALSE;
+	if (check_len && strlen(u) != UUID_LENGTH)
+		return FALSE;
 
 	/*
 	 * Check that it only contains lowercase hex and dashes at the right 
