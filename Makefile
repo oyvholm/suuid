@@ -16,6 +16,10 @@ clean:
 .PHONY: distclean
 distclean: clean
 
+.PHONY: install
+install:
+	cd src && $(MAKE) install
+
 .PHONY: testlock
 testlock:
 	cd src && $(MAKE) testlock

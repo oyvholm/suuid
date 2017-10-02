@@ -2,6 +2,8 @@
 # File ID: 5cedd236-af56-11e6-92f6-279c2a0468a3
 # Author: Øyvind A. Holm <sunny@sunbase.org>
 
+PREFIX = /usr/local
+
 NO_SQLITE = 1
 
 SUUID_EXEC = suuid
@@ -161,6 +163,12 @@ edit: tags
 .PHONY: gdb
 gdb: $(SUUID_EXEC)
 	gdb -tui -x gdbrc $$(cat gdbopts 2>/dev/null) $(SUUID_EXEC)
+
+.PHONY: install
+install: $(PREFIX)/bin/$(SUUID_EXEC)
+
+$(PREFIX)/bin/$(SUUID_EXEC): $(SUUID_EXEC)
+	install $(SUUID_EXEC) $(PREFIX)/bin/$(SUUID_EXEC)
 
 .PHONY: test
 test: $(SUUID_EXEC)

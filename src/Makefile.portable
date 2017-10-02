@@ -2,6 +2,8 @@
 # File ID: 27e0d738-2b93-11e6-8668-02010e0a6634
 # Author: Øyvind A. Holm <sunny@sunbase.org>
 
+PREFIX = /usr/local
+
 SUUID_EXEC = suuid
 SESS_EXEC  = sess
 
@@ -115,6 +117,12 @@ edit: tags
 .PHONY: gdb
 gdb: $(SUUID_EXEC)
 	gdb -tui -x gdbrc $$(cat gdbopts 2>/dev/null) $(SUUID_EXEC)
+
+.PHONY: install
+install: $(PREFIX)/bin/$(SUUID_EXEC)
+
+$(PREFIX)/bin/$(SUUID_EXEC): $(SUUID_EXEC)
+	install $(SUUID_EXEC) $(PREFIX)/bin/$(SUUID_EXEC)
 
 .PHONY: test
 test: $(SUUID_EXEC)
