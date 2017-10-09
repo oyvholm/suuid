@@ -11,12 +11,14 @@
 progname=ti
 VERSION=0.2.0
 
+opt_dry_run=0
 opt_edit=0
 opt_help=0
 opt_quiet=0
 opt_verbose=0
 while test -n "$1"; do
 	case "$1" in
+	-n|--dry-run) opt_dry_run=1; shift ;;
 	-e|--edit) opt_edit=1; shift ;;
 	-h|--help) opt_help=1; shift ;;
 	-q|--quiet) opt_quiet=$(($opt_quiet + 1)); shift ;;
@@ -37,6 +39,8 @@ done
 opt_verbose=$(($opt_verbose - $opt_quiet))
 tag=ti
 
+test "$opt_dry_run" = "1" && sim=echo || sim=
+
 if test "$opt_help" = "1"; then
 	test $opt_verbose -gt 0 && { echo; echo $progname $VERSION; }
 	cat <<END
@@ -53,6 +57,9 @@ Options:
     Edit the comment with the default text editor used by suuid(1).
   -h, --help
     Show this help.
+  -n, --dry-run
+    Don't log the comment, only send the suuid command that would be 
+    executed to stdout.
   -q, --quiet
     Be more quiet. Can be repeated to increase silence.
   -v, --verbose
@@ -70,7 +77,7 @@ else
 	cmt="$*"
 fi
 
-test -z "$cmt" || suuid -t $tag -c "$cmt" || {
+test -z "$cmt" || $sim suuid -t $tag -c "$cmt" || {
 	echo $progname: suuid error >&2
 	exit 1
 }
