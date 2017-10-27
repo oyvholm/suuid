@@ -158,7 +158,7 @@ edit: tags
 
 .PHONY: gdb
 gdb: $(SUUID_EXEC)
-	gdb -tui -x gdbrc $$(cat gdbopts 2>/dev/null) $(SUUID_EXEC)
+	gdb -x gdbrc $$(cat gdbopts 2>/dev/null) $(SUUID_EXEC)
 
 .PHONY: install
 install: $(PREFIX)/bin/$(SUUID_EXEC)
