@@ -44,16 +44,8 @@
 #if 1 /* Set to 0 to test without prototypes */
 
 /* sess.c */
-extern int verbose_level(const int action, ...);
 extern int msg(const int verbose, const char *format, ...);
 extern int myerror(const char *format, ...);
-extern int print_license(void);
-extern int print_version(void);
-extern int usage(const int retval);
-extern int choose_opt_action(struct Options *dest,
-                             const int c, const struct option *opts);
-extern int parse_options(struct Options *dest,
-                         const int argc, char * const argv[]);
 
 #endif
 

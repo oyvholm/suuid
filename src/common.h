@@ -182,14 +182,7 @@ extern char *get_username(void);
 extern char *get_tty(void);
 
 /* genuuid.c */
-extern int init_randomness(void);
 extern void init_opt(struct Options *dest);
-extern char *process_comment_option(const char *cmt);
-extern int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
-                             const struct Options *opt);
-extern char *process_uuid(struct Logs *logs, const struct Rc *rc,
-                          const struct Options *opt, struct Entry *entry);
-extern void sighandler(const int sig);
 extern struct uuid_result create_and_log_uuids(const struct Options *opt);
 
 /* io.h */
@@ -199,43 +192,21 @@ extern char *read_from_editor(const char *editor);
 
 /* logfile.c */
 extern bool valid_xml_chars(const char *s);
-extern char *suuid_xml(const char *text);
 extern void init_xml_entry(struct Entry *e);
-extern char *allocate_elem(const char *elem, const char *src);
-extern char *alloc_attr(const char *attr, const char *data);
-extern char *get_xml_tags(const struct Entry *entry);
-extern char *create_sess_xml(const struct Entry *entry);
-extern char *xml_entry(const struct Entry *entry, const bool raw);
-extern FILE *lock_file(FILE *fp, const char *fname);
-extern FILE *write_xml_header(FILE *fp);
-extern FILE *seek_to_eof(FILE *fp, const char *fname);
-extern FILE *unknown_end_line(FILE *fp, const char *fname);
-extern FILE *check_last_log_line(FILE *fp, const char *fname);
-extern FILE *seek_to_entry_pos(FILE *fp, const char *fname);
 extern FILE *open_logfile(const char *fname);
 extern int add_to_logfile(FILE *fp, const struct Entry *entry, const bool raw);
 extern int close_logfile(FILE *fp);
 
 /* rcfile.c */
 extern char *get_rcfilename(const struct Options *opt);
-extern char *has_key(const char *line, const char *keyword);
-extern int parse_rc_line(const char *line, struct Rc *rc);
 extern int read_rcfile(const char *rcfile, struct Rc *rc);
 
 /* selftest.c */
 extern int run_self_tests(void);
 
 /* sessvar.c */
-extern bool is_legal_desc_char(const unsigned char c);
-extern bool is_valid_desc_string(const char *s);
-extern char *get_desc_from_command(const char *cmd);
-extern int fill_sess(struct Entry *dest, const char *uuid,
-                     const char *desc, const size_t desclen);
 extern int get_sess_info(struct Entry *entry);
 extern void free_sess(struct Entry *entry);
-extern char *concat_cmd_string(const int argc, char * const argv[]);
-extern char *clean_up_sessvar(char *dest);
-extern const char *add_to_sessvar(const char *desc, const char *uuid);
 extern int run_session(const struct Options *orig_opt,
                        const int argc, char * const argv[]);
 
@@ -249,7 +220,6 @@ extern char *utf8_check(const char *text);
 
 /* tag.c */
 extern void rewind_tag(void);
-extern bool tag_exists(const struct Entry *entry, const char *tag);
 extern char *get_next_tag(const struct Entry *entry);
 extern int store_tag(struct Entry *entry, const char *arg);
 extern void free_tags(struct Entry *entry);
@@ -257,10 +227,7 @@ extern void free_tags(struct Entry *entry);
 /* uuid.c */
 extern bool valid_macaddr(const char *macaddr);
 extern bool valid_uuid(const char *u, const bool check_len);
-extern char *scramble_mac_address(char *uuid);
 extern char *generate_uuid(const struct Rc *rc, const bool random_mac);
-extern char *uuid_date(char *dest, const char *uuid);
-extern bool is_valid_date(const char *s, const bool check_len);
 extern char *uuid_date_from_uuid(char *dest, const char *uuid);
 extern char *scan_for_uuid(const char *s);
 
