@@ -187,7 +187,6 @@ extern struct uuid_result create_and_log_uuids(const struct Options *opt);
 
 /* io.h */
 extern char *read_from_fp(FILE *fp);
-extern char *read_from_file(const char *fname);
 extern char *read_from_editor(const char *editor);
 
 /* logfile.c */

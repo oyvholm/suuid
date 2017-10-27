@@ -44,16 +44,12 @@
 #if 1 /* Set to 0 to test without prototypes */
 
 /* sess.c */
-extern int msg(const int verbose, const char *format, ...);
-extern int myerror(const char *format, ...);
 
 #endif
 
 /*
  * Global variables
  */
-
-extern char *progname;
 
 #endif /* ifndef _SESS_H */
 
