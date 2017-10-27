@@ -138,24 +138,14 @@ int print_license(void)
 int print_version(void)
 {
 	printf("%s %s (%s)\n", progname, SUUID_VERSION, SUUID_DATE);
-#ifdef USE_SQLITE
-	printf("Linked against SQLite %s\n", sqlite3_libversion());
-#endif
-#if defined(FAKE_HOST) || defined(TEST_FUNC)
-	printf("\nThis version is compiled with the following conditional "
-               "directives:\n");
-#endif
 #ifdef FAKE_HOST
-	printf("\nFAKE_HOST: Always return \"fake\" as hostname. This is to "
-	       "make sure it \n"
-	       "doesn't write to the real log file.\n");
+	printf("has FAKE_HOST\n");
 #endif
 #ifdef TEST_FUNC
-	printf("\nTEST_FUNC: Send non-option command line arguments to "
-	       "various functions \n"
-	       "for testing. This doesn't break anything, as the program only "
-	       "checks for \n"
-	       "options. Non-option arguments are ignored.\n");
+	printf("has TEST_FUNC\n");
+#endif
+#ifdef USE_SQLITE
+	printf("has USE_SQLITE %s\n", sqlite3_libversion());
 #endif
 
 	return EXIT_SUCCESS;

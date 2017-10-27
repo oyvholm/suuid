@@ -138,23 +138,18 @@ int print_license(void)
 int print_version(void)
 {
 	printf("%s %s (%s)\n", progname, VERSION, RELEASE_DATE);
-#ifdef USE_SQLITE
-	printf("Linked against SQLite %s\n", sqlite3_libversion());
-#endif
 	printf("\n*** THIS PROGRAM IS UNFINISHED, DON'T USE ***\n");
-#if defined(FAKE_HOST) || defined(PERL_COMPAT)
-	printf("\nThis version is compiled with the following conditional "
-               "directives:\n");
-#endif
 #ifdef FAKE_HOST
-	printf("\nFAKE_HOST: Always return \"fake\" as hostname. This is to "
-	       "make sure it \n"
-	       "doesn't write to the real log file.\n");
+	printf("has FAKE_HOST\n");
 #endif
 #ifdef PERL_COMPAT
-	printf("\nPERL_COMPAT: Suppress the new and better behaviour, behave "
-	       "just like the \n"
-	       "original Perl version to make the tests succeed.\n");
+	printf("has PERL_COMPAT\n");
+#endif
+#ifdef TEST_FUNC
+	printf("has TEST_FUNC\n");
+#endif
+#ifdef USE_SQLITE
+	printf("has USE_SQLITE %s\n", sqlite3_libversion());
 #endif
 
 	return EXIT_SUCCESS;
