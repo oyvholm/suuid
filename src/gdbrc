@@ -1,12 +1,15 @@
-set args -vvvvv -l logdir
+!mkdir -p logdir
+set args -vvvvv -l logdir -n 10
 set confirm off
 set pagination off
+skip function allocate_elem
 skip function check_hex
 skip function free_sess
 skip function free_tags
 skip function get_hostname
 skip function get_log_prefix
 skip function get_logdir
+skip function get_next_tag
 skip function get_rcfilename
 skip function get_tty
 skip function get_username
@@ -16,19 +19,24 @@ skip function init_xml_entry
 skip function is_legal_desc_char
 skip function is_valid_date
 skip function is_valid_desc_string
+skip function lock_file
 skip function msg
+skip function myerror
 skip function parse_options
 skip function parse_rc_line
 skip function print_license
 skip function print_version
 skip function read_rcfile
+skip function rewind_tag
 skip function scan_for_uuid
 skip function sqlite3_close_v2
 skip function sqlite3_open_v2
+skip function suuid_xml
 skip function trim_str_end
 skip function trim_str_front
 skip function utf8_check
 skip function valid_hostname
+skip function valid_macaddr
 skip function valid_uuid
 skip function verbose_level
 tui enable
