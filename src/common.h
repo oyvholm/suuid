@@ -27,7 +27,7 @@
  * Standard header files
  */
 
-#ifndef NO_SQLITE
+#ifdef USE_SQLITE
 #  include "sqlite3.h"
 #endif
 
