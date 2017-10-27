@@ -4,8 +4,6 @@
 
 PREFIX = /usr/local
 
-USE_SQLITE = 1
-
 SUUID_EXEC = suuid
 SESS_EXEC  = sess
 
@@ -35,7 +33,7 @@ ifdef FAKE_HOST
 	CCFLAGS += -DFAKE_HOST
 endif
 
-# USE_SQLITE: Compile without SQLite.
+# USE_SQLITE: Compile with SQLite.
 ifdef USE_SQLITE
 	CCFLAGS += -pedantic -DUSE_SQLITE
 endif
@@ -58,7 +56,7 @@ LDFLAGS = -Wall -Wextra -Werror
 # Linux (gcc)    : -lpthread -ldl
 # FreeBSD (clang): -lpthread
 LIBS =
-ifndef USE_SQLITE
+ifdef USE_SQLITE
 	LIBS += -lpthread
 	ifeq ($(UNAME), Linux)
 		LIBS += -ldl
@@ -67,10 +65,10 @@ endif
 
 # For regular use, it's not necessary to modify anything below this line.
 
-# If compiling without -DUSE_SQLITE, add sqlite3.o to COMMON_OBJS
+# If compiling with -DUSE_SQLITE, add sqlite3.o to COMMON_OBJS
 COMMON_OBJS = database.o environ.o genuuid.o io.o logfile.o \
               rcfile.o selftest.o sessvar.o string.o tag.o uuid.o
-ifndef USE_SQLITE
+ifdef USE_SQLITE
 	COMMON_OBJS += sqlite3.o
 endif
 
@@ -196,12 +194,12 @@ testcomb: clean $(WHAT)
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
 	$(MAKE) clean $(WHAT) FAKE_HOST= USE_SQLITE=
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
-	test -n "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -z "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
 	$(MAKE) clean $(WHAT) FAKE_HOST= USE_SQLITE=1
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
-	test -z "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -n "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
 	# FAKE_HOST=1
@@ -212,23 +210,23 @@ testcomb: clean $(WHAT)
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
 	$(MAKE) clean $(WHAT) FAKE_HOST=1 USE_SQLITE=
 	test -n "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
-	test -n "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -z "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
 	$(MAKE) clean $(WHAT) FAKE_HOST=1 USE_SQLITE=1
 	test -n "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
-	test -z "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -n "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
 	# USE_SQLITE
 	$(MAKE) clean $(WHAT) USE_SQLITE=
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
-	test -n "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -z "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
 	$(MAKE) clean $(WHAT) USE_SQLITE=1
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
-	test -z "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -n "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
 	# PERL_COMPAT=
@@ -239,12 +237,12 @@ testcomb: clean $(WHAT)
 	test -z "$$(./$(SESS_EXEC) --version | grep 'TEST_FUNC:')"
 	$(MAKE) clean $(WHAT) PERL_COMPAT= USE_SQLITE=
 	test -n "$$(./$(SESS_EXEC) --version | grep 'FAKE_HOST:')"
-	test -n "$$(./$(SESS_EXEC) --version | grep $(LINKED_STR))"
+	test -z "$$(./$(SESS_EXEC) --version | grep $(LINKED_STR))"
 	test -n "$$(./$(SESS_EXEC) --version | grep 'PERL_COMPAT:')"
 	test -z "$$(./$(SESS_EXEC) --version | grep 'TEST_FUNC:')"
 	$(MAKE) clean $(WHAT) PERL_COMPAT= USE_SQLITE=1
 	test -n "$$(./$(SESS_EXEC) --version | grep 'FAKE_HOST:')"
-	test -z "$$(./$(SESS_EXEC) --version | grep $(LINKED_STR))"
+	test -n "$$(./$(SESS_EXEC) --version | grep $(LINKED_STR))"
 	test -n "$$(./$(SESS_EXEC) --version | grep 'PERL_COMPAT:')"
 	test -z "$$(./$(SESS_EXEC) --version | grep 'TEST_FUNC:')"
 	# PERL_COMPAT=1
@@ -255,12 +253,12 @@ testcomb: clean $(WHAT)
 	test -z "$$(./$(SESS_EXEC) --version | grep 'TEST_FUNC:')"
 	$(MAKE) clean $(WHAT) PERL_COMPAT=1 USE_SQLITE=
 	test -n "$$(./$(SESS_EXEC) --version | grep 'FAKE_HOST:')"
-	test -n "$$(./$(SESS_EXEC) --version | grep $(LINKED_STR))"
+	test -z "$$(./$(SESS_EXEC) --version | grep $(LINKED_STR))"
 	test -n "$$(./$(SESS_EXEC) --version | grep 'PERL_COMPAT:')"
 	test -z "$$(./$(SESS_EXEC) --version | grep 'TEST_FUNC:')"
 	$(MAKE) clean $(WHAT) PERL_COMPAT=1 USE_SQLITE=1
 	test -n "$$(./$(SESS_EXEC) --version | grep 'FAKE_HOST:')"
-	test -z "$$(./$(SESS_EXEC) --version | grep $(LINKED_STR))"
+	test -n "$$(./$(SESS_EXEC) --version | grep $(LINKED_STR))"
 	test -n "$$(./$(SESS_EXEC) --version | grep 'PERL_COMPAT:')"
 	test -z "$$(./$(SESS_EXEC) --version | grep 'TEST_FUNC:')"
 	# TEST_FUNC=
@@ -271,12 +269,12 @@ testcomb: clean $(WHAT)
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
 	$(MAKE) clean $(WHAT) TEST_FUNC= USE_SQLITE=
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
-	test -n "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -z "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
 	$(MAKE) clean $(WHAT) TEST_FUNC= USE_SQLITE=1
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
-	test -z "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -n "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
 	# TEST_FUNC=1
@@ -287,12 +285,12 @@ testcomb: clean $(WHAT)
 	test -n "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
 	$(MAKE) clean $(WHAT) TEST_FUNC=1 USE_SQLITE=
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
-	test -n "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -z "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
 	test -n "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
 	$(MAKE) clean $(WHAT) TEST_FUNC=1 USE_SQLITE=1
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'FAKE_HOST:')"
-	test -z "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
+	test -n "$$(./$(SUUID_EXEC) --version | grep $(LINKED_STR))"
 	test -z "$$(./$(SUUID_EXEC) --version | grep 'PERL_COMPAT:')"
 	test -n "$$(./$(SUUID_EXEC) --version | grep 'TEST_FUNC:')"
 
