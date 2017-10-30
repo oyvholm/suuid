@@ -118,16 +118,22 @@ char *read_from_editor(const char *editor)
 
 	if (system(cmdbuf) == -1) {
 		myerror("read_from_editor(): Cannot execute \"%s\"", cmdbuf);
-		return NULL;
+		retval = NULL;
+		goto cleanup;
 	}
 
 	retval = read_from_file(tmpfile);
-	if (!retval)
-		return NULL;
+	if (!retval) {
+		retval = NULL;
+		goto cleanup;
+	}
 
 	if (remove(tmpfile) == -1)
 		myerror("Warning: Could not remove temporary file \"%s\"",
 		        tmpfile);
+
+cleanup:
+	free(cmdbuf);
 
 	return retval;
 }
