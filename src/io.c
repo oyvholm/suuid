@@ -102,7 +102,7 @@ char *read_from_editor(const char *editor)
 	assert(strlen(editor));
 
 	if (mkstemp(tmpfile) == -1) {
-		myerror("read_from_editor(): Could not create file name for"
+		myerror("read_from_editor(): Could not create file name for "
 		        "temporary file");
 		return NULL;
 	}
