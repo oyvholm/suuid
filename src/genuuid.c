@@ -307,6 +307,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 
 	assert(opt);
 
+	memset(&rc, 0, sizeof(rc));
 	logs.logfp = NULL;
 	count = opt->count;
 	retval.count = 0;
