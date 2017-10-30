@@ -1,4 +1,7 @@
 *.o
+/*.gcda
+/*.gcno
+/*.gcov
 /SUUID-VERSION
 /logdir/
 /sess

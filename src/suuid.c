@@ -141,6 +141,9 @@ int print_version(void)
 #ifdef FAKE_HOST
 	printf("has FAKE_HOST\n");
 #endif
+#ifdef GCOV
+	printf("has GCOV\n");
+#endif
 #ifdef TEST_FUNC
 	printf("has TEST_FUNC\n");
 #endif

@@ -21,6 +21,9 @@ UNAME := $(shell uname)
 # Clang 3.8.0 on FreeBSD 11.0 works with -pedantic.
 CCFLAGS = -Wall -Wextra -Werror -O0 -c -g
 
+CCFLAGS += $$(test -n "$(GCOV)" && \
+              echo -n "-fprofile-arcs -ftest-coverage -DGCOV=1")
+
 # sqlite3.c gives warnings on NetBSD and OpenBSD, as described in 
 # ../doc/netbsd.txt and ../doc/openbsd.txt. Temporarily disable -Werror for 
 # sqlite3.c until this is sorted out.
@@ -61,6 +64,7 @@ ifdef USE_SQLITE
 		LIBS += -ldl
 	endif
 endif
+LIBS += $$(test -n "$(GCOV)" && echo "-lgcov --coverage");
 
 # For regular use, it's not necessary to modify anything below this line.
 
@@ -148,6 +152,7 @@ clean:
 	rm -f $(SUUID_EXEC) $(SUUID_OBJS)
 	rm -f $(SESS_EXEC) $(SESS_OBJS)
 	rm -f sqlite3.o
+	rm -f *.gcda *.gcno *.gcov
 	rm -fr $(TESTLOCKDIR)
 	cd t && $(MAKE) clean
 
