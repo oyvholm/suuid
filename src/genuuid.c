@@ -299,7 +299,8 @@ void sighandler(const int sig)
 struct uuid_result create_and_log_uuids(const struct Options *opt)
 {
 	struct uuid_result retval;
-	char *rcfile = NULL, *logfile = NULL;
+	char *rcfile = NULL;
+	char *logfile = NULL;
 	unsigned int i, count;
 	struct Rc rc;
 	struct Entry entry;
