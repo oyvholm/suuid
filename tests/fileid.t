@@ -156,7 +156,7 @@ END
     );
 
     # }}}
-    my $uuid_tmpfile = glob("$logdir/*");
+    my $uuid_tmpfile = glob("$logdir/*.xml");
     ok(-f $uuid_tmpfile, "uuid file exists");
 
     diag("Cleaning up...");

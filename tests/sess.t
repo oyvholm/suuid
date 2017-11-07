@@ -169,7 +169,7 @@ END
     );
 
     # }}}
-    my $logfile = glob("$logdir/*");
+    my $logfile = glob("$logdir/*.xml");
     like(file_data($logfile), # {{{
         '/^' . $xml_header .
         join(' ',
