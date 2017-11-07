@@ -161,6 +161,16 @@ edit: tags
 	$(EDITOR) $$(git ls-files | grep -v -e ^COPYING -e ^sqlite3 \
 	                                    -e \\.gitignore)
 
+.PHONY: gcov
+gcov: clean
+	$(MAKE) GCOV=1
+	$(MAKE) test
+	gcov suuid.c sess.c $(COMMON_C)
+
+.PHONY: gcov-cmt
+gcov-cmt: gcov
+	gcov-cmt suuid.c sess.c $(COMMON_C)
+
 .PHONY: gdb
 gdb: $(SUUID_EXEC)
 	gdb -x gdbrc $$(cat gdbopts 2>/dev/null) $(SUUID_EXEC)
