@@ -143,6 +143,26 @@ END
     );
 
     # }}}
+    diag('--license option');
+    likecmd("$CMD --license", # {{{
+            '/GNU General Public License' .
+            '.*' .
+            'either version 2 of the License/s',
+            '/^$/',
+            0,
+            'Option --license displays the program license');
+
+    # }}}
+    diag('Unknown option');
+    likecmd("$CMD --gurgle", # {{{
+            '/^$/',
+            "/\\.\\.\\/$CMD_BASENAME: Option error\\n" .
+            "\\nType \"\\.\\.\\/$CMD_BASENAME --help\" for help screen\\. " .
+            "Returning with value 1\\.\\n/s",
+            1,
+            'Unknown option specified');
+
+    # }}}
 
     $ENV{'HOME'} = "/dontexist/$Outdir";
     delete $ENV{'SESS_UUID'};
