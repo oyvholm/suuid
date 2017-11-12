@@ -53,16 +53,9 @@ char *get_editor(void)
 			return NULL;
 		}
 	} else {
-		/*
-		 * Unable to get path to the editor from the environment, use a 
-		 * hardcoded value.
-		 */
-		retval = strdup(STD_EDITOR); /* It's free()'ed later */
-		if (!retval) {
-			myerror("get_editor(): Could not duplicate \"%s\"",
-			        STD_EDITOR);
-			return NULL;
-		}
+		myerror("Environment variables %s and EDITOR aren't defined, "
+		        "cannot start editor", ENV_EDITOR);
+		retval = NULL;
 	}
 
 	return retval;

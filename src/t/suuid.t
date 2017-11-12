@@ -1077,8 +1077,14 @@ sub test_suuid_editor {
     execute_editor($Outdir, $Outfile,
                    "SUUID_EDITOR is empty, use EDITOR");
 
+    $ENV{'EDITOR'} = "";
+    editor_fail($Outdir, $Outfile,
+                "both SUUID_EDITOR and EDITOR are empty");
+
     delete $ENV{'SUUID_EDITOR'};
     delete $ENV{'EDITOR'};
+    editor_fail($Outdir, $Outfile,
+                "neither SUUID_EDITOR nor EDITOR are defined");
     # }}}
 }
 
@@ -1103,6 +1109,23 @@ sub execute_editor {
 
     # }}}
     ok(unlink($Outfile), "Delete [Outfile]");
+    # }}}
+}
+
+sub editor_fail {
+    # {{{
+    my ($Outdir, $Outfile, $msg) = @_;
+
+    testcmd("$CMD -c -- -l $Outdir", # {{{
+        "",
+        "../$CMD_BASENAME: Environment variables SUUID_EDITOR and EDITOR " .
+        "aren't defined, cannot start editor\n",
+        1,
+        "\"-c --\", $msg",
+    );
+
+    # }}}
+    ok(!-e $Outfile, "[Outfile] doesn't exist");
     # }}}
 }
 

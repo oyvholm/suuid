@@ -195,12 +195,10 @@ int usage(const int retval)
 	       "(\"--\") as a \n"
 	       "    comment opens the editor defined in the environment "
 	       "variable \n"
-	       "    %s to edit the message. If %s is "
-	       "not defined, \n"
-	       "    EDITOR is read, if not defined, \"%s\" is called, it "
-	       "should exist \n"
-	       "    everywhere. It may not, but it should.\n",
-	       ENV_EDITOR, ENV_EDITOR, STD_EDITOR);
+	       "    %s to edit the message. If %s is not defined, \n"
+	       "    the value from EDITOR is used. If none of these variables "
+	       "are \n"
+	       "    defined, the program aborts.\n", ENV_EDITOR, ENV_EDITOR);
 	printf("  -h, --help\n"
 	       "    Show this help.\n");
 	printf("  --license\n"
