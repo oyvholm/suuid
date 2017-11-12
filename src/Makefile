@@ -156,6 +156,10 @@ clean:
 	rm -fr $(TESTLOCKDIR)
 	cd t && $(MAKE) clean
 
+.PHONY: clean-gcov
+clean-gcov:
+	gcov-cmt -d suuid.c sess.c $(COMMON_C)
+
 .PHONY: edit
 edit: tags
 	$(EDITOR) $$(git ls-files | grep -v -e ^COPYING -e ^sqlite3 \
