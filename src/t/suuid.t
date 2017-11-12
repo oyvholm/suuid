@@ -752,6 +752,7 @@ sub test_suuid_executable {
     # }}}
     ok(unlink($Outfile), "Delete [Outfile]");
     test_suuid_comment($Outdir, $Outfile);
+    test_suuid_editor($Outdir, $Outfile);
     diag("Testing -n (--count) option...");
     testcmd("$CMD --count j", # {{{
         "",
@@ -1035,6 +1036,51 @@ sub test_suuid_comment {
     return;
     # }}}
 } # test_suuid_comment()
+
+sub test_suuid_editor {
+    # {{{
+    my ($Outdir, $Outfile) = @_;
+
+    diag("Create comment with external editor");
+
+    $ENV{'SUUID_EDITOR'} = "./fake-editor";
+    $ENV{'EDITOR'} = "./not-exist";
+    execute_editor($Outdir, $Outfile, "use SUUID_EDITOR, " .
+                   "EDITOR is defined, but ignored");
+
+    delete $ENV{'SUUID_EDITOR'};
+    $ENV{'EDITOR'} = "./fake-editor";
+    execute_editor($Outdir, $Outfile,
+                   "SUUID_EDITOR is undefined, use EDITOR");
+
+    delete $ENV{'SUUID_EDITOR'};
+    delete $ENV{'EDITOR'};
+    # }}}
+}
+
+sub execute_editor {
+    # {{{
+    my ($Outdir, $Outfile, $msg) = @_;
+
+    likecmd("$CMD --comment -- -l $Outdir", # {{{
+        "/^$v1_templ\n\$/s",
+        '/^$/',
+        0,
+        "\"--comment --\", $msg",
+    );
+
+    # }}}
+    like(file_data($Outfile), # {{{
+        s_top(
+            s_suuid('txt' => 'Text from editor')
+        ),
+        "Log contents OK after $msg",
+    );
+
+    # }}}
+    ok(unlink($Outfile), "Delete [Outfile]");
+    # }}}
+}
 
 sub test_suuid_environment {
     # {{{
