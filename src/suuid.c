@@ -137,6 +137,10 @@ int print_license(void)
 
 int print_version(void)
 {
+	if (verbose_level(0) < 0) {
+		puts(SUUID_VERSION);
+		return EXIT_SUCCESS;
+	}
 	printf("%s %s (%s)\n", progname, SUUID_VERSION, SUUID_DATE);
 #ifdef FAKE_HOST
 	printf("has FAKE_HOST\n");

@@ -143,6 +143,13 @@ END
     );
 
     # }}}
+    likecmd("$CMD --version --quiet", # {{{
+            '/^\d+\.\d+\.\d+\S+$/',
+            '/^$/',
+            0,
+            '--version with --quiet shows only the version number');
+
+    # }}}
     diag('--license option');
     likecmd("$CMD --license", # {{{
             '/GNU General Public License' .
