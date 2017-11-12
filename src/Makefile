@@ -23,6 +23,7 @@ CCFLAGS = -Wall -Wextra -Werror -O0 -c -g
 
 CCFLAGS += $$(test -n "$(GCOV)" && \
               echo -n "-fprofile-arcs -ftest-coverage -DGCOV=1")
+CCFLAGS += $$(test -n "$(NDEBUG)" && echo -n "-DNDEBUG=1")
 
 # sqlite3.c gives warnings on NetBSD and OpenBSD, as described in 
 # ../doc/netbsd.txt and ../doc/openbsd.txt. Temporarily disable -Werror for 

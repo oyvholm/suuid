@@ -151,6 +151,9 @@ int print_version(void)
 #ifdef TEST_FUNC
 	printf("has TEST_FUNC\n");
 #endif
+#ifdef NDEBUG
+	printf("has NDEBUG\n");
+#endif
 #ifdef USE_SQLITE
 	printf("has USE_SQLITE %s\n", sqlite3_libversion());
 #endif
