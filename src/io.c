@@ -97,6 +97,7 @@ char *read_from_editor(const char *editor)
 	     tmpfile[] = ".tmp-suuid.XXXXXX",
 	     *cmdbuf;
 	size_t size;
+	int r;
 
 	assert(editor);
 	assert(strlen(editor));
@@ -116,8 +117,12 @@ char *read_from_editor(const char *editor)
 	}
 	snprintf(cmdbuf, size, "%s %s", editor, tmpfile);
 
-	if (system(cmdbuf) == -1) {
+	r = system(cmdbuf);
+	if (r == -1 || r >> 8 == 127) {
 		myerror("read_from_editor(): Cannot execute \"%s\"", cmdbuf);
+		if (access(tmpfile, F_OK) != -1)
+			fprintf(stderr, "%s: File contents is stored in "
+			        "temporary file %s\n", progname, tmpfile);
 		retval = NULL;
 		goto cleanup;
 	}

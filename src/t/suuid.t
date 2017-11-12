@@ -1053,6 +1053,25 @@ sub test_suuid_editor {
     execute_editor($Outdir, $Outfile,
                    "SUUID_EDITOR is undefined, use EDITOR");
 
+    $ENV{'EDITOR'} = "./not-exist";
+    ok(!-e $ENV{'EDITOR'}, "$ENV{'EDITOR'} doesn't exist");
+    my @tmpglob = glob(".tmp-suuid.*");
+    scalar(@tmpglob) && unlink(@tmpglob);
+    is(glob(".tmp-suuid.*"), undef, "No .tmp-suuid.* files exist");
+    likecmd("$CMD --comment -- -l $Outdir", # {{{
+        '/^$/s',
+        "/\\.\\.\\/$CMD_BASENAME: read_from_editor\\(\\): Cannot execute " .
+        "\"\\.\\/not-exist \\.tmp-suuid\\./",
+        1,
+        "\"--comment --\", SUUID_EDITOR is undefined, " .
+        "EDITOR has non-existing editor",
+    );
+
+    # }}}
+    @tmpglob = glob(".tmp-suuid.*");
+    is(scalar(@tmpglob), 1, "One .tmp-suuid.* tempfile is created");
+    ok(unlink($tmpglob[0]), "Delete tempfile");
+
     delete $ENV{'SUUID_EDITOR'};
     delete $ENV{'EDITOR'};
     # }}}
