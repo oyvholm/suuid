@@ -134,6 +134,14 @@ END
     );
 
     # }}}
+    likecmd("$CMD -vvv --version", # {{{
+        '/^\S+ \d+\.\d+\.\S+ \(\d\d\d\d-\d\d-\d\d\)\n/s',
+        '/^\S+ Using verbose level 3\n$/',
+        0,
+        '-vvv displays verbosity message',
+    );
+
+    # }}}
     diag('Testing --version option...');
     likecmd("$CMD --version", # {{{
         '/^\S+ \d+\.\d+\.\S+ \(\d\d\d\d-\d\d-\d\d\)\n/',
@@ -745,6 +753,17 @@ sub test_suuid_executable {
     ok(unlink($Outfile), "Delete [Outfile]");
     test_suuid_comment($Outdir, $Outfile);
     diag("Testing -n (--count) option...");
+    testcmd("$CMD --count j", # {{{
+        "",
+        "../$CMD_BASENAME: Error in -n/--count argument\n" .
+        "../$CMD_BASENAME: Option error\n" .
+        "\nType \"../$CMD_BASENAME --help\" for help screen. " .
+        "Returning with value 1.\n",
+        1,
+        "Invalid value in --count argument",
+    );
+
+    # }}}
     likecmd("$CMD -n 5 -c \"Great test\" -t testeri -l $Outdir", # {{{
         "/^($v1_templ\n){5}\$/s",
         '/^$/',
