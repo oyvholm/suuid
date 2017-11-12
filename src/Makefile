@@ -166,10 +166,14 @@ gcov: clean
 	$(MAKE) GCOV=1
 	$(MAKE) test
 	gcov suuid.c sess.c $(COMMON_C)
+	@echo $$(grep -E '^ +#####:' *.c.gcov | wc -l) gcov markers
 
 .PHONY: gcov-cmt
 gcov-cmt: gcov
 	gcov-cmt suuid.c sess.c $(COMMON_C)
+	@echo $$( \
+	    grep ' /\* gcov \*/' suuid.c sess.c $(COMMON_C) | wc -l \
+	) gcov markers
 
 .PHONY: gdb
 gdb: $(SUUID_EXEC)
