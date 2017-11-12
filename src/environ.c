@@ -28,23 +28,25 @@
 char *get_editor(void)
 {
 	char *retval;
+	char *e1 = getenv(ENV_EDITOR);
+	char *e2 = getenv("EDITOR");
 
-	if (getenv(ENV_EDITOR)) {
+	if (e1 && strlen(e1)) {
 		/*
 		 * Use the editor specified in an environment variable used 
 		 * only by this program.
 		 */
-		retval = strdup(getenv(ENV_EDITOR));
+		retval = strdup(e1);
 		if (!retval) {
 			myerror("get_editor(): Could not duplicate "
 			        "%s environment variable", ENV_EDITOR);
 			return NULL;
 		}
-	} else if (getenv("EDITOR")) {
+	} else if (e2 && strlen(e2)) {
 		/*
 		 * Use the default environment variable all programs use.
 		 */
-		retval = strdup(getenv("EDITOR"));
+		retval = strdup(e2);
 		if (!retval) {
 			myerror("get_editor(): Could not duplicate "
 			        "EDITOR environment variable");

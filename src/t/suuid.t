@@ -1072,6 +1072,11 @@ sub test_suuid_editor {
     is(scalar(@tmpglob), 1, "One .tmp-suuid.* tempfile is created");
     ok(unlink($tmpglob[0]), "Delete tempfile");
 
+    $ENV{'SUUID_EDITOR'} = "";
+    $ENV{'EDITOR'} = "./fake-editor";
+    execute_editor($Outdir, $Outfile,
+                   "SUUID_EDITOR is empty, use EDITOR");
+
     delete $ENV{'SUUID_EDITOR'};
     delete $ENV{'EDITOR'};
     # }}}
