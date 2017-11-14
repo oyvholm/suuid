@@ -173,6 +173,9 @@ gcov: clean
 	gcov suuid.c sess.c $(COMMON_C)
 	@echo $$(grep -E '^ +#####:' *.c.gcov | wc -l) gcov markers
 
+.PHONY: gcov-clean
+gcov-clean: clean-gcov
+
 .PHONY: gcov-cmt
 gcov-cmt: gcov
 	gcov-cmt suuid.c sess.c $(COMMON_C)
