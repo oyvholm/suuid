@@ -20,6 +20,13 @@
 
 #include "suuid.h"
 
+int test_errno(void)
+{
+	errno = EACCES;
+	myerror("errno is EACCES");
+	return EXIT_SUCCESS;
+}
+
 /*
  * selftest() - Run internal testing to check that it works on the current 
  * system. Executed if --selftest is used.
@@ -28,12 +35,15 @@
 
 int selftest(void)
 {
-	int retval = EXIT_SUCCESS;
+	int total = 1; /* Update this when adding or deleting tests */
+	int fail = 0;
 
-	printf("1..1\n");
-	printf("ok 1 - No tests created yet\n");
+	printf("1..%u\n", total);
+	if (!(fail += test_errno()))
+		printf("ok 1 - myerror() when errno is EACCES\n");
+	fprintf(stderr, "# %u/%u tests failed\n", fail, total);
 
-	return retval;
+	return fail;
 }
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */

@@ -28,6 +28,7 @@ INSERT INTO synced VALUES('src/Gen-version','Lib/std/c/Gen-version','9746b7b6112
 INSERT INTO synced VALUES('src/Makefile','Lib/std/c/Makefile','4f1d59b1929757ad25b2321821fce598627d5d55','2017-10-02 15:10:57');
 INSERT INTO synced VALUES('src/common.h','Lib/std/c/std.h','4f1d59b1929757ad25b2321821fce598627d5d55','2017-10-02 15:10:57');
 INSERT INTO synced VALUES('src/gdbrc','Lib/std/c/gdbrc','4f1d59b1929757ad25b2321821fce598627d5d55','2017-10-02 15:10:57');
+INSERT INTO synced VALUES('src/selftest.c','Lib/std/c/selftest.c','9746b7b61124066a687a57641c12a3a1e363b0ee','2017-12-18 16:37:23');
 INSERT INTO synced VALUES('src/suuid.c','Lib/std/c/std.c','4f1d59b1929757ad25b2321821fce598627d5d55','2017-10-02 15:10:57');
 INSERT INTO synced VALUES('src/suuid.h','Lib/std/c/std.h','4f1d59b1929757ad25b2321821fce598627d5d55','2017-10-02 15:10:57');
 INSERT INTO synced VALUES('src/t/suuid.t','Lib/std/perl-tests','5d9a5b337cbc4997dfa181e3fd9a9484487b5605','2016-10-25 02:43:03');
