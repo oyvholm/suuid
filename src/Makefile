@@ -89,16 +89,14 @@ DEFAULT_DEPS = $(SUUID_EXEC)
 .PHONY: default
 default: $(DEFAULT_DEPS)
 
-SUUID-VERSION: Gen-version suuid.c $(COMMON_C) $(SUUID_DEPS)
+version.h: Gen-version suuid.c $(COMMON_C) $(SUUID_DEPS)
 	./Gen-version
 
 $(SUUID_EXEC): $(SUUID_OBJS) $(COMMON_OBJS)
 	$(LD) -o $(SUUID_EXEC) $(LDFLAGS) $(SUUID_OBJS) $(COMMON_OBJS) $(LIBS)
 
-suuid.o: SUUID-VERSION suuid.c $(SUUID_DEPS)
-	$(CC) $(CCFLAGS) suuid.c \
-	    -D$$(grep SUUID_VERSION SUUID-VERSION) \
-	    -D$$(grep SUUID_DATE SUUID-VERSION)
+suuid.o: version.h suuid.c $(SUUID_DEPS)
+	$(CC) $(CCFLAGS) suuid.c
 
 database.o: database.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) database.c
@@ -138,7 +136,7 @@ uuid.o: uuid.c $(SUUID_DEPS)
 
 .PHONY: clean
 clean:
-	rm -f SUUID-VERSION
+	rm -f version.h
 	rm -f $(COMMON_OBJS)
 	rm -f $(SUUID_EXEC) $(SUUID_OBJS)
 	rm -f sqlite3.o

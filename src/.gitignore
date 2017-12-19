@@ -2,8 +2,8 @@
 /*.gcda
 /*.gcno
 /*.gcov
-/SUUID-VERSION
 /logdir/
 /suuid
 /tags
 /testlockdir/
+/version.h
