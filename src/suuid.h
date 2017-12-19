@@ -24,16 +24,12 @@
 #include "common.h"
 
 /*
- * Function prototypes
+ * Public function prototypes
  */
-
-#if 1 /* Set to 0 to test without prototypes */
 
 /* suuid.c */
 extern int msg(const int verbose, const char *format, ...);
 extern int myerror(const char *format, ...);
-
-#endif
 
 /*
  * Global variables
