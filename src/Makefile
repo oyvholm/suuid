@@ -5,7 +5,6 @@
 PREFIX = /usr/local
 
 SUUID_EXEC = suuid
-SESS_EXEC  = sess
 
 TESTLOCKDIR = testlockdir
 CTAGS = ctags
@@ -77,18 +76,15 @@ ifdef USE_SQLITE
 endif
 
 SUUID_OBJS  = suuid.o
-SESS_OBJS   = sess.o
 
 COMMON_C = environ.c genuuid.c io.c logfile.c rcfile.c \
            selftest.c sessvar.c string.c tag.c uuid.c
 
 SUUID_HFILES = suuid.h common.h
-SESS_HFILES  = sess.h common.h
 
 SUUID_DEPS = $(SUUID_HFILES) Makefile
-SESS_DEPS  = $(SESS_HFILES) $(SUUID_DEPS) Makefile
 
-DEFAULT_DEPS = $(SUUID_EXEC) $(SESS_EXEC)
+DEFAULT_DEPS = $(SUUID_EXEC)
 
 .PHONY: default
 default: $(DEFAULT_DEPS)
@@ -98,9 +94,6 @@ SUUID-VERSION: Gen-version suuid.c $(COMMON_C) $(SUUID_DEPS)
 
 $(SUUID_EXEC): $(SUUID_OBJS) $(COMMON_OBJS)
 	$(LD) -o $(SUUID_EXEC) $(LDFLAGS) $(SUUID_OBJS) $(COMMON_OBJS) $(LIBS)
-
-$(SESS_EXEC): $(SESS_OBJS) $(COMMON_OBJS)
-	$(LD) -o $(SESS_EXEC) $(LDFLAGS) $(SESS_OBJS) $(COMMON_OBJS) $(LIBS)
 
 suuid.o: SUUID-VERSION suuid.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) suuid.c \
@@ -128,9 +121,6 @@ rcfile.o: rcfile.c $(SUUID_DEPS)
 selftest.o: selftest.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) selftest.c
 
-sess.o: sess.c $(SESS_DEPS)
-	$(CC) $(CCFLAGS) sess.c
-
 sessvar.o: sessvar.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) sessvar.c
 
@@ -151,7 +141,6 @@ clean:
 	rm -f SUUID-VERSION
 	rm -f $(COMMON_OBJS)
 	rm -f $(SUUID_EXEC) $(SUUID_OBJS)
-	rm -f $(SESS_EXEC) $(SESS_OBJS)
 	rm -f sqlite3.o
 	rm -f *.gcda *.gcno *.gcov
 	rm -fr $(TESTLOCKDIR)
@@ -159,7 +148,7 @@ clean:
 
 .PHONY: clean-gcov
 clean-gcov:
-	gcov-cmt -d suuid.c sess.c $(COMMON_C)
+	gcov-cmt -d suuid.c $(COMMON_C)
 
 .PHONY: edit
 edit: tags
@@ -170,7 +159,7 @@ edit: tags
 gcov: clean
 	$(MAKE) GCOV=1
 	$(MAKE) test
-	gcov suuid.c sess.c $(COMMON_C)
+	gcov suuid.c $(COMMON_C)
 	@echo $$(grep -E '^ +#####:' *.c.gcov | wc -l) gcov markers
 
 .PHONY: gcov-clean
@@ -178,9 +167,9 @@ gcov-clean: clean-gcov
 
 .PHONY: gcov-cmt
 gcov-cmt: gcov
-	gcov-cmt suuid.c sess.c $(COMMON_C)
+	gcov-cmt suuid.c $(COMMON_C)
 	@echo $$( \
-	    grep ' /\* gcov \*/' suuid.c sess.c $(COMMON_C) | wc -l \
+	    grep ' /\* gcov \*/' suuid.c $(COMMON_C) | wc -l \
 	) gcov markers
 
 .PHONY: gdb
@@ -255,12 +244,10 @@ testlock: $(SUUID_EXEC)
 	for f in $$(seq 1 500); do ./$(SUUID_EXEC) -wn -l $(TESTLOCKDIR); done
 
 .PHONY: testnew
-testnew: test $(SESS_EXEC)
-	cd t && ./sess.t
+testnew: test
 
-tags: $(COMMON_C) suuid.c sess.c $(SUUID_HFILES) $(SESS_HFILES) t/suuid.t
-	$(CTAGS) $(COMMON_C) suuid.c sess.c $(SUUID_HFILES) $(SESS_HFILES) \
-	    t/suuid.t
+tags: $(COMMON_C) suuid.c $(SUUID_HFILES) t/suuid.t
+	$(CTAGS) $(COMMON_C) suuid.c $(SUUID_HFILES) t/suuid.t
 
 .PHONY: valgrind
 valgrind:
