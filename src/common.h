@@ -21,9 +21,17 @@
 #ifndef _COMMON_H
 #define _COMMON_H
 
-/*
- * Standard header files
- */
+#define FALSE  0
+#define TRUE   1
+
+#define T_RESET  "\x1b[m\x0f"
+#define T_RED    "\x1b[31m"
+#define T_GREEN  "\x1b[32m"
+
+#define DATE_LENGTH  28 /* Length of ISO date format with nanoseconds */
+#define UUID_LENGTH  36 /* Length of a standard UUID */
+
+#define stddebug  stderr
 
 #include "version.h"
 
@@ -45,18 +53,6 @@
 #include <sys/file.h>
 #include <sys/time.h>
 #include <unistd.h>
-
-#define FALSE  0
-#define TRUE   1
-
-#define T_RESET  "\x1b[m\x0f"
-#define T_RED    "\x1b[31m"
-#define T_GREEN  "\x1b[32m"
-
-#define DATE_LENGTH  28 /* Length of ISO date format with nanoseconds */
-#define UUID_LENGTH  36 /* Length of a standard UUID */
-
-#define stddebug  stderr
 
 #define ENV_EDITOR  "SUUID_EDITOR" /* Name of editor to use with "-c --" */
 #define ENV_SESS  "SESS_UUID" /* Name of environment variable where the session 
@@ -104,16 +100,8 @@
 #  endif
 #endif
 
-/*
- * Macros
- */
-
 #define DEBL  msg(2, "%s, line %u in %s()", __FILE__, __LINE__, __func__)
 #define in_range(a,b,c)  ((a) >= (b) && (a) <= (c) ? TRUE : FALSE)
-
-/*
- * Typedefs
- */
 
 typedef unsigned char bool;
 struct Rc {
@@ -162,10 +150,8 @@ struct uuid_result {
 };
 
 /*
- * Function prototypes
+ * Public function prototypes
  */
-
-#if 1 /* Set to 0 to test without prototypes */
 
 /* database.c */
 
@@ -228,8 +214,6 @@ extern bool valid_uuid(const char *u, const bool check_len);
 extern char *generate_uuid(const struct Rc *rc, const bool random_mac);
 extern char *uuid_date_from_uuid(char *dest, const char *uuid);
 extern char *scan_for_uuid(const char *s);
-
-#endif
 
 #endif /* ifndef _COMMON_H */
 
