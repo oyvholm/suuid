@@ -21,12 +21,12 @@
 #include "suuid.h"
 
 /*
- * run_self_tests() - Run internal testing to check that it works on the 
- * current system. Executed if --self-test is used.
- * Returns EXIT_FAILURE if any tests fail, EXIT_SUCCESS otherwise.
+ * selftest() - Run internal testing to check that it works on the current 
+ * system. Executed if --selftest is used.
+ * Returns number of failed tests.
  */
 
-int run_self_tests(void)
+int selftest(void)
 {
 	int retval = EXIT_SUCCESS;
 

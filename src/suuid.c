@@ -425,7 +425,7 @@ int main(int argc, char *argv[])
 	if (opt.help)
 		return usage(EXIT_SUCCESS);
 	if (opt.selftest)
-		return run_self_tests();
+		return selftest();
 	if (opt.version)
 		return print_version();
 	if (opt.license)

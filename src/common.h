@@ -186,7 +186,7 @@ extern char *get_rcfilename(const struct Options *opt);
 extern int read_rcfile(const char *rcfile, struct Rc *rc);
 
 /* selftest.c */
-extern int run_self_tests(void);
+extern int selftest(void);
 
 /* sessvar.c */
 extern int get_sess_info(struct Entry *entry);
