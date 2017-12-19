@@ -61,7 +61,7 @@ void init_opt(struct Options *dest)
 	dest->random_mac = FALSE;
 	dest->raw = FALSE;
 	dest->rcfile = NULL;
-	dest->self_test = FALSE;
+	dest->selftest = FALSE;
 	dest->uuid = NULL;
 	dest->verbose = 0;
 	dest->version = FALSE;
