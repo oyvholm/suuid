@@ -166,9 +166,6 @@ gcov-clean: clean-gcov
 .PHONY: gcov-cmt
 gcov-cmt: gcov
 	gcov-cmt suuid.c $(COMMON_C)
-	@echo $$( \
-	    grep ' /\* gcov \*/' suuid.c $(COMMON_C) | wc -l \
-	) gcov markers
 
 .PHONY: gdb
 gdb: $(SUUID_EXEC)
