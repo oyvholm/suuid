@@ -160,6 +160,7 @@ char *generate_uuid(const struct Rc *rc, const bool random_mac)
  * NULL if it's not a valid v1 UUID.
  */
 
+#ifdef UNUSED
 char *uuid_date(char *dest, const char *uuid)
 {
 	/* fixme: unfinished */
@@ -183,6 +184,7 @@ char *uuid_date(char *dest, const char *uuid)
 
 	return dest;
 }
+#endif
 
 /*
  * is_valid_date() - Check that the date pointed to by s is valid. If check_len 

@@ -44,6 +44,7 @@ char *check_hex(const char *hex, const size_t len)
  * chars with a single char. Returns s if ok, NULL if error.
  */
 
+#ifdef UNUSED
 char *squeeze_chars(char *s, const char *chars)
 {
 	char *p = s, *p2, *buf;
@@ -73,6 +74,7 @@ char *squeeze_chars(char *s, const char *chars)
 
 	return s;
 }
+#endif
 
 /*
  * string_to_lower() - Convert all characters in str to lower case.

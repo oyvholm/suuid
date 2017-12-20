@@ -59,6 +59,7 @@ bool is_valid_desc_string(const char *s)
  * NULL or empty, or if something fails or cmd is NULL or empty, return NULL.
  */
 
+#ifdef UNUSED
 char *get_desc_from_command(const char *cmd)
 {
 	char *ap, *p, *p2;
@@ -84,6 +85,7 @@ char *get_desc_from_command(const char *cmd)
 
 	return ap;
 }
+#endif
 
 /*
  * fill_sess() - Fill the first available dest->sess element with uuid and desc 
@@ -222,6 +224,7 @@ void free_sess(struct Entry *entry)
  * allocated string containing the command, or NULL if anything fails.
  */
 
+#ifdef UNUSED
 char *concat_cmd_string(const int argc, char * const argv[])
 {
 	int t;
@@ -257,12 +260,14 @@ char *concat_cmd_string(const int argc, char * const argv[])
 
 	return cmd;
 }
+#endif
 
 /*
  * clean_up_sessvar() - Modifies dest by removing trailing and repeated commas. 
  * Returns dest.
  */
 
+#ifdef UNUSED
 char *clean_up_sessvar(char *dest)
 {
 	unsigned int i;
@@ -278,6 +283,7 @@ char *clean_up_sessvar(char *dest)
 
 	return dest;
 }
+#endif
 
 /*
  * add_to_sessvar() - Modify the session environment variable (defined in 
@@ -286,6 +292,7 @@ char *clean_up_sessvar(char *dest)
  * EXIT_FAILURE if anything fails or uuid isn't a valid UUID.
  */
 
+#ifdef UNUSED
 const char *add_to_sessvar(const char *desc, const char *uuid)
 {
 	size_t envlen; /* Length of the new string */
@@ -340,6 +347,7 @@ const char *add_to_sessvar(const char *desc, const char *uuid)
 
 	return getenv(ENV_SESS);
 }
+#endif
 
 /*
  * run_session() - Execute a shell command and log it with start time, end time 
@@ -348,6 +356,7 @@ const char *add_to_sessvar(const char *desc, const char *uuid)
  * the return value from the program.
  */
 
+#ifdef UNUSED
 int run_session(const struct Options *orig_opt,
                 const int argc, char * const argv[])
 {
@@ -402,5 +411,6 @@ cleanup:
 
 	return(retval);
 }
+#endif
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */
