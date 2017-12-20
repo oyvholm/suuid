@@ -43,7 +43,7 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s/^.*\/(.*?)$/$1/;
-our $VERSION = '0.4.0';
+our $VERSION = '0.0.0'; # Not used here, $CMD decides
 
 my %descriptions = ();
 
@@ -91,10 +91,9 @@ exit(main());
 sub main {
 	my $Retval = 0;
 
-	diag(sprintf('========== Executing %s v%s ==========',
-	             $progname, $VERSION));
+	diag('========== BEGIN version info ==========');
 	diag(`$CMD --version`);
-	diag('');
+	diag('=========== END version info ===========');
 
 	if ($Opt{'todo'} && !$Opt{'all'}) {
 		goto todo_section;
@@ -109,6 +108,10 @@ sub main {
 	test_standard_options();
 	test_test_functions();
 	test_suuid_executable();
+
+	diag('========== BEGIN version info ==========');
+	diag(`$CMD --version`);
+	diag('=========== END version info ===========');
 
 	todo_section:
 	;
