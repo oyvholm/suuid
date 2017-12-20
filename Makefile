@@ -46,6 +46,10 @@ testboth:
 tags: src/*.c src/*.h
 	ctags src/*.c src/*.h
 
+.PHONY: uninstall
+uninstall:
+	cd src && $(MAKE) uninstall
+
 .PHONY: valgrind
 valgrind:
 	cd src && $(MAKE) valgrind

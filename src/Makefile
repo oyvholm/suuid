@@ -247,6 +247,10 @@ testlock: $(SUUID_EXEC)
 .PHONY: testnew
 testnew: test
 
+.PHONY: uninstall
+uninstall:
+	rm -f $(PREFIX)/bin/$(SUUID_EXEC)
+
 .PHONY: valgrind
 valgrind:
 	cd t && $(MAKE) valgrind
