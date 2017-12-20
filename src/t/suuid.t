@@ -116,75 +116,13 @@ END
 
 =cut
 
-	diag('Testing -h (--help) option...');
-	likecmd("$CMD -h", # {{{
-		'/  Show this help/i',
-		'/^$/',
-		0,
-		'Option -h prints help screen',
-	);
-
-	# }}}
-	diag('Testing -v (--verbose) option...');
-	likecmd("$CMD -hv", # {{{
-		'/^\n\S+ \d+\.\d+\.\S+ \(\d\d\d\d-\d\d-\d\d\)\n/s',
-		'/^$/',
-		0,
-		'Option -v with -h returns version number and help screen',
-	);
-
-	# }}}
-	likecmd("$CMD -vvv --version", # {{{
-		'/^\S+ \d+\.\d+\.\S+ \(\d\d\d\d-\d\d-\d\d\)\n/s',
-		'/^\S+ Using verbose level 3\n$/',
-		0,
-		'-vvv displays verbosity message',
-	);
-
-	# }}}
-	diag('Testing --version option...');
-	likecmd("$CMD --version", # {{{
-		'/^\S+ \d+\.\d+\.\S+ \(\d\d\d\d-\d\d-\d\d\)\n/',
-		'/^$/',
-		0,
-		'Option --version returns version number',
-	);
-
-	# }}}
-	likecmd("$CMD --version --quiet", # {{{
-			'/^\d+\.\d+\.\d+\S+$/',
-			'/^$/',
-			0,
-			'--version with --quiet shows only the version number');
-
-	# }}}
-	diag('--license option');
-	likecmd("$CMD --license", # {{{
-			'/GNU General Public License' .
-			'.*' .
-			'either version 2 of the License/s',
-			'/^$/',
-			0,
-			'Option --license displays the program license');
-
-	# }}}
-	diag('Unknown option');
-	likecmd("$CMD --gurgle", # {{{
-			'/^$/',
-			"/\\.\\.\\/$CMD_BASENAME: Option error\\n" .
-			"\\nType \"\\.\\.\\/$CMD_BASENAME --help\" for help screen\\. " .
-			"Returning with value 1\\.\\n/s",
-			1,
-			'Unknown option specified');
-
-	# }}}
-
 	$ENV{'HOME'} = "/dontexist/$Outdir";
 	delete $ENV{'SESS_UUID'};
 	delete $ENV{'SUUID_EDITOR'};
 	delete $ENV{'SUUID_HOSTNAME'};
 	delete $ENV{'SUUID_LOGDIR'};
 
+	test_standard_options();
 	test_test_functions();
 	test_suuid_executable();
 
@@ -207,6 +145,53 @@ END
 	return $Retval;
 	# }}}
 } # main()
+
+sub test_standard_options {
+	diag('Testing -h (--help) option...');
+	likecmd("$CMD -h",
+	        '/  Show this help/i',
+	        '/^$/',
+	        0,
+	        'Option -h prints help screen');
+
+	diag('Testing -v (--verbose) option...');
+	likecmd("$CMD -hv",
+	        '/^\n\S+ \d+\.\d+\.\d+/s',
+	        '/^$/',
+	        0,
+	        'Option -v with -h returns version number and help screen');
+
+	diag('Testing --version option...');
+	likecmd("$CMD --version",
+	        '/^\S+ \d+\.\d+\.\d+/',
+	        '/^$/',
+	        0,
+	        'Option --version returns version number');
+	likecmd("$CMD --version --quiet",
+	        '/^\d+\.\d+\.\d+\S*$/',
+	        '/^$/',
+	        0,
+	        '--version with --quiet shows only the version number');
+
+	diag('--license option');
+	likecmd("$CMD --license",
+	        '/GNU General Public License' .
+	        '.*' .
+	        'either version 2 of the License/s',
+	        '/^$/',
+	        0,
+	        'Option --license displays the program license');
+
+	diag('Unknown option');
+	likecmd("$CMD --gurgle",
+	        '/^$/',
+	        "/\\.\\.\\/$CMD_BASENAME: Option error\\n" .
+	        "\\nType \"\\.\\.\\/$CMD_BASENAME --help\" for help screen\\. " .
+	        "Returning with value 1\\.\\n/s",
+	        1,
+	        'Unknown option specified');
+	return;
+}
 
 sub test_test_functions {
 	# {{{
