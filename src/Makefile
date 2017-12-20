@@ -136,11 +136,11 @@ uuid.o: uuid.c $(SUUID_DEPS)
 
 .PHONY: clean
 clean:
+	rm -f $(SUUID_EXEC) $(SUUID_OBJS)
+	rm -f *.gcda *.gcno *.gcov
 	rm -f version.h
 	rm -f $(COMMON_OBJS)
-	rm -f $(SUUID_EXEC) $(SUUID_OBJS)
 	rm -f sqlite3.o
-	rm -f *.gcda *.gcno *.gcov
 	rm -fr $(TESTLOCKDIR)
 	cd t && $(MAKE) clean
 
