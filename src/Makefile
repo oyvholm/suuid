@@ -153,7 +153,7 @@ edit: tags
 gcov:
 	$(MAKE) clean test GCOV=1
 	gcov suuid.c $(COMMON_C)
-	@echo $$(grep -E '^ +#####:' *.c.gcov | wc -l) gcov markers
+	@echo $$(grep -E '^ +#####:' *.c.gcov | wc -l) untested lines >&2
 
 .PHONY: gcov-cmt
 gcov-cmt: gcov
