@@ -180,6 +180,9 @@ install: $(PREFIX)/bin/$(SUUID_EXEC)
 $(PREFIX)/bin/$(SUUID_EXEC): $(SUUID_EXEC)
 	install $(SUUID_EXEC) $(PREFIX)/bin/$(SUUID_EXEC)
 
+tags: $(COMMON_C) suuid.c $(SUUID_HFILES) t/suuid.t
+	$(CTAGS) $(COMMON_C) suuid.c $(SUUID_HFILES) t/suuid.t
+
 .PHONY: test
 test: $(SUUID_EXEC)
 	cd t && $(MAKE) test
@@ -243,9 +246,6 @@ testlock: $(SUUID_EXEC)
 
 .PHONY: testnew
 testnew: test
-
-tags: $(COMMON_C) suuid.c $(SUUID_HFILES) t/suuid.t
-	$(CTAGS) $(COMMON_C) suuid.c $(SUUID_HFILES) t/suuid.t
 
 .PHONY: valgrind
 valgrind:
