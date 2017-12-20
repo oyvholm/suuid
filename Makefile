@@ -2,8 +2,8 @@
 # File ID: c9f9bc1a-28d8-11e5-b53c-fefdb24f8e10
 # Author: Øyvind A. Holm <sunny@sunbase.org>
 
-.PHONY: default
-default:
+.PHONY: all
+all:
 	cd src && $(MAKE)
 
 .PHONY: clean

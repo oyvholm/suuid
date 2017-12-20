@@ -86,8 +86,8 @@ SUUID_DEPS = $(SUUID_HFILES) Makefile
 
 DEFAULT_DEPS = $(SUUID_EXEC)
 
-.PHONY: default
-default: $(DEFAULT_DEPS)
+.PHONY: all
+all: $(DEFAULT_DEPS)
 
 version.h: Gen-version suuid.c $(COMMON_C) $(SUUID_DEPS)
 	./Gen-version
