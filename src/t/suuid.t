@@ -1721,7 +1721,8 @@ sub testcmd {
 	$retval &= is(`$Cmd$stderr_cmd`, $Exp_stdout, "$Txt (stdout)");
 	my $ret_val = $?;
 	if (defined($Exp_stderr)) {
-		$retval &= is(file_data($TMP_STDERR), $Exp_stderr, "$Txt (stderr)");
+		$retval &= is(file_data($TMP_STDERR),
+		              $Exp_stderr, "$Txt (stderr)");
 		unlink($TMP_STDERR);
 	} else {
 		diag("Warning: stderr not defined for '$Txt'");
@@ -1749,7 +1750,8 @@ sub likecmd {
 	$retval &= like(`$Cmd$stderr_cmd`, $Exp_stdout, "$Txt (stdout)");
 	my $ret_val = $?;
 	if (defined($Exp_stderr)) {
-		$retval &= like(file_data($TMP_STDERR), $Exp_stderr, "$Txt (stderr)");
+		$retval &= like(file_data($TMP_STDERR),
+		                $Exp_stderr, "$Txt (stderr)");
 		unlink($TMP_STDERR);
 	} else {
 		diag("Warning: stderr not defined for '$Txt'");
