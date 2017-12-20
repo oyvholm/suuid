@@ -140,29 +140,13 @@ char *get_hostname(const struct Rc *rc)
 
 char *get_logdir(const struct Options *opt)
 {
-	char *retval = NULL;
+	char *p = NULL, *retval = NULL;
 
-	if (opt && opt->logdir) {
-		/*
-		 * The log directory is specified via the -l/--logdir argument.
-		 */
-		retval = strdup(opt->logdir);
-		if (!retval) {
-			myerror("get_logdir(): Could not duplicate "
-			        "-l/--logdir argument");
-			return NULL;
-		}
-	} else if (getenv(ENV_LOGDIR)) {
-		/*
-		 * Read logdir name from a dedicated environment variable.
-		 */
-		retval = strdup(getenv(ENV_LOGDIR));
-		if (!retval) {
-			myerror("get_logdir(): Could not duplicate %s "
-			        "environment variable", ENV_LOGDIR);
-			return NULL;
-		}
-	} else if (getenv("HOME")) {
+	if (opt && opt->logdir)
+		p = opt->logdir;
+	else if (getenv(ENV_LOGDIR))
+		p = getenv(ENV_LOGDIR);
+	else if (getenv("HOME")) {
 		/*
 		 * Use default hardcoded value.
 		 */
@@ -170,11 +154,6 @@ char *get_logdir(const struct Options *opt)
 		           strlen("/uuids") + 1; /* fixme: slash */
 
 		retval = malloc(size + 1);
-		if (!retval) {
-			myerror("get_logdir(): Cannot allocate %lu bytes",
-			        size);
-			return NULL;
-		}
 		snprintf(retval, size, "%s/uuids", /* fixme: slash */
 		                       getenv("HOME"));
 	} else {
@@ -183,6 +162,10 @@ char *get_logdir(const struct Options *opt)
 		                "create logdir path\n", progname, ENV_LOGDIR);
 		return NULL;
 	}
+	if (p)
+		retval = strdup(p);
+	if (!retval)
+		myerror("get_logdir(): Memory allocation error");
 
 	return retval;
 }
