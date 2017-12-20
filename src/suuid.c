@@ -25,6 +25,7 @@
  */
 
 char *progname;
+int simfail = 0;
 
 /*
  * verbose_level() - Get or set the verbosity level. If action is 0, return the 
@@ -94,7 +95,7 @@ int myerror(const char *format, ...)
 	va_start(ap, format);
 	retval += vfprintf(stderr, format, ap);
 	va_end(ap);
-	if (orig_errno)
+	if (orig_errno || simfail == 1)
 		retval += fprintf(stderr, ": %s", strerror(orig_errno));
 	retval += fprintf(stderr, "\n");
 
@@ -236,6 +237,9 @@ int usage(const int retval)
 	       "    Increase level of verbosity. Can be repeated.\n");
 	printf("  --selftest\n"
 	       "    Run the built-in test suite.\n");
+	printf("  --simfail NUM\n"
+	       "    Simulate a failure at position NUM. "
+	       "Used by the test suite.\n");
 	printf("  --version\n"
 	       "    Print version information.\n");
 	printf("  -w x, --whereto x\n"
@@ -299,6 +303,8 @@ int choose_opt_action(struct Options *dest,
 			dest->rcfile = optarg;
 		else if (!strcmp(opts->name, "selftest"))
 			dest->selftest = TRUE;
+		else if (!strcmp(opts->name, "simfail"))
+			dest->simfail = simfail = atoi(optarg);
 		else if (!strcmp(opts->name, "version"))
 			dest->version = TRUE;
 		break;
@@ -374,6 +380,7 @@ int parse_options(struct Options *dest, const int argc, char * const argv[])
 			{"raw", no_argument, 0, 0},
 			{"rcfile", required_argument, 0, 0},
 			{"selftest", no_argument, 0, 0},
+			{"simfail", required_argument, 0, 0},
 			{"tag", required_argument, 0, 't'},
 			{"verbose", no_argument, 0, 'v'},
 			{"version", no_argument, 0, 0},

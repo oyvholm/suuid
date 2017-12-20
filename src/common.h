@@ -137,6 +137,7 @@ struct Options {
 	bool raw;
 	char *rcfile;
 	bool selftest;
+	int simfail;
 	char *tag[MAX_TAGS];
 	char *uuid;
 	int verbose;
