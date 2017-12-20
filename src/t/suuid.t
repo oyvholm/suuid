@@ -106,6 +106,7 @@ sub main {
 	delete $ENV{'SUUID_LOGDIR'};
 
 	test_standard_options();
+	test_executable();
 	test_test_functions();
 	test_suuid_executable();
 
@@ -174,6 +175,19 @@ sub test_standard_options {
 	        1,
 	        'Unknown option specified');
 	return;
+}
+
+sub test_executable {
+	diag("--selftest");
+	testcmd("$CMD --selftest",
+	        <<END,
+# myerror("errno is EACCES")
+END
+	        <<END,
+../$CMD_BASENAME: errno is EACCES: Permission denied
+END
+	        0,
+	        '--selftest');
 }
 
 sub test_test_functions {
