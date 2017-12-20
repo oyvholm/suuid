@@ -144,10 +144,6 @@ clean:
 	rm -fr $(TESTLOCKDIR)
 	cd t && $(MAKE) clean
 
-.PHONY: clean-gcov
-clean-gcov:
-	gcov-cmt -d suuid.c $(COMMON_C)
-
 .PHONY: edit
 edit: tags
 	$(EDITOR) $$(git ls-files | grep -v -e ^COPYING -e ^sqlite3 \
@@ -160,12 +156,13 @@ gcov: clean
 	gcov suuid.c $(COMMON_C)
 	@echo $$(grep -E '^ +#####:' *.c.gcov | wc -l) gcov markers
 
-.PHONY: gcov-clean
-gcov-clean: clean-gcov
-
 .PHONY: gcov-cmt
 gcov-cmt: gcov
 	gcov-cmt suuid.c $(COMMON_C)
+
+.PHONY: gcov-cmt-clean
+gcov-cmt-clean:
+	gcov-cmt -d suuid.c $(COMMON_C)
 
 .PHONY: gdb
 gdb: $(SUUID_EXEC)
