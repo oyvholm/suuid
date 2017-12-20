@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-#=======================================================================
+#==============================================================================
 # tests/suuid.t
 # File ID: 7a006334-f988-11dd-8845-000475e441b9
 #
@@ -8,9 +8,9 @@
 #
 # Character set: UTF-8
 # ©opyleft 2008– Øyvind A. Holm <sunny@sunbase.org>
-# License: GNU General Public License version 2 or later, see end of 
-# file for legal stuff.
-#=======================================================================
+# License: GNU General Public License version 2 or later, see end of file for 
+# legal stuff.
+#==============================================================================
 
 use strict;
 use warnings;
@@ -89,7 +89,6 @@ if ($Opt{'valgrind'}) {
 exit(main());
 
 sub main {
-	# {{{
 	my $Retval = 0;
 
 	diag(sprintf('========== Executing %s v%s ==========',
@@ -100,21 +99,6 @@ sub main {
 	if ($Opt{'todo'} && !$Opt{'all'}) {
 		goto todo_section;
 	}
-
-=pod
-
-	testcmd("$CMD command", # {{{
-		<<'END',
-[expected stdout]
-END
-		'',
-		0,
-		'description',
-	);
-
-	# }}}
-
-=cut
 
 	$ENV{'HOME'} = "/dontexist/$Outdir";
 	delete $ENV{'SESS_UUID'};
@@ -130,21 +114,17 @@ END
 	;
 
 	if ($Opt{'all'} || $Opt{'todo'}) {
-		diag('Running TODO tests...'); # {{{
-
+		diag('Running TODO tests...');
 		TODO: {
-
 			local $TODO = '';
 			# Insert TODO tests here.
-
 		}
-		# TODO tests }}}
 	}
 
 	diag('Testing finished.');
+
 	return $Retval;
-	# }}}
-} # main()
+}
 
 sub test_standard_options {
 	diag('Testing -h (--help) option...');
@@ -1707,7 +1687,6 @@ sub unique_macs {
 } # unique_macs()
 
 sub testcmd {
-	# {{{
 	my ($Cmd, $Exp_stdout, $Exp_stderr, $Exp_retval, $Desc) = @_;
 	defined($descriptions{$Desc}) &&
 		BAIL_OUT("testcmd(): '$Desc' description is used twice");
@@ -1733,11 +1712,9 @@ sub testcmd {
 	$retval &= is($ret_val >> 8, $Exp_retval, "$Txt (retval)");
 
 	return $retval;
-	# }}}
-} # testcmd()
+}
 
 sub likecmd {
-	# {{{
 	my ($Cmd, $Exp_stdout, $Exp_stderr, $Exp_retval, $Desc) = @_;
 	defined($descriptions{$Desc}) &&
 		BAIL_OUT("likecmd(): '$Desc' description is used twice");
@@ -1763,11 +1740,10 @@ sub likecmd {
 	$retval &= is($ret_val >> 8, $Exp_retval, "$Txt (retval)");
 
 	return $retval;
-	# }}}
-} # likecmd()
+}
 
 sub file_data {
-	# Return file content as a string {{{
+	# Return file content as a string
 	my $File = shift;
 	defined($File) || return('');
 	my $Txt;
@@ -1777,28 +1753,25 @@ sub file_data {
 	$Txt = <$fp>;
 	close($fp);
 	return $Txt;
-	# }}}
-} # file_data()
+}
 
 sub create_file {
-	# Create new file and fill it with data {{{
+	# Create new file and fill it with data
 	my ($file, $text) = @_;
 	open(my $fp, ">$file") or return 0;
 	print($fp $text);
 	close($fp);
 	return (file_data($file) eq $text) ? 1 : 0;
-	# }}}
-} # create_file()
+}
 
 sub print_version {
-	# Print program version {{{
+	# Print program version
 	print("$progname $VERSION\n");
 	return;
-	# }}}
-} # print_version()
+}
 
 sub usage {
-	# Send the help message to stdout {{{
+	# Send the help message to stdout
 	my $Retval = shift;
 
 	if ($Opt{'verbose'}) {
@@ -1831,33 +1804,31 @@ Options:
 
 END
 	exit($Retval);
-	# }}}
-} # usage()
+}
 
 sub msg {
-	# Print a status message to stderr based on verbosity level {{{
+	# Print a status message to stderr based on verbosity level
 	my ($verbose_level, $Txt) = @_;
 
 	$verbose_level > $Opt{'verbose'} && return;
 	print(STDERR "$progname: $Txt\n");
 	return;
-	# }}}
-} # msg()
+}
 
 __END__
 
-# This program is free software; you can redistribute it and/or modify 
-# it under the terms of the GNU General Public License as published by 
-# the Free Software Foundation; either version 2 of the License, or (at 
-# your option) any later version.
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License as published by the Free Software 
+# Foundation; either version 2 of the License, or (at your option) any later 
+# version.
 #
-# This program is distributed in the hope that it will be useful, but 
-# WITHOUT ANY WARRANTY; without even the implied warranty of 
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# This program is distributed in the hope that it will be useful, but WITHOUT 
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+# FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License 
-# along with this program.
+# You should have received a copy of the GNU General Public License along with 
+# this program.
 # If not, see L<http://www.gnu.org/licenses/>.
 
 # vim: set ts=4 sw=4 sts=4 noet fo+=w tw=79 fenc=UTF-8 :
