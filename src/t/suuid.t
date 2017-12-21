@@ -977,6 +977,26 @@ sub test_suuid_comment {
 
 	# }}}
 	ok(unlink($Outfile), "Delete [Outfile]");
+	my $tmpfile = ".$progname-dat.tmp";
+	create_file($tmpfile, "A\tB\\C");
+	likecmd("$CMD -c - -l $Outdir <$tmpfile", # {{{
+		"/^$v1_templ\n\$/s",
+		'/^$/',
+		0,
+		"Read tab and backslash from stdin",
+	);
+
+	# }}}
+	like(file_data($Outfile), # {{{
+		s_top(
+			s_suuid('txt' => 'A\\\\tB\\\\\\\\C', 'tty' => ''),
+		),
+		"Log ok after tab and backslash",
+	);
+
+	# }}}
+	ok(unlink($tmpfile), "Delete $tmpfile");
+	ok(unlink($Outfile), "Delete [Outfile]");
 	likecmd("$CMD -c - -l $Outdir </dev/null", # {{{
 		"/^$v1_templ\n\$/s",
 		'/^$/',
