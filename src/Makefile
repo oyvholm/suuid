@@ -77,8 +77,8 @@ endif
 
 SUUID_OBJS  = suuid.o
 
-COMMON_C = environ.c genuuid.c io.c logfile.c rcfile.c \
-           selftest.c sessvar.c string.c tag.c uuid.c
+COMMON_C = database.c environ.c genuuid.c io.c logfile.c \
+           rcfile.c selftest.c sessvar.c string.c tag.c uuid.c
 
 SUUID_HFILES = suuid.h common.h
 
