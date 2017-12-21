@@ -55,6 +55,21 @@ void *mymalloc(const size_t size)
 }
 
 /*
+ * mystrdup() - Wrapper around strdup(), display error message if the 
+ * allocation fails. Returns the value from strdup().
+ */
+
+char *mystrdup(const char *s)
+{
+	char *p = strdup(s);
+
+	if (!p)
+		myerror("Memory allocation error, cannot duplicate string");
+
+	return p;
+}
+
+/*
  * squeeze_chars() - Modify s directly by replacing all repeated characters in 
  * chars with a single char. Returns s if ok, NULL if error.
  */
@@ -70,11 +85,9 @@ char *squeeze_chars(char *s, const char *chars)
 	if (!s || !strlen(s))
 		return s;
 
-	buf = strdup(s);
-	if (!buf) {
-		myerror("squeeze_chars(): Could not duplicate string");
+	buf = mystrdup(s);
+	if (!buf)
 		return NULL;
-	}
 	memset(buf, 0, strlen(s));
 
 	p2 = buf;

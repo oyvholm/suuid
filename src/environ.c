@@ -27,38 +27,17 @@
 
 char *get_editor(void)
 {
-	char *retval;
-	char *e1 = getenv(ENV_EDITOR);
-	char *e2 = getenv("EDITOR");
+	char *e;
 
-	if (e1 && strlen(e1)) {
-		/*
-		 * Use the editor specified in an environment variable used 
-		 * only by this program.
-		 */
-		retval = strdup(e1);
-		if (!retval) {
-			myerror("get_editor(): Could not duplicate "
-			        "%s environment variable", ENV_EDITOR);
-			return NULL;
-		}
-	} else if (e2 && strlen(e2)) {
-		/*
-		 * Use the default environment variable all programs use.
-		 */
-		retval = strdup(e2);
-		if (!retval) {
-			myerror("get_editor(): Could not duplicate "
-			        "EDITOR environment variable");
-			return NULL;
-		}
-	} else {
-		myerror("Environment variables %s and EDITOR aren't defined, "
-		        "cannot start editor", ENV_EDITOR);
-		retval = NULL;
-	}
+	e = getenv(ENV_EDITOR);
+	if (!e || !strlen(e))
+		e = getenv("EDITOR");
+	if (e && strlen(e))
+		return mystrdup(e);
+	myerror("Environment variables %s and EDITOR aren't defined, "
+	        "cannot start editor", ENV_EDITOR);
 
-	return retval;
+	return NULL;
 }
 
 /*
@@ -165,9 +144,7 @@ char *get_logdir(const struct Options *opt)
 		return NULL;
 	}
 	if (p)
-		retval = strdup(p);
-	if (!retval)
-		myerror("get_logdir(): Memory allocation error");
+		retval = mystrdup(p);
 
 	return retval;
 }

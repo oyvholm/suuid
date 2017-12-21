@@ -83,11 +83,9 @@ int store_tag(struct Entry *entry, const char *arg)
 	assert(entry);
 	assert(arg);
 
-	tag = strdup(arg); /* Don't modify the source */
-	if (!tag) {
-		myerror("store_tag(): Could not duplicate arg string");
+	tag = mystrdup(arg); /* Don't modify the source */
+	if (!tag)
 		return EXIT_FAILURE;
-	}
 
 	while ((p = strchr(tag, ','))) {
 		*p++ = '\0';
@@ -132,11 +130,8 @@ int store_tag(struct Entry *entry, const char *arg)
 		goto cleanup;
 	}
 
-	if (!(entry->tag[tag_count++] = strdup(tag))) {
-		myerror("store_tag(): Could not allocate memory for "
-		        "return value");
+	if (!(entry->tag[tag_count++] = mystrdup(tag)))
 		retval = EXIT_FAILURE;
-	}
 
 cleanup:
 	free(tag);

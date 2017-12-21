@@ -32,12 +32,8 @@ char *get_rcfilename(const struct Options *opt)
 
 	assert(opt);
 
-	if (opt && opt->rcfile) {
-		retval = strdup(opt->rcfile);
-		if (!retval)
-			myerror("Cannot duplicate --rcfile argument");
-		return retval;
-	}
+	if (opt && opt->rcfile)
+		return mystrdup(opt->rcfile);
 	env = getenv("HOME");
 	if (!env) {
 		fprintf(stderr, "%s: HOME environment variable not defined, "
@@ -97,18 +93,18 @@ int parse_rc_line(const char *line, struct Rc *rc)
 	assert(rc);
 
 	if (has_key(line, "hostname")) {
-		rc->hostname = strdup(has_key(line, "hostname"));
+		rc->hostname = mystrdup(has_key(line, "hostname"));
 		if (!rc->hostname)
 			return EXIT_FAILURE;
 	}
 	if (has_key(line, "macaddr")) {
-		rc->macaddr = strdup(has_key(line, "macaddr"));
+		rc->macaddr = mystrdup(has_key(line, "macaddr"));
 		if (!rc->macaddr)
 			return EXIT_FAILURE;
 		string_to_lower(rc->macaddr);
 	}
 	if (has_key(line, "uuidcmd")) {
-		rc->uuidcmd = strdup(has_key(line, "uuidcmd"));
+		rc->uuidcmd = mystrdup(has_key(line, "uuidcmd"));
 		if (!rc->uuidcmd)
 			return EXIT_FAILURE;
 	}
@@ -152,8 +148,6 @@ int read_rcfile(const char *rcfile, struct Rc *rc)
 		trim_str_front(buf);
 		trim_str_end(buf);
 		if (parse_rc_line(buf, rc) == EXIT_FAILURE) {
-			myerror("Could not allocate memory for line from "
-			        "rc file \"%s\"", rcfile);
 			fclose(fp);
 			return EXIT_FAILURE;
 		}

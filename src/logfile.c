@@ -146,15 +146,8 @@ char *allocate_elem(const char *elem, const char *src)
 	assert(elem);
 	assert(strlen(elem));
 
-	if (!src) {
-		retval = strdup("");
-		if (!retval) {
-			myerror("allocate_elem(): Could not duplicate empty "
-			        "string");
-			return NULL;
-		}
-		return retval;
-	}
+	if (!src)
+		return mystrdup("");
 
 	size += strlen("<") + strlen(elem) + strlen(">") +
 	        strlen(src) * MAX_GROWTH +
@@ -236,16 +229,11 @@ char *get_xml_tags(const struct Entry *entry)
 		}
 	} while (p);
 
-	if (!size) {
+	if (!size)
 		/*
 		 * No tags found, return empty string,
 		 */
-		buf = strdup("");
-		if (!buf)
-			myerror("get_xml_tags(): Could not duplicate "
-			        "empty string");
-		return buf;
-	}
+		return mystrdup("");
 
 	buf = mymalloc(size);
 	if (!buf)
@@ -321,16 +309,11 @@ char *create_sess_xml(const struct Entry *entry)
 		i++;
 	}
 
-	if (!size) {
+	if (!size)
 		/*
 		 * No elements in the sess array, return empty string.
 		 */
-		buf = strdup("");
-		if (!buf)
-			myerror("create_sess_xml(): Cannot duplicate empty "
-			        "string");
-		return buf;
-	}
+		return mystrdup("");
 
 	/*
 	 * Allocate space for the final string and a temporary work buffer.

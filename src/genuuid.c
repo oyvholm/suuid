@@ -111,12 +111,9 @@ char *process_comment_option(const char *cmt)
 		 * The comment was stored as a plain string in the -c/--comment 
 		 * argument.
 		 */
-		retval = strdup(cmt);
-		if (!retval) {
-			myerror("%s: Cannot allocate memory for comment, "
-			        "strdup() failed");
+		retval = mystrdup(cmt);
+		if (!retval)
 			return NULL;
-		}
 	}
 	if (!valid_xml_chars(retval)) {
 		fprintf(stderr, "%s: Comment contains illegal characters or "

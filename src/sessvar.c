@@ -66,12 +66,9 @@ char *get_desc_from_command(const char *cmd)
 
 	if (!cmd || !strlen(cmd))
 		return NULL;
-	ap = strdup(cmd);
-	if (!ap) {
-		myerror("get_desc_from_command(): Could not duplicate command "
-		        "string");
+	ap = mystrdup(cmd);
+	if (!ap)
 		return NULL;
-	}
 	p = ap;
 	while (strchr("./", *p))
 		p++;
@@ -148,12 +145,9 @@ int get_sess_info(struct Entry *entry)
 	if (!getenv(ENV_SESS))
 		return EXIT_SUCCESS;
 
-	s = strdup(getenv(ENV_SESS));
-	if (!s) {
-		myerror("get_sess_info(): Could not duplicate %s environment "
-		        "variable", ENV_SESS);
+	s = mystrdup(getenv(ENV_SESS));
+	if (!s)
 		return EXIT_FAILURE;
-	}
 
 	if (!scan_for_uuid(s)) {
 		/*
@@ -304,17 +298,14 @@ const char *add_to_sessvar(const char *desc, const char *uuid)
 	if (getenv(ENV_SESS)) {
 		char *ap;
 
-		ap = strdup(getenv(ENV_SESS));
+		ap = mystrdup(getenv(ENV_SESS));
 		clean_up_sessvar(ap);
-		sessvar = strdup(ap);
+		sessvar = mystrdup(ap);
 		free(ap);
 	} else
-		sessvar = strdup("");
-	if (!sessvar) {
-		myerror("add_to_sessvar(): Could not duplicate %s "
-		        "environment variable", ENV_SESS);
+		sessvar = mystrdup("");
+	if (!sessvar)
 		return NULL;
-	}
 
 	envlen = strlen(ENV_SESS) + 1 + strlen(sessvar) + 1 +
 	         strlen(desc) + 1 + UUID_LENGTH + 1 + 1;
@@ -379,9 +370,8 @@ int run_session(const struct Options *orig_opt,
 		retval = -1;
 		goto cleanup;
 	}
-	start_uuid = strdup(result.lastuuid);
+	start_uuid = mystrdup(result.lastuuid);
 	if (!start_uuid) {
-		myerror("Could not duplicate start UUID");
 		retval = -1;
 		goto cleanup;
 	}
