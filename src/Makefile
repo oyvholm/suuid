@@ -40,12 +40,6 @@ ifdef USE_SQLITE
 	CCFLAGS += -pedantic -DUSE_SQLITE
 endif
 
-# PERL_COMPAT: Compile a version with some changes to make it compatible with 
-# the Perl version
-ifdef PERL_COMPAT
-	CCFLAGS += -DPERL_COMPAT
-endif
-
 # TEST_FUNC: Send non-option arguments to a function for testing. Doesn't break 
 # anything, non-option arguments are ignored by the program.
 ifdef TEST_FUNC
@@ -202,14 +196,6 @@ testcomb: clean $(WHAT)
 	# USE_SQLITE
 	$(MAKE) clean $(WHAT) USE_SQLITE=
 	$(MAKE) clean $(WHAT) USE_SQLITE=1
-	# PERL_COMPAT=
-	$(MAKE) clean $(WHAT) PERL_COMPAT=
-	$(MAKE) clean $(WHAT) PERL_COMPAT= USE_SQLITE=
-	$(MAKE) clean $(WHAT) PERL_COMPAT= USE_SQLITE=1
-	# PERL_COMPAT=1
-	$(MAKE) clean $(WHAT) PERL_COMPAT=1
-	$(MAKE) clean $(WHAT) PERL_COMPAT=1 USE_SQLITE=
-	$(MAKE) clean $(WHAT) PERL_COMPAT=1 USE_SQLITE=1
 	# TEST_FUNC=
 	$(MAKE) clean $(WHAT) TEST_FUNC=
 	$(MAKE) clean $(WHAT) TEST_FUNC= USE_SQLITE=
