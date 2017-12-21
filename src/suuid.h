@@ -36,6 +36,7 @@ extern int myerror(const char *format, ...);
  */
 
 extern char *progname;
+extern int simfail;
 
 #endif /* ifndef _SUUID_H */
 
