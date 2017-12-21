@@ -46,6 +46,11 @@ ifdef TEST_FUNC
 	CCFLAGS += -DTEST_FUNC
 endif
 
+# UNUSED: Compile with unused/unfinished code.
+ifdef UNUSED
+	CCFLAGS += -DUNUSED
+endif
+
 LDFLAGS = -Wall -Wextra -Werror
 
 # When compiling with SQLite, add these libraries to LIBS:
