@@ -74,7 +74,7 @@ char *mystrdup(const char *s)
  * chars with a single char. Returns s if ok, NULL if error.
  */
 
-#ifdef UNUSED
+#if defined(UNUSED) || defined(TEST_FUNC)
 char *squeeze_chars(char *s, const char *chars)
 {
 	char *p = s, *p2, *buf;
