@@ -1203,6 +1203,17 @@ sub test_suuid_environment {
 
 	# }}}
 	ok(unlink($Outfile), "Delete [Outfile]");
+	$ENV{'SESS_UUID'}="abc";
+	likecmd("$CMD -l $Outdir", # {{{
+		"/^$v1_templ\n\$/s",
+		'/^$/',
+		0,
+		"SESS_UUID doesn't have UUID",
+	);
+
+	# }}}
+	delete $ENV{'SESS_UUID'};
+	ok(unlink($Outfile), "Delete [Outfile]");
 	likecmd("SESS_UUID=ssh-agent/da700fd8-43eb-11e2-889a-0016d364066c $CMD -l $Outdir", # {{{
 		"/^$v1_templ\n\$/s",
 		'/^$/',
