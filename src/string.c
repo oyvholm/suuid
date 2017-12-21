@@ -40,6 +40,21 @@ char *check_hex(const char *hex, const size_t len)
 }
 
 /*
+ * mymalloc() - Wrapper around malloc(), display error message if the 
+ * allocation fails. Returns the value from malloc().
+ */
+
+void *mymalloc(const size_t size)
+{
+	void *v = malloc(size);
+
+	if (!v)
+		myerror("Memory allocation error (%lu bytes)", size);
+
+	return v;
+}
+
+/*
  * squeeze_chars() - Modify s directly by replacing all repeated characters in 
  * chars with a single char. Returns s if ok, NULL if error.
  */

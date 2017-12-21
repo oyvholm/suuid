@@ -197,6 +197,7 @@ extern int run_session(const struct Options *orig_opt,
 
 /* string.c */
 extern char *check_hex(const char *hex, const size_t len);
+extern void *mymalloc(const size_t size);
 extern char *squeeze_chars(char *s, const char *chars);
 extern char *string_to_lower(char *str);
 extern char *trim_str_front(char *dest);

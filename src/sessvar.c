@@ -238,12 +238,9 @@ char *concat_cmd_string(const int argc, char * const argv[])
 		cmdsize += strlen(argv[t]) + 1; /* Add one for space */
 	}
 	cmdsize += 1; /* Terminating '\0' */
-	cmd = malloc(cmdsize);
-	if (!cmd) {
-		myerror("Could not allocate %lu bytes for command string",
-		        cmdsize);
+	cmd = mymalloc(cmdsize);
+	if (!cmd)
 		return NULL;
-	}
 	memset(cmd, 0, cmdsize);
 
 	for (t = optind; t < argc; t++) {
@@ -321,10 +318,8 @@ const char *add_to_sessvar(const char *desc, const char *uuid)
 
 	envlen = strlen(ENV_SESS) + 1 + strlen(sessvar) + 1 +
 	         strlen(desc) + 1 + UUID_LENGTH + 1 + 1;
-	envbuf = malloc(envlen);
+	envbuf = mymalloc(envlen);
 	if (!envbuf) {
-		myerror("Could not allocate %lu bytes for %s buffer",
-		        envlen, ENV_SESS);
 		free(sessvar);
 		return NULL;
 	}

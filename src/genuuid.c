@@ -240,12 +240,9 @@ char *process_uuid(struct Logs *logs,
 	 */
 
 	if (!entry->date)
-		entry->date = malloc(DATE_LENGTH + 1);
-	if (!entry->date) {
-		myerror("process_uuid(): Could not allocate %lu bytes for "
-		        "date string", DATE_LENGTH + 1);
+		entry->date = mymalloc(DATE_LENGTH + 1);
+	if (!entry->date)
 		return NULL;
-	}
 	if (!uuid_date_from_uuid(entry->date, entry->uuid))
 		return NULL;
 

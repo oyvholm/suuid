@@ -45,11 +45,9 @@ char *get_rcfilename(const struct Options *opt)
 		return NULL;
 	}
 	size = strlen(env) + strlen(STD_RCFILE) + 32;
-	retval = malloc(size);
-	if (!retval) {
-		myerror("Could not allocate %lu bytes for rcfile name", size);
+	retval = mymalloc(size);
+	if (!retval)
 		return NULL;
-	}
 	snprintf(retval, size, "%s/%s", env, STD_RCFILE); /* fixme: slash */
 
 	return retval;

@@ -109,12 +109,9 @@ char *read_from_editor(const char *editor)
 	}
 
 	size = strlen(editor) + strlen(tmpfile) + 5;
-	cmdbuf = malloc(size);
-	if (!cmdbuf) {
-		myerror("read_from_editor(): Could not allocate %lu bytes for "
-		        "command buffer", size);
+	cmdbuf = mymalloc(size);
+	if (!cmdbuf)
 		return NULL;
-	}
 	snprintf(cmdbuf, size, "%s %s", editor, tmpfile);
 
 	r = system(cmdbuf);

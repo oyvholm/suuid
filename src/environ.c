@@ -153,7 +153,9 @@ char *get_logdir(const struct Options *opt)
 		int size = strlen(getenv("HOME")) +
 		           strlen("/uuids") + 1; /* fixme: slash */
 
-		retval = malloc(size + 1);
+		retval = mymalloc(size + 1);
+		if (!retval)
+			return NULL;
 		snprintf(retval, size, "%s/uuids", /* fixme: slash */
 		                       getenv("HOME"));
 	} else {
@@ -221,12 +223,9 @@ char *get_log_prefix(const struct Rc *rc, const struct Options *opt, char *ext)
 
 	prefix_length = strlen(logdir) + strlen("/") + /* fixme: slash */
 	                strlen(hostname) + strlen(ext) + 1;
-	prefix = malloc(prefix_length + 1);
-	if (!prefix) {
-		myerror("get_log_prefix(): Could not allocate %lu bytes for "
-		        "log prefix", prefix_length + 1);
+	prefix = mymalloc(prefix_length + 1);
+	if (!prefix)
 		goto cleanup;
-	}
 	/* fixme: Remove slash hardcoding, use some portable solution */
 	snprintf(prefix, prefix_length, "%s/%s%s", logdir, hostname, ext);
 
@@ -248,12 +247,9 @@ char *getpath(void)
 	char *p;
 	size_t size = BUFSIZ;
 
-	retval = malloc(size);
-	if (!retval) {
-		myerror("getpath(): Could not allocate %lu bytes in first "
-		        "malloc()", size);
+	retval = mymalloc(size);
+	if (!retval)
 		return NULL;
-	}
 	for (p = getcwd(retval, size); !p;) {
 		size += BUFSIZ;
 		retval = realloc(retval, size);

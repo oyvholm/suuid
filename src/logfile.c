@@ -65,12 +65,9 @@ char *suuid_xml(const char *text)
 	assert(text);
 
 	size = strlen(text);
-	retval = malloc(size * MAX_GROWTH + 1);
-	if (!retval) {
-		myerror("Cannot allocate %lu bytes for XML",
-		        size + MAX_GROWTH + 1);
+	retval = mymalloc(size * MAX_GROWTH + 1);
+	if (!retval)
 		return NULL;
-	}
 
 	destp = retval;
 	for (p = text; *p; p++) {
@@ -163,12 +160,9 @@ char *allocate_elem(const char *elem, const char *src)
 	        strlen(src) * MAX_GROWTH +
 	        strlen("<") + strlen(elem) + strlen("/> ") + 1;
 
-	retval = malloc(size + 1);
-	if (!retval) {
-		myerror("allocate_elem(): Cannot allocate %lu bytes",
-		        size + 1);
+	retval = mymalloc(size + 1);
+	if (!retval)
 		return NULL;
-	}
 
 	ap = suuid_xml(src);
 	if (!ap)
@@ -200,11 +194,9 @@ char *alloc_attr(const char *attr, const char *data)
 	size = strlen(" ") + strlen(attr) + strlen("=\"") + strlen(data) +
 	       strlen("\"") + 1;
 
-	retval = malloc(size + 1);
-	if (!retval) {
-		myerror("alloc_attr(): Cannot allocate %lu bytes", size + 1);
+	retval = mymalloc(size + 1);
+	if (!retval)
 		return NULL;
-	}
 
 	snprintf(retval, size, " %s=\"%s\"", attr, data);
 
@@ -255,19 +247,14 @@ char *get_xml_tags(const struct Entry *entry)
 		return buf;
 	}
 
-	buf = malloc(size);
-	if (!buf) {
-		myerror("get_xml_tags(): Could not allocate %lu bytes for buf",
-		        size);
+	buf = mymalloc(size);
+	if (!buf)
 		return NULL;
-	}
 	buf[0] = '\0';
 
 	tmpsize = tmpsize * MAX_GROWTH + 16;
-	tmpbuf = malloc(tmpsize);
+	tmpbuf = mymalloc(tmpsize);
 	if (!tmpbuf) {
-		myerror("get_xml_tags(): Could not allocate %lu bytes for "
-		        "tmpbuf", tmpsize);
 		free(buf);
 		return NULL;
 	}
@@ -349,17 +336,12 @@ char *create_sess_xml(const struct Entry *entry)
 	 * Allocate space for the final string and a temporary work buffer.
 	 */
 
-	buf = malloc(size);
-	if (!buf) {
-		myerror("create_sess_xml(): Cannot allocate %lu bytes for buf",
-		        size);
+	buf = mymalloc(size);
+	if (!buf)
 		return NULL;
-	}
 
-	tmpbuf = malloc(tmpsize);
+	tmpbuf = mymalloc(tmpsize);
 	if (!tmpbuf) {
-		myerror("create_sess_xml(): Cannot allocate %lu bytes for "
-		        "tmpbuf", tmpsize);
 		free(buf);
 		return NULL;
 	}
@@ -460,10 +442,8 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 
 		size = strlen("<txt> ") + strlen(entry->txt) +
 		       strlen(" </txt> ") + 1;
-		e.txt = malloc(size);
+		e.txt = mymalloc(size);
 		if (!e.txt) {
-			myerror("xml_entry(): Could not allocate %lu bytes "
-			        "for raw XML <txt> string", size);
 			free(sess_xml);
 			free(tag_xml);
 			free(e.date);
@@ -491,10 +471,8 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 	size = DATE_LENGTH + UUID_LENGTH + strlen(tag_xml) + strlen(e.txt) +
 	       strlen(e.host) + strlen(e.cwd) + strlen(e.user) +
 	       strlen(e.tty) + strlen(sess_xml) + 128;
-	retval = malloc(size);
+	retval = mymalloc(size);
 	if (!retval) {
-		myerror("xml_entry(): Could not allocate %lu bytes for XML "
-		        "string", size);
 		free(e.txt);
 		free(sess_xml);
 		free(tag_xml);

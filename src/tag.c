@@ -105,10 +105,8 @@ int store_tag(struct Entry *entry, const char *arg)
 			 */
 			char *tag2;
 
-			tag2 = malloc(strlen(p) + 1);
+			tag2 = mymalloc(strlen(p) + 1);
 			if (!tag2) {
-				myerror("store_tag(): Could not allocate "
-				        "%u bytes for new tag", strlen(p) + 1);
 				retval = EXIT_FAILURE;
 				goto cleanup;
 			}
