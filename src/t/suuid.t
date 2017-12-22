@@ -81,6 +81,8 @@ my $xml_header = join("",
 
 my $Outdir = "tmp-suuid-t-$$-" . substr(rand, 2, 8);
 
+my $FAKE_HOST = `$CMD --version` =~ /has FAKE_HOST/ ? 1 : 0;
+
 if ($Opt{'valgrind'}) {
 	$CMD = "valgrind -q --leak-check=full --show-leak-kinds=all -- " .
 	       "../$CMD_BASENAME";
@@ -356,7 +358,8 @@ sub test_suuid_executable {
 	);
 
 	# }}}
-	my $host_outfile = glob("$Outdir/*.xml");
+	my $host_outfile = $FAKE_HOST ? "$Outdir/fake.xml"
+	                              : glob("$Outdir/*.xml");
 	defined($host_outfile) || ($host_outfile = '');
 	like(file_data($host_outfile), # {{{
 		s_top(''),
@@ -391,17 +394,18 @@ sub test_suuid_executable {
 	);
 
 	# }}}
-	like(file_data("$Outdir/urk13579kru.xml"), # {{{
+	my $filename = $FAKE_HOST ? "fake" : "urk13579kru";
+	like(file_data("$Outdir/$filename.xml"), # {{{
 		s_top(
 			s_suuid(
-				'host' => 'urk13579kru',
+				'host' => $filename,
 			),
 		),
 		"The SUUID_HOSTNAME environment variable was read",
 	);
 
 	# }}}
-	ok(unlink("$Outdir/urk13579kru.xml"), "Delete [Outdir]/urk13579kru.xml");
+	ok(unlink("$Outdir/$filename.xml"), "Delete [Outdir]/$filename.xml");
 	diag("Testing -m (--random-mac) option...");
 	likecmd("$CMD -m -l $Outdir", # {{{
 		"/^$v1rand_templ\\n\$/s",
@@ -446,15 +450,16 @@ sub test_suuid_executable {
 	);
 
 	# }}}
-	like(file_data("$Outdir/altrc1.xml"), # {{{
+	$filename = $FAKE_HOST ? "fake" : "altrc1";
+	like(file_data("$Outdir/$filename.xml"), # {{{
 		s_top(
-			s_suuid('host' => 'altrc1'),
+			s_suuid('host' => $filename),
 		),
 		"hostname from rcfile1 is stored in the file",
 	);
 
 	# }}}
-	ok(unlink("$Outdir/altrc1.xml"), "Delete [Outdir]/altrc1.xml");
+	ok(unlink("$Outdir/$filename.xml"), "Delete [Outdir]/$filename.xml");
 	ok(!-e 'nosuchrc', "'nosuchrc' doesn't exist");
 	likecmd("$CMD --rcfile nosuchrc -l $Outdir", # {{{
 		"/^$v1_templ\\n\$/s",

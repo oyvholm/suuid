@@ -101,11 +101,11 @@ char *get_hostname(const struct Rc *rc)
 			myerror("Cannot get hostname");
 			return NULL;
 		}
-#ifdef FAKE_HOST
-		strncpy(buf, "fake", HOST_NAME_MAX);
-#endif
 	}
 
+#ifdef FAKE_HOST
+	strncpy(buf, "fake", HOST_NAME_MAX);
+#endif
 	return buf;
 }
 
