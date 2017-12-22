@@ -133,11 +133,13 @@ int read_rcfile(const char *rcfile, struct Rc *rc)
 		return EXIT_SUCCESS;
 
 	fp = fopen(rcfile, "r");
-	if (!fp)
+	if (!fp) {
+		errno = 0;
 		return EXIT_SUCCESS; /* It's perfectly fine if it's not 
 		                      * readable, that probably means it 
 		                      * doesn't exist.
 		                      */
+	}
 
 	do {
 		if (!fgets(buf, BUFSIZ, fp) && errno) {

@@ -1508,9 +1508,25 @@ sub test_suuid_environment {
 	# }}}
 	ok(unlink($Outfile), "Delete [Outfile]");
 	$ENV{'HOME'} = $bck_home;
+	test_invalid_hostname("", "SUUID_HOSTNAME is empty", $Outfile);
 	return;
 	# }}}
 } # test_suuid_environment()
+
+sub test_invalid_hostname {
+	my ($h, $desc, $Outfile) = @_;
+
+	$ENV{SUUID_HOSTNAME} = $h;
+	testcmd("$CMD", # {{{
+		'',
+		"../suuid: fill_entry_struct(): Got invalid hostname: \"$h\"\n",
+		1,
+		$desc,
+	);
+
+	# }}}
+	delete $ENV{SUUID_HOSTNAME};
+}
 
 sub test_suuid_signal {
 	# {{{
