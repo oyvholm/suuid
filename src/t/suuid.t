@@ -1519,7 +1519,7 @@ sub test_invalid_hostname {
 	$ENV{SUUID_HOSTNAME} = $h;
 	testcmd("$CMD", # {{{
 		'',
-		"../suuid: fill_entry_struct(): Got invalid hostname: \"$h\"\n",
+		"../suuid: Got invalid hostname: \"$h\"\n",
 		1,
 		$desc,
 	);

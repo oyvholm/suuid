@@ -157,15 +157,8 @@ int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
 	 */
 
 	entry->host = get_hostname(rc);
-	if (!entry->host) {
-		myerror("fill_entry_struct(): Cannot get hostname");
+	if (!entry->host)
 		return EXIT_FAILURE;
-	}
-	if (!valid_hostname(entry->host)) {
-		myerror("fill_entry_struct(): Got invalid hostname: \"%s\"",
-		        entry->host);
-		return EXIT_FAILURE;
-	}
 	entry->cwd = getpath();
 	entry->user = get_username();
 	entry->tty = get_tty();

@@ -49,7 +49,9 @@ bool valid_hostname(const char *s)
 {
 	unsigned char *p;
 
-	if (!s || !strlen(s) || strlen(s) > HOST_NAME_MAX ||
+	assert(s);
+
+	if (!strlen(s) || strlen(s) > HOST_NAME_MAX ||
 	    strstr(s, "..") || utf8_check(s))
 		return FALSE;
 
@@ -81,32 +83,30 @@ bool valid_hostname(const char *s)
 char *get_hostname(const struct Rc *rc)
 {
 	static char buf[HOST_NAME_MAX + 1];
-	char *retval = buf;
+	char *p;
 
 	assert(rc);
 
-	if (getenv(ENV_HOSTNAME))
-		/*
-		 * Use hostname from a special environment variable.
-		 */
-		strncpy(buf, getenv(ENV_HOSTNAME), HOST_NAME_MAX);
-	else if (rc->hostname)
-		/*
-		 * Use hostname from the rc file.
-		 */
-		strncpy(buf, rc->hostname, HOST_NAME_MAX);
+	p = getenv(ENV_HOSTNAME);
+	if (!p)
+		p = rc->hostname;
+	if (p) {
+		if (!valid_hostname(p)) {
+			myerror("Got invalid hostname: \"%s\"", p);
+			return NULL;
+		}
+		strncpy(buf, p, HOST_NAME_MAX);
+	} else {
+		if (gethostname(buf, HOST_NAME_MAX) == -1) {
+			myerror("Cannot get hostname");
+			return NULL;
+		}
 #ifdef FAKE_HOST
-	else if (1)
-		retval = "fake";
+		strncpy(buf, "fake", HOST_NAME_MAX);
 #endif
-	else if (gethostname(buf, HOST_NAME_MAX) == -1)
-		/*
-		 * Use the computer's real hostname or fail. No UUID is created 
-		 * without a valid hostname.
-		 */
-		return NULL;
+	}
 
-	return retval;
+	return buf;
 }
 
 /*
@@ -180,15 +180,8 @@ char *get_log_prefix(const struct Rc *rc, const struct Options *opt, char *ext)
 	 */
 
 	hostname = get_hostname(rc);
-	if (!hostname) {
-		myerror("get_log_prefix(): Cannot get hostname");
+	if (!hostname)
 		goto cleanup;
-	}
-	if (!valid_hostname(hostname)) {
-		myerror("get_log_prefix(): Got invalid hostname: \"%s\"",
-		        hostname);
-		goto cleanup;
-	}
 
 	if (!ext)
 		ext = "";
