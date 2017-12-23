@@ -1,0 +1,10 @@
+# suuid.git/.gitlab-ci.yml
+# File ID: b8e2f808-e7ba-11e7-896a-db5caa6d21d3
+
+suuid:linux:
+  stage: build
+  before_script:
+    - apt-get update -qq && apt-get install -y uuid
+    - id -u ci &>/dev/null || useradd ci
+  script:
+    - su ci -c "script -e -q -c 'make test'"
