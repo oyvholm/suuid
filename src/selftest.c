@@ -29,6 +29,7 @@ int selftest(void)
 {
 	char buf1[] = "ABCÅÆØ";
 	char buf2[DATE_LENGTH + 1];
+	char buf3[UUID_LENGTH + 1];
 
 	errno = EACCES;
 	puts("# myerror(\"errno is EACCES\")");
@@ -66,6 +67,26 @@ int selftest(void)
 	       "acdaf974-e78e-11e7-87d5-g74d993421b0\") = %s\n",
 	       uuid_date_from_uuid(buf2,
 	                           "acdaf974-e78e-11e7-87d5-g74d993421b0"));
+
+	printf("valid_uuid(\"acdaf974-e78e-11e7-87d5-f74d993421b0\", 1) "
+	       "= %d\n",
+	       valid_uuid("acdaf974-e78e-11e7-87d5-f74d993421b0", 1));
+	printf("valid_uuid(\"acdaf974-e78e-11e7-87d5-f74d993421b0123\", 0) "
+	       "= %d\n",
+	       valid_uuid("acdaf974-e78e-11e7-87d5-f74d993421b0123", 0));
+	printf("valid_uuid(\"acdaf974-e78e-11e7-87d5-f74d993421b0123\", 1) "
+	       "= %d\n",
+	       valid_uuid("acdaf974-e78e-11e7-87d5-f74d993421b0123", 1));
+	printf("valid_uuid(\"c9ffa9cb-708d-454b-b1f2-f18f609cb825\", 1) "
+	       "= %d\n",
+	       valid_uuid("c9ffa9cb-708d-454b-b1f2-f18f609cb825", 1));
+
+	strncpy(buf3, "acdaf974-e78e-11e7-87d5-f74d993421b0", UUID_LENGTH + 1);
+	printf("scramble_mac_address(buf3) = %d\n",
+	       scramble_mac_address(buf3) != NULL);
+	buf3[0] = 'g';
+	printf("scramble_mac_address(buf3) = %d\n",
+	       scramble_mac_address(buf3) != NULL);
 
 	return EXIT_SUCCESS;
 }

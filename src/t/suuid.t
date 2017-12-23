@@ -199,6 +199,12 @@ uuid_date_from_uuid(buf2, "notvalid") = (null)
 uuid_date_from_uuid(buf2, "") = (null)
 uuid_date_from_uuid(buf2, "c9ffa9cb-708d-454b-b1f2-f18f609cb825") = (null)
 uuid_date_from_uuid(buf2, "acdaf974-e78e-11e7-87d5-g74d993421b0") = (null)
+valid_uuid("acdaf974-e78e-11e7-87d5-f74d993421b0", 1) = 1
+valid_uuid("acdaf974-e78e-11e7-87d5-f74d993421b0123", 0) = 1
+valid_uuid("acdaf974-e78e-11e7-87d5-f74d993421b0123", 1) = 0
+valid_uuid("c9ffa9cb-708d-454b-b1f2-f18f609cb825", 1) = 0
+scramble_mac_address(buf3) = 1
+scramble_mac_address(buf3) = 0
 END
 	        <<END,
 ../$CMD_BASENAME: errno is EACCES: Permission denied
