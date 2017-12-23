@@ -81,7 +81,8 @@ my $xml_header = join("",
 
 my $Outdir = "tmp-suuid-t-$$-" . substr(rand, 2, 8);
 
-my $FAKE_HOST = `$CMD --version` =~ /has FAKE_HOST/ ? 1 : 0;
+my $exec_version = `$CMD --version`;
+my $FAKE_HOST = ($exec_version =~ /has FAKE_HOST/s) ? 1 : 0;
 
 if ($Opt{'valgrind'}) {
 	$CMD = "valgrind -q --leak-check=full --show-leak-kinds=all -- " .
