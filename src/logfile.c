@@ -365,7 +365,7 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 {
 	struct Entry e;
 	char *retval;
-	char *tag_xml, *sess_xml;
+	char *tag_xml = NULL, *sess_xml = NULL;
 	size_t size;
 
 	assert(entry);
@@ -398,17 +398,14 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 
 	tag_xml = get_xml_tags(entry);
 	if (!tag_xml) {
-		free(e.date);
-		free(e.uuid);
-		return NULL;
+		retval = NULL;
+		goto cleanup;
 	}
 
 	sess_xml = create_sess_xml(entry);
 	if (!sess_xml) {
-		free(tag_xml);
-		free(e.date);
-		free(e.uuid);
-		return NULL;
+		retval = NULL;
+		goto cleanup;
 	}
 
 	if (raw) {
@@ -427,11 +424,8 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 		       strlen(" </txt> ") + 1;
 		e.txt = mymalloc(size);
 		if (!e.txt) {
-			free(sess_xml);
-			free(tag_xml);
-			free(e.date);
-			free(e.uuid);
-			return NULL;
+			retval = NULL;
+			goto cleanup;
 		}
 		txt_space = entry->txt[0] == '<' ? " " : "";
 		snprintf(e.txt, size, "<txt>%s%s%s</txt> ",
@@ -456,12 +450,8 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 	       strlen(e.tty) + strlen(sess_xml) + 128;
 	retval = mymalloc(size);
 	if (!retval) {
-		free(e.txt);
-		free(sess_xml);
-		free(tag_xml);
-		free(e.date);
-		free(e.uuid);
-		return NULL;
+		retval = NULL;
+		goto cleanup;
 	}
 
 	/*
@@ -487,6 +477,7 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 	                       (e.user) ? e.user : "",
 	                       (e.tty) ? e.tty : "", sess_xml);
 
+cleanup:
 	free(e.tty);
 	free(e.user);
 	free(e.cwd);
