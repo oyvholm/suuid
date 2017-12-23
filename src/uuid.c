@@ -238,10 +238,10 @@ char *uuid_date_from_uuid(char *dest, const char *uuid)
 	assert(dest);
 	assert(uuid);
 
-	if (!valid_uuid(uuid, FALSE))
-		return NULL;
 	if (uuid[14] != '1')
 		return NULL; /* Not a v1 UUID, has no timestamp */
+	if (!valid_uuid(uuid, FALSE))
+		return NULL;
 
 	memset(cmd, 0, 50);
 	snprintf(cmd, 49, "uuid -d %s", uuid);

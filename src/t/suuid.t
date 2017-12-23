@@ -192,6 +192,12 @@ is_valid_date("2017-12-23T02:33:57Z", 0) = 0
 is_valid_date("2017-12-23T02:33:57.1234567Z", 1) = 1
 is_valid_date("2017-12-23T02:33:57.1234567Z", 0) = 1
 is_valid_date("2017-12-23T02:33:57.1234567Zabcd", 0) = 1
+uuid_date_from_uuid(buf2, "acdaf974-e78e-11e7-87d5-f74d993421b0") =
+  "2017-12-23T03:09:22.9493620Z"
+uuid_date_from_uuid(buf2, "notvalid") = (null)
+uuid_date_from_uuid(buf2, "") = (null)
+uuid_date_from_uuid(buf2, "c9ffa9cb-708d-454b-b1f2-f18f609cb825") = (null)
+uuid_date_from_uuid(buf2, "acdaf974-e78e-11e7-87d5-g74d993421b0") = (null)
 END
 	        <<END,
 ../$CMD_BASENAME: errno is EACCES: Permission denied

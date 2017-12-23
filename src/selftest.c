@@ -28,6 +28,7 @@
 int selftest(void)
 {
 	char buf1[] = "ABCÅÆØ";
+	char buf2[DATE_LENGTH + 1];
 
 	errno = EACCES;
 	puts("# myerror(\"errno is EACCES\")");
@@ -48,6 +49,23 @@ int selftest(void)
 	       is_valid_date("2017-12-23T02:33:57.1234567Z", 0));
 	printf("is_valid_date(\"2017-12-23T02:33:57.1234567Zabcd\", 0) = %d\n",
 	       is_valid_date("2017-12-23T02:33:57.1234567Zabcd", 0));
+
+	printf("uuid_date_from_uuid(buf2, \""
+	       "acdaf974-e78e-11e7-87d5-f74d993421b0\") =\n  \"%s\"\n",
+	       uuid_date_from_uuid(buf2,
+	                           "acdaf974-e78e-11e7-87d5-f74d993421b0"));
+	printf("uuid_date_from_uuid(buf2, \"notvalid\") = %s\n",
+	       uuid_date_from_uuid(buf2, "notvalid"));
+	printf("uuid_date_from_uuid(buf2, \"\") = %s\n",
+	       uuid_date_from_uuid(buf2, ""));
+	printf("uuid_date_from_uuid(buf2, \""
+	       "c9ffa9cb-708d-454b-b1f2-f18f609cb825\") = %s\n",
+	       uuid_date_from_uuid(buf2,
+	                           "c9ffa9cb-708d-454b-b1f2-f18f609cb825"));
+	printf("uuid_date_from_uuid(buf2, \""
+	       "acdaf974-e78e-11e7-87d5-g74d993421b0\") = %s\n",
+	       uuid_date_from_uuid(buf2,
+	                           "acdaf974-e78e-11e7-87d5-g74d993421b0"));
 
 	return EXIT_SUCCESS;
 }
