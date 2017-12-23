@@ -1514,6 +1514,12 @@ sub test_suuid_environment {
 	ok(unlink($Outfile), "Delete [Outfile]");
 	$ENV{'HOME'} = $bck_home;
 	test_invalid_hostname("", "SUUID_HOSTNAME is empty", $Outfile);
+	test_invalid_hostname("a" x 100, "SUUID_HOSTNAME is too long, 100 bytes",
+	                      $Outfile);
+	test_invalid_hostname(";", "SUUID_HOSTNAME contains semicolon", $Outfile);
+	test_invalid_hostname("a..b", "SUUID_HOSTNAME contains \"..\"", $Outfile);
+	test_invalid_hostname("\xf8", "SUUID_HOSTNAME contains latin1 char",
+	                      $Outfile);
 	return;
 	# }}}
 } # test_suuid_environment()
