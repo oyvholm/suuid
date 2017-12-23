@@ -35,6 +35,7 @@ bool is_legal_desc_char(const unsigned char c)
  * return FALSE if not.
  */
 
+#ifdef UNUSED
 bool is_valid_desc_string(const char *s)
 {
 	const char *p = s;
@@ -52,6 +53,7 @@ bool is_valid_desc_string(const char *s)
 
 	return TRUE;
 }
+#endif
 
 /*
  * get_desc_from_command() - Return pointer to allocated desc string extracted 
@@ -120,10 +122,7 @@ int fill_sess(struct Entry *dest, const char *uuid,
 			free(auuid);
 			return EXIT_FAILURE;
 		}
-		if (!is_valid_desc_string(adesc))
-			free(adesc);
-		else
-			dest->sess[sessind].desc = adesc;
+		dest->sess[sessind].desc = adesc;
 	}
 	dest->sess[sessind].uuid = auuid;
 	sessind++;
