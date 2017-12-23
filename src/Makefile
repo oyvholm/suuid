@@ -14,12 +14,7 @@ LD = cc
 
 UNAME := $(shell uname)
 
-# sqlite3.h uses long long, and gcc 4.8.4 and 4.9.2 (probably all other 
-# versions too) abort when using -pedantic because it's not defined by ISO C90. 
-# If you still want to use -pedantic with gcc, add -Wno-long-long to CCFLAGS. 
-# Clang 3.8.0 on FreeBSD 11.0 works with -pedantic.
 CCFLAGS = -Wall -Wextra -Werror -O0 -c -g
-
 CCFLAGS += $$(test -n "$(GCOV)" && \
               echo -n "-fprofile-arcs -ftest-coverage -DGCOV=1")
 CCFLAGS += $$(test -n "$(NDEBUG)" && echo -n "-DNDEBUG=1")
@@ -35,9 +30,14 @@ ifdef FAKE_HOST
 	CCFLAGS += -DFAKE_HOST
 endif
 
-# USE_SQLITE: Compile with SQLite.
+# USE_SQLITE: Compile with SQLite. sqlite3.h uses long long, and gcc 4.8.4 and 
+# 4.9.2 (probably all other versions too) abort when using -pedantic because 
+# it's not defined by ISO C90. If you still want to use -pedantic with gcc, add 
+# -Wno-long-long to CCFLAGS. Clang 3.8.0 on FreeBSD 11.0 works with -pedantic.
 ifdef USE_SQLITE
-	CCFLAGS += -pedantic -DUSE_SQLITE
+	CCFLAGS += -DUSE_SQLITE
+else
+	CCFLAGS += -pedantic
 endif
 
 # TEST_FUNC: Send non-option arguments to a function for testing. Doesn't break 
