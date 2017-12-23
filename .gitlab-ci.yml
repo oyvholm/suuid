@@ -1,6 +1,8 @@
 # suuid.git/.gitlab-ci.yml
 # File ID: b8e2f808-e7ba-11e7-896a-db5caa6d21d3
 
+image: gcc
+
 suuid:linux:
   stage: build
   before_script:
