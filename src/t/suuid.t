@@ -72,7 +72,8 @@ my $Lh = "[0-9a-fA-F]";
 my $Templ = "$Lh\{8}-$Lh\{4}-$Lh\{4}-$Lh\{4}-$Lh\{12}";
 my $v1_templ = "$Lh\{8}-$Lh\{4}-1$Lh\{3}-$Lh\{4}-$Lh\{12}";
 my $v1rand_templ = "$Lh\{8}-$Lh\{4}-1$Lh\{3}-$Lh\{4}-$Lh\[37bf]$Lh\{10}";
-my $date_templ = '20[0-9][0-9]-[0-1][0-9]-[0-3][0-9]T[0-2][0-9]:[0-5][0-9]:[0-6][0-9]\.\d+Z';
+my $date_templ = '20[0-9][0-9]-[0-1][0-9]-[0-3][0-9]T' .
+                 '[0-2][0-9]:[0-5][0-9]:[0-6][0-9]\.\d+Z';
 my $xml_header = join("",
 	'<\?xml version="1\.0" encoding="UTF-8"\?>\n',
 	'<!DOCTYPE suuids SYSTEM "dtd\/suuids\.dtd">\n',
@@ -229,9 +230,15 @@ sub test_test_functions {
 	diag("Testing s_suuid_tag()..."); # {{{
 	is(s_suuid_tag(''), '', "s_suuid_tag('') returns ''");
 	is(s_suuid_tag('test'), '<tag>test</tag> ', "s_suuid_tag('test')");
-	is(s_suuid_tag('test,lixom'), '<tag>test</tag> <tag>lixom</tag> ', "s_suuid_tag('test,lixom')");
-	is(s_suuid_tag('test,lixom,på en måte'), '<tag>test</tag> <tag>lixom</tag> <tag>på en måte</tag> ', "s_suuid_tag('test,lixom,på en måte')");
-	is(s_suuid_tag('test,lixom, space '), '<tag>test</tag> <tag>lixom</tag> <tag> space </tag> ', "s_suuid_tag('test,lixom, space ')");
+	is(s_suuid_tag('test,lixom'),
+	   '<tag>test</tag> <tag>lixom</tag> ',
+	   "s_suuid_tag('test,lixom')");
+	is(s_suuid_tag('test,lixom,på en måte'),
+	   '<tag>test</tag> <tag>lixom</tag> <tag>på en måte</tag> ',
+	   "s_suuid_tag('test,lixom,på en måte')");
+	is(s_suuid_tag('test,lixom, space '),
+	   '<tag>test</tag> <tag>lixom</tag> <tag> space </tag> ',
+	   "s_suuid_tag('test,lixom, space ')");
 
 	# }}}
 	diag("Testing s_suuid_sess()..."); # {{{
@@ -258,7 +265,10 @@ sub test_test_functions {
 							is(s_suuid_sess($str), undef, $humstr);
 						}
 					} else {
-						like(s_suuid_sess($str), '/^<sess( desc="deschere")?>ff529c20-4522-11e2-8c4a-0016d364066c<\/sess> $/', $humstr)
+						like(s_suuid_sess($str),
+						     '/^<sess( desc="deschere")?>' .
+						     'ff529c20-4522-11e2-8c4a-0016d364066c<\/sess> $/',
+						     $humstr)
 					}
 				}
 			}
@@ -304,8 +314,10 @@ sub test_test_functions {
 		's_suuid_sess() receives string with three with desc',
 	);
 	is(
-		s_suuid_sess('/ee5db39a-43f7-11e2-a975-0016d364066c,/da700fd8-43eb-11e2-889a-0016d364066c,'),
-		'<sess>ee5db39a-43f7-11e2-a975-0016d364066c</sess> <sess>da700fd8-43eb-11e2-889a-0016d364066c</sess> ',
+		s_suuid_sess('/ee5db39a-43f7-11e2-a975-0016d364066c,' .
+		             '/da700fd8-43eb-11e2-889a-0016d364066c,'),
+		'<sess>ee5db39a-43f7-11e2-a975-0016d364066c</sess> ' .
+		'<sess>da700fd8-43eb-11e2-889a-0016d364066c</sess> ',
 		"s_suuid_sess() receives two without desc",
 	);
 
@@ -439,7 +451,8 @@ sub test_suuid_executable {
 	# }}}
 	ok(unlink($Outfile), "Delete [Outfile]");
 	diag("Testing --raw option...");
-	likecmd("$CMD --raw -c '<dingle><dangle>bær</dangle></dingle>' -l $Outdir", # {{{
+	likecmd("$CMD --raw -c '<dingle><dangle>bær</dangle></dingle>' " .
+	        "-l $Outdir", # {{{
 		"/^$v1_templ\\n\$/s",
 		'/^$/s',
 		0,
@@ -864,8 +877,9 @@ sub test_suuid_executable {
 	ok(chmod(0444, $Outfile), "Make [Outfile] read-only");
 	likecmd("$CMD -l $Outdir", # {{{
 		'/^$/s',
-		'/^\.\.\/suuid: .*?\.xml: Could not open file for read\+write: Permission denied\n' .
-		'$/s',
+		'/^\.\.\/suuid: .*?\.xml: Could not open file for read\+write: ' .
+		  'Permission denied\n' .
+		  '$/s',
 		1,
 		"Unable to write to the log file",
 	);
@@ -948,7 +962,8 @@ sub test_suuid_comment {
 	# }}}
 	testcmd("$CMD -c \"F\xf8kka \xf8pp\" -l $Outdir", # {{{
 		"",
-		"../suuid: Comment contains illegal characters or is not valid UTF-8\n",
+		"../suuid: Comment contains illegal characters " .
+		    "or is not valid UTF-8\n",
 		1,
 		"Refuse non-UTF-8 text to --comment option",
 	);
@@ -956,7 +971,8 @@ sub test_suuid_comment {
 	# }}}
 	testcmd("$CMD -c \"Ctrl-d: \x04\" -l $Outdir", # {{{
 		"",
-		"../suuid: Comment contains illegal characters or is not valid UTF-8\n",
+		"../suuid: Comment contains illegal characters " .
+		    "or is not valid UTF-8\n",
 		1,
 		"Reject Ctrl-d in comment",
 	);
@@ -972,7 +988,8 @@ sub test_suuid_comment {
 	# }}}
 	testcmd("echo \"F\xf8kka \xf8pp\" | $CMD -c - -l $Outdir", # {{{
 		"",
-		"../suuid: Comment contains illegal characters or is not valid UTF-8\n",
+		"../suuid: Comment contains illegal characters " .
+		    "or is not valid UTF-8\n",
 		1,
 		"Reject non-UTF-8 comment from stdin",
 	);
@@ -980,7 +997,8 @@ sub test_suuid_comment {
 	# }}}
 	testcmd("echo \"Ctrl-d: \x04\" | $CMD -c - -l $Outdir", # {{{
 		"",
-		"../suuid: Comment contains illegal characters or is not valid UTF-8\n",
+		"../suuid: Comment contains illegal characters " .
+		    "or is not valid UTF-8\n",
 		1,
 		"Reject Ctrl-d in comment from stdin",
 	);
@@ -1161,7 +1179,8 @@ sub test_suuid_environment {
 	my $bck_home;
 
 	diag("Test logging of \$SESS_UUID environment variable...");
-	likecmd("SESS_UUID=27538da4-fc68-11dd-996d-000475e441b9 $CMD -t yess -l $Outdir", # {{{
+	likecmd("SESS_UUID=27538da4-fc68-11dd-996d-000475e441b9 $CMD -t yess " .
+	        "-l $Outdir", # {{{
 		"/^$v1_templ\n\$/s",
 		'/^$/',
 		0,
@@ -1181,7 +1200,8 @@ sub test_suuid_environment {
 
 	# }}}
 	ok(unlink($Outfile), "Delete [Outfile]");
-	likecmd("SESS_UUID=ssh-agent/da700fd8-43eb-11e2-889a-0016d364066c, $CMD -l $Outdir", # {{{
+	likecmd("SESS_UUID=ssh-agent/da700fd8-43eb-11e2-889a-0016d364066c, $CMD " .
+	        "-l $Outdir", # {{{
 		"/^$v1_templ\n\$/s",
 		'/^$/',
 		0,
@@ -1199,7 +1219,9 @@ sub test_suuid_environment {
 	);
 
 	# }}}
-	likecmd("SESS_UUID=ssh-agent/da700fd8-43eb-11e2-889a-0016d364066c,dingle©/4c66b03a-43f4-11e2-b70d-0016d364066c, $CMD -l $Outdir", # {{{
+	likecmd("SESS_UUID=ssh-agent/da700fd8-43eb-11e2-889a-0016d364066c," .
+	                    "dingle©/4c66b03a-43f4-11e2-b70d-0016d364066c, " .
+	                    "$CMD -l $Outdir", # {{{
 		"/^$v1_templ\n\$/s",
 		'/^$/',
 		0,
@@ -1233,7 +1255,8 @@ sub test_suuid_environment {
 	# }}}
 	delete $ENV{'SESS_UUID'};
 	ok(unlink($Outfile), "Delete [Outfile]");
-	likecmd("SESS_UUID=ssh-agent/da700fd8-43eb-11e2-889a-0016d364066c $CMD -l $Outdir", # {{{
+	likecmd("SESS_UUID=ssh-agent/da700fd8-43eb-11e2-889a-0016d364066c " .
+	        "$CMD -l $Outdir", # {{{
 		"/^$v1_templ\n\$/s",
 		'/^$/',
 		0,
@@ -1252,7 +1275,8 @@ sub test_suuid_environment {
 
 	# }}}
 	ok(unlink($Outfile), "Delete [Outfile]");
-	likecmd("SESS_UUID=/da700fd8-43eb-11e2-889a-0016d364066c $CMD -l $Outdir", # {{{
+	likecmd("SESS_UUID=/da700fd8-43eb-11e2-889a-0016d364066c " .
+	        "$CMD -l $Outdir", # {{{
 		"/^$v1_templ\n\$/s",
 		'/^$/',
 		0,
@@ -1271,18 +1295,22 @@ sub test_suuid_environment {
 
 	# }}}
 	ok(unlink($Outfile), "Delete [Outfile]");
-	likecmd("SESS_UUID=ee5db39a-43f7-11e2-a975-0016d364066c,/da700fd8-43eb-11e2-889a-0016d364066c $CMD -l $Outdir", # {{{
+	likecmd("SESS_UUID=ee5db39a-43f7-11e2-a975-0016d364066c," .
+	                 "/da700fd8-43eb-11e2-889a-0016d364066c " .
+	                 "$CMD -l $Outdir", # {{{
 		"/^$v1_templ\n\$/s",
 		'/^$/',
 		0,
-		"SESS_UUID with two UUIDs, latter missing name and comma, but has slash",
+		"SESS_UUID with two UUIDs, latter missing name and comma, " .
+		"but has slash",
 	);
 
 	# }}}
 	like(file_data($Outfile), # {{{
 		s_top(
 			s_suuid(
-				'sess' => '/ee5db39a-43f7-11e2-a975-0016d364066c,/da700fd8-43eb-11e2-889a-0016d364066c,',
+				'sess' => '/ee5db39a-43f7-11e2-a975-0016d364066c,' .
+				          '/da700fd8-43eb-11e2-889a-0016d364066c,',
 			),
 		),
 		"Second <sess> is correct without comma",
@@ -1290,7 +1318,9 @@ sub test_suuid_environment {
 
 	# }}}
 	ok(unlink($Outfile), "Delete [Outfile]");
-	likecmd("SESS_UUID=ee5db39a-43f7-11e2-a975-0016d364066cda700fd8-43eb-11e2-889a-0016d364066c $CMD -l $Outdir", # {{{
+	likecmd("SESS_UUID=ee5db39a-43f7-11e2-a975-0016d364066c" .
+	                  "da700fd8-43eb-11e2-889a-0016d364066c " .
+	                  "$CMD -l $Outdir", # {{{
 		"/^$v1_templ\n\$/s",
 		'/^$/',
 		0,
@@ -1301,7 +1331,8 @@ sub test_suuid_environment {
 	like(file_data($Outfile), # {{{
 		s_top(
 			s_suuid(
-				'sess' => '/ee5db39a-43f7-11e2-a975-0016d364066c,/da700fd8-43eb-11e2-889a-0016d364066c,',
+				'sess' => '/ee5db39a-43f7-11e2-a975-0016d364066c,' .
+				          '/da700fd8-43eb-11e2-889a-0016d364066c,',
 			),
 		),
 		"Still separates them into two UUIDs",
@@ -1309,7 +1340,10 @@ sub test_suuid_environment {
 
 	# }}}
 	ok(unlink($Outfile), "Delete [Outfile]");
-	likecmd("SESS_UUID=da700fd8-43eb-11e2-889a-0016d364066cabcee5db39a-43f7-11e2-a975-0016d364066c $CMD -l $Outdir", # {{{
+	likecmd("SESS_UUID=da700fd8-43eb-11e2-889a-0016d364066c" .
+	                  "abc" .
+	                  "ee5db39a-43f7-11e2-a975-0016d364066c " .
+	                  "$CMD -l $Outdir", # {{{
 		"/^$v1_templ\n\$/s",
 		'/^$/',
 		0,
@@ -1320,7 +1354,8 @@ sub test_suuid_environment {
 	like(file_data($Outfile), # {{{
 		s_top(
 			s_suuid(
-				'sess' => '/da700fd8-43eb-11e2-889a-0016d364066c,abc/ee5db39a-43f7-11e2-a975-0016d364066c,',
+				'sess' => '/da700fd8-43eb-11e2-889a-0016d364066c,' .
+				          'abc/ee5db39a-43f7-11e2-a975-0016d364066c,',
 			),
 		),
 		"Separated the two UUIDs, keeps 'abc'",
@@ -1328,7 +1363,9 @@ sub test_suuid_environment {
 
 	# }}}
 	ok(unlink($Outfile), "Delete [Outfile]");
-	likecmd("SESS_UUID=da700fd8-43eb-11e2-889a-0016d364066cabc/ee5db39a-43f7-11e2-a975-0016d364066c $CMD -l $Outdir", # {{{
+	likecmd("SESS_UUID=da700fd8-43eb-11e2-889a-0016d364066c" .
+	              "abc/ee5db39a-43f7-11e2-a975-0016d364066c " .
+	              "$CMD -l $Outdir", # {{{
 		"/^$v1_templ\n\$/s",
 		'/^$/',
 		0,
@@ -1339,7 +1376,8 @@ sub test_suuid_environment {
 	like(file_data($Outfile), # {{{
 		s_top(
 			s_suuid(
-				'sess' => '/da700fd8-43eb-11e2-889a-0016d364066c,abc/ee5db39a-43f7-11e2-a975-0016d364066c,',
+				'sess' => '/da700fd8-43eb-11e2-889a-0016d364066c,' .
+				          'abc/ee5db39a-43f7-11e2-a975-0016d364066c,',
 			),
 		),
 		"The two UUIDs are separated, 'abc/' is kept",
@@ -1347,7 +1385,10 @@ sub test_suuid_environment {
 
 	# }}}
 	ok(unlink($Outfile), "Delete [Outfile]");
-	likecmd("SESS_UUID=" . "da700fd8-43eb-11e2-889a-0016d364066c" . "ee5db39a-43f7-11e2-a975-0016d364066c" . "abc" . " $CMD -l $Outdir", # {{{
+	likecmd("SESS_UUID=da700fd8-43eb-11e2-889a-0016d364066c" .
+	                  "ee5db39a-43f7-11e2-a975-0016d364066c" .
+	                  "abc" .
+	                  " $CMD -l $Outdir", # {{{
 		"/^$v1_templ\n\$/s",
 		'/^$/',
 		0,
@@ -1368,7 +1409,9 @@ sub test_suuid_environment {
 
 	# }}}
 	ok(unlink($Outfile), "Delete [Outfile]");
-	likecmd("SESS_UUID=" . "da700fd8-43eb-11e2-889a-0016d364066c" . ",,ee5db39a-43f7-11e2-a975-0016d364066c" . " $CMD -l $Outdir", # {{{
+	likecmd("SESS_UUID=da700fd8-43eb-11e2-889a-0016d364066c" .
+	                ",,ee5db39a-43f7-11e2-a975-0016d364066c" .
+	                " $CMD -l $Outdir", # {{{
 		"/^$v1_templ\n\$/s",
 		'/^$/',
 		0,
@@ -1389,7 +1432,10 @@ sub test_suuid_environment {
 
 	# }}}
 	ok(unlink($Outfile), "Delete [Outfile]");
-	likecmd("SESS_UUID='" . ",,,,," . "abc/da700fd8-43eb-11e2-889a-0016d364066c" . ",,,,,,,,,," . "def/ee5db39a-43f7-11e2-a975-0016d364066c" . ",,%..¤¤¤%¤,,,'" . " $CMD -l $Outdir", # {{{
+	likecmd("SESS_UUID='" . ",,,,," .
+	        "abc/da700fd8-43eb-11e2-889a-0016d364066c" . ",,,,,,,,,," .
+	        "def/ee5db39a-43f7-11e2-a975-0016d364066c" . ",,%..¤¤¤%¤,,,'" .
+	        " $CMD -l $Outdir", # {{{
 		"/^$v1_templ\n\$/s",
 		'/^$/',
 		0,
@@ -1410,7 +1456,9 @@ sub test_suuid_environment {
 
 	# }}}
 	ok(unlink($Outfile), "Delete [Outfile]");
-	likecmd("SESS_UUID=" . "da700fd8-43eb-11e2-889a-0016d364066c" . "def/ee5db39a-43f7-11e2-a975-0016d364066c" . " $CMD -l $Outdir", # {{{
+	likecmd("SESS_UUID=" . "da700fd8-43eb-11e2-889a-0016d364066c" .
+	        "def/ee5db39a-43f7-11e2-a975-0016d364066c" .
+	        " $CMD -l $Outdir", # {{{
 		"/^$v1_templ\n\$/s",
 		'/^$/',
 		0,
@@ -1431,7 +1479,11 @@ sub test_suuid_environment {
 
 	# }}}
 	ok(unlink($Outfile), "Delete [Outfile]");
-	likecmd("SESS_UUID=5f650dac-4404-11e2-8e0e-0016d364066c5f660e28-4404-11e2-808e-0016d364066c5f66ef14-4404-11e2-8b45-0016d364066c5f67e266-4404-11e2-a6f8-0016d364066c $CMD -l $Outdir", # {{{
+	likecmd("SESS_UUID=5f650dac-4404-11e2-8e0e-0016d364066c" .
+	                  "5f660e28-4404-11e2-808e-0016d364066c" .
+	                  "5f66ef14-4404-11e2-8b45-0016d364066c" .
+	                  "5f67e266-4404-11e2-a6f8-0016d364066c " .
+	                  "$CMD -l $Outdir", # {{{
 		"/^$v1_templ\n\$/s",
 		'/^$/',
 		0,
@@ -1453,11 +1505,17 @@ sub test_suuid_environment {
 
 	# }}}
 	ok(unlink($Outfile), "Delete [Outfile]");
-	likecmd("SESS_UUID=5f650dac-4404-11e2-8e0e-0016d364066cabc5f660e28-4404-11e2-808e-0016d364066c5f66ef14-4404-11e2-8b45-0016d364066c,nmap/5f67e266-4404-11e2-a6f8-0016d364066c $CMD -l $Outdir", # {{{
+	likecmd("SESS_UUID=5f650dac-4404-11e2-8e0e-0016d364066c" .
+	                  "abc" .
+	                  "5f660e28-4404-11e2-808e-0016d364066c" .
+	                  "5f66ef14-4404-11e2-8b45-0016d364066c," .
+	                  "nmap/5f67e266-4404-11e2-a6f8-0016d364066c " .
+	                  "$CMD -l $Outdir", # {{{
 		"/^$v1_templ\n\$/s",
 		'/^$/',
 		0,
-		"SESS_UUID contains four UUIDs, 'abc' separates the first two, last one has desc",
+		"SESS_UUID contains four UUIDs, 'abc' separates the first two, " .
+		"last one has desc",
 	);
 
 	# }}}
@@ -1475,7 +1533,11 @@ sub test_suuid_environment {
 
 	# }}}
 	ok(unlink($Outfile), "Delete [Outfile]");
-	likecmd("SESS_UUID=ssh-agent/fea9315a-43d6-11e2-8294-0016d364066c,logging/febfd0f4-43d6-11e2-9117-0016d364066c,screen/0e144c10-43d7-11e2-9833-0016d364066c,ti/152d8f16-4409-11e2-be17-0016d364066c, $CMD -l $Outdir", # {{{
+	likecmd("SESS_UUID=ssh-agent/fea9315a-43d6-11e2-8294-0016d364066c," .
+	                    "logging/febfd0f4-43d6-11e2-9117-0016d364066c," .
+	                     "screen/0e144c10-43d7-11e2-9833-0016d364066c," .
+	                         "ti/152d8f16-4409-11e2-be17-0016d364066c, " .
+	                         "$CMD -l $Outdir", # {{{
 		"/^$v1_templ\n\$/s",
 		'/^$/',
 		0,
@@ -1645,7 +1707,8 @@ sub read_long_text_from_stdin {
 	like(file_data($Outfile), # {{{
 		s_top(
 			 s_suuid(
-				'txt' => '1\\\\n2\\\\n3\\\\n[\d\\\\n]+19998\\\\n19999\\\\n20000',
+				'txt' => '1\\\\n2\\\\n3\\\\n[\d\\\\n]+' .
+				         '19998\\\\n19999\\\\n20000',
 				'tty' => '',
 			 ),
 		),
@@ -1769,7 +1832,8 @@ sub unique_macs {
 	my %mac = ();
 	if (open(my $fp, '<', $file)) {
 		while (<$fp>) {
-			/^<suuid t="[^"]+" u="$Lh{8}-$Lh{4}-1$Lh{3}-$Lh{4}-($Lh{12})".*/ && ($mac{$1} = 1);
+			/^<suuid t="[^"]+" u="$Lh{8}-$Lh{4}-1$Lh{3}-$Lh{4}-($Lh{12})".*/ &&
+			    ($mac{$1} = 1);
 		}
 		close($fp);
 	} else {
