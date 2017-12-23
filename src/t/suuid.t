@@ -185,6 +185,13 @@ sub test_executable {
 	testcmd("$CMD --selftest",
 	        <<END,
 # myerror("errno is EACCES")
+string_to_lower(NULL) = (null)
+string_to_lower("ABCÅÆØ") = abcÅÆØ
+is_valid_date("2017-12-23T02:33:57Z", 1) = 0
+is_valid_date("2017-12-23T02:33:57Z", 0) = 0
+is_valid_date("2017-12-23T02:33:57.1234567Z", 1) = 1
+is_valid_date("2017-12-23T02:33:57.1234567Z", 0) = 1
+is_valid_date("2017-12-23T02:33:57.1234567Zabcd", 0) = 1
 END
 	        <<END,
 ../$CMD_BASENAME: errno is EACCES: Permission denied

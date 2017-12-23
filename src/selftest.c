@@ -27,10 +27,27 @@
 
 int selftest(void)
 {
+	char buf1[] = "ABCÅÆØ";
+
 	errno = EACCES;
 	puts("# myerror(\"errno is EACCES\")");
 	myerror("errno is EACCES");
 	errno = 0;
+
+	printf("string_to_lower(NULL) = %s\n", string_to_lower(NULL));
+	printf("string_to_lower(\"%s\") = ", buf1);
+	printf("%s\n", string_to_lower(buf1));
+
+	printf("is_valid_date(\"2017-12-23T02:33:57Z\", 1) = %d\n",
+	       is_valid_date("2017-12-23T02:33:57Z", 1));
+	printf("is_valid_date(\"2017-12-23T02:33:57Z\", 0) = %d\n",
+	       is_valid_date("2017-12-23T02:33:57Z", 0));
+	printf("is_valid_date(\"2017-12-23T02:33:57.1234567Z\", 1) = %d\n",
+	       is_valid_date("2017-12-23T02:33:57.1234567Z", 1));
+	printf("is_valid_date(\"2017-12-23T02:33:57.1234567Z\", 0) = %d\n",
+	       is_valid_date("2017-12-23T02:33:57.1234567Z", 0));
+	printf("is_valid_date(\"2017-12-23T02:33:57.1234567Zabcd\", 0) = %d\n",
+	       is_valid_date("2017-12-23T02:33:57.1234567Zabcd", 0));
 
 	return EXIT_SUCCESS;
 }
