@@ -16,8 +16,9 @@ suuid_version=0.4.0
 suuid_date=2016-12-02
 
 tag_prefix="suuid-v$suuid_version"
+has_git=$(git --version | grep -q "git version" && echo 1 || echo 0)
 
-if test -d ../.git; then
+if test -d ../.git -a $has_git -eq 1; then
 	if git tag | grep -q ^$tag_prefix; then
 		numsince=$(
 		    git log --format=%h \
