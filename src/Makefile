@@ -63,56 +63,56 @@ CFILES = database.c environ.c genuuid.c io.c logfile.c \
 
 SUUID_HFILES = suuid.h common.h
 
-SUUID_DEPS = $(SUUID_HFILES) Makefile
+DEPS = $(SUUID_HFILES) Makefile
 
 DEFAULT_DEPS = $(EXEC)
 
 .PHONY: all
 all: $(DEFAULT_DEPS)
 
-version.h: Gen-version suuid.c $(CFILES) $(SUUID_DEPS)
+version.h: Gen-version suuid.c $(CFILES) $(DEPS)
 	./Gen-version
 
 $(EXEC): $(OBJS) $(COMMON_OBJS)
 	$(LD) -o $(EXEC) $(LDFLAGS) $(OBJS) $(COMMON_OBJS) $(LIBS)
 
-suuid.o: version.h suuid.c $(SUUID_DEPS)
+suuid.o: version.h suuid.c $(DEPS)
 	$(CC) $(CCFLAGS) suuid.c
 
-database.o: database.c $(SUUID_DEPS)
+database.o: database.c $(DEPS)
 	$(CC) $(CCFLAGS) database.c
 
-environ.o: environ.c $(SUUID_DEPS)
+environ.o: environ.c $(DEPS)
 	$(CC) $(CCFLAGS) environ.c
 
-genuuid.o: genuuid.c $(SUUID_DEPS)
+genuuid.o: genuuid.c $(DEPS)
 	$(CC) $(CCFLAGS) genuuid.c
 
-io.o: io.c $(SUUID_DEPS)
+io.o: io.c $(DEPS)
 	$(CC) $(CCFLAGS) io.c
 
-logfile.o: logfile.c $(SUUID_DEPS)
+logfile.o: logfile.c $(DEPS)
 	$(CC) $(CCFLAGS) logfile.c
 
-rcfile.o: rcfile.c $(SUUID_DEPS)
+rcfile.o: rcfile.c $(DEPS)
 	$(CC) $(CCFLAGS) rcfile.c
 
-selftest.o: selftest.c $(SUUID_DEPS)
+selftest.o: selftest.c $(DEPS)
 	$(CC) $(CCFLAGS) selftest.c
 
-sessvar.o: sessvar.c $(SUUID_DEPS)
+sessvar.o: sessvar.c $(DEPS)
 	$(CC) $(CCFLAGS) sessvar.c
 
 sqlite3.o: sqlite3.c
 	$(CC) $(SQLITE_CCFLAGS) -DSQLITE_ENABLE_JSON1 sqlite3.c
 
-string.o: string.c $(SUUID_DEPS)
+string.o: string.c $(DEPS)
 	$(CC) $(CCFLAGS) string.c
 
-tag.o: tag.c $(SUUID_DEPS)
+tag.o: tag.c $(DEPS)
 	$(CC) $(CCFLAGS) tag.c
 
-uuid.o: uuid.c $(SUUID_DEPS)
+uuid.o: uuid.c $(DEPS)
 	$(CC) $(CCFLAGS) uuid.c
 
 .PHONY: clean
