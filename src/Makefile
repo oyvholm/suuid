@@ -56,7 +56,7 @@ ifdef USE_SQLITE
 	COMMON_OBJS += sqlite3.o
 endif
 
-SUUID_OBJS  = suuid.o
+OBJS  = suuid.o
 
 CFILES = database.c environ.c genuuid.c io.c logfile.c \
          rcfile.c selftest.c sessvar.c string.c tag.c uuid.c
@@ -73,8 +73,8 @@ all: $(DEFAULT_DEPS)
 version.h: Gen-version suuid.c $(CFILES) $(SUUID_DEPS)
 	./Gen-version
 
-$(EXEC): $(SUUID_OBJS) $(COMMON_OBJS)
-	$(LD) -o $(EXEC) $(LDFLAGS) $(SUUID_OBJS) $(COMMON_OBJS) $(LIBS)
+$(EXEC): $(OBJS) $(COMMON_OBJS)
+	$(LD) -o $(EXEC) $(LDFLAGS) $(OBJS) $(COMMON_OBJS) $(LIBS)
 
 suuid.o: version.h suuid.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) suuid.c
@@ -117,7 +117,7 @@ uuid.o: uuid.c $(SUUID_DEPS)
 
 .PHONY: clean
 clean:
-	rm -f $(EXEC) $(SUUID_OBJS)
+	rm -f $(EXEC) $(OBJS)
 	rm -f *.gcda *.gcno *.gcov
 	rm -f version.h
 	rm -f $(COMMON_OBJS)
