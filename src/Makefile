@@ -58,7 +58,7 @@ endif
 
 OBJS  = suuid.o
 
-CFILES = database.c environ.c genuuid.c io.c logfile.c \
+CFILES = suuid.c database.c environ.c genuuid.c io.c logfile.c \
          rcfile.c selftest.c sessvar.c string.c tag.c uuid.c
 
 HFILES = suuid.h common.h
@@ -70,7 +70,7 @@ DEFAULT_DEPS = $(EXEC)
 .PHONY: all
 all: $(DEFAULT_DEPS)
 
-version.h: Gen-version suuid.c $(CFILES) $(DEPS)
+version.h: Gen-version $(CFILES) $(DEPS)
 	./Gen-version
 
 $(EXEC): $(OBJS) $(COMMON_OBJS)
@@ -133,16 +133,16 @@ edit: tags
 .PHONY: gcov
 gcov:
 	$(MAKE) clean test GCOV=1
-	gcov suuid.c $(CFILES)
+	gcov $(CFILES)
 	@echo $$(grep -E '^ +#####:' *.c.gcov | wc -l) untested lines >&2
 
 .PHONY: gcov-cmt
 gcov-cmt: gcov
-	gcov-cmt suuid.c $(CFILES)
+	gcov-cmt $(CFILES)
 
 .PHONY: gcov-cmt-clean
 gcov-cmt-clean:
-	gcov-cmt -d suuid.c $(CFILES)
+	gcov-cmt -d $(CFILES)
 
 .PHONY: gdb
 gdb: $(EXEC)
@@ -154,8 +154,8 @@ install: $(PREFIX)/bin/$(EXEC)
 $(PREFIX)/bin/$(EXEC): $(EXEC)
 	install $(EXEC) $(PREFIX)/bin/$(EXEC)
 
-tags: $(CFILES) suuid.c $(HFILES) t/suuid.t
-	$(CTAGS) $(CFILES) suuid.c $(HFILES) t/suuid.t
+tags: $(CFILES) $(HFILES) t/suuid.t
+	$(CTAGS) $(CFILES) $(HFILES) t/suuid.t
 
 .PHONY: test
 test: $(EXEC)
