@@ -49,14 +49,12 @@ LIBS += $$(test -n "$(GCOV)" && echo "-lgcov --coverage");
 
 # For regular use, it's not necessary to modify anything below this line.
 
-# If compiling with -DUSE_SQLITE, add sqlite3.o to COMMON_OBJS
-COMMON_OBJS = database.o environ.o genuuid.o io.o logfile.o \
-              rcfile.o selftest.o sessvar.o string.o tag.o uuid.o
+# If compiling with -DUSE_SQLITE, add sqlite3.o to OBJS
+OBJS = suuid.o database.o environ.o genuuid.o io.o logfile.o \
+       rcfile.o selftest.o sessvar.o string.o tag.o uuid.o
 ifdef USE_SQLITE
-	COMMON_OBJS += sqlite3.o
+	OBJS += sqlite3.o
 endif
-
-OBJS  = suuid.o
 
 CFILES = suuid.c database.c environ.c genuuid.c io.c logfile.c \
          rcfile.c selftest.c sessvar.c string.c tag.c uuid.c
@@ -73,8 +71,8 @@ all: $(DEFAULT_DEPS)
 version.h: Gen-version $(CFILES) $(DEPS)
 	./Gen-version
 
-$(EXEC): $(OBJS) $(COMMON_OBJS)
-	$(LD) -o $(EXEC) $(LDFLAGS) $(OBJS) $(COMMON_OBJS) $(LIBS)
+$(EXEC): $(OBJS)
+	$(LD) -o $(EXEC) $(LDFLAGS) $(OBJS) $(LIBS)
 
 suuid.o: version.h suuid.c $(DEPS)
 	$(CC) $(CCFLAGS) suuid.c
@@ -120,7 +118,6 @@ clean:
 	rm -f $(EXEC) $(OBJS)
 	rm -f *.gcda *.gcno *.gcov
 	rm -f version.h
-	rm -f $(COMMON_OBJS)
 	rm -f sqlite3.o
 	rm -fr $(TESTLOCKDIR)
 	cd t && $(MAKE) clean
