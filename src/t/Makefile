@@ -16,7 +16,7 @@ build:
 
 .PHONY: clean
 clean:
-	rm -rf tmp-* *-stderr.tmp
+	rm -rf *.tmp .tmp-* rc-macaddr tmp-*
 	if test ! -e log/.git; then rm -rf log; fi
 
 .PHONY: valgrind
