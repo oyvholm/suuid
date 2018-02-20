@@ -61,9 +61,9 @@ OBJS  = suuid.o
 CFILES = database.c environ.c genuuid.c io.c logfile.c \
          rcfile.c selftest.c sessvar.c string.c tag.c uuid.c
 
-SUUID_HFILES = suuid.h common.h
+HFILES = suuid.h common.h
 
-DEPS = $(SUUID_HFILES) Makefile
+DEPS = $(HFILES) Makefile
 
 DEFAULT_DEPS = $(EXEC)
 
@@ -154,8 +154,8 @@ install: $(PREFIX)/bin/$(EXEC)
 $(PREFIX)/bin/$(EXEC): $(EXEC)
 	install $(EXEC) $(PREFIX)/bin/$(EXEC)
 
-tags: $(CFILES) suuid.c $(SUUID_HFILES) t/suuid.t
-	$(CTAGS) $(CFILES) suuid.c $(SUUID_HFILES) t/suuid.t
+tags: $(CFILES) suuid.c $(HFILES) t/suuid.t
+	$(CTAGS) $(CFILES) suuid.c $(HFILES) t/suuid.t
 
 .PHONY: test
 test: $(EXEC)
