@@ -18,6 +18,10 @@ exec_date=2016-12-02
 tag_prefix="suuid-v$exec_version"
 has_git=$(git --version | grep -q "git version" && echo 1 || echo 0)
 
+newdef() {
+	echo "#define $1  1" >>version.h
+}
+
 if test -d ../.git -a $has_git -eq 1; then
 	if git tag | grep -q ^$tag_prefix; then
 		numsince=$(
@@ -43,6 +47,20 @@ cat <<END >version.h
 #define EXEC_VERSION  "$exec_fullversion"
 #define EXEC_DATE  "$exec_date"
 END
+
+# FAKE_HOST: Use "fake" as hostname to avoid conflicts with files created by 
+# the Perl version.
+test -n "$FAKE_HOST" && newdef FAKE_HOST
+
+# NDEBUG: Disable assert()
+test -n "$NDEBUG" && newdef NDEBUG
+
+# TEST_FUNC: Send non-option arguments to a function for testing. Doesn't break 
+# anything, non-option arguments are ignored by the program.
+test -n "$TEST_FUNC" && newdef TEST_FUNC
+
+# UNUSED: Compile with unused/unfinished code.
+test -n "$UNUSED" && newdef UNUSED
 
 exit 0
 

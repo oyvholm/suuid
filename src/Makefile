@@ -17,18 +17,11 @@ UNAME := $(shell uname)
 CCFLAGS = -Wall -Wextra -Werror -O0 -c -g
 CCFLAGS += $$(test -n "$(GCOV)" && \
               echo -n "-fprofile-arcs -ftest-coverage -DGCOV=1")
-CCFLAGS += $$(test -n "$(NDEBUG)" && echo -n "-DNDEBUG=1")
 
 # sqlite3.c gives warnings on NetBSD and OpenBSD, as described in 
 # ../doc/netbsd.txt and ../doc/openbsd.txt. Temporarily disable -Werror for 
 # sqlite3.c until this is sorted out.
 SQLITE_CCFLAGS = -Wall -Wextra -O0 -c -g
-
-# FAKE_HOST: Use "fake" as hostname to avoid conflicts with files created by 
-# the Perl version.
-ifdef FAKE_HOST
-	CCFLAGS += -DFAKE_HOST
-endif
 
 # USE_SQLITE: Compile with SQLite. sqlite3.h uses long long, and gcc 4.8.4 and 
 # 4.9.2 (probably all other versions too) abort when using -pedantic because 
@@ -38,17 +31,6 @@ ifdef USE_SQLITE
 	CCFLAGS += -DUSE_SQLITE
 else
 	CCFLAGS += -pedantic
-endif
-
-# TEST_FUNC: Send non-option arguments to a function for testing. Doesn't break 
-# anything, non-option arguments are ignored by the program.
-ifdef TEST_FUNC
-	CCFLAGS += -DTEST_FUNC
-endif
-
-# UNUSED: Compile with unused/unfinished code.
-ifdef UNUSED
-	CCFLAGS += -DUNUSED
 endif
 
 LDFLAGS = -Wall -Wextra -Werror
