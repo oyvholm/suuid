@@ -4,7 +4,7 @@
 
 PREFIX = /usr/local
 
-SUUID_EXEC = suuid
+EXEC = suuid
 
 TESTLOCKDIR = testlockdir
 CTAGS = ctags
@@ -65,7 +65,7 @@ SUUID_HFILES = suuid.h common.h
 
 SUUID_DEPS = $(SUUID_HFILES) Makefile
 
-DEFAULT_DEPS = $(SUUID_EXEC)
+DEFAULT_DEPS = $(EXEC)
 
 .PHONY: all
 all: $(DEFAULT_DEPS)
@@ -73,8 +73,8 @@ all: $(DEFAULT_DEPS)
 version.h: Gen-version suuid.c $(COMMON_C) $(SUUID_DEPS)
 	./Gen-version
 
-$(SUUID_EXEC): $(SUUID_OBJS) $(COMMON_OBJS)
-	$(LD) -o $(SUUID_EXEC) $(LDFLAGS) $(SUUID_OBJS) $(COMMON_OBJS) $(LIBS)
+$(EXEC): $(SUUID_OBJS) $(COMMON_OBJS)
+	$(LD) -o $(EXEC) $(LDFLAGS) $(SUUID_OBJS) $(COMMON_OBJS) $(LIBS)
 
 suuid.o: version.h suuid.c $(SUUID_DEPS)
 	$(CC) $(CCFLAGS) suuid.c
@@ -117,7 +117,7 @@ uuid.o: uuid.c $(SUUID_DEPS)
 
 .PHONY: clean
 clean:
-	rm -f $(SUUID_EXEC) $(SUUID_OBJS)
+	rm -f $(EXEC) $(SUUID_OBJS)
 	rm -f *.gcda *.gcno *.gcov
 	rm -f version.h
 	rm -f $(COMMON_OBJS)
@@ -145,20 +145,20 @@ gcov-cmt-clean:
 	gcov-cmt -d suuid.c $(COMMON_C)
 
 .PHONY: gdb
-gdb: $(SUUID_EXEC)
-	gdb -x gdbrc $$(cat gdbopts 2>/dev/null) $(SUUID_EXEC)
+gdb: $(EXEC)
+	gdb -x gdbrc $$(cat gdbopts 2>/dev/null) $(EXEC)
 
 .PHONY: install
-install: $(PREFIX)/bin/$(SUUID_EXEC)
+install: $(PREFIX)/bin/$(EXEC)
 
-$(PREFIX)/bin/$(SUUID_EXEC): $(SUUID_EXEC)
-	install $(SUUID_EXEC) $(PREFIX)/bin/$(SUUID_EXEC)
+$(PREFIX)/bin/$(EXEC): $(EXEC)
+	install $(EXEC) $(PREFIX)/bin/$(EXEC)
 
 tags: $(COMMON_C) suuid.c $(SUUID_HFILES) t/suuid.t
 	$(CTAGS) $(COMMON_C) suuid.c $(SUUID_HFILES) t/suuid.t
 
 .PHONY: test
-test: $(SUUID_EXEC)
+test: $(EXEC)
 	cd t && $(MAKE) test
 
 .PHONY: testall
@@ -203,19 +203,19 @@ testhist: test
 	done
 
 .PHONY: testlock
-testlock: $(SUUID_EXEC)
+testlock: $(EXEC)
 	rm -rf $(TESTLOCKDIR)
 	mkdir $(TESTLOCKDIR)
-	for f in $$(seq 1 500); do ./$(SUUID_EXEC) -wn -l $(TESTLOCKDIR); done &
-	for f in $$(seq 1 500); do ./$(SUUID_EXEC) -wn -l $(TESTLOCKDIR); done &
-	for f in $$(seq 1 500); do ./$(SUUID_EXEC) -wn -l $(TESTLOCKDIR); done
+	for f in $$(seq 1 500); do ./$(EXEC) -wn -l $(TESTLOCKDIR); done &
+	for f in $$(seq 1 500); do ./$(EXEC) -wn -l $(TESTLOCKDIR); done &
+	for f in $$(seq 1 500); do ./$(EXEC) -wn -l $(TESTLOCKDIR); done
 
 .PHONY: testnew
 testnew: test
 
 .PHONY: uninstall
 uninstall:
-	rm -f $(PREFIX)/bin/$(SUUID_EXEC)
+	rm -f $(PREFIX)/bin/$(EXEC)
 
 .PHONY: valgrind
 valgrind:
