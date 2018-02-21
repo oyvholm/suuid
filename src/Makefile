@@ -56,10 +56,8 @@ HFILES = suuid.h common.h
 
 DEPS = $(HFILES) Makefile
 
-DEFAULT_DEPS = $(EXEC)
-
 .PHONY: all
-all: $(DEFAULT_DEPS)
+all: $(EXEC)
 
 version.h: Gen-version $(CFILES) $(DEPS)
 	./Gen-version
