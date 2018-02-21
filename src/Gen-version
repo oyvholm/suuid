@@ -52,6 +52,9 @@ END
 # the Perl version.
 test -n "$FAKE_HOST" && newdef FAKE_HOST
 
+# GCOV: Compile with coverage code for gcov(1)
+test -n "$GCOV" && newdef GCOV
+
 # NDEBUG: Disable assert()
 test -n "$NDEBUG" && newdef NDEBUG
 
@@ -61,6 +64,12 @@ test -n "$TEST_FUNC" && newdef TEST_FUNC
 
 # UNUSED: Compile with unused/unfinished code.
 test -n "$UNUSED" && newdef UNUSED
+
+# USE_SQLITE: Compile with SQLite. sqlite3.h uses long long, and gcc 4.8.4 and 
+# 4.9.2 (probably all other versions too) abort when using -pedantic because 
+# it's not defined by ISO C90. If you still want to use -pedantic with gcc, add 
+# -Wno-long-long to CCFLAGS. Clang 3.8.0 on FreeBSD 11.0 works with -pedantic.
+test -n "$USE_SQLITE" && newdef USE_SQLITE
 
 exit 0
 
