@@ -26,7 +26,6 @@ INSERT INTO synced VALUES('obsolete/suuid.pl','','273d6f5b1b1e7eb6c8553cd2cb3b17
 INSERT INTO synced VALUES('src/COPYING','Lib/std/COPYING','17bc73d79f068dfaf2655db1090f6b9206734555','2016-06-06 03:02:53');
 INSERT INTO synced VALUES('src/Gen-version','Lib/std/c/Gen-version','7b1bb04bf32d5fc760f1a4dbbfd700841ca0292e','2017-12-29 02:32:30');
 INSERT INTO synced VALUES('src/Makefile','Lib/std/c/Makefile','6277f2b035d8cab6d50c0d102ae626e54bd3bb72','2017-12-21 12:56:56');
-INSERT INTO synced VALUES('src/common.h','Lib/std/c/std.h','6277f2b035d8cab6d50c0d102ae626e54bd3bb72','2017-12-21 12:56:56');
 INSERT INTO synced VALUES('src/gdbrc','Lib/std/c/gdbrc','4f1d59b1929757ad25b2321821fce598627d5d55','2017-10-02 15:10:57');
 INSERT INTO synced VALUES('src/selftest.c','Lib/std/c/selftest.c','6277f2b035d8cab6d50c0d102ae626e54bd3bb72','2017-12-21 12:56:56');
 INSERT INTO synced VALUES('src/suuid.c','Lib/std/c/std.c','6277f2b035d8cab6d50c0d102ae626e54bd3bb72','2017-12-21 12:56:56');

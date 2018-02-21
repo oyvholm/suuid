@@ -52,7 +52,7 @@ endif
 CFILES = suuid.c database.c environ.c genuuid.c io.c logfile.c \
          rcfile.c selftest.c sessvar.c string.c tag.c uuid.c
 
-HFILES = suuid.h common.h
+HFILES = suuid.h
 
 DEPS = $(HFILES) Makefile
 
