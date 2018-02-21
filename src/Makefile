@@ -7,7 +7,6 @@ PREFIX = /usr/local
 EXEC = suuid
 
 TESTLOCKDIR = testlockdir
-CTAGS = ctags
 
 CC = cc
 LD = cc
@@ -146,7 +145,7 @@ $(PREFIX)/bin/$(EXEC): $(EXEC)
 	install $(EXEC) $(PREFIX)/bin/$(EXEC)
 
 tags: $(CFILES) $(HFILES) t/suuid.t
-	$(CTAGS) $(CFILES) $(HFILES) t/suuid.t
+	ctags $(CFILES) $(HFILES) t/suuid.t
 
 .PHONY: test
 test: $(EXEC)
