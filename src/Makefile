@@ -59,11 +59,11 @@ DEPS = $(HFILES) Makefile
 .PHONY: all
 all: $(EXEC)
 
-version.h: Gen-version $(CFILES) $(DEPS)
-	./Gen-version
-
 $(EXEC): $(OBJS)
 	$(LD) -o $(EXEC) $(LDFLAGS) $(OBJS) $(LIBS)
+
+version.h: Gen-version $(CFILES) $(DEPS)
+	./Gen-version
 
 suuid.o: version.h suuid.c $(DEPS)
 	$(CC) $(CCFLAGS) suuid.c
