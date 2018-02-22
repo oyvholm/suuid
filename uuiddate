@@ -14,7 +14,6 @@
 
 use strict;
 use warnings;
-use bigint;
 use Getopt::Long;
 
 local $| = 1;

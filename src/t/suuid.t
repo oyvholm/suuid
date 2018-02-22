@@ -20,7 +20,6 @@ BEGIN {
 	# use_ok() goes here
 }
 
-use bigint;
 use Getopt::Long;
 
 local $| = 1;

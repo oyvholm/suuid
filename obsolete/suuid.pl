@@ -16,7 +16,6 @@ use strict;
 use warnings;
 use Fcntl ':flock';
 use Getopt::Long;
-use bigint;
 
 local $| = 1;
 
