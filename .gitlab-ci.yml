@@ -9,4 +9,4 @@ suuid:linux:
     - apt-get update -qq && apt-get install -y uuid valgrind
     - id -u ci &>/dev/null || useradd ci
   script:
-    - su ci -c "script -e -q -c 'make test clean valgrind'"
+    - su ci -c "script -e -q -c 'make testboth clean valgrind'"
