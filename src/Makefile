@@ -4,10 +4,9 @@
 
 PREFIX = /usr/local
 
-SUUID_EXEC = suuid
+EXEC = suuid
 
 TESTLOCKDIR = testlockdir
-CTAGS = ctags
 
 CC = cc
 LD = cc
@@ -16,39 +15,15 @@ UNAME := $(shell uname)
 
 CCFLAGS = -Wall -Wextra -Werror -O0 -c -g
 CCFLAGS += $$(test -n "$(GCOV)" && \
-              echo -n "-fprofile-arcs -ftest-coverage -DGCOV=1")
-CCFLAGS += $$(test -n "$(NDEBUG)" && echo -n "-DNDEBUG=1")
+              echo -n "-fprofile-arcs -ftest-coverage")
 
 # sqlite3.c gives warnings on NetBSD and OpenBSD, as described in 
 # ../doc/netbsd.txt and ../doc/openbsd.txt. Temporarily disable -Werror for 
 # sqlite3.c until this is sorted out.
 SQLITE_CCFLAGS = -Wall -Wextra -O0 -c -g
 
-# FAKE_HOST: Use "fake" as hostname to avoid conflicts with files created by 
-# the Perl version.
-ifdef FAKE_HOST
-	CCFLAGS += -DFAKE_HOST
-endif
-
-# USE_SQLITE: Compile with SQLite. sqlite3.h uses long long, and gcc 4.8.4 and 
-# 4.9.2 (probably all other versions too) abort when using -pedantic because 
-# it's not defined by ISO C90. If you still want to use -pedantic with gcc, add 
-# -Wno-long-long to CCFLAGS. Clang 3.8.0 on FreeBSD 11.0 works with -pedantic.
-ifdef USE_SQLITE
-	CCFLAGS += -DUSE_SQLITE
-else
+ifndef USE_SQLITE
 	CCFLAGS += -pedantic
-endif
-
-# TEST_FUNC: Send non-option arguments to a function for testing. Doesn't break 
-# anything, non-option arguments are ignored by the program.
-ifdef TEST_FUNC
-	CCFLAGS += -DTEST_FUNC
-endif
-
-# UNUSED: Compile with unused/unfinished code.
-ifdef UNUSED
-	CCFLAGS += -DUNUSED
 endif
 
 LDFLAGS = -Wall -Wextra -Werror
@@ -67,78 +42,73 @@ LIBS += $$(test -n "$(GCOV)" && echo "-lgcov --coverage");
 
 # For regular use, it's not necessary to modify anything below this line.
 
-# If compiling with -DUSE_SQLITE, add sqlite3.o to COMMON_OBJS
-COMMON_OBJS = database.o environ.o genuuid.o io.o logfile.o \
-              rcfile.o selftest.o sessvar.o string.o tag.o uuid.o
+# If compiling with USE_SQLITE, add sqlite3.o to OBJS
+OBJS = suuid.o database.o environ.o genuuid.o io.o logfile.o \
+       rcfile.o selftest.o sessvar.o string.o tag.o uuid.o
 ifdef USE_SQLITE
-	COMMON_OBJS += sqlite3.o
+	OBJS += sqlite3.o
 endif
 
-SUUID_OBJS  = suuid.o
+CFILES = suuid.c database.c environ.c genuuid.c io.c logfile.c \
+         rcfile.c selftest.c sessvar.c string.c tag.c uuid.c
 
-COMMON_C = database.c environ.c genuuid.c io.c logfile.c \
-           rcfile.c selftest.c sessvar.c string.c tag.c uuid.c
+HFILES = suuid.h
 
-SUUID_HFILES = suuid.h common.h
-
-SUUID_DEPS = $(SUUID_HFILES) Makefile
-
-DEFAULT_DEPS = $(SUUID_EXEC)
+DEPS = $(HFILES) Makefile
 
 .PHONY: all
-all: $(DEFAULT_DEPS)
+all: $(EXEC)
 
-version.h: Gen-version suuid.c $(COMMON_C) $(SUUID_DEPS)
+$(EXEC): $(OBJS)
+	$(LD) -o $(EXEC) $(LDFLAGS) $(OBJS) $(LIBS)
+
+version.h: Gen-version $(CFILES) $(DEPS)
 	./Gen-version
 
-$(SUUID_EXEC): $(SUUID_OBJS) $(COMMON_OBJS)
-	$(LD) -o $(SUUID_EXEC) $(LDFLAGS) $(SUUID_OBJS) $(COMMON_OBJS) $(LIBS)
-
-suuid.o: version.h suuid.c $(SUUID_DEPS)
+suuid.o: version.h suuid.c $(DEPS)
 	$(CC) $(CCFLAGS) suuid.c
 
-database.o: database.c $(SUUID_DEPS)
+database.o: database.c $(DEPS)
 	$(CC) $(CCFLAGS) database.c
 
-environ.o: environ.c $(SUUID_DEPS)
+environ.o: environ.c $(DEPS)
 	$(CC) $(CCFLAGS) environ.c
 
-genuuid.o: genuuid.c $(SUUID_DEPS)
+genuuid.o: genuuid.c $(DEPS)
 	$(CC) $(CCFLAGS) genuuid.c
 
-io.o: io.c $(SUUID_DEPS)
+io.o: io.c $(DEPS)
 	$(CC) $(CCFLAGS) io.c
 
-logfile.o: logfile.c $(SUUID_DEPS)
+logfile.o: logfile.c $(DEPS)
 	$(CC) $(CCFLAGS) logfile.c
 
-rcfile.o: rcfile.c $(SUUID_DEPS)
+rcfile.o: rcfile.c $(DEPS)
 	$(CC) $(CCFLAGS) rcfile.c
 
-selftest.o: selftest.c $(SUUID_DEPS)
+selftest.o: selftest.c $(DEPS)
 	$(CC) $(CCFLAGS) selftest.c
 
-sessvar.o: sessvar.c $(SUUID_DEPS)
+sessvar.o: sessvar.c $(DEPS)
 	$(CC) $(CCFLAGS) sessvar.c
 
 sqlite3.o: sqlite3.c
 	$(CC) $(SQLITE_CCFLAGS) -DSQLITE_ENABLE_JSON1 sqlite3.c
 
-string.o: string.c $(SUUID_DEPS)
+string.o: string.c $(DEPS)
 	$(CC) $(CCFLAGS) string.c
 
-tag.o: tag.c $(SUUID_DEPS)
+tag.o: tag.c $(DEPS)
 	$(CC) $(CCFLAGS) tag.c
 
-uuid.o: uuid.c $(SUUID_DEPS)
+uuid.o: uuid.c $(DEPS)
 	$(CC) $(CCFLAGS) uuid.c
 
 .PHONY: clean
 clean:
-	rm -f $(SUUID_EXEC) $(SUUID_OBJS)
+	rm -f $(EXEC) $(OBJS)
 	rm -f *.gcda *.gcno *.gcov
 	rm -f version.h
-	rm -f $(COMMON_OBJS)
 	rm -f sqlite3.o
 	rm -fr $(TESTLOCKDIR)
 	cd t && $(MAKE) clean
@@ -151,32 +121,32 @@ edit: tags
 .PHONY: gcov
 gcov:
 	$(MAKE) clean test GCOV=1
-	gcov suuid.c $(COMMON_C)
+	gcov $(CFILES)
 	@echo $$(grep -E '^ +#####:' *.c.gcov | wc -l) untested lines >&2
 
 .PHONY: gcov-cmt
 gcov-cmt: gcov
-	gcov-cmt suuid.c $(COMMON_C)
+	gcov-cmt $(CFILES)
 
 .PHONY: gcov-cmt-clean
 gcov-cmt-clean:
-	gcov-cmt -d suuid.c $(COMMON_C)
+	gcov-cmt -d $(CFILES)
 
 .PHONY: gdb
-gdb: $(SUUID_EXEC)
-	gdb -x gdbrc $$(cat gdbopts 2>/dev/null) $(SUUID_EXEC)
+gdb: $(EXEC)
+	gdb -x gdbrc $$(cat gdbopts 2>/dev/null) $(EXEC)
 
 .PHONY: install
-install: $(PREFIX)/bin/$(SUUID_EXEC)
+install: $(PREFIX)/bin/$(EXEC)
 
-$(PREFIX)/bin/$(SUUID_EXEC): $(SUUID_EXEC)
-	install $(SUUID_EXEC) $(PREFIX)/bin/$(SUUID_EXEC)
+$(PREFIX)/bin/$(EXEC): $(EXEC)
+	install $(EXEC) $(PREFIX)/bin/$(EXEC)
 
-tags: $(COMMON_C) suuid.c $(SUUID_HFILES) t/suuid.t
-	$(CTAGS) $(COMMON_C) suuid.c $(SUUID_HFILES) t/suuid.t
+tags: $(CFILES) $(HFILES) t/suuid.t
+	ctags $(CFILES) $(HFILES) t/suuid.t
 
 .PHONY: test
-test: $(SUUID_EXEC)
+test: $(EXEC)
 	cd t && $(MAKE) test
 
 .PHONY: testall
@@ -221,19 +191,19 @@ testhist: test
 	done
 
 .PHONY: testlock
-testlock: $(SUUID_EXEC)
+testlock: $(EXEC)
 	rm -rf $(TESTLOCKDIR)
 	mkdir $(TESTLOCKDIR)
-	for f in $$(seq 1 500); do ./$(SUUID_EXEC) -wn -l $(TESTLOCKDIR); done &
-	for f in $$(seq 1 500); do ./$(SUUID_EXEC) -wn -l $(TESTLOCKDIR); done &
-	for f in $$(seq 1 500); do ./$(SUUID_EXEC) -wn -l $(TESTLOCKDIR); done
+	for f in $$(seq 1 500); do ./$(EXEC) -wn -l $(TESTLOCKDIR); done &
+	for f in $$(seq 1 500); do ./$(EXEC) -wn -l $(TESTLOCKDIR); done &
+	for f in $$(seq 1 500); do ./$(EXEC) -wn -l $(TESTLOCKDIR); done
 
 .PHONY: testnew
 testnew: test
 
 .PHONY: uninstall
 uninstall:
-	rm -f $(PREFIX)/bin/$(SUUID_EXEC)
+	rm -f $(PREFIX)/bin/$(EXEC)
 
 .PHONY: valgrind
 valgrind:
