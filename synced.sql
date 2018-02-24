@@ -29,7 +29,7 @@ INSERT INTO synced VALUES('src/Makefile','Lib/std/c/Makefile','70a3d4af3bfc94480
 INSERT INTO synced VALUES('src/gdbrc','Lib/std/c/gdbrc','70a3d4af3bfc94480ade6a6206ecaaafbe23d5a0','2018-02-22 01:09:32');
 INSERT INTO synced VALUES('src/selftest.c','Lib/std/c/selftest.c','6277f2b035d8cab6d50c0d102ae626e54bd3bb72','2017-12-21 12:56:56');
 INSERT INTO synced VALUES('src/suuid.c','Lib/std/c/std.c','70a3d4af3bfc94480ade6a6206ecaaafbe23d5a0','2018-02-22 01:09:32');
-INSERT INTO synced VALUES('src/suuid.h','Lib/std/c/std.h','6277f2b035d8cab6d50c0d102ae626e54bd3bb72','2017-12-21 12:56:56');
+INSERT INTO synced VALUES('src/suuid.h','Lib/std/c/std.h','194ba0690e345aaa5c44ba2c429c17e42f1f9e9b','2018-02-24 16:36:59');
 INSERT INTO synced VALUES('src/t/suuid.t','Lib/std/perl-tests','5d9a5b337cbc4997dfa181e3fd9a9484487b5605','2016-10-25 02:43:03');
 INSERT INTO synced VALUES('tests/conv-suuid.t','Lib/std/perl-tests','5d9a5b337cbc4997dfa181e3fd9a9484487b5605','2016-10-25 02:43:03');
 INSERT INTO synced VALUES('tests/finduuid.t','Lib/std/perl-tests-tab','c58b81b5652b062928cc7bde7153bda48f2474a8','2016-11-15 00:26:12');

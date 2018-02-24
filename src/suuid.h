@@ -21,6 +21,8 @@
 #ifndef _SUUID_H
 #define _SUUID_H
 
+#include "version.h"
+
 #define FALSE  0
 #define TRUE   1
 
@@ -32,8 +34,6 @@
 #define UUID_LENGTH  36 /* Length of a standard UUID */
 
 #define stddebug  stderr
-
-#include "version.h"
 
 #ifdef USE_SQLITE
 #  include "sqlite3.h"
