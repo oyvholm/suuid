@@ -879,21 +879,19 @@ sub test_suuid_executable {
 
 	# }}}
 	my @stat_array = stat($Outfile);
-	ok(chmod(0444, $Outfile), "Make [Outfile] read-only");
+	ok(unlink($Outfile), "Delete [Outfile]");
+	ok(mkdir($Outfile), "mkdir [Outfile]");
 	likecmd("$CMD -l $Outdir", # {{{
 		'/^$/s',
 		'/^\.\.\/suuid: .*?\.xml: Could not open file for read\+write: ' .
-		  'Permission denied\n' .
+		  'Is a directory\n' .
 		  '$/s',
 		1,
 		"Unable to write to the log file",
 	);
-	if (defined($stat_array[2])) {
-		ok(chmod($stat_array[2], $Outfile), "Make [Outfile] writable again");
-	}
 
 	# }}}
-	ok(unlink($Outfile), "Delete [Outfile]");
+	ok(rmdir($Outfile), "rmdir [Outfile]");
 	diag("Test what happens when the end of the log file is messed up");
 	ok(create_file($Outfile, ""), "Create empty log file");
 	likecmd("$CMD -l $Outdir", # {{{
