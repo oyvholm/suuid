@@ -12,8 +12,8 @@
 
 progname=Gen-version
 
-exec_version=0.4.0
-exec_date=2016-12-02
+exec_version=0.5.0
+exec_date=2018-12-30
 
 tag_prefix="suuid-v$exec_version"
 has_git=$(git --version | grep -q "git version" && echo 1 || echo 0)
