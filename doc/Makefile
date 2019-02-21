@@ -2,9 +2,12 @@
 
 .PHONY: all
 all:
+	cd rfc-source && $(MAKE)
 
 .PHONY: clean
 clean:
+	cd rfc-source && $(MAKE) clean
 
 .PHONY: test
 test:
+	cd rfc-source && $(MAKE) test
