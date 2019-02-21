@@ -13,8 +13,10 @@ static void write_state(unsigned16 clockseq, uuid_time_t timestamp,
     uuid_node_t node);
 static void format_uuid_v1(uuid_t *uuid, unsigned16 clockseq,
     uuid_time_t timestamp, uuid_node_t node);
+#ifdef USE_MD5
 static void format_uuid_v3or5(uuid_t *uuid, unsigned char hash[16],
     int v);
+#endif
 static void get_current_time(uuid_time_t *timestamp);
 static unsigned16 true_random(void);
 
@@ -181,6 +183,7 @@ static unsigned16 true_random(void)
     return rand();
 }
 
+#ifdef USE_MD5
 /* uuid_create_md5_from_name -- create a version 3 (MD5) UUID using a
    "name" from a "name space" */
 void uuid_create_md5_from_name(uuid_t *uuid, uuid_t nsid, void *name,
@@ -205,7 +208,9 @@ void uuid_create_md5_from_name(uuid_t *uuid, uuid_t nsid, void *name,
     /* the hash is in network byte order at this point */
     format_uuid_v3or5(uuid, hash, 3);
 }
+#endif
 
+#ifdef USE_MD5
 void uuid_create_sha1_from_name(uuid_t *uuid, uuid_t nsid, void *name,
                                 int namelen)
 {
@@ -245,6 +250,7 @@ void format_uuid_v3or5(uuid_t *uuid, unsigned char hash[16], int v)
     uuid->clock_seq_hi_and_reserved &= 0x3F;
     uuid->clock_seq_hi_and_reserved |= 0x80;
 }
+#endif
 
 /* uuid_compare --  Compare two UUID's "lexically" and return */
 #define CHECK(f1, f2) if (f1 != f2) return f1 < f2 ? -1 : 1;

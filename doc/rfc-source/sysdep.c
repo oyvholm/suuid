@@ -55,6 +55,7 @@ void get_system_time(uuid_time_t *uuid_time)
     *uuid_time = time.QuadPart;
 }
 
+#ifdef USE_MD5
 /* Sample code, not for use in production; see RFC 1750 */
 void get_random_info(char seed[16])
 {
@@ -80,6 +81,7 @@ void get_random_info(char seed[16])
     MD5Update(&c, &r, sizeof r);
     MD5Final(seed, &c);
 }
+#endif
 
 #else
 
@@ -97,6 +99,7 @@ void get_system_time(uuid_time_t *uuid_time)
         + I64(0x01B21DD213814000);
 }
 
+#ifdef USE_MD5
 /* Sample code, not for use in production; see RFC 1750 */
 void get_random_info(char seed[16])
 {
@@ -114,5 +117,6 @@ void get_random_info(char seed[16])
     MD5Update(&c, &r, sizeof r);
     MD5Final(seed, &c);
 }
+#endif
 
 #endif

@@ -12,10 +12,12 @@
 #include <sys/sysinfo.h>
 #endif
 
+#ifdef USE_MD5
 #include "global.h"
 /* change to point to where MD5 .h's live; RFC 1321 has sample
    implementation */
 #include "md5.h"
+#endif
 
 /* set the following to the number of 100ns ticks of the actual
    resolution of your system's clock */
