@@ -4,12 +4,14 @@
 
 .PHONY: all
 all:
+	cd doc && $(MAKE)
 	cd src && $(MAKE)
 
 .PHONY: clean
 clean:
 	rm -f synced.sqlite.20*.bck tags
 	find . -name .testadd.tmp -type d -print0 | xargs -0r rm -rf
+	cd doc && $(MAKE) clean
 	cd src && $(MAKE) clean
 	cd tests && $(MAKE) clean
 
@@ -30,6 +32,7 @@ testnew: test
 
 .PHONY: test
 test:
+	cd doc && $(MAKE) test
 	cd src && $(MAKE) test
 	cd tests && $(MAKE) test
 
