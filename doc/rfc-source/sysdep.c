@@ -1,12 +1,17 @@
 #include "copyrt.h"
+#include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "sysdep.h"
+
+typedef u_int64_t unsigned64;
 
 /* system dependent call to get IEEE node ID.
    This sample implementation generates a random node ID. */
 void get_ieee_node_identifier(uuid_node_t *node)
 {
-    static inited = 0;
+    static int inited = 0;
     static uuid_node_t saved_node;
     char seed[16];
     FILE *fp;
@@ -116,6 +121,31 @@ void get_random_info(char seed[16])
     gethostname(r.hostname, 256);
     MD5Update(&c, &r, sizeof r);
     MD5Final(seed, &c);
+}
+#else
+void get_random_info(char seed[16])
+{
+	FILE *fp;
+	int i;
+
+	fp = fopen("/dev/urandom", "r");
+	if (!fp) {
+		fprintf(stderr, "get_random_info(): Cannot open /dev/urandom: "
+		        "%s\n", strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+	for (i = 0; i < 16; i++) {
+		int c = fgetc(fp);
+
+		if (c == EOF) {
+			fprintf(stderr,
+			        "get_random_info(): fgetc() got EOF\n");
+			fclose(fp);
+			exit(EXIT_FAILURE);
+		}
+		seed[i] = c;
+	}
+	fclose(fp);
 }
 #endif
 

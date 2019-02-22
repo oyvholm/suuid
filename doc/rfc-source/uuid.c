@@ -272,3 +272,8 @@ int uuid_compare(uuid_t *u1, uuid_t *u2)
     return 0;
 }
 #undef CHECK
+
+int main(void)
+{
+	return EXIT_SUCCESS;
+}
