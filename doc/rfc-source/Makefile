@@ -34,6 +34,10 @@ clean:
 edit: tags
 	$(EDITOR) $$(git ls-files)
 
+.PHONY: gdb
+gdb: $(EXEC)
+	gdb -x gdbrc $$(cat gdbopts 2>/dev/null) $(EXEC)
+
 tags: $(CFILES) $(HFILES)
 	ctags $(CFILES) $(HFILES)
 
