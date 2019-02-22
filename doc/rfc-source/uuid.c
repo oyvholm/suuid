@@ -290,9 +290,20 @@ void puid(uuid_t u)
 int main(void)
 {
 	uuid_t uuid;
+	int i;
 
 	uuid_create(&uuid);
 	puid(uuid);
+	fprintf(stderr, "time_low = %lx\n", uuid.time_low);
+	fprintf(stderr, "time_mid = %x\n", uuid.time_mid);
+	fprintf(stderr, "time_hi_and_version = %x\n", uuid.time_hi_and_version);
+	fprintf(stderr, "clock_seq_hi_and_reserved = %x\n",
+	        uuid.clock_seq_hi_and_reserved);
+	fprintf(stderr, "clock_seq_low = %x\n", uuid.clock_seq_low);
+	fprintf(stderr, "node = ");
+	for (i = 0; i < 6; i++)
+		fprintf(stderr, "%x", uuid.node[i]);
+	fprintf(stderr, "\n");
 
 	return EXIT_SUCCESS;
 }
