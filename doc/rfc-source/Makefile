@@ -6,8 +6,11 @@ EXEC = uuid
 CC = cc
 LD = cc
 CCFLAGS = -Wall -Wextra -Werror -O0 -c -g
+CCFLAGS += $$(test -n "$(GCOV)" && \
+              echo -n "-fprofile-arcs -ftest-coverage")
 LDFLAGS = -Wall -Wextra -Werror
 LIBS =
+LIBS += $$(test -n "$(GCOV)" && echo "-lgcov --coverage");
 
 OBJS = sysdep.o uuid.o
 CFILES = uuid.c sysdep.c
@@ -29,10 +32,25 @@ uuid.o: uuid.c $(DEPS)
 .PHONY: clean
 clean:
 	rm -f $(EXEC) $(OBJS)
+	rm -f *.gcda *.gcno *.gcov
 
 .PHONY: edit
 edit: tags
 	$(EDITOR) $$(git ls-files)
+
+.PHONY: gcov
+gcov:
+	$(MAKE) test GCOV=1
+	gcov $(CFILES)
+	@echo $$(grep -E '^ +#####:' *.c.gcov | wc -l) untested lines >&2
+
+.PHONY: gcov-cmt
+gcov-cmt: gcov
+	gcov-cmt $(CFILES)
+
+.PHONY: gcov-cmt-clean
+gcov-cmt-clean:
+	gcov-cmt -d $(CFILES)
 
 .PHONY: gdb
 gdb: $(EXEC)
