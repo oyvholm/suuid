@@ -2,5 +2,7 @@
 /*.gcno
 /*.gcov
 /*.o
+/nodeid
+/state
 /tags
 /uuid

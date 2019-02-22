@@ -33,6 +33,7 @@ uuid.o: uuid.c $(DEPS)
 clean:
 	rm -f $(EXEC) $(OBJS)
 	rm -f *.gcda *.gcno *.gcov
+	rm -f nodeid state
 
 .PHONY: edit
 edit: tags
