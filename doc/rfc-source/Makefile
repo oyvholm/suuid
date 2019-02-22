@@ -31,8 +31,11 @@ clean:
 	rm -f $(EXEC) $(OBJS)
 
 .PHONY: edit
-edit:
+edit: tags
 	$(EDITOR) $$(git ls-files)
+
+tags: $(CFILES) $(HFILES)
+	ctags $(CFILES) $(HFILES)
 
 .PHONY: test
 test: $(EXEC)
