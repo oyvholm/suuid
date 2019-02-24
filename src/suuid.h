@@ -52,6 +52,7 @@
 #include <string.h>
 #include <sys/file.h>
 #include <sys/time.h>
+#include <time.h>
 #include <unistd.h>
 
 #define ENV_EDITOR  "SUUID_EDITOR" /* Name of editor to use with "-c --" */
@@ -62,6 +63,7 @@
 #define ENV_LOGDIR  "SUUID_LOGDIR" /* Optional environment variable with path 
                                     * to log directory
                                     */
+#define EPOCH_DIFF 12219292800
 #define STD_RCFILE  ".suuidrc"
 #define MAX_SESS  1000 /* Maximum number of sess elements per entry */
 #define MAX_TAGS  1000 /* Maximum number of tags */
@@ -223,6 +225,7 @@ extern bool valid_uuid(const char *u, const bool check_len);
 extern char *scramble_mac_address(char *uuid);
 extern char *generate_uuid(const struct Rc *rc, const bool random_mac);
 extern bool is_valid_date(const char *s, const bool check_len);
+extern char *uuid_date(char *dest, const char *uuid);
 extern char *uuid_date_from_uuid(char *dest, const char *uuid);
 extern char *scan_for_uuid(const char *s);
 

@@ -192,12 +192,14 @@ is_valid_date("2017-12-23T02:33:57Z", 0) = 0
 is_valid_date("2017-12-23T02:33:57.1234567Z", 1) = 1
 is_valid_date("2017-12-23T02:33:57.1234567Z", 0) = 1
 is_valid_date("2017-12-23T02:33:57.1234567Zabcd", 0) = 1
-uuid_date_from_uuid(buf2, "acdaf974-e78e-11e7-87d5-f74d993421b0") =
+uuid_date(buf2, "00000000-0000-11e7-87d5-f74d993421b0") =
+  "2017-03-03T10:56:05.8089472Z"
+uuid_date(buf2, "acdaf974-e78e-11e7-87d5-f74d993421b0") =
   "2017-12-23T03:09:22.9493620Z"
-uuid_date_from_uuid(buf2, "notvalid") = (null)
-uuid_date_from_uuid(buf2, "") = (null)
-uuid_date_from_uuid(buf2, "c9ffa9cb-708d-454b-b1f2-f18f609cb825") = (null)
-uuid_date_from_uuid(buf2, "acdaf974-e78e-11e7-87d5-g74d993421b0") = (null)
+uuid_date(buf2, "notvalid") = (null)
+uuid_date(buf2, "") = (null)
+uuid_date(buf2, "c9ffa9cb-708d-454b-b1f2-f18f609cb825") = (null)
+uuid_date(buf2, "acdaf974-e78e-11e7-87d5-g74d993421b0") = (null)
 valid_uuid("acdaf974-e78e-11e7-87d5-f74d993421b0", 1) = 1
 valid_uuid("acdaf974-e78e-11e7-87d5-f74d993421b0123", 0) = 1
 valid_uuid("acdaf974-e78e-11e7-87d5-f74d993421b0123", 1) = 0

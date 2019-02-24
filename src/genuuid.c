@@ -233,7 +233,7 @@ char *process_uuid(struct Logs *logs,
 		entry->date = mymalloc(DATE_LENGTH + 1);
 	if (!entry->date)
 		return NULL;
-	if (!uuid_date_from_uuid(entry->date, entry->uuid))
+	if (!uuid_date(entry->date, entry->uuid))
 		return NULL;
 
 	if (add_to_logfile(logs->logfp, entry, opt->raw) == EXIT_FAILURE)

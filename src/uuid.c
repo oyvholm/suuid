@@ -160,11 +160,14 @@ char *generate_uuid(const struct Rc *rc, const bool random_mac)
  * NULL if it's not a valid v1 UUID.
  */
 
-#ifdef UNUSED
 char *uuid_date(char *dest, const char *uuid)
 {
-	/* fixme: unfinished */
 	char hexbuf[16];
+	u_int64_t val;
+	unsigned int nano;
+	time_t timeval;
+	struct tm *tm;
+	char *p;
 
 	assert(dest);
 	assert(uuid);
@@ -179,12 +182,27 @@ char *uuid_date(char *dest, const char *uuid)
 	strncat(hexbuf, uuid + 9, 4);
 	strncat(hexbuf, uuid, 8);
 
-	if (1)
-		strncpy(dest, "2000-01-01T00:00:00.0000000Z", DATE_LENGTH + 1);
+	val = strtoull(hexbuf, NULL, 16);
+	nano = val % 10000000;
+	timeval = (val / 10000000) - EPOCH_DIFF;
+	tm = gmtime(&timeval);
+
+	memset(dest, 0, DATE_LENGTH + 1);
+	strftime(dest, DATE_LENGTH, "%Y-%m-%dT%H:%M:%S", tm);
+	p = dest + strlen(dest);
+	if (p - dest != 19) {
+		myerror("%u: Invalid date length, should be 19", p - dest);
+		return NULL;
+	}
+	snprintf(p, DATE_LENGTH - 19 + 1, ".%07uZ", nano);
+	if (!is_valid_date(dest, 1)) {
+		myerror("uuid_date(): %s: Generated invalid timestamp", dest);
+		return NULL;
+	}
+
 
 	return dest;
 }
-#endif
 
 /*
  * is_valid_date() - Check that the date pointed to by s is valid. If check_len 

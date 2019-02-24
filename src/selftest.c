@@ -51,22 +51,22 @@ int selftest(void)
 	printf("is_valid_date(\"2017-12-23T02:33:57.1234567Zabcd\", 0) = %d\n",
 	       is_valid_date("2017-12-23T02:33:57.1234567Zabcd", 0));
 
-	printf("uuid_date_from_uuid(buf2, \""
+	printf("uuid_date(buf2, \""
+	       "00000000-0000-11e7-87d5-f74d993421b0\") =\n  \"%s\"\n",
+	       uuid_date(buf2, "00000000-0000-11e7-87d5-f74d993421b0"));
+	printf("uuid_date(buf2, \""
 	       "acdaf974-e78e-11e7-87d5-f74d993421b0\") =\n  \"%s\"\n",
-	       uuid_date_from_uuid(buf2,
-	                           "acdaf974-e78e-11e7-87d5-f74d993421b0"));
-	printf("uuid_date_from_uuid(buf2, \"notvalid\") = %s\n",
-	       uuid_date_from_uuid(buf2, "notvalid"));
-	printf("uuid_date_from_uuid(buf2, \"\") = %s\n",
-	       uuid_date_from_uuid(buf2, ""));
-	printf("uuid_date_from_uuid(buf2, \""
+	       uuid_date(buf2, "acdaf974-e78e-11e7-87d5-f74d993421b0"));
+
+	printf("uuid_date(buf2, \"notvalid\") = %s\n",
+	       uuid_date(buf2, "notvalid"));
+	printf("uuid_date(buf2, \"\") = %s\n", uuid_date(buf2, ""));
+	printf("uuid_date(buf2, \""
 	       "c9ffa9cb-708d-454b-b1f2-f18f609cb825\") = %s\n",
-	       uuid_date_from_uuid(buf2,
-	                           "c9ffa9cb-708d-454b-b1f2-f18f609cb825"));
-	printf("uuid_date_from_uuid(buf2, \""
+	       uuid_date(buf2, "c9ffa9cb-708d-454b-b1f2-f18f609cb825"));
+	printf("uuid_date(buf2, \""
 	       "acdaf974-e78e-11e7-87d5-g74d993421b0\") = %s\n",
-	       uuid_date_from_uuid(buf2,
-	                           "acdaf974-e78e-11e7-87d5-g74d993421b0"));
+	       uuid_date(buf2, "acdaf974-e78e-11e7-87d5-g74d993421b0"));
 
 	printf("valid_uuid(\"acdaf974-e78e-11e7-87d5-f74d993421b0\", 1) "
 	       "= %d\n",
