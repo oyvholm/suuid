@@ -16,6 +16,8 @@ UNAME := $(shell uname)
 CCFLAGS = -Wall -Wextra -Werror -O0 -c -g
 CCFLAGS += $$(test -n "$(GCOV)" && \
               echo -n "-fprofile-arcs -ftest-coverage")
+CCFLAGS += $$(test -n "$(VERIFY_UUID)" && \
+              echo -n "-DVERIFY_UUID=$(VERIFY_UUID)")
 
 # sqlite3.c gives warnings on NetBSD and OpenBSD, as described in 
 # ../doc/netbsd.txt and ../doc/openbsd.txt. Temporarily disable -Werror for 

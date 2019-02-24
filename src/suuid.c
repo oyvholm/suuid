@@ -161,6 +161,9 @@ int print_version(void)
 #ifdef USE_SQLITE
 	printf("has USE_SQLITE %s\n", sqlite3_libversion());
 #endif
+#ifdef VERIFY_UUID
+	printf("has VERIFY_UUID\n");
+#endif
 
 	return EXIT_SUCCESS;
 }

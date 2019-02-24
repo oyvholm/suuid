@@ -168,6 +168,10 @@ char *uuid_date(char *dest, const char *uuid)
 	time_t timeval;
 	struct tm *tm;
 	char *p;
+#ifdef VERIFY_UUID
+	char chkbuf[DATE_LENGTH + 1];
+	char *chkres;
+#endif
 
 	assert(dest);
 	assert(uuid);
@@ -200,6 +204,21 @@ char *uuid_date(char *dest, const char *uuid)
 		return NULL;
 	}
 
+#ifdef VERIFY_UUID
+	chkres = uuid_date_from_uuid(chkbuf, uuid);
+	if (chkres) {
+		if (strcmp(dest, chkbuf)) {
+			myerror("uuid_date(): UUID DATE DIFFERENCE:");
+			myerror("uuid_date(): dest   = \"%s\"", dest);
+			myerror("uuid_date(): chkbuf = \"%s\"", chkbuf);
+			return NULL;
+		}
+	} else {
+		myerror("uuid_date(): uuid_date_from_uuid() failed, "
+		        "cannot verify UUID timestamp");
+		return NULL;
+	}
+#endif
 
 	return dest;
 }
@@ -242,6 +261,7 @@ bool is_valid_date(const char *s, const bool check_len)
 		return TRUE;
 }
 
+#ifdef VERIFY_UUID
 /*
  * uuid_date_from_uuid() - Same functionality as uuid_date(), but use the 
  * uuid(1) program to calculate the date. Use until uuid_date() works.
@@ -300,6 +320,7 @@ char *uuid_date_from_uuid(char *dest, const char *uuid)
 
 	return dest;
 }
+#endif
 
 /*
  * scan_for_uuid() - Return a pointer to the first UUID in the string s, or 
