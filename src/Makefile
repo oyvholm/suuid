@@ -24,10 +24,6 @@ CCFLAGS += $$(test -n "$(VERIFY_UUID)" && \
 # sqlite3.c until this is sorted out.
 SQLITE_CCFLAGS = -Wall -Wextra -O0 -c -g
 
-ifndef USE_SQLITE
-	CCFLAGS += -pedantic
-endif
-
 LDFLAGS = -Wall -Wextra -Werror
 
 # When compiling with SQLite, add these libraries to LIBS:
