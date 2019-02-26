@@ -42,7 +42,7 @@ char *get_editor(void)
 
 /*
  * valid_hostname() - Check if hostname in string s is a somewhat valid 
- * hostname. Return TRUE if ok, FALSE if not.
+ * hostname. Return true if ok, false if not.
  */
 
 bool valid_hostname(const char *s)
@@ -53,7 +53,7 @@ bool valid_hostname(const char *s)
 
 	if (!strlen(s) || strlen(s) > HOST_NAME_MAX ||
 	    strstr(s, "..") || utf8_check(s))
-		return FALSE;
+		return false;
 
 	p = (unsigned char *)s;
 	while (*p) {
@@ -68,11 +68,11 @@ bool valid_hostname(const char *s)
 		 */
 		if (strchr("!\"#$%&'()*+,/:;<=>?@[\\]^`{|}~", *p) ||
 		    *p < '!' || *p >= '\x7f')
-			return FALSE;
+			return false;
 		p++;
 	}
 
-	return TRUE;
+	return true;
 }
 
 /*

@@ -34,7 +34,7 @@ void rewind_tag(void)
 }
 
 /*
- * tag_exists() - Return TRUE if tag already is added to the array, FALSE if 
+ * tag_exists() - Return true if tag already is added to the array, false if 
  * not.
  */
 
@@ -48,9 +48,9 @@ bool tag_exists(const struct Entry *entry, const char *tag)
 
 	for (i = 0; i < tag_count; i++)
 		if (!strcmp(tag, entry->tag[i]))
-			return TRUE;
+			return true;
 
-	return FALSE;
+	return false;
 }
 
 /*

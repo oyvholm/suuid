@@ -20,7 +20,7 @@
 
 #include "suuid.h"
 
-bool should_terminate = FALSE;
+bool should_terminate = false;
 
 /*
  * init_randomness() - Initialise the random number generator. Returns 
@@ -55,17 +55,17 @@ void init_opt(struct Options *dest)
 
 	dest->comment = NULL;
 	dest->count = 1;
-	dest->help = FALSE;
-	dest->license = FALSE;
+	dest->help = false;
+	dest->license = false;
 	dest->logdir = NULL;
-	dest->random_mac = FALSE;
-	dest->raw = FALSE;
+	dest->random_mac = false;
+	dest->raw = false;
 	dest->rcfile = NULL;
-	dest->selftest = FALSE;
+	dest->selftest = false;
 	dest->simfail = 0;
 	dest->uuid = NULL;
 	dest->verbose = 0;
-	dest->version = FALSE;
+	dest->version = false;
 	dest->whereto = NULL;
 	for (i = 0; i < MAX_TAGS; i++)
 		dest->tag[i] = NULL;
@@ -211,7 +211,7 @@ char *process_uuid(struct Logs *logs,
 	 */
 
 	if (opt->uuid) {
-		if (!valid_uuid(opt->uuid, TRUE)) {
+		if (!valid_uuid(opt->uuid, true)) {
 			fprintf(stderr, "process_uuid(): UUID \"%s\" is not "
 			                "valid.\n", opt->uuid);
 			return NULL;
@@ -271,7 +271,7 @@ void sighandler(const int sig)
 	else
 		myerror("sighandler(): Unknown signal %d (%s) received, "
 		        "should not happen\n", sig, strsignal(sig));
-	should_terminate = TRUE;
+	should_terminate = true;
 }
 
 /*
@@ -301,7 +301,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	count = opt->count;
 	retval.count = 0;
 	memset(retval.lastuuid, 0, UUID_LENGTH + 1);
-	retval.success = TRUE;
+	retval.success = true;
 	init_xml_entry(&entry);
 
 	/*
@@ -310,24 +310,24 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	 */
 
 	if (init_randomness() == EXIT_FAILURE) {
-		retval.success = FALSE;
+		retval.success = false;
 		goto cleanup;
 	}
 
 	rcfile = get_rcfilename(opt);
 	if (read_rcfile(rcfile, &rc) == EXIT_FAILURE) {
-		retval.success = FALSE;
+		retval.success = false;
 		goto cleanup;
 	}
 
 	if (fill_entry_struct(&entry, &rc, opt) == EXIT_FAILURE) {
-		retval.success = FALSE;
+		retval.success = false;
 		goto cleanup;
 	}
 
 	logfile = get_log_prefix(&rc, opt, ".xml");
 	if (!logfile) {
-		retval.success = FALSE;
+		retval.success = false;
 		goto cleanup;
 	}
 
@@ -343,7 +343,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 
 	logs.logfp = open_logfile(logfile);
 	if (!logs.logfp) {
-		retval.success = FALSE;
+		retval.success = false;
 		goto cleanup;
 	}
 
@@ -355,14 +355,14 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 		count = 1;
 	for (i = 0; i < count; i++) {
 		if (!process_uuid(&logs, &rc, opt, &entry)) {
-			retval.success = FALSE;
+			retval.success = false;
 			goto cleanup;
 		}
 		retval.count++;
 		if (should_terminate)
 			break;
 	}
-	if (valid_uuid(entry.uuid, TRUE))
+	if (valid_uuid(entry.uuid, true))
 		strncpy(retval.lastuuid, entry.uuid, UUID_LENGTH + 1);
 
 	/*
@@ -379,7 +379,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 
 cleanup:
 	if (logs.logfp && (close_logfile(logs.logfp) == EXIT_FAILURE))
-		retval.success = FALSE;
+		retval.success = false;
 
 	free(logfile);
 	free_sess(&entry);

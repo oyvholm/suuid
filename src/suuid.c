@@ -302,29 +302,29 @@ int choose_opt_action(struct Options *dest,
 	switch (c) {
 	case 0:
 		if (!strcmp(opts->name, "license"))
-			dest->license = TRUE;
+			dest->license = true;
 		else if (!strcmp(opts->name, "raw"))
-			dest->raw = TRUE;
+			dest->raw = true;
 		else if (!strcmp(opts->name, "rcfile"))
 			dest->rcfile = optarg;
 		else if (!strcmp(opts->name, "selftest"))
-			dest->selftest = TRUE;
+			dest->selftest = true;
 		else if (!strcmp(opts->name, "simfail"))
 			dest->simfail = simfail = atoi(optarg);
 		else if (!strcmp(opts->name, "version"))
-			dest->version = TRUE;
+			dest->version = true;
 		break;
 	case 'c':
 		dest->comment = optarg;
 		break;
 	case 'h':
-		dest->help = TRUE;
+		dest->help = true;
 		break;
 	case 'l':
 		dest->logdir = optarg;
 		break;
 	case 'm':
-		dest->random_mac = TRUE;
+		dest->random_mac = true;
 		break;
 	case 'n':
 		if (!sscanf(optarg, "%u", &dest->count)) {

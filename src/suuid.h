@@ -23,9 +23,6 @@
 
 #include "version.h"
 
-#define FALSE  0
-#define TRUE   1
-
 #define T_RESET  "\x1b[m\x0f"
 #define T_RED    "\x1b[31m"
 #define T_GREEN  "\x1b[32m"
@@ -47,6 +44,7 @@
 #include <pwd.h>
 #include <signal.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -103,9 +101,8 @@
 #endif
 
 #define DEBL  msg(2, "%s, line %u in %s()", __FILE__, __LINE__, __func__)
-#define in_range(a,b,c)  ((a) >= (b) && (a) <= (c) ? TRUE : FALSE)
+#define in_range(a,b,c)  ((a) >= (b) && (a) <= (c) ? true : false)
 
-typedef unsigned char bool;
 struct Rc {
 	char *hostname;
 	char *macaddr;

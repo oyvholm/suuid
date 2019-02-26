@@ -28,7 +28,7 @@ size_t MAX_GROWTH = 5; /* When converting from plain text to the XML format
 
 /*
  * valid_xml_chars() - Check that the string pointed to by s contains valid 
- * UTF-8 and no control chars. Return TRUE if ok, FALSE if invalid.
+ * UTF-8 and no control chars. Return true if ok, false if invalid.
  */
 
 bool valid_xml_chars(const char *s)
@@ -38,16 +38,16 @@ bool valid_xml_chars(const char *s)
 	assert(s);
 
 	if (utf8_check(s))
-		return FALSE;
+		return false;
 	while (*p) {
 		if (*p < ' ' && !strchr("\n\t", *p))
-			return FALSE;
+			return false;
 		if (*p == 127)
-			return FALSE;
+			return false;
 		p++;
 	}
 
-	return TRUE;
+	return true;
 }
 
 /*
@@ -357,7 +357,7 @@ char *create_sess_xml(const struct Entry *entry)
 
 /*
  * xml_entry() - Return pointer to allocated string with one XML entry 
- * extracted from the entry struct, or NULL if error. If raw is TRUE, insert 
+ * extracted from the entry struct, or NULL if error. If raw is true, insert 
  * the comment into the XML unmodified, no escaping is performed.
  */
 
@@ -369,7 +369,7 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 	size_t size;
 
 	assert(entry);
-	assert(raw == FALSE || raw == TRUE);
+	assert(raw == false || raw == true);
 
 	init_xml_entry(&e);
 
@@ -706,7 +706,7 @@ int add_to_logfile(FILE *fp, const struct Entry *entry, const bool raw)
 
 	assert(fp);
 	assert(entry);
-	assert(raw == FALSE || raw == TRUE);
+	assert(raw == false || raw == true);
 
 	ap = xml_entry(entry, raw);
 	if (!ap)

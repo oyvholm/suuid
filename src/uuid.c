@@ -22,7 +22,7 @@
 
 /*
  * valid_macaddr() - Check that macaddr is a valid MAC address.
- * Return TRUE if OK, FALSE if something is wrong.
+ * Return true if OK, false if something is wrong.
  */
 
 bool valid_macaddr(const char *macaddr)
@@ -30,38 +30,38 @@ bool valid_macaddr(const char *macaddr)
 	if (check_hex(macaddr, 12)) {
 		fprintf(stderr, "%s: MAC address contains illegal characters, "
 		        "can only contain hex digits\n", progname);
-		return FALSE;
+		return false;
 	}
 	if (strlen(macaddr) != 12) {
 		fprintf(stderr, "%s: Wrong MAC address length, "
 		        "must be exactly 12 hex digits\n", progname);
-		return FALSE;
+		return false;
 	}
 	if (!strchr("37bf", macaddr[1])) {
 		fprintf(stderr, "%s: MAC address doesn't follow RFC 4122, the "
 		                "second hex digit must be one of \"37bf\"\n",
 		                progname);
-		return FALSE;
+		return false;
 	}
 
-	return TRUE;
+	return true;
 }
 
 /*
  * valid_uuid() - Check that the UUID pointed to by u is a valid UUID. If 
- * check_len is TRUE, also check that the string length is exactly the same as 
+ * check_len is true, also check that the string length is exactly the same as 
  * a standard UUID, UUID_LENGTH chars.
- * Return TRUE if valid, FALSE if not.
+ * Return true if valid, false if not.
  */
 
 bool valid_uuid(const char *u, const bool check_len)
 {
-	assert(check_len == FALSE || check_len == TRUE);
+	assert(check_len == false || check_len == true);
 
 	if (!u || strlen(u) < UUID_LENGTH)
-		return FALSE;
+		return false;
 	if (check_len && strlen(u) != UUID_LENGTH)
-		return FALSE;
+		return false;
 
 	/*
 	 * Check that it only contains lowercase hex and dashes at the right 
@@ -70,15 +70,15 @@ bool valid_uuid(const char *u, const bool check_len)
 	if (check_hex(u, 8) || u[8] != '-' || check_hex(u + 9, 4) ||
 	    u[13] != '-' || check_hex(u + 14, 4) || u[18] != '-' ||
 	    check_hex(u + 19, 4) || u[23] != '-' || check_hex(u + 24, 12))
-		return FALSE;
+		return false;
 
 	/*
 	 * At the moment only v1 UUIDs are allowed.
 	 */
 	if (u[14] != '1')
-		return FALSE;
+		return false;
 
-	return TRUE;
+	return true;
 }
 
 /*
@@ -93,7 +93,7 @@ char *scramble_mac_address(char *uuid)
 
 	assert(uuid);
 
-	if (!valid_uuid(uuid, FALSE))
+	if (!valid_uuid(uuid, false))
 		return NULL;
 
 	for (i = UUID_LENGTH - 12; i < UUID_LENGTH; i += 2) {
@@ -119,7 +119,7 @@ char *generate_uuid(const struct Rc *rc, const bool random_mac)
 	FILE *fp;
 
 	assert(rc);
-	assert(random_mac == FALSE || random_mac == TRUE);
+	assert(random_mac == false || random_mac == true);
 
 	if (rc->uuidcmd)
 		cmd = rc->uuidcmd;
@@ -139,7 +139,7 @@ char *generate_uuid(const struct Rc *rc, const bool random_mac)
 	uuid[UUID_LENGTH] = '\0';
 	pclose(fp);
 
-	if (!valid_uuid(uuid, TRUE))
+	if (!valid_uuid(uuid, true))
 		return NULL;
 
 	if (rc->macaddr) {
@@ -149,7 +149,7 @@ char *generate_uuid(const struct Rc *rc, const bool random_mac)
 	if (random_mac && !scramble_mac_address(uuid))
 		return NULL;
 
-	assert(valid_uuid(uuid, TRUE));
+	assert(valid_uuid(uuid, true));
 
 	return uuid;
 }
@@ -176,7 +176,7 @@ char *uuid_date(char *dest, const char *uuid)
 	assert(dest);
 	assert(uuid);
 
-	if (!valid_uuid(uuid, FALSE))
+	if (!valid_uuid(uuid, false))
 		return NULL;
 	if (uuid[14] != '1')
 		return NULL; /* Not a v1 UUID, has no timestamp */
@@ -225,17 +225,17 @@ char *uuid_date(char *dest, const char *uuid)
 
 /*
  * is_valid_date() - Check that the date pointed to by s is valid. If check_len 
- * is TRUE, also check that the string length is correct.
+ * is true, also check that the string length is correct.
  * Return 1 if ok, 0 if invalid.
  */
 
 bool is_valid_date(const char *s, const bool check_len)
 {
 	assert(s);
-	assert(check_len == FALSE || check_len == TRUE);
+	assert(check_len == false || check_len == true);
 
 	if (check_len && strlen(s) != DATE_LENGTH)
-		return FALSE;
+		return false;
 
 	if (s[0] != '2' || s[1] != '0' || /* Yay for Y2.1K */
 	    !isdigit((int)s[2]) || !isdigit((int)s[3]) || /* Two last digits 
@@ -256,9 +256,9 @@ bool is_valid_date(const char *s, const bool check_len)
 	        !isdigit((int)s[24]) || !isdigit((int)s[25]) ||
 	        !isdigit((int)s[26]) || /* Nanoseconds */
 	    s[27] != 'Z')
-		return FALSE;
+		return false;
 	else
-		return TRUE;
+		return true;
 }
 
 #ifdef VERIFY_UUID
@@ -278,7 +278,7 @@ char *uuid_date_from_uuid(char *dest, const char *uuid)
 
 	if (uuid[14] != '1')
 		return NULL; /* Not a v1 UUID, has no timestamp */
-	if (!valid_uuid(uuid, FALSE))
+	if (!valid_uuid(uuid, false))
 		return NULL;
 
 	memset(cmd, 0, 50);
@@ -312,7 +312,7 @@ char *uuid_date_from_uuid(char *dest, const char *uuid)
 
 	strncpy(dest, p, DATE_LENGTH + 1);
 	free(ap);
-	if (!is_valid_date(dest, TRUE)) {
+	if (!is_valid_date(dest, true)) {
 		fprintf(stderr, "uuid_date_from_uuid(): Generated date is "
 		                "invalid: \"%s\"\n", dest);
 		return NULL;
@@ -334,7 +334,7 @@ char *scan_for_uuid(const char *s)
 	assert(s);
 
 	while (strlen(p) >= UUID_LENGTH) {
-		if (valid_uuid(p, FALSE))
+		if (valid_uuid(p, false))
 			return (char *)p;
 		p++;
 	}

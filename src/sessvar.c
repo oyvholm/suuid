@@ -21,18 +21,18 @@
 #include "suuid.h"
 
 /*
- * is_legal_desc_char() - Return TRUE if the character c is a valid char for 
- * use in the desc attribute in <sess> elements, FALSE if not.
+ * is_legal_desc_char() - Return true if the character c is a valid char for 
+ * use in the desc attribute in <sess> elements, false if not.
  */
 
 bool is_legal_desc_char(const unsigned char c)
 {
-	return strchr(DESC_LEGAL, c) ? TRUE : FALSE;
+	return strchr(DESC_LEGAL, c) ? true : false;
 }
 
 /*
- * is_valid_desc_string() - Return TRUE if the string s is a valid desc name, 
- * return FALSE if not.
+ * is_valid_desc_string() - Return true if the string s is a valid desc name, 
+ * return false if not.
  */
 
 #ifdef UNUSED
@@ -44,14 +44,14 @@ bool is_valid_desc_string(const char *s)
 
 	while (*p) {
 		if (!is_legal_desc_char(*p))
-			return FALSE;
+			return false;
 		p++;
 	}
 
 	if (utf8_check(s))
-		return FALSE;
+		return false;
 
-	return TRUE;
+	return true;
 }
 #endif
 
@@ -99,7 +99,7 @@ int fill_sess(struct Entry *dest, const char *uuid,
 	static unsigned int sessind = 0;
 
 	assert(dest);
-	assert(valid_uuid(uuid, FALSE));
+	assert(valid_uuid(uuid, false));
 
 	if (sessind >= MAX_SESS) {
 		fprintf(stderr, "%s: Maximum number of sess entries (%u) "
@@ -159,7 +159,7 @@ int get_sess_info(struct Entry *entry)
 
 	p = s;
 	while (*p) {
-		if (valid_uuid(p, FALSE)) {
+		if (valid_uuid(p, false)) {
 			size_t desclen = 0;
 
 			if (desc_found && !desc_end)
@@ -289,7 +289,7 @@ const char *add_to_sessvar(const char *desc, const char *uuid)
 	char *sessvar; /* Copy of the original envvar */
 	char *envbuf; /* Temporary buffer for the finished string */
 
-	assert(valid_uuid(uuid, TRUE));
+	assert(valid_uuid(uuid, true));
 
 	if (!is_valid_desc_string(desc))
 		desc = NULL;
@@ -374,7 +374,7 @@ int run_session(const struct Options *orig_opt,
 		retval = -1;
 		goto cleanup;
 	}
-	assert(valid_uuid(start_uuid, TRUE));
+	assert(valid_uuid(start_uuid, true));
 	msg(3, "old %s: \"%s\"", ENV_SESS, getenv(ENV_SESS));
 	add_to_sessvar(cmd_desc, start_uuid);
 	msg(3, "new %s: \"%s\"", ENV_SESS, getenv(ENV_SESS));
