@@ -22,7 +22,7 @@ CCFLAGS += $$(test -n "$(VERIFY_UUID)" && \
 # sqlite3.c gives warnings on NetBSD and OpenBSD, as described in 
 # ../doc/netbsd.txt and ../doc/openbsd.txt. Temporarily disable -Werror for 
 # sqlite3.c until this is sorted out.
-SQLITE_CCFLAGS = -Wall -Wextra -O0 -c -g
+SQLITE_CCFLAGS = -Wall -O0 -c -g
 
 LDFLAGS = -Wall -Wextra -Werror
 
