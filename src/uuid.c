@@ -163,7 +163,7 @@ char *generate_uuid(const struct Rc *rc, const bool random_mac)
 char *uuid_date(char *dest, const char *uuid)
 {
 	char hexbuf[16];
-	long long val;
+	unsigned long long val;
 	unsigned int nano;
 	time_t timeval;
 	struct tm *tm;
