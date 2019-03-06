@@ -21,25 +21,6 @@
 #include "suuid.h"
 
 /*
- * check_hex() - Check that len bytes at the location pointed to by p are all 
- * legal lowercase hex chars. Return a pointer to the first invalid character 
- * or NULL if everything is ok.
- */
-
-char *check_hex(const char *hex, const size_t len)
-{
-	const char *p;
-
-	assert(hex);
-
-	for (p = hex; p < hex + len; p++)
-		if (!strchr("0123456789abcdef", *p))
-			return (char *)p;
-
-	return NULL;
-}
-
-/*
  * mymalloc() - Wrapper around malloc(), display error message if the 
  * allocation fails. Returns the value from malloc().
  */

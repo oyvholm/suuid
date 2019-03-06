@@ -195,7 +195,6 @@ extern int run_session(const struct Options *orig_opt,
                        const int argc, char * const argv[]);
 
 /* string.c */
-extern char *check_hex(const char *hex, const size_t len);
 extern void *mymalloc(const size_t size);
 extern char *mystrdup(const char *s);
 #if defined(UNUSED) || defined(TEST_FUNC)
@@ -217,6 +216,7 @@ extern int store_tag(struct Entry *entry, const char *arg);
 extern void free_tags(struct Entry *entry);
 
 /* uuid.c */
+extern char *check_hex(const char *hex, const size_t len);
 extern bool valid_macaddr(const char *macaddr);
 extern bool valid_uuid(const char *u, const bool check_len);
 extern char *scan_for_uuid(const char *s);
