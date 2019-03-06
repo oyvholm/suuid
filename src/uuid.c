@@ -147,7 +147,8 @@ char *generate_uuid(const struct Rc *rc, const bool random_mac)
 	/* fixme: Generate it properly */
 	fp = popen(cmd, "r");
 	if (!fp) {
-		myerror("generate_uuid(): Could not exec \"%s\"", cmd);
+		fprintf(stderr, "%s: generate_uuid(): Could not exec \"%s\"\n",
+		                progname, cmd);
 		return NULL;
 	}
 	if (!fgets(uuid, UUID_LENGTH + 1, fp)) {
@@ -253,13 +254,14 @@ char *uuid_date(char *dest, const char *uuid)
 	strftime(dest, DATE_LENGTH, "%Y-%m-%dT%H:%M:%S", tm);
 	p = dest + strlen(dest);
 	if (p - dest != 19) {
-		myerror("%lu: Invalid date length, should be 19",
-				(unsigned long)(p - dest));
+		fprintf(stderr, "%s: %lu: Invalid date length, should be 19\n",
+		                progname, (unsigned long)(p - dest));
 		return NULL;
 	}
 	snprintf(p, DATE_LENGTH - 19 + 1, ".%07uZ", nano);
 	if (!is_valid_date(dest, 1)) {
-		myerror("uuid_date(): %s: Generated invalid timestamp", dest);
+		fprintf(stderr, "%s: uuid_date(): %s: Generated invalid "
+		                "timestamp\n", progname, dest);
 		return NULL;
 	}
 
@@ -267,14 +269,18 @@ char *uuid_date(char *dest, const char *uuid)
 	chkres = uuid_date_from_uuid(chkbuf, uuid);
 	if (chkres) {
 		if (strcmp(dest, chkbuf)) {
-			myerror("uuid_date(): UUID DATE DIFFERENCE:");
-			myerror("uuid_date(): dest   = \"%s\"", dest);
-			myerror("uuid_date(): chkbuf = \"%s\"", chkbuf);
+			fprintf(stderr, "%s: uuid_date(): "
+			                "UUID DATE DIFFERENCE:\n", progname);
+			fprintf(stderr, "%s: uuid_date(): dest   = \"%s\"\n",
+			                progname, dest);
+			fprintf(stderr, "%s: uuid_date(): chkbuf = \"%s\"\n",
+			                progname, chkbuf);
 			return NULL;
 		}
 	} else {
-		myerror("uuid_date(): uuid_date_from_uuid() failed, "
-		        "cannot verify UUID timestamp");
+		fprintf(stderr, "%s: uuid_date(): uuid_date_from_uuid() "
+		                "failed, cannot verify UUID timestamp\n",
+		                progname);
 		return NULL;
 	}
 #endif
@@ -307,7 +313,8 @@ char *uuid_date_from_uuid(char *dest, const char *uuid)
 
 	fp = popen(cmd, "r");
 	if (!fp) {
-		myerror("uuid_date_from_uuid(): Could not exec \"%s\"", cmd);
+		fprintf(stderr, "%s: uuid_date_from_uuid(): "
+		                "Could not exec \"%s\"\n", progname, cmd);
 		return NULL;
 	}
 	ap = read_from_fp(fp);
