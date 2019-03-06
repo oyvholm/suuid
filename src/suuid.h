@@ -53,6 +53,8 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "uuid.h"
+
 #define ENV_EDITOR  "SUUID_EDITOR" /* Name of editor to use with "-c --" */
 #define ENV_SESS  "SESS_UUID" /* Name of environment variable where the session 
                                * information is stored
