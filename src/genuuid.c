@@ -363,7 +363,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 			break;
 	}
 	if (valid_uuid(entry.uuid, true))
-		strncpy(retval.lastuuid, entry.uuid, UUID_LENGTH + 1);
+		memcpy(retval.lastuuid, entry.uuid, UUID_LENGTH + 1);
 
 	/*
 	 * Check that the correct amount of UUIDs were created.
