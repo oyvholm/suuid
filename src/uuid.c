@@ -40,12 +40,33 @@ char *check_hex(const char *hex, const size_t len)
 }
 
 /*
+ * write_hex() - Read `len` bytes of binary data from `src` and write it as 
+ * lowercase hexadecimal to `dest`. `dest` must be at least double the size of 
+ * `src` plus a terminating null byte. Returns `dest`.
+ */
+
+char *write_hex(char *dest, const unsigned char *src, size_t len)
+{
+	size_t i;
+
+	assert(dest);
+	assert(src);
+
+	for (i = 0; i < len; i++)
+		sprintf(dest + 2*i, "%02x", src[i]);
+
+	return dest;
+}
+
+/*
  * valid_macaddr() - Check that macaddr is a valid MAC address.
  * Return true if OK, false if something is wrong.
  */
 
 bool valid_macaddr(const char *macaddr)
 {
+	unsigned int first;
+
 	if (check_hex(macaddr, 12)) {
 		fprintf(stderr, "%s: MAC address contains illegal characters, "
 		        "can only contain hex digits\n", progname);
@@ -56,9 +77,14 @@ bool valid_macaddr(const char *macaddr)
 		        "must be exactly 12 hex digits\n", progname);
 		return false;
 	}
-	if (!strchr("37bf", macaddr[1])) {
-		fprintf(stderr, "%s: MAC address doesn't follow RFC 4122, the "
-		                "second hex digit must be one of \"37bf\"\n",
+	if (sscanf(macaddr, "%2x", &first) != 1) {
+		fprintf(stderr, "%s: valid_macaddr(): sscanf() failed when "
+		                "scanning \"%s\"\n", progname, macaddr);
+		return false;
+	}
+	if (!(first & 0x01)) {
+		fprintf(stderr, "%s: MAC address doesn't follow RFC 4122, "
+		                "multicast bit not set\n",
 		                progname);
 		return false;
 	}
@@ -121,6 +147,33 @@ char *scan_for_uuid(const char *s)
 }
 
 /*
+ * generate_macaddr() - Generate random node address in `dest`, MACADDR_LENGTH 
+ * bytes and set the multicast bit. Returns pointer to dest or NULL if error.
+ */
+
+unsigned char *generate_macaddr(unsigned char *dest)
+{
+	int i;
+
+	assert(dest);
+
+	for (i = 0; i < MACADDR_LENGTH; i++)
+		dest[i] = random() & 0xFF;
+	dest[0] |= 0x01;
+#ifdef VERIFY_UUID
+	char chkbuf[MACADDR_LENGTH * 2 + 1];
+	write_hex(chkbuf, dest, MACADDR_LENGTH);
+	if (!valid_macaddr(chkbuf)) {
+		fprintf(stderr, "%s: generate_macaddr() generated invalid "
+		                "address: \"%s\"\n", progname, chkbuf);
+		dest = NULL;
+	}
+#endif
+
+	return dest;
+}
+
+/*
  * scramble_mac_address() - Overwrite the last 12 characters of the received 
  * pointer to an UUID with random bytes as specified by RFC 4122. Return 
  * pointer to the UUID if successful, or NULL if an invalid UUID was received.
@@ -128,20 +181,22 @@ char *scan_for_uuid(const char *s)
 
 char *scramble_mac_address(char *uuid)
 {
-	int i;
+	unsigned char buf[MACADDR_LENGTH];
+	char *macaddr;
 
 	assert(uuid);
-
+	macaddr = uuid + 24;
 	if (!valid_uuid(uuid, false))
 		return NULL;
-
-	for (i = UUID_LENGTH - 12; i < UUID_LENGTH; i += 2) {
-		char buf[3];
-
-		snprintf(buf, 3, "%02x", (unsigned int)random() & 0xff);
-		strncpy(uuid + i, buf, 2);
+	generate_macaddr(buf);
+	write_hex(macaddr, buf, MACADDR_LENGTH);
+#ifdef VERIFY_UUID
+	if (!valid_macaddr(macaddr)) {
+		fprintf(stderr, "%s: scramble_mac_address() generated invalid "
+		                "address: \"%s\"\n", progname, macaddr);
+		return NULL;
 	}
-	uuid[25] = "37bf"[random() & 0x03];
+#endif
 
 	return uuid;
 }
