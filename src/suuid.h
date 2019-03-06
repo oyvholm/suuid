@@ -27,9 +27,6 @@
 #define T_RED    "\x1b[31m"
 #define T_GREEN  "\x1b[32m"
 
-#define DATE_LENGTH  28 /* Length of ISO date format with nanoseconds */
-#define UUID_LENGTH  36 /* Length of a standard UUID */
-
 #define stddebug  stderr
 
 #ifdef USE_SQLITE
@@ -63,7 +60,6 @@
 #define ENV_LOGDIR  "SUUID_LOGDIR" /* Optional environment variable with path 
                                     * to log directory
                                     */
-#define EPOCH_DIFF 12219292800
 #define STD_RCFILE  ".suuidrc"
 #define MAX_SESS  1000 /* Maximum number of sess elements per entry */
 #define MAX_TAGS  1000 /* Maximum number of tags */

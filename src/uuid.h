@@ -20,6 +20,11 @@
 
 #ifndef _UUID_H
 #define _UUID_H
+
+#define DATE_LENGTH  28 /* Length of ISO date format with nanoseconds */
+#define EPOCH_DIFF 12219292800
+#define UUID_LENGTH  36 /* Length of a standard UUID */
+
 #endif /* ifndef _UUID_H */
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */
