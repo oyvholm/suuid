@@ -82,6 +82,26 @@ bool valid_uuid(const char *u, const bool check_len)
 }
 
 /*
+ * scan_for_uuid() - Return a pointer to the first UUID in the string s, or 
+ * NULL if no UUID was found.
+ */
+
+char *scan_for_uuid(const char *s)
+{
+	const char *p = s;
+
+	assert(s);
+
+	while (strlen(p) >= UUID_LENGTH) {
+		if (valid_uuid(p, false))
+			return (char *)p;
+		p++;
+	}
+
+	return NULL;
+}
+
+/*
  * scramble_mac_address() - Overwrite the last 12 characters of the received 
  * pointer to an UUID with random bytes as specified by RFC 4122. Return 
  * pointer to the UUID if successful, or NULL if an invalid UUID was received.
@@ -155,6 +175,44 @@ char *generate_uuid(const struct Rc *rc, const bool random_mac)
 }
 
 /*
+ * is_valid_date() - Check that the date pointed to by s is valid. If check_len 
+ * is true, also check that the string length is correct.
+ * Return 1 if ok, 0 if invalid.
+ */
+
+bool is_valid_date(const char *s, const bool check_len)
+{
+	assert(s);
+	assert(check_len == false || check_len == true);
+
+	if (check_len && strlen(s) != DATE_LENGTH)
+		return false;
+
+	if (s[0] != '2' || s[1] != '0' || /* Yay for Y2.1K */
+	    !isdigit((int)s[2]) || !isdigit((int)s[3]) || /* Two last digits 
+	                                                     in year */
+	    s[4] != '-' ||
+	    !strchr("01", s[5]) || !isdigit((int)s[6]) || /* Month */
+	    s[7] != '-' ||
+	    !strchr("0123", s[8]) || !isdigit((int)s[9]) || /* Day */
+	    s[10] != 'T' ||
+	    !strchr("012", s[11]) || !isdigit((int)s[12]) || /* Hour */
+	    s[13] != ':' ||
+	    !strchr("012345", s[14]) || !isdigit((int)s[15]) || /* Minute */
+	    s[16] != ':' ||
+	    !strchr("0123456", s[17]) || !isdigit((int)s[18]) || /* Second */
+	    s[19] != '.' ||
+	    !isdigit((int)s[20])     || !isdigit((int)s[21]) ||
+	        !isdigit((int)s[22]) || !isdigit((int)s[23]) ||
+	        !isdigit((int)s[24]) || !isdigit((int)s[25]) ||
+	        !isdigit((int)s[26]) || /* Nanoseconds */
+	    s[27] != 'Z')
+		return false;
+	else
+		return true;
+}
+
+/*
  * uuid_date() - Receive an UUID v1 and write the UUID date to dest, 29 bytes 
  * (ISO 8601 date plus terminating null byte). Return pointer to dest if ok, or 
  * NULL if it's not a valid v1 UUID.
@@ -223,44 +281,6 @@ char *uuid_date(char *dest, const char *uuid)
 	return dest;
 }
 
-/*
- * is_valid_date() - Check that the date pointed to by s is valid. If check_len 
- * is true, also check that the string length is correct.
- * Return 1 if ok, 0 if invalid.
- */
-
-bool is_valid_date(const char *s, const bool check_len)
-{
-	assert(s);
-	assert(check_len == false || check_len == true);
-
-	if (check_len && strlen(s) != DATE_LENGTH)
-		return false;
-
-	if (s[0] != '2' || s[1] != '0' || /* Yay for Y2.1K */
-	    !isdigit((int)s[2]) || !isdigit((int)s[3]) || /* Two last digits 
-	                                                     in year */
-	    s[4] != '-' ||
-	    !strchr("01", s[5]) || !isdigit((int)s[6]) || /* Month */
-	    s[7] != '-' ||
-	    !strchr("0123", s[8]) || !isdigit((int)s[9]) || /* Day */
-	    s[10] != 'T' ||
-	    !strchr("012", s[11]) || !isdigit((int)s[12]) || /* Hour */
-	    s[13] != ':' ||
-	    !strchr("012345", s[14]) || !isdigit((int)s[15]) || /* Minute */
-	    s[16] != ':' ||
-	    !strchr("0123456", s[17]) || !isdigit((int)s[18]) || /* Second */
-	    s[19] != '.' ||
-	    !isdigit((int)s[20])     || !isdigit((int)s[21]) ||
-	        !isdigit((int)s[22]) || !isdigit((int)s[23]) ||
-	        !isdigit((int)s[24]) || !isdigit((int)s[25]) ||
-	        !isdigit((int)s[26]) || /* Nanoseconds */
-	    s[27] != 'Z')
-		return false;
-	else
-		return true;
-}
-
 #ifdef VERIFY_UUID
 /*
  * uuid_date_from_uuid() - Same functionality as uuid_date(), but use the 
@@ -321,25 +341,5 @@ char *uuid_date_from_uuid(char *dest, const char *uuid)
 	return dest;
 }
 #endif
-
-/*
- * scan_for_uuid() - Return a pointer to the first UUID in the string s, or 
- * NULL if no UUID was found.
- */
-
-char *scan_for_uuid(const char *s)
-{
-	const char *p = s;
-
-	assert(s);
-
-	while (strlen(p) >= UUID_LENGTH) {
-		if (valid_uuid(p, false))
-			return (char *)p;
-		p++;
-	}
-
-	return NULL;
-}
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */
