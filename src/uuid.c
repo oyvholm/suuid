@@ -253,7 +253,8 @@ char *uuid_date(char *dest, const char *uuid)
 	strftime(dest, DATE_LENGTH, "%Y-%m-%dT%H:%M:%S", tm);
 	p = dest + strlen(dest);
 	if (p - dest != 19) {
-		myerror("%u: Invalid date length, should be 19", p - dest);
+		myerror("%lu: Invalid date length, should be 19",
+				(unsigned long)(p - dest));
 		return NULL;
 	}
 	snprintf(p, DATE_LENGTH - 19 + 1, ".%07uZ", nano);
