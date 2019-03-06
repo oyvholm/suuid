@@ -206,14 +206,13 @@ char *scramble_mac_address(char *uuid)
  * NULL if error.
  */
 
-char *generate_uuid(const struct Rc *rc, const bool random_mac)
+char *generate_uuid(const struct Rc *rc)
 {
 	static char uuid[UUID_LENGTH + 2];
 	char *cmd = "uuid";
 	FILE *fp;
 
 	assert(rc);
-	assert(random_mac == false || random_mac == true);
 
 	if (rc->uuidcmd)
 		cmd = rc->uuidcmd;
@@ -241,8 +240,6 @@ char *generate_uuid(const struct Rc *rc, const bool random_mac)
 		assert(valid_macaddr(rc->macaddr)); /* Should be valid now */
 		strncpy(uuid + 24, rc->macaddr, 12);
 	}
-	if (random_mac && !scramble_mac_address(uuid))
-		return NULL;
 
 	assert(valid_uuid(uuid, true));
 

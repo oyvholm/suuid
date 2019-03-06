@@ -217,8 +217,11 @@ char *process_uuid(struct Logs *logs,
 			return NULL;
 		}
 		entry->uuid = opt->uuid;
-	} else
-		entry->uuid = generate_uuid(rc, opt->random_mac);
+	} else {
+		entry->uuid = generate_uuid(rc);
+		if (opt->random_mac && !scramble_mac_address(entry->uuid))
+			return NULL;
+	}
 	if (!entry->uuid) {
 		fprintf(stderr, "%s: UUID generation failed\n", progname);
 		return NULL;
