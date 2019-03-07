@@ -219,6 +219,9 @@ char *process_uuid(struct Logs *logs,
 		entry->uuid = opt->uuid;
 	} else {
 		entry->uuid = generate_uuid(rc);
+		if (rc->macaddr)
+			memcpy(entry->uuid + 24, rc->macaddr,
+			       MACADDR_LENGTH * 2);
 		if (opt->random_mac && !scramble_mac_address(entry->uuid))
 			return NULL;
 	}

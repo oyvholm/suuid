@@ -236,13 +236,6 @@ char *generate_uuid(const struct Rc *rc)
 	if (!valid_uuid(uuid, true))
 		return NULL;
 
-	if (rc->macaddr) {
-		assert(valid_macaddr(rc->macaddr)); /* Should be valid now */
-		strncpy(uuid + 24, rc->macaddr, 12);
-	}
-
-	assert(valid_uuid(uuid, true));
-
 	return uuid;
 }
 
