@@ -216,16 +216,16 @@ char *process_uuid(struct Logs *logs,
 			                "valid.\n", opt->uuid);
 			return NULL;
 		}
-		entry->uuid = opt->uuid;
+		memcpy(entry->uuid, opt->uuid, UUID_LENGTH + 1);
 	} else {
-		entry->uuid = generate_uuid(rc);
+		generate_uuid(entry->uuid, rc);
 		if (rc->macaddr)
 			memcpy(entry->uuid + 24, rc->macaddr,
 			       MACADDR_LENGTH * 2);
 		if (opt->random_mac && !scramble_mac_address(entry->uuid))
 			return NULL;
 	}
-	if (!entry->uuid) {
+	if (!valid_uuid(entry->uuid, true)) {
 		fprintf(stderr, "%s: UUID generation failed\n", progname);
 		return NULL;
 	}

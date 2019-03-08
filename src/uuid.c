@@ -206,9 +206,8 @@ char *scramble_mac_address(char *uuid)
  * NULL if error.
  */
 
-char *generate_uuid(const struct Rc *rc)
+char *generate_uuid(char *uuid, const struct Rc *rc)
 {
-	static char uuid[UUID_LENGTH + 2];
 	char *cmd = "uuid";
 	FILE *fp;
 

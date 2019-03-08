@@ -118,7 +118,7 @@ void init_xml_entry(struct Entry *e)
 	assert(e);
 
 	e->date = NULL;
-	e->uuid = NULL;
+	memset(e->uuid, 0, UUID_LENGTH + 1);
 	e->txt = NULL;
 	e->host = NULL;
 	e->cwd = NULL;
@@ -364,6 +364,7 @@ char *create_sess_xml(const struct Entry *entry)
 char *xml_entry(const struct Entry *entry, const bool raw)
 {
 	struct Entry e;
+	char *uuidp;
 	char *retval;
 	char *tag_xml = NULL, *sess_xml = NULL;
 	size_t size;
@@ -373,21 +374,21 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 
 	init_xml_entry(&e);
 
-	if (!entry->uuid)
+	if (!valid_uuid(entry->uuid, true))
 		return NULL;
 
 	/*
 	 * Allocate space for the UUID and timestamp attributes.
 	 */
 
-	e.uuid = alloc_attr("u", entry->uuid);
-	if (!e.uuid)
+	uuidp = alloc_attr("u", entry->uuid);
+	if (!uuidp)
 		return NULL;
 
 	if (entry->date) {
 		e.date = alloc_attr("t", entry->date);
 		if (!e.date) {
-			free(e.uuid);
+			free(uuidp);
 			return NULL;
 		}
 	}
@@ -469,7 +470,7 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 	                       "%s" /* sess */
 	                       "</suuid>",
 	                       (e.date) ? e.date : "",
-	                       (e.uuid) ? e.uuid : "",
+	                       (uuidp) ? uuidp : "",
 	                       tag_xml ? tag_xml : "",
 	                       (e.txt) ? e.txt : "",
 	                       (e.host) ? e.host : "",
@@ -486,7 +487,7 @@ cleanup:
 	free(sess_xml);
 	free(tag_xml);
 	free(e.date);
-	free(e.uuid);
+	free(uuidp);
 
 	return retval;
 }
