@@ -117,7 +117,7 @@ void init_xml_entry(struct Entry *e)
 
 	assert(e);
 
-	e->date = NULL;
+	memset(e->date, 0, DATE_LENGTH + 1);
 	memset(e->uuid, 0, UUID_LENGTH + 1);
 	e->txt = NULL;
 	e->host = NULL;
@@ -365,6 +365,7 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 {
 	struct Entry e;
 	char *uuidp;
+	char *datep;
 	char *retval;
 	char *tag_xml = NULL, *sess_xml = NULL;
 	size_t size;
@@ -385,9 +386,9 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 	if (!uuidp)
 		return NULL;
 
-	if (entry->date) {
-		e.date = alloc_attr("t", entry->date);
-		if (!e.date) {
+	if (is_valid_date(entry->date, true)) {
+		datep = alloc_attr("t", entry->date);
+		if (!datep) {
 			free(uuidp);
 			return NULL;
 		}
@@ -469,7 +470,7 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 	                       "%s" /* tty */
 	                       "%s" /* sess */
 	                       "</suuid>",
-	                       (e.date) ? e.date : "",
+	                       (datep) ? datep : "",
 	                       (uuidp) ? uuidp : "",
 	                       tag_xml ? tag_xml : "",
 	                       (e.txt) ? e.txt : "",
@@ -486,7 +487,7 @@ cleanup:
 	free(e.txt);
 	free(sess_xml);
 	free(tag_xml);
-	free(e.date);
+	free(datep);
 	free(uuidp);
 
 	return retval;

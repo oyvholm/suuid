@@ -235,10 +235,6 @@ char *process_uuid(struct Logs *logs,
 	 * buffer.
 	 */
 
-	if (!entry->date)
-		entry->date = mymalloc(DATE_LENGTH + 1);
-	if (!entry->date)
-		return NULL;
 	if (!uuid_date(entry->date, entry->uuid))
 		return NULL;
 
@@ -394,7 +390,6 @@ cleanup:
 	free(rc.macaddr);
 	free(rc.hostname);
 	free(entry.txt);
-	free(entry.date);
 	free(entry.cwd);
 	free(rcfile);
 

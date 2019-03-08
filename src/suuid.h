@@ -111,7 +111,7 @@ struct Sess {
 	char *desc;
 };
 struct Entry {
-	char *date;
+	char date[DATE_LENGTH + 1];
 	char uuid[UUID_LENGTH + 1];
 	char *tag[MAX_TAGS];
 	char *txt;
