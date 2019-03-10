@@ -365,7 +365,7 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 {
 	struct Entry e;
 	char *uuidp;
-	char *datep;
+	char *datep = NULL;
 	char *retval;
 	char *tag_xml = NULL, *sess_xml = NULL;
 	size_t size;
