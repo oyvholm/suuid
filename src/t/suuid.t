@@ -383,23 +383,6 @@ sub test_suuid_executable {
 	# }}}
 	ok(unlink($Outfile), "Delete [Outfile]");
 	read_long_text_from_stdin($CMD, $Outdir, $Outfile);
-	testcmd("$CMD --rcfile rcfile-inv-uuidcmd -l $Outdir", # {{{
-		'',
-		"../suuid: UUID generation failed\n",
-		1,
-		"uuidcmd does not generate valid UUID",
-	);
-
-	# }}}
-	my $host_outfile = $FAKE_HOST ? "$Outdir/fake.xml"
-	                              : glob("$Outdir/*.xml");
-	defined($host_outfile) || ($host_outfile = '');
-	like(file_data($host_outfile), # {{{
-		s_top(''),
-		"suuid file is empty",
-	);
-
-	# }}}
 	diag("Read the SUUID_LOGDIR environment variable...");
 	likecmd("SUUID_LOGDIR=$Outdir $CMD -vvv", # {{{
 		"/^$v1_templ\n\$/s",
@@ -503,7 +486,7 @@ sub test_suuid_executable {
 	);
 
 	# }}}
-	ok(unlink($host_outfile), "Delete [host_outfile]");
+	ok(unlink($Outfile), "Delete [Outfile], line " . __LINE__);
 	my $mac = "1b460a166a4d";
 	create_file("rc-macaddr", "macaddr=$mac\n");
 	likecmd("$CMD --rcfile rc-macaddr -l $Outdir", # {{{

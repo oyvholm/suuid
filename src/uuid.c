@@ -213,9 +213,6 @@ char *generate_uuid(char *uuid, const struct Rc *rc)
 
 	assert(rc);
 
-	if (rc->uuidcmd)
-		cmd = rc->uuidcmd;
-
 	/* fixme: Generate it properly */
 	fp = popen(cmd, "r");
 	if (!fp) {

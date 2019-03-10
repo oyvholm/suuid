@@ -104,7 +104,6 @@
 struct Rc {
 	char *hostname;
 	char *macaddr;
-	char *uuidcmd;
 };
 struct Sess {
 	char *uuid;

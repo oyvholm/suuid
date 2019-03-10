@@ -103,11 +103,6 @@ int parse_rc_line(const char *line, struct Rc *rc)
 			return EXIT_FAILURE;
 		string_to_lower(rc->macaddr);
 	}
-	if (has_key(line, "uuidcmd")) {
-		rc->uuidcmd = mystrdup(has_key(line, "uuidcmd"));
-		if (!rc->uuidcmd)
-			return EXIT_FAILURE;
-	}
 
 	return EXIT_SUCCESS;
 }
@@ -127,7 +122,6 @@ int read_rcfile(const char *rcfile, struct Rc *rc)
 
 	rc->hostname = NULL;
 	rc->macaddr = NULL;
-	rc->uuidcmd = NULL;
 
 	if (!rcfile)
 		return EXIT_SUCCESS;
