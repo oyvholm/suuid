@@ -202,8 +202,8 @@ char *scramble_mac_address(char *uuid)
 }
 
 /*
- * generate_uuid() - Return a pointer to a string with a generated UUID v1, or 
- * NULL if error.
+ * generate_uuid() - Write new unique uuid v1 to `uuid`, a buffer containing at 
+ * least UUID_LENGTH + 1 bytes. Returns pointer to `uuid` or NULL if error.
  */
 
 char *generate_uuid(char *uuid)
