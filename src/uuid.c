@@ -59,40 +59,6 @@ char *write_hex(char *dest, const unsigned char *src, size_t len)
 }
 
 /*
- * valid_macaddr() - Check that macaddr is a valid MAC address.
- * Return true if OK, false if something is wrong.
- */
-
-bool valid_macaddr(const char *macaddr)
-{
-	unsigned int first;
-
-	if (check_hex(macaddr, 12)) {
-		fprintf(stderr, "%s: MAC address contains illegal characters, "
-		        "can only contain hex digits\n", progname);
-		return false;
-	}
-	if (strlen(macaddr) != 12) {
-		fprintf(stderr, "%s: Wrong MAC address length, "
-		        "must be exactly 12 hex digits\n", progname);
-		return false;
-	}
-	if (sscanf(macaddr, "%2x", &first) != 1) {
-		fprintf(stderr, "%s: valid_macaddr(): sscanf() failed when "
-		                "scanning \"%s\"\n", progname, macaddr);
-		return false;
-	}
-	if (!(first & 0x01)) {
-		fprintf(stderr, "%s: MAC address doesn't follow RFC 4122, "
-		                "multicast bit not set\n",
-		                progname);
-		return false;
-	}
-
-	return true;
-}
-
-/*
  * valid_uuid() - Check that the UUID pointed to by u is a valid UUID. If 
  * check_len is true, also check that the string length is exactly the same as 
  * a standard UUID, UUID_LENGTH chars.
@@ -144,6 +110,40 @@ char *scan_for_uuid(const char *s)
 	}
 
 	return NULL;
+}
+
+/*
+ * valid_macaddr() - Check that macaddr is a valid MAC address.
+ * Return true if OK, false if something is wrong.
+ */
+
+bool valid_macaddr(const char *macaddr)
+{
+	unsigned int first;
+
+	if (check_hex(macaddr, 12)) {
+		fprintf(stderr, "%s: MAC address contains illegal characters, "
+		        "can only contain hex digits\n", progname);
+		return false;
+	}
+	if (strlen(macaddr) != 12) {
+		fprintf(stderr, "%s: Wrong MAC address length, "
+		        "must be exactly 12 hex digits\n", progname);
+		return false;
+	}
+	if (sscanf(macaddr, "%2x", &first) != 1) {
+		fprintf(stderr, "%s: valid_macaddr(): sscanf() failed when "
+		                "scanning \"%s\"\n", progname, macaddr);
+		return false;
+	}
+	if (!(first & 0x01)) {
+		fprintf(stderr, "%s: MAC address doesn't follow RFC 4122, "
+		                "multicast bit not set\n",
+		                progname);
+		return false;
+	}
+
+	return true;
 }
 
 /*
