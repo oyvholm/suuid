@@ -26,6 +26,19 @@
 #define MACADDR_LENGTH  6 /* Length of MAC address */
 #define UUID_LENGTH  36 /* Length of a standard UUID */
 
+/* uuid.c */
+extern char *check_hex(const char *hex, const size_t len);
+extern bool valid_macaddr(const char *macaddr);
+extern bool valid_uuid(const char *u, const bool check_len);
+extern char *scan_for_uuid(const char *s);
+extern char *scramble_mac_address(char *uuid);
+extern char *generate_uuid(char *uuid);
+extern bool is_valid_date(const char *s, const bool check_len);
+extern char *uuid_date(char *dest, const char *uuid);
+#ifdef VERIFY_UUID
+extern char *uuid_date_from_uuid(char *dest, const char *uuid);
+#endif
+
 #endif /* ifndef _UUID_H */
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */
