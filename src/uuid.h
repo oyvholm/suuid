@@ -28,6 +28,18 @@
 
 typedef unsigned long long utime_t;
 
+struct uuid_time {
+	unsigned int hi;
+	unsigned int mid;
+	unsigned int low;
+};
+struct uuid {
+	struct uuid_time time;
+	unsigned int clseq_hi;
+	unsigned int clseq_lo;
+	unsigned char node[MACADDR_LENGTH];
+};
+
 /* uuid.c */
 extern bool valid_uuid(const char *u, const bool check_len);
 extern char *scan_for_uuid(const char *s);

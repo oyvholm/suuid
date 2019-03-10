@@ -113,6 +113,101 @@ char *scan_for_uuid(const char *s)
 }
 
 /*
+ * create_uuid_time() - Store `tv` as 60-bit integer in `utime`. Returns 
+ * nothing.
+ */
+
+void create_uuid_time(utime_t *utime, const struct timeval *tv)
+{
+	assert(utime);
+	assert(tv);
+
+	*utime = ((utime_t)tv->tv_sec * 10000000) +
+	         ((utime_t)tv->tv_usec * 10) +
+	         EPOCH_DIFF * 10000000;
+}
+
+/*
+ * fill_uuid_time() - Insert values from `tv` into `ut`. Returns nothing.
+ */
+
+void fill_uuid_time(struct uuid_time *ut, const struct timeval *tv)
+{
+	utime_t utime;
+
+	assert(ut);
+	assert(tv);
+
+	create_uuid_time(&utime, tv);
+	ut->low = (unsigned long)(utime & 0xFFFFFFFF);
+	ut->mid = (unsigned short)((utime >> 32) & 0xFFFF);
+	ut->hi = (unsigned short)((utime >> 48) & 0x0FFF);
+	ut->hi |= (1 << 12);
+}
+
+/*
+ * get_current_time() - Store the current system time in `tv`. If the computer 
+ * is fast enough to create identical timestamps, repeat until the timestamp 
+ * changes. Returns pointer to `tv` if ok or NULL if error.
+ */
+
+struct timeval *get_current_time(struct timeval *tv)
+{
+	struct timeval tvbuf;
+	utime_t utime;
+	unsigned long count = 0;
+	unsigned long maxcount = 1000000;
+	static utime_t prevtime = 0;
+
+	assert(tv);
+
+	while (1) {
+		if (gettimeofday(&tvbuf, NULL)) {
+			fprintf(stderr, "%s: get_current_time(): "
+			                "gettimeofday() failed\n", progname);
+			return NULL;
+		}
+		create_uuid_time(&utime, &tvbuf);
+		if (utime > prevtime)
+			break;
+		if (++count > maxcount) {
+			fprintf(stderr, "%s: get_current_time(): Got the same "
+			                "timestamp after %lu tries. System "
+			                "clock broken?\n", progname, maxcount);
+			return NULL;
+		}
+	}
+	prevtime = utime;
+	memcpy(tv, &tvbuf, sizeof(tvbuf));
+
+	return tv;
+}
+
+/*
+ * get_clockseq() - Set u->clseq_hi and u->clseq_lo to next value or init them 
+ * to random values if not initialised. Returns nothing.
+ */
+
+void get_clockseq(struct uuid *u)
+{
+	static unsigned int seq;
+	static bool done_init = false;
+	unsigned int val;
+
+	assert(u);
+
+	if (!done_init) {
+		seq = random() & 0xFFFF;
+		done_init = true;
+	}
+	val = ++seq;
+
+	u->clseq_lo = val & 0xFF;
+	u->clseq_hi = (val & 0x3F00) >> 8;
+	u->clseq_hi |= 0x80;
+}
+
+/*
  * valid_macaddr() - Check that macaddr is a valid MAC address.
  * Return true if OK, false if something is wrong.
  */
@@ -184,31 +279,44 @@ char *scramble_mac_address(char *uuid)
 }
 
 /*
+ * finish_uuid() - Write finished uuid to `dest`, use values in `u`. Returns 
+ * pointer to `dest`.
+ */
+
+char *finish_uuid(char *dest, const struct uuid *u)
+{
+	assert(dest);
+	assert(u);
+
+	sprintf(dest, "%08x-%04x-1%03x-%02x%02x-",
+	              u->time.low & 0xFFFFFFFF,
+	              u->time.mid & 0xFFFF,
+	              u->time.hi & 0xFFF,
+	              u->clseq_hi & 0xFF,
+	              u->clseq_lo & 0xFF);
+	write_hex(dest + 24, u->node, MACADDR_LENGTH);
+
+	return dest;
+}
+
+/*
  * generate_uuid() - Write new unique uuid v1 to `uuid`, a buffer containing at 
  * least UUID_LENGTH + 1 bytes. Returns pointer to `uuid` or NULL if error.
  */
 
 char *generate_uuid(char *uuid)
 {
-	char *cmd = "uuid";
-	FILE *fp;
+	struct uuid u;
+	struct timeval currtime;
 
-	/* fixme: Generate it properly */
-	fp = popen(cmd, "r");
-	if (!fp) {
-		fprintf(stderr, "%s: generate_uuid(): Could not exec \"%s\"\n",
-		                progname, cmd);
+	assert(uuid);
+
+	if (!get_current_time(&currtime))
 		return NULL;
-	}
-	if (!fgets(uuid, UUID_LENGTH + 1, fp)) {
-		/*
-		 * Nevermind read errors, valid_uuid() checks if it's valid 
-		 * later.
-		 */
-	}
-	uuid[UUID_LENGTH] = '\0';
-	pclose(fp);
-
+	fill_uuid_time(&u.time, &currtime);
+	get_clockseq(&u);
+	generate_macaddr(u.node);
+	finish_uuid(uuid, &u);
 	if (!valid_uuid(uuid, true))
 		return NULL;
 
