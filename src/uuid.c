@@ -160,15 +160,6 @@ unsigned char *generate_macaddr(unsigned char *dest)
 	for (i = 0; i < MACADDR_LENGTH; i++)
 		dest[i] = random() & 0xFF;
 	dest[0] |= 0x01;
-#ifdef VERIFY_UUID
-	char chkbuf[MACADDR_LENGTH * 2 + 1];
-	write_hex(chkbuf, dest, MACADDR_LENGTH);
-	if (!valid_macaddr(chkbuf)) {
-		fprintf(stderr, "%s: generate_macaddr() generated invalid "
-		                "address: \"%s\"\n", progname, chkbuf);
-		dest = NULL;
-	}
-#endif
 
 	return dest;
 }
@@ -190,13 +181,6 @@ char *scramble_mac_address(char *uuid)
 		return NULL;
 	generate_macaddr(buf);
 	write_hex(macaddr, buf, MACADDR_LENGTH);
-#ifdef VERIFY_UUID
-	if (!valid_macaddr(macaddr)) {
-		fprintf(stderr, "%s: scramble_mac_address() generated invalid "
-		                "address: \"%s\"\n", progname, macaddr);
-		return NULL;
-	}
-#endif
 
 	return uuid;
 }
