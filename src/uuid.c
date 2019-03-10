@@ -262,7 +262,7 @@ bool is_valid_date(const char *s, const bool check_len)
 char *uuid_date(char *dest, const char *uuid)
 {
 	char hexbuf[16];
-	unsigned long long val;
+	utime_t val;
 	unsigned int nano;
 	time_t timeval;
 	struct tm *tm;

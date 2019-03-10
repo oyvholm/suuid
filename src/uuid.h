@@ -26,6 +26,8 @@
 #define MACADDR_LENGTH  6 /* Length of MAC address */
 #define UUID_LENGTH  36 /* Length of a standard UUID */
 
+typedef unsigned long long utime_t;
+
 /* uuid.c */
 extern bool valid_uuid(const char *u, const bool check_len);
 extern char *scan_for_uuid(const char *s);
