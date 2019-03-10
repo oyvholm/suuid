@@ -218,7 +218,7 @@ extern bool valid_macaddr(const char *macaddr);
 extern bool valid_uuid(const char *u, const bool check_len);
 extern char *scan_for_uuid(const char *s);
 extern char *scramble_mac_address(char *uuid);
-extern char *generate_uuid(char *uuid, const struct Rc *rc);
+extern char *generate_uuid(char *uuid);
 extern bool is_valid_date(const char *s, const bool check_len);
 extern char *uuid_date(char *dest, const char *uuid);
 #ifdef VERIFY_UUID

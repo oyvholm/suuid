@@ -218,7 +218,7 @@ char *process_uuid(struct Logs *logs,
 		}
 		memcpy(entry->uuid, opt->uuid, UUID_LENGTH + 1);
 	} else {
-		generate_uuid(entry->uuid, rc);
+		generate_uuid(entry->uuid);
 		if (rc->macaddr)
 			memcpy(entry->uuid + 24, rc->macaddr,
 			       MACADDR_LENGTH * 2);

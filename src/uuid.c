@@ -206,12 +206,10 @@ char *scramble_mac_address(char *uuid)
  * NULL if error.
  */
 
-char *generate_uuid(char *uuid, const struct Rc *rc)
+char *generate_uuid(char *uuid)
 {
 	char *cmd = "uuid";
 	FILE *fp;
-
-	assert(rc);
 
 	/* fixme: Generate it properly */
 	fp = popen(cmd, "r");
