@@ -148,10 +148,10 @@ bool valid_macaddr(const char *macaddr)
 
 /*
  * generate_macaddr() - Generate random node address in `dest`, MACADDR_LENGTH 
- * bytes and set the multicast bit. Returns pointer to dest or NULL if error.
+ * bytes and set the multicast bit. Returns nothing.
  */
 
-unsigned char *generate_macaddr(unsigned char *dest)
+void generate_macaddr(unsigned char *dest)
 {
 	int i;
 
@@ -160,8 +160,6 @@ unsigned char *generate_macaddr(unsigned char *dest)
 	for (i = 0; i < MACADDR_LENGTH; i++)
 		dest[i] = random() & 0xFF;
 	dest[0] |= 0x01;
-
-	return dest;
 }
 
 /*
