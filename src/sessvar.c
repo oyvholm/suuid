@@ -30,12 +30,12 @@ bool is_legal_desc_char(const unsigned char c)
 	return strchr(DESC_LEGAL, c) ? true : false;
 }
 
+#ifdef UNUSED
 /*
  * is_valid_desc_string() - Return true if the string s is a valid desc name, 
  * return false if not.
  */
 
-#ifdef UNUSED
 bool is_valid_desc_string(const char *s)
 {
 	const char *p = s;
@@ -55,13 +55,13 @@ bool is_valid_desc_string(const char *s)
 }
 #endif
 
+#ifdef UNUSED
 /*
  * get_desc_from_command() - Return pointer to allocated desc string extracted 
  * from the command, used for the desc attribute in the sess string. If cmd is 
  * NULL or empty, or if something fails or cmd is NULL or empty, return NULL.
  */
 
-#ifdef UNUSED
 char *get_desc_from_command(const char *cmd)
 {
 	char *ap, *p, *p2;
@@ -211,13 +211,13 @@ void free_sess(struct Entry *entry)
 	}
 }
 
+#ifdef UNUSED
 /*
  * concat_cmd_string() - Concatenate the command line arguments received in 
  * argc and argv with a single space character between them. Return pointer to 
  * allocated string containing the command, or NULL if anything fails.
  */
 
-#ifdef UNUSED
 char *concat_cmd_string(const int argc, char * const argv[])
 {
 	int t;
@@ -252,12 +252,12 @@ char *concat_cmd_string(const int argc, char * const argv[])
 }
 #endif
 
+#ifdef UNUSED
 /*
  * clean_up_sessvar() - Modifies dest by removing trailing and repeated commas. 
  * Returns dest.
  */
 
-#ifdef UNUSED
 char *clean_up_sessvar(char *dest)
 {
 	unsigned int i;
@@ -275,6 +275,7 @@ char *clean_up_sessvar(char *dest)
 }
 #endif
 
+#ifdef UNUSED
 /*
  * add_to_sessvar() - Modify the session environment variable (defined in 
  * ENV_SESS) by adding ",desc/uuid," to the end of it. If desc is NULL or 
@@ -282,7 +283,6 @@ char *clean_up_sessvar(char *dest)
  * EXIT_FAILURE if anything fails or uuid isn't a valid UUID.
  */
 
-#ifdef UNUSED
 const char *add_to_sessvar(const char *desc, const char *uuid)
 {
 	size_t envlen; /* Length of the new string */
@@ -334,6 +334,7 @@ const char *add_to_sessvar(const char *desc, const char *uuid)
 }
 #endif
 
+#ifdef UNUSED
 /*
  * run_session() - Execute a shell command and log it with start time, end time 
  * and return value. If any error occurs, return -1. Otherwise, return with the 
@@ -341,7 +342,6 @@ const char *add_to_sessvar(const char *desc, const char *uuid)
  * the return value from the program.
  */
 
-#ifdef UNUSED
 int run_session(const struct Options *orig_opt,
                 const int argc, char * const argv[])
 {

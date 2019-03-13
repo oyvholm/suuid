@@ -50,12 +50,12 @@ char *mystrdup(const char *s)
 	return p;
 }
 
+#if defined(UNUSED) || defined(TEST_FUNC)
 /*
  * squeeze_chars() - Modify s directly by replacing all repeated characters in 
  * chars with a single char. Returns s if ok, NULL if error.
  */
 
-#if defined(UNUSED) || defined(TEST_FUNC)
 char *squeeze_chars(char *s, const char *chars)
 {
 	char *p = s, *p2, *buf;
