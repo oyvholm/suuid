@@ -44,7 +44,7 @@ char *get_rcfilename(const struct Options *opt)
 	retval = mymalloc(size);
 	if (!retval)
 		return NULL;
-	snprintf(retval, size, "%s/%s", env, STD_RCFILE); /* fixme: slash */
+	snprintf(retval, size, "%s/%s", env, STD_RCFILE); /* FIXME: slash */
 
 	return retval;
 }

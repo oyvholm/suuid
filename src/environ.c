@@ -58,7 +58,7 @@ bool valid_hostname(const char *s)
 	p = (unsigned char *)s;
 	while (*p) {
 		/*
-		 * Fixme: Check up on some RFC or something so the correct 
+		 * FIXME: Check up on some RFC or something so the correct 
 		 * rules are enforced, don't just invent something. Have only 
 		 * included characters here that look like they shouldn't be 
 		 * allowed. Like, in these wonderful modern times, are 
@@ -130,12 +130,12 @@ char *get_logdir(const struct Options *opt)
 		 * Use default hardcoded value.
 		 */
 		int size = strlen(getenv("HOME")) +
-		           strlen("/uuids") + 1; /* fixme: slash */
+		           strlen("/uuids") + 1; /* FIXME: slash */
 
 		retval = mymalloc(size + 1);
 		if (!retval)
 			return NULL;
-		snprintf(retval, size, "%s/uuids", /* fixme: slash */
+		snprintf(retval, size, "%s/uuids", /* FIXME: slash */
 		                       getenv("HOME"));
 	} else {
 		fprintf(stderr, "%s: $%s and $HOME environment "
@@ -191,12 +191,12 @@ char *get_log_prefix(const struct Rc *rc, const struct Options *opt, char *ext)
 	 * return it as an allocated string.
 	 */
 
-	prefix_length = strlen(logdir) + strlen("/") + /* fixme: slash */
+	prefix_length = strlen(logdir) + strlen("/") + /* FIXME: slash */
 	                strlen(hostname) + strlen(ext) + 1;
 	prefix = mymalloc(prefix_length + 1);
 	if (!prefix)
 		goto cleanup;
-	/* fixme: Remove slash hardcoding, use some portable solution */
+	/* FIXME: Remove slash hardcoding, use some portable solution */
 	snprintf(prefix, prefix_length, "%s/%s%s", logdir, hostname, ext);
 
 cleanup:

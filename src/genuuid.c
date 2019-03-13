@@ -122,7 +122,7 @@ char *process_comment_option(const char *cmt)
 		return NULL;
 	}
 
-	/* fixme: This is how it's done in the Perl version. I'm not sure if 
+	/* FIXME: This is how it's done in the Perl version. I'm not sure if 
 	 * it's an ok thing to do, even though it looks nice in the log files 
 	 * and has worked great for years. Maybe this behaviour should be 
 	 * changed when the C version passes all tests in suuid.t .
@@ -152,7 +152,7 @@ int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
 	 * Get information about the environment; hostname, current directory, 
 	 * login name and tty.
 	 *
-	 * Fixme: Add check so this and the session info thing are run only 
+	 * FIXME: Add check so this and the session info thing are run only 
 	 * once. Only has some effect if creating many UUIDs.
 	 */
 

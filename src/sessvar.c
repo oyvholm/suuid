@@ -381,7 +381,7 @@ int run_session(const struct Options *orig_opt,
 
 	msg(1, "Executing \"%s\"", cmd);
 	/*
-	 * fixme: This value is shifted with 8 bits in main(). Check if it's 
+	 * FIXME: This value is shifted with 8 bits in main(). Check if it's 
 	 * ok.
 	 */
 	retval = system(cmd);

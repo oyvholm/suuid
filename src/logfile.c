@@ -659,7 +659,7 @@ FILE *open_logfile(const char *fname)
 	assert(strlen(fname));
 
 	/*
-	 * Fixme: Make the existence check/file creation atomic. See the log 
+	 * FIXME: Make the existence check/file creation atomic. See the log 
 	 * message for commit a0c635c3aba8 ("Get rid of create_logfile() and 
 	 * set_up_logfile(), move into open_logfile()", 2016-07-06) for more 
 	 * info. ... OK, because I feel generous today, here it is:
