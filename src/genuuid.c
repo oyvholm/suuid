@@ -32,7 +32,7 @@ int init_randomness(void)
 	struct timeval tv;
 
 	if (gettimeofday(&tv, NULL) == -1) {
-		myerror("Could not initialiase randomness generator, "
+		myerror("Could not initialise randomness generator, "
 		        "gettimeofday() failed");
 		return EXIT_FAILURE;
 	}
