@@ -123,7 +123,6 @@ struct Options {
 	bool raw;
 	char *rcfile;
 	bool selftest;
-	int simfail;
 	char *tag[MAX_TAGS];
 	char *uuid;
 	int verbose;
@@ -207,7 +206,6 @@ extern void free_tags(struct Entry *entry);
  */
 
 extern char *progname;
-extern int simfail;
 
 #endif /* ifndef _SUUID_H */
 
