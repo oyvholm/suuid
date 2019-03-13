@@ -53,16 +53,17 @@
 #include "uuid.h"
 
 #define ENV_EDITOR  "SUUID_EDITOR" /* Name of editor to use with "-c --" */
-#define ENV_SESS  "SESS_UUID" /* Name of environment variable where the session 
-                               * information is stored
-                               */
 #define ENV_HOSTNAME  "SUUID_HOSTNAME" /* Optional environment variable */
 #define ENV_LOGDIR  "SUUID_LOGDIR" /* Optional environment variable with path 
                                     * to log directory
                                     */
-#define STD_RCFILE  ".suuidrc"
+#define ENV_SESS  "SESS_UUID" /* Name of environment variable where the session 
+                               * information is stored
+                               */
 #define MAX_SESS  1000 /* Maximum number of sess elements per entry */
 #define MAX_TAGS  1000 /* Maximum number of tags */
+#define STD_RCFILE  ".suuidrc"
+
 #define LEGAL_UTF8_CHARS  "\x80\x81\x82\x83\x84\x85\x86\x87" \
                           "\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f" \
                           "\x90\x91\x92\x93\x94\x95\x96\x97" \
