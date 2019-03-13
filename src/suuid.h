@@ -60,6 +60,7 @@
 #define ENV_SESS  "SESS_UUID" /* Name of environment variable where the session 
                                * information is stored
                                */
+#define MAX_HOSTNAME_LENGTH  100
 #define MAX_SESS  1000 /* Maximum number of sess elements per entry */
 #define MAX_TAGS  1000 /* Maximum number of tags */
 #define STD_RCFILE  ".suuidrc"
@@ -86,18 +87,6 @@
                     "_"                          \
                     "abcdefghijklmnopqrstuvwxyz" \
                     LEGAL_UTF8_CHARS /* Legal chars in sess descriptions */
-
-/*
- * FreeBSD doesn't have HOST_NAME_MAX, try to use something else.
- */
-
-#ifndef HOST_NAME_MAX
-#  ifdef _POSIX_HOST_NAME_MAX
-#    define HOST_NAME_MAX  _POSIX_HOST_NAME_MAX
-#  else
-#    define HOST_NAME_MAX  255
-#  endif
-#endif
 
 #define DEBL  msg(2, "%s, line %u in %s()", __FILE__, __LINE__, __func__)
 #define in_range(a,b,c)  ((a) >= (b) && (a) <= (c) ? true : false)

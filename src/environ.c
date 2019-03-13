@@ -51,7 +51,7 @@ bool valid_hostname(const char *s)
 
 	assert(s);
 
-	if (!strlen(s) || strlen(s) > HOST_NAME_MAX ||
+	if (!strlen(s) || strlen(s) > MAX_HOSTNAME_LENGTH ||
 	    strstr(s, "..") || utf8_check(s))
 		return false;
 
@@ -82,7 +82,7 @@ bool valid_hostname(const char *s)
 
 char *get_hostname(const struct Rc *rc)
 {
-	static char buf[HOST_NAME_MAX + 1];
+	static char buf[MAX_HOSTNAME_LENGTH + 1];
 	char *p;
 
 	assert(rc);
@@ -95,16 +95,16 @@ char *get_hostname(const struct Rc *rc)
 			myerror("Got invalid hostname: \"%s\"", p);
 			return NULL;
 		}
-		strncpy(buf, p, HOST_NAME_MAX);
+		strncpy(buf, p, MAX_HOSTNAME_LENGTH);
 	} else {
-		if (gethostname(buf, HOST_NAME_MAX) == -1) {
+		if (gethostname(buf, MAX_HOSTNAME_LENGTH) == -1) {
 			myerror("Cannot get hostname");
 			return NULL;
 		}
 	}
 
 #ifdef FAKE_HOST
-	strncpy(buf, "fake", HOST_NAME_MAX);
+	strncpy(buf, "fake", MAX_HOSTNAME_LENGTH);
 #endif
 	return buf;
 }
