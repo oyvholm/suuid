@@ -109,18 +109,18 @@ int fill_sess(struct Entry *dest, const char *uuid,
 
 	auuid = strndup(uuid, UUID_LENGTH);
 	if (!auuid) {
-		myerror("fill_sess(): Memory allcation error, "
+		myerror("fill_sess(): Memory allcation error, " /* gncov */
 		        "could not duplicate UUID");
-		return EXIT_FAILURE;
+		return EXIT_FAILURE; /* gncov */
 	}
 
 	if (desc && desclen) {
 		adesc = strndup(desc, desclen);
 		if (!adesc) {
-			myerror("fill_sess(): Memory allocation error, "
+			myerror("fill_sess(): Memory allocation error, " /* gncov */
 			        "could not duplicate desc");
-			free(auuid);
-			return EXIT_FAILURE;
+			free(auuid); /* gncov */
+			return EXIT_FAILURE; /* gncov */
 		}
 		dest->sess[sessind].desc = adesc;
 	}
@@ -146,7 +146,7 @@ int get_sess_info(struct Entry *entry)
 
 	s = mystrdup(getenv(ENV_SESS));
 	if (!s)
-		return EXIT_FAILURE;
+		return EXIT_FAILURE; /* gncov */
 
 	if (!scan_for_uuid(s)) {
 		/*

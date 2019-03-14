@@ -32,9 +32,9 @@ int init_randomness(void)
 	struct timeval tv;
 
 	if (gettimeofday(&tv, NULL) == -1) {
-		myerror("Could not initialise randomness generator, "
+		myerror("Could not initialise randomness generator, " /* gncov */
 		        "gettimeofday() failed");
-		return EXIT_FAILURE;
+		return EXIT_FAILURE; /* gncov */
 	}
 
 	srandom((unsigned int)tv.tv_sec ^ (unsigned int)tv.tv_usec ^
@@ -88,8 +88,8 @@ char *process_comment_option(const char *cmt)
 		 */
 		retval = read_from_fp(stdin);
 		if (!retval) {
-			myerror("Could not read data from stdin");
-			return NULL;
+			myerror("Could not read data from stdin"); /* gncov */
+			return NULL; /* gncov */
 		}
 	} else if (!strcmp(cmt, "--")) {
 		/*
@@ -112,7 +112,7 @@ char *process_comment_option(const char *cmt)
 		 */
 		retval = mystrdup(cmt);
 		if (!retval)
-			return NULL;
+			return NULL; /* gncov */
 	}
 	if (!valid_xml_chars(retval)) {
 		fprintf(stderr, "%s: Comment contains illegal characters or "
@@ -312,8 +312,8 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	 */
 
 	if (init_randomness() == EXIT_FAILURE) {
-		retval.success = false;
-		goto cleanup;
+		retval.success = false; /* gncov */
+		goto cleanup; /* gncov */
 	}
 
 	rcfile = get_rcfilename(opt);
@@ -381,7 +381,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 
 cleanup:
 	if (logs.logfp && (close_logfile(logs.logfp) == EXIT_FAILURE))
-		retval.success = false;
+		retval.success = false; /* gncov */
 
 	free(logfile);
 	free_sess(&entry);

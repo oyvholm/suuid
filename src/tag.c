@@ -85,7 +85,7 @@ int store_tag(struct Entry *entry, const char *arg)
 
 	tag = mystrdup(arg); /* Don't modify the source */
 	if (!tag)
-		return EXIT_FAILURE;
+		return EXIT_FAILURE; /* gncov */
 
 	while ((p = strchr(tag, ','))) {
 		*p++ = '\0';
@@ -105,8 +105,8 @@ int store_tag(struct Entry *entry, const char *arg)
 
 			tag2 = mymalloc(strlen(p) + 1);
 			if (!tag2) {
-				retval = EXIT_FAILURE;
-				goto cleanup;
+				retval = EXIT_FAILURE; /* gncov */
+				goto cleanup; /* gncov */
 			}
 			strcpy(tag2, p);
 			free(tag);
@@ -131,7 +131,7 @@ int store_tag(struct Entry *entry, const char *arg)
 	}
 
 	if (!(entry->tag[tag_count++] = mystrdup(tag)))
-		retval = EXIT_FAILURE;
+		retval = EXIT_FAILURE; /* gncov */
 
 cleanup:
 	free(tag);

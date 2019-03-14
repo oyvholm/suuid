@@ -163,18 +163,18 @@ struct timeval *get_current_time(struct timeval *tv)
 
 	while (1) {
 		if (gettimeofday(&tvbuf, NULL)) {
-			fprintf(stderr, "%s: get_current_time(): "
+			fprintf(stderr, "%s: get_current_time(): " /* gncov */
 			                "gettimeofday() failed\n", progname);
-			return NULL;
+			return NULL; /* gncov */
 		}
 		create_uuid_time(&utime, &tvbuf);
 		if (utime > prevtime)
 			break;
-		if (++count > maxcount) {
-			fprintf(stderr, "%s: get_current_time(): Got the same "
+		if (++count > maxcount) { /* gncov */
+			fprintf(stderr, "%s: get_current_time(): Got the same " /* gncov */
 			                "timestamp after %lu tries. System "
 			                "clock broken?\n", progname, maxcount);
-			return NULL;
+			return NULL; /* gncov */
 		}
 	}
 	prevtime = utime;
@@ -312,13 +312,13 @@ char *generate_uuid(char *uuid)
 	assert(uuid);
 
 	if (!get_current_time(&currtime))
-		return NULL;
+		return NULL; /* gncov */
 	fill_uuid_time(&u.time, &currtime);
 	get_clockseq(&u);
 	generate_macaddr(u.node);
 	finish_uuid(uuid, &u);
 	if (!valid_uuid(uuid, true))
-		return NULL;
+		return NULL; /* gncov */
 
 	return uuid;
 }
@@ -402,15 +402,15 @@ char *uuid_date(char *dest, const char *uuid)
 	strftime(dest, DATE_LENGTH, "%Y-%m-%dT%H:%M:%S", tm);
 	p = dest + strlen(dest);
 	if (p - dest != 19) {
-		fprintf(stderr, "%s: %lu: Invalid date length, should be 19\n",
-		                progname, (unsigned long)(p - dest));
-		return NULL;
+		fprintf(stderr, "%s: %lu: Invalid date length, should be 19\n", /* gncov */
+		                progname, (unsigned long)(p - dest)); /* gncov */
+		return NULL; /* gncov */
 	}
 	snprintf(p, DATE_LENGTH - 19 + 1, ".%07uZ", nano);
 	if (!is_valid_date(dest, 1)) {
-		fprintf(stderr, "%s: uuid_date(): %s: Generated invalid "
+		fprintf(stderr, "%s: uuid_date(): %s: Generated invalid " /* gncov */
 		                "timestamp\n", progname, dest);
-		return NULL;
+		return NULL; /* gncov */
 	}
 
 #ifdef VERIFY_UUID

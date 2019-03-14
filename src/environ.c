@@ -98,8 +98,8 @@ char *get_hostname(const struct Rc *rc)
 		strncpy(buf, p, MAX_HOSTNAME_LENGTH);
 	} else {
 		if (gethostname(buf, MAX_HOSTNAME_LENGTH) == -1) {
-			myerror("Cannot get hostname");
-			return NULL;
+			myerror("Cannot get hostname"); /* gncov */
+			return NULL; /* gncov */
 		}
 	}
 
@@ -134,7 +134,7 @@ char *get_logdir(const struct Options *opt)
 
 		retval = mymalloc(size + 1);
 		if (!retval)
-			return NULL;
+			return NULL; /* gncov */
 		snprintf(retval, size, "%s/uuids", /* FIXME: slash */
 		                       getenv("HOME"));
 	} else {
@@ -195,7 +195,7 @@ char *get_log_prefix(const struct Rc *rc, const struct Options *opt, char *ext)
 	                strlen(hostname) + strlen(ext) + 1;
 	prefix = mymalloc(prefix_length + 1);
 	if (!prefix)
-		goto cleanup;
+		goto cleanup; /* gncov */
 	/* FIXME: Remove slash hardcoding, use some portable solution */
 	snprintf(prefix, prefix_length, "%s/%s%s", logdir, hostname, ext);
 
@@ -219,25 +219,25 @@ char *getpath(void)
 
 	retval = mymalloc(size);
 	if (!retval)
-		return NULL;
+		return NULL; /* gncov */
 	for (p = getcwd(retval, size); !p;) {
-		size += BUFSIZ;
-		retval = realloc(retval, size);
-		if (!retval) {
-			myerror("getpath(): Could not reallocate %lu bytes",
+		size += BUFSIZ; /* gncov */
+		retval = realloc(retval, size); /* gncov */
+		if (!retval) { /* gncov */
+			myerror("getpath(): Could not reallocate %lu bytes", /* gncov */
 			        size);
-			return NULL;
+			return NULL; /* gncov */
 		}
-		p = getcwd(retval, size);
-		if (!p && errno != ERANGE) {
+		p = getcwd(retval, size); /* gncov */
+		if (!p && errno != ERANGE) { /* gncov */
 			/*
 			 * Avoid infinite loop in case there's another getcwd() 
 			 * problem that's not fixable by just allocating more 
 			 * memory.
 			 */
-			myerror("getpath(): Cannot get current directory");
-			free(retval);
-			return NULL;
+			myerror("getpath(): Cannot get current directory"); /* gncov */
+			free(retval); /* gncov */
+			return NULL; /* gncov */
 		}
 	}
 
@@ -255,7 +255,7 @@ char *get_username(void)
 
 	pw = getpwuid(getuid());
 	if (!pw)
-		retval = NULL;
+		retval = NULL; /* gncov */
 	else
 		retval = pw->pw_name;
 

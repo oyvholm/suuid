@@ -67,7 +67,7 @@ char *suuid_xml(const char *text)
 	size = strlen(text);
 	retval = mymalloc(size * MAX_GROWTH + 1);
 	if (!retval)
-		return NULL;
+		return NULL; /* gncov */
 
 	destp = retval;
 	for (p = text; *p; p++) {
@@ -155,11 +155,11 @@ char *allocate_elem(const char *elem, const char *src)
 
 	retval = mymalloc(size + 1);
 	if (!retval)
-		return NULL;
+		return NULL; /* gncov */
 
 	ap = suuid_xml(src);
 	if (!ap)
-		return NULL;
+		return NULL; /* gncov */
 
 	if (strlen(ap))
 		snprintf(retval, size, "<%s>%s</%s> ", elem, ap, elem);
@@ -189,7 +189,7 @@ char *alloc_attr(const char *attr, const char *data)
 
 	retval = mymalloc(size + 1);
 	if (!retval)
-		return NULL;
+		return NULL; /* gncov */
 
 	snprintf(retval, size, " %s=\"%s\"", attr, data);
 
@@ -237,14 +237,14 @@ char *get_xml_tags(const struct Entry *entry)
 
 	buf = mymalloc(size);
 	if (!buf)
-		return NULL;
+		return NULL; /* gncov */
 	buf[0] = '\0';
 
 	tmpsize = tmpsize * MAX_GROWTH + 16;
 	tmpbuf = mymalloc(tmpsize);
 	if (!tmpbuf) {
-		free(buf);
-		return NULL;
+		free(buf); /* gncov */
+		return NULL; /* gncov */
 	}
 
 	/*
@@ -261,9 +261,9 @@ char *get_xml_tags(const struct Entry *entry)
 
 			ap = suuid_xml(p);
 			if (!ap) {
-				free(tmpbuf);
-				free(buf);
-				return NULL;
+				free(tmpbuf); /* gncov */
+				free(buf); /* gncov */
+				return NULL; /* gncov */
 			}
 
 			snprintf(tmpbuf, tmpsize, "<tag>%s</tag> ", ap);
@@ -321,12 +321,12 @@ char *create_sess_xml(const struct Entry *entry)
 
 	buf = mymalloc(size);
 	if (!buf)
-		return NULL;
+		return NULL; /* gncov */
 
 	tmpbuf = mymalloc(tmpsize);
 	if (!tmpbuf) {
-		free(buf);
-		return NULL;
+		free(buf); /* gncov */
+		return NULL; /* gncov */
 	}
 
 	buf[0] = '\0';
@@ -384,13 +384,13 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 
 	uuidp = alloc_attr("u", entry->uuid);
 	if (!uuidp)
-		return NULL;
+		return NULL; /* gncov */
 
 	if (is_valid_date(entry->date, true)) {
 		datep = alloc_attr("t", entry->date);
 		if (!datep) {
-			free(uuidp);
-			return NULL;
+			free(uuidp); /* gncov */
+			return NULL; /* gncov */
 		}
 	}
 
@@ -400,14 +400,14 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 
 	tag_xml = get_xml_tags(entry);
 	if (!tag_xml) {
-		retval = NULL;
-		goto cleanup;
+		retval = NULL; /* gncov */
+		goto cleanup; /* gncov */
 	}
 
 	sess_xml = create_sess_xml(entry);
 	if (!sess_xml) {
-		retval = NULL;
-		goto cleanup;
+		retval = NULL; /* gncov */
+		goto cleanup; /* gncov */
 	}
 
 	if (raw) {
@@ -426,8 +426,8 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 		       strlen(" </txt> ") + 1;
 		e.txt = mymalloc(size);
 		if (!e.txt) {
-			retval = NULL;
-			goto cleanup;
+			retval = NULL; /* gncov */
+			goto cleanup; /* gncov */
 		}
 		txt_space = entry->txt[0] == '<' ? " " : "";
 		snprintf(e.txt, size, "<txt>%s%s%s</txt> ",
@@ -452,8 +452,8 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 	       strlen(e.tty) + strlen(sess_xml) + 128;
 	retval = mymalloc(size);
 	if (!retval) {
-		retval = NULL;
-		goto cleanup;
+		retval = NULL; /* gncov */
+		goto cleanup; /* gncov */
 	}
 
 	/*
@@ -505,9 +505,9 @@ FILE *lock_file(FILE *fp, const char *fname)
 	assert(strlen(fname));
 
 	if (flock(fileno(fp), LOCK_EX) == -1) {
-		myerror("Could not lock file \"%s\"", fname);
-		fclose(fp);
-		return NULL;
+		myerror("Could not lock file \"%s\"", fname); /* gncov */
+		fclose(fp); /* gncov */
+		return NULL; /* gncov */
 	}
 
 	return fp;
@@ -529,8 +529,8 @@ FILE *write_xml_header(FILE *fp)
 	assert(fp);
 
 	if (fputs(header, fp) == EOF) {
-		myerror("Cannot write header to the log file");
-		return NULL;
+		myerror("Cannot write header to the log file"); /* gncov */
+		return NULL; /* gncov */
 	}
 
 	return fp;
@@ -549,8 +549,8 @@ FILE *seek_to_eof(FILE *fp, const char *fname)
 	assert(fname);
 
 	if (fseek(fp, 0, SEEK_END) == -1) {
-		myerror("%s: Cannot seek to end of file", fname);
-		return NULL;
+		myerror("%s: Cannot seek to end of file", fname); /* gncov */
+		return NULL; /* gncov */
 	}
 
 	return fp;
@@ -591,24 +591,24 @@ FILE *check_last_log_line(FILE *fp, const char *fname)
 	assert(fname);
 
 	if (fseek(fp, -10, SEEK_END) == -1) {
-		myerror("%s: Could not seek in log file", fname);
-		return NULL;
+		myerror("%s: Could not seek in log file", fname); /* gncov */
+		return NULL; /* gncov */
 	}
 	filepos = ftell(fp);
 	if (filepos == -1) {
-		myerror("%s: Cannot get file position of end line", fname);
-		return NULL;
+		myerror("%s: Cannot get file position of end line", fname); /* gncov */
+		return NULL; /* gncov */
 	}
 	if (!fgets(check_line, 10, fp)) {
-		myerror("Error when reading end line from log file \"%s\"",
+		myerror("Error when reading end line from log file \"%s\"", /* gncov */
 		        fname);
-		return NULL;
+		return NULL; /* gncov */
 	}
 	if (strcmp(check_line, "</suuids>"))
 		return unknown_end_line(fp, fname);
 	if (fseek(fp, filepos, SEEK_SET) == -1) {
-		myerror("%s: Cannot seek to position %lu", fname, filepos);
-		return NULL;
+		myerror("%s: Cannot seek to position %lu", fname, filepos); /* gncov */
+		return NULL; /* gncov */
 	}
 
 	return fp;
@@ -629,11 +629,11 @@ FILE *seek_to_entry_pos(FILE *fp, const char *fname)
 	assert(fname);
 
 	if (!seek_to_eof(fp, fname))
-		return NULL;
+		return NULL; /* gncov */
 	filepos = ftell(fp);
 	if (filepos == -1) {
-		myerror("%s: Cannot get file position at EOF", fname);
-		return NULL;
+		myerror("%s: Cannot get file position at EOF", fname); /* gncov */
+		return NULL; /* gncov */
 	}
 	if (filepos > 10)
 		return check_last_log_line(fp, fname);
@@ -691,7 +691,7 @@ FILE *open_logfile(const char *fname)
 		}
 	}
 	if (!lock_file(fp, fname))
-		return NULL;
+		return NULL; /* gncov */
 
 	return seek_to_entry_pos(fp, fname);
 }
@@ -714,11 +714,11 @@ int add_to_logfile(FILE *fp, const struct Entry *entry, const bool raw)
 	if (!ap)
 		return EXIT_FAILURE;
 	if (fputs(ap, fp) < 0)
-		retval = EXIT_FAILURE;
+		retval = EXIT_FAILURE; /* gncov */
 	if (fputc('\n', fp) == EOF)
-		retval = EXIT_FAILURE;
+		retval = EXIT_FAILURE; /* gncov */
 	if (retval == EXIT_FAILURE)
-		myerror("add_to_logfile(): Cannot write to the log file");
+		myerror("add_to_logfile(): Cannot write to the log file"); /* gncov */
 
 	free(ap);
 
@@ -738,15 +738,15 @@ int close_logfile(FILE *fp)
 	assert(fp);
 
 	if (fprintf(fp, "</suuids>\n") != 10)
-		retval = EXIT_FAILURE;
+		retval = EXIT_FAILURE; /* gncov */
 	if (fflush(fp) == EOF)
-		retval = EXIT_FAILURE;
+		retval = EXIT_FAILURE; /* gncov */
 	flock(fileno(fp), LOCK_UN);
 	if (fclose(fp) == EOF)
-		retval = EXIT_FAILURE;
+		retval = EXIT_FAILURE; /* gncov */
 
 	if (retval == EXIT_FAILURE)
-		myerror("Error when closing log file");
+		myerror("Error when closing log file"); /* gncov */
 
 	return retval;
 }

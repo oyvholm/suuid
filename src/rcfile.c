@@ -43,7 +43,7 @@ char *get_rcfilename(const struct Options *opt)
 	size = strlen(env) + strlen(STD_RCFILE) + 32;
 	retval = mymalloc(size);
 	if (!retval)
-		return NULL;
+		return NULL; /* gncov */
 	snprintf(retval, size, "%s/%s", env, STD_RCFILE); /* FIXME: slash */
 
 	return retval;
@@ -95,12 +95,12 @@ int parse_rc_line(const char *line, struct Rc *rc)
 	if (has_key(line, "hostname")) {
 		rc->hostname = mystrdup(has_key(line, "hostname"));
 		if (!rc->hostname)
-			return EXIT_FAILURE;
+			return EXIT_FAILURE; /* gncov */
 	}
 	if (has_key(line, "macaddr")) {
 		rc->macaddr = mystrdup(has_key(line, "macaddr"));
 		if (!rc->macaddr)
-			return EXIT_FAILURE;
+			return EXIT_FAILURE; /* gncov */
 		string_to_lower(rc->macaddr);
 	}
 
@@ -137,15 +137,15 @@ int read_rcfile(const char *rcfile, struct Rc *rc)
 
 	do {
 		if (!fgets(buf, BUFSIZ, fp) && errno) {
-			myerror("%s: Could not read from rcfile", rcfile);
-			fclose(fp);
-			return EXIT_FAILURE;
+			myerror("%s: Could not read from rcfile", rcfile); /* gncov */
+			fclose(fp); /* gncov */
+			return EXIT_FAILURE; /* gncov */
 		}
 		trim_str_front(buf);
 		trim_str_end(buf);
 		if (parse_rc_line(buf, rc) == EXIT_FAILURE) {
-			fclose(fp);
-			return EXIT_FAILURE;
+			fclose(fp); /* gncov */
+			return EXIT_FAILURE; /* gncov */
 		}
 		*buf = '\0';
 	} while (!feof(fp));
