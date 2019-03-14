@@ -53,6 +53,7 @@ CFILES = suuid.c database.c environ.c genuuid.c io.c logfile.c \
 HFILES = suuid.h uuid.h
 
 DEPS = $(HFILES) Makefile
+GNCOV_STR = $$(test -n "$(GNCOV)" && echo "-g")
 
 .PHONY: all
 all: $(EXEC)
@@ -124,7 +125,7 @@ gcov:
 
 .PHONY: gcov-cmt
 gcov-cmt: gcov
-	gcov-cmt $(CFILES)
+	gcov-cmt $(GNCOV_STR) $(CFILES)
 
 .PHONY: gcov-cmt-clean
 gcov-cmt-clean:
