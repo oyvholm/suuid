@@ -168,7 +168,7 @@ struct timeval *get_current_time(struct timeval *tv)
 			return NULL; /* gncov */
 		}
 		create_uuid_time(&utime, &tvbuf);
-		if (utime > prevtime)
+		if (utime != prevtime)
 			break;
 		if (++count > maxcount) { /* gncov */
 			fprintf(stderr, "%s: get_current_time(): " /* gncov */
