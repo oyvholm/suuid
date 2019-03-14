@@ -40,8 +40,8 @@ char *read_from_fp(FILE *fp)
 		size_t bytes_read;
 
 		if (!new_mem) {
-			myerror("read_from_fp(): Cannot allocate memory for " /* gncov */
-			        "stream buffer");
+			myerror("read_from_fp(): Cannot allocate " /* gncov */
+			        "memory for stream buffer");
 			free(retval); /* gncov */
 			return NULL; /* gncov */
 		}
@@ -103,8 +103,8 @@ char *read_from_editor(const char *editor)
 	assert(strlen(editor));
 
 	if (mkstemp(tmpfile) == -1) {
-		myerror("read_from_editor(): Could not create file name for " /* gncov */
-		        "temporary file");
+		myerror("read_from_editor(): Could not create " /* gncov */
+		        "file name for temporary file");
 		return NULL; /* gncov */
 	}
 
@@ -131,8 +131,8 @@ char *read_from_editor(const char *editor)
 	}
 
 	if (remove(tmpfile) == -1)
-		myerror("Warning: Could not remove temporary file \"%s\"", /* gncov */
-		        tmpfile);
+		myerror("Warning: Could not remove temporary " /* gncov */
+		        "file \"%s\"", tmpfile);
 
 cleanup:
 	free(cmdbuf);

@@ -30,7 +30,8 @@ void *mymalloc(const size_t size)
 	void *v = malloc(size);
 
 	if (!v)
-		myerror("Memory allocation error (%lu bytes)", size); /* gncov */
+		myerror("Memory allocation error (%lu bytes)", /* gncov */
+		        size);
 
 	return v;
 }
@@ -45,7 +46,8 @@ char *mystrdup(const char *s)
 	char *p = strdup(s);
 
 	if (!p)
-		myerror("Memory allocation error, cannot duplicate string"); /* gncov */
+		myerror("Memory allocation error, cannot " /* gncov */
+		        "duplicate string");
 
 	return p;
 }

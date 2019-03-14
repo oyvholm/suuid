@@ -137,7 +137,8 @@ int read_rcfile(const char *rcfile, struct Rc *rc)
 
 	do {
 		if (!fgets(buf, BUFSIZ, fp) && errno) {
-			myerror("%s: Could not read from rcfile", rcfile); /* gncov */
+			myerror("%s: Could not read from rcfile", /* gncov */
+			        rcfile);
 			fclose(fp); /* gncov */
 			return EXIT_FAILURE; /* gncov */
 		}

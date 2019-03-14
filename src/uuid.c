@@ -171,9 +171,10 @@ struct timeval *get_current_time(struct timeval *tv)
 		if (utime > prevtime)
 			break;
 		if (++count > maxcount) { /* gncov */
-			fprintf(stderr, "%s: get_current_time(): Got the same " /* gncov */
-			                "timestamp after %lu tries. System "
-			                "clock broken?\n", progname, maxcount);
+			fprintf(stderr, "%s: get_current_time(): " /* gncov */
+			                "Got the same timestamp after %lu "
+			                "tries. System clock broken?\n",
+			                progname, maxcount);
 			return NULL; /* gncov */
 		}
 	}
@@ -402,14 +403,15 @@ char *uuid_date(char *dest, const char *uuid)
 	strftime(dest, DATE_LENGTH, "%Y-%m-%dT%H:%M:%S", tm);
 	p = dest + strlen(dest);
 	if (p - dest != 19) {
-		fprintf(stderr, "%s: %lu: Invalid date length, should be 19\n", /* gncov */
-		                progname, (unsigned long)(p - dest)); /* gncov */
+		fprintf(stderr, "%s: %lu: Invalid date length, " /* gncov */
+		                "should be 19\n", progname,
+		                (unsigned long)(p - dest)); /* gncov */
 		return NULL; /* gncov */
 	}
 	snprintf(p, DATE_LENGTH - 19 + 1, ".%07uZ", nano);
 	if (!is_valid_date(dest, 1)) {
-		fprintf(stderr, "%s: uuid_date(): %s: Generated invalid " /* gncov */
-		                "timestamp\n", progname, dest);
+		fprintf(stderr, "%s: uuid_date(): %s: Generated " /* gncov */
+		                "invalid timestamp\n", progname, dest);
 		return NULL; /* gncov */
 	}
 

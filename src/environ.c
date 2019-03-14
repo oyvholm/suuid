@@ -224,8 +224,8 @@ char *getpath(void)
 		size += BUFSIZ; /* gncov */
 		retval = realloc(retval, size); /* gncov */
 		if (!retval) { /* gncov */
-			myerror("getpath(): Could not reallocate %lu bytes", /* gncov */
-			        size);
+			myerror("getpath(): Could not " /* gncov */
+			        "reallocate %lu bytes", size);
 			return NULL; /* gncov */
 		}
 		p = getcwd(retval, size); /* gncov */
@@ -235,7 +235,8 @@ char *getpath(void)
 			 * problem that's not fixable by just allocating more 
 			 * memory.
 			 */
-			myerror("getpath(): Cannot get current directory"); /* gncov */
+			myerror("getpath(): Cannot get current " /* gncov */
+			        "directory");
 			free(retval); /* gncov */
 			return NULL; /* gncov */
 		}

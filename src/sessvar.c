@@ -117,8 +117,8 @@ int fill_sess(struct Entry *dest, const char *uuid,
 	if (desc && desclen) {
 		adesc = strndup(desc, desclen);
 		if (!adesc) {
-			myerror("fill_sess(): Memory allocation error, " /* gncov */
-			        "could not duplicate desc");
+			myerror("fill_sess(): Memory allocation " /* gncov */
+			        "error, could not duplicate desc");
 			free(auuid); /* gncov */
 			return EXIT_FAILURE; /* gncov */
 		}

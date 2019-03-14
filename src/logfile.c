@@ -596,18 +596,20 @@ FILE *check_last_log_line(FILE *fp, const char *fname)
 	}
 	filepos = ftell(fp);
 	if (filepos == -1) {
-		myerror("%s: Cannot get file position of end line", fname); /* gncov */
+		myerror("%s: Cannot get file position of " /* gncov */
+		        "end line", fname);
 		return NULL; /* gncov */
 	}
 	if (!fgets(check_line, 10, fp)) {
-		myerror("Error when reading end line from log file \"%s\"", /* gncov */
-		        fname);
+		myerror("Error when reading end line from log " /* gncov */
+		        "file \"%s\"", fname);
 		return NULL; /* gncov */
 	}
 	if (strcmp(check_line, "</suuids>"))
 		return unknown_end_line(fp, fname);
 	if (fseek(fp, filepos, SEEK_SET) == -1) {
-		myerror("%s: Cannot seek to position %lu", fname, filepos); /* gncov */
+		myerror("%s: Cannot seek to position %lu", /* gncov */
+		        fname, filepos);
 		return NULL; /* gncov */
 	}
 
@@ -632,7 +634,8 @@ FILE *seek_to_entry_pos(FILE *fp, const char *fname)
 		return NULL; /* gncov */
 	filepos = ftell(fp);
 	if (filepos == -1) {
-		myerror("%s: Cannot get file position at EOF", fname); /* gncov */
+		myerror("%s: Cannot get file position at EOF", /* gncov */
+		        fname);
 		return NULL; /* gncov */
 	}
 	if (filepos > 10)
@@ -718,7 +721,8 @@ int add_to_logfile(FILE *fp, const struct Entry *entry, const bool raw)
 	if (fputc('\n', fp) == EOF)
 		retval = EXIT_FAILURE; /* gncov */
 	if (retval == EXIT_FAILURE)
-		myerror("add_to_logfile(): Cannot write to the log file"); /* gncov */
+		myerror("add_to_logfile(): Cannot write to the " /* gncov */
+		        "log file");
 
 	free(ap);
 
