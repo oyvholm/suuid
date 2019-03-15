@@ -156,7 +156,7 @@ struct timeval *get_current_time(struct timeval *tv)
 	struct timeval tvbuf;
 	utime_t utime;
 	unsigned long count = 0;
-	unsigned long maxcount = 1000000;
+	const unsigned long maxcount = 1000000;
 	static utime_t prevtime = 0;
 
 	assert(tv);

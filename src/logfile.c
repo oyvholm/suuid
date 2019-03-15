@@ -20,11 +20,12 @@
 
 #include "suuid.h"
 
-size_t MAX_GROWTH = 5; /* When converting from plain text to the XML format 
-                        * used in the log file, the worst case is if the whole 
-                        * string contains only ampersands, then it will grow by 
-                        * a factor of five.
-                        */
+/*
+ * When converting from plain text to the XML format used in the log file, the 
+ * worst case is if the whole string contains only ampersands, then it will 
+ * grow by a factor of five.
+ */
+const size_t MAX_GROWTH = 5;
 
 /*
  * valid_xml_chars() - Check that the string pointed to by s contains valid 
@@ -522,9 +523,9 @@ FILE *lock_file(FILE *fp, const char *fname)
 
 FILE *write_xml_header(FILE *fp)
 {
-	char *header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-	                "<!DOCTYPE suuids SYSTEM \"dtd/suuids.dtd\">\n"
-	                "<suuids>\n";
+	const char *header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+	                     "<!DOCTYPE suuids SYSTEM \"dtd/suuids.dtd\">\n"
+	                     "<suuids>\n";
 
 	assert(fp);
 
