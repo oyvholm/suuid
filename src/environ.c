@@ -156,7 +156,8 @@ char *get_logdir(const struct Options *opt)
  * added to the returned string, it can be "", NULL or a string.
  */
 
-char *get_log_prefix(const struct Rc *rc, const struct Options *opt, char *ext)
+char *get_log_prefix(const struct Rc *rc, const struct Options *opt,
+                     const char *ext)
 {
 	char *logdir, *hostname;
 	size_t prefix_length; /* Total length of prefix */
