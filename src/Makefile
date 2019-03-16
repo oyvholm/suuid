@@ -24,10 +24,10 @@ LIBS += $$(test -n "$(GCOV)" && echo "-lgcov --coverage");
 
 # For regular use, it's not necessary to modify anything below this line.
 
-OBJS = suuid.o database.o environ.o genuuid.o io.o logfile.o \
+OBJS = suuid.o environ.o genuuid.o io.o logfile.o \
        rcfile.o selftest.o sessvar.o string.o tag.o uuid.o
 
-CFILES = suuid.c database.c environ.c genuuid.c io.c logfile.c \
+CFILES = suuid.c environ.c genuuid.c io.c logfile.c \
          rcfile.c selftest.c sessvar.c string.c tag.c uuid.c
 
 HFILES = suuid.h uuid.h
@@ -46,9 +46,6 @@ version.h: Gen-version $(CFILES) $(DEPS)
 
 suuid.o: version.h suuid.c $(DEPS)
 	$(CC) $(CCFLAGS) suuid.c
-
-database.o: database.c $(DEPS)
-	$(CC) $(CCFLAGS) database.c
 
 environ.o: environ.c $(DEPS)
 	$(CC) $(CCFLAGS) environ.c

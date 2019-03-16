@@ -137,8 +137,6 @@ struct uuid_result {
  * Public function prototypes
  */
 
-/* database.c */
-
 /* environ.c */
 extern char *get_editor(void);
 extern bool valid_hostname(const char *s);
