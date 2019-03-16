@@ -240,8 +240,6 @@ int usage(const int retval)
 	       "    Use x as tag (category).\n");
 	printf("  -v, --verbose\n"
 	       "    Increase level of verbosity. Can be repeated.\n");
-	printf("  --selftest\n"
-	       "    Run the built-in test suite.\n");
 	printf("  --version\n"
 	       "    Print version information.\n");
 	printf("  -w x, --whereto x\n"
