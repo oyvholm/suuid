@@ -83,6 +83,7 @@ my $Outdir = "tmp-suuid-t-$$-" . substr(rand, 2, 8);
 
 my $exec_version = `$CMD --version`;
 my $FAKE_HOST = ($exec_version =~ /has FAKE_HOST/s) ? 1 : 0;
+my $SELFTEST = ($exec_version =~ /has SELFTEST/s) ? 1 : 0;
 
 if ($Opt{'valgrind'}) {
 	$CMD = "valgrind -q --leak-check=full --show-leak-kinds=all -- " .
@@ -181,6 +182,7 @@ sub test_standard_options {
 }
 
 sub test_executable {
+	$SELFTEST || return;
 	diag("--selftest");
 	testcmd("$CMD --selftest",
 	        <<END,

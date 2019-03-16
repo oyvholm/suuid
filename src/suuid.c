@@ -151,6 +151,9 @@ int print_version(void)
 #ifdef NDEBUG
 	printf("has NDEBUG\n");
 #endif
+#ifdef SELFTEST
+	printf("has SELFTEST\n");
+#endif
 #ifdef TEST_FUNC
 	printf("has TEST_FUNC\n");
 #endif
@@ -234,8 +237,10 @@ int usage(const int retval)
 	printf("  --rcfile X\n"
 	       "    Use file X instead of '%s/%s'.\n",
 	       getenv("HOME"), STD_RCFILE);
+#ifdef SELFTEST
 	printf("  --selftest\n"
 	       "    Run various internal self tests and exit.\n");
+#endif
 	printf("  -t x, --tag x\n"
 	       "    Use x as tag (category).\n");
 	printf("  -v, --verbose\n"
@@ -301,8 +306,10 @@ int choose_opt_action(struct Options *dest,
 			dest->raw = true;
 		else if (!strcmp(opts->name, "rcfile"))
 			dest->rcfile = optarg;
+#ifdef SELFTEST
 		else if (!strcmp(opts->name, "selftest"))
 			dest->selftest = true;
+#endif
 		else if (!strcmp(opts->name, "version"))
 			dest->version = true;
 		break;
@@ -377,7 +384,9 @@ int parse_options(struct Options *dest, const int argc, char * const argv[])
 			{"random-mac", no_argument, 0, 'm'},
 			{"raw", no_argument, 0, 0},
 			{"rcfile", required_argument, 0, 0},
+#ifdef SELFTEST
 			{"selftest", no_argument, 0, 0},
+#endif
 			{"tag", required_argument, 0, 't'},
 			{"verbose", no_argument, 0, 'v'},
 			{"version", no_argument, 0, 0},
@@ -431,8 +440,10 @@ int main(int argc, char *argv[])
 
 	if (opt.help)
 		return usage(EXIT_SUCCESS);
+#ifdef SELFTEST
 	if (opt.selftest)
 		return selftest();
+#endif
 	if (opt.version)
 		return print_version();
 	if (opt.license)

@@ -122,7 +122,9 @@ struct Options {
 	bool random_mac;
 	bool raw;
 	char *rcfile;
+#ifdef SELFTEST
 	bool selftest;
+#endif
 	char *tag[MAX_TAGS];
 	char *uuid;
 	int verbose;
@@ -172,7 +174,9 @@ extern char *get_rcfilename(const struct Options *opt);
 extern int read_rcfile(const char *rcfile, struct Rc *rc);
 
 /* selftest.c */
+#ifdef SELFTEST
 extern int selftest(void);
+#endif
 
 /* sessvar.c */
 extern int get_sess_info(struct Entry *entry);

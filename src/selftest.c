@@ -20,6 +20,7 @@
 
 #include "suuid.h"
 
+#ifdef SELFTEST
 /*
  * selftest() - Run internal testing to check that it works on the current 
  * system. Executed if --selftest is used.
@@ -90,5 +91,6 @@ int selftest(void)
 
 	return EXIT_SUCCESS;
 }
+#endif /* ifdef SELFTEST */
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */

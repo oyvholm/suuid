@@ -58,6 +58,9 @@ test -n "$GCOV" && newdef GCOV
 # NDEBUG: Disable assert()
 test -n "$NDEBUG" && newdef NDEBUG
 
+# SELFTEST: Include --selftest option for testing of internal functions.
+test -n "$SELFTEST" && newdef SELFTEST
+
 # TEST_FUNC: Send non-option arguments to a function for testing. Doesn't break 
 # anything, non-option arguments are ignored by the program.
 test -n "$TEST_FUNC" && newdef TEST_FUNC
