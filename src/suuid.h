@@ -29,10 +29,6 @@
 
 #define stddebug  stderr
 
-#ifdef USE_SQLITE
-#  include "sqlite3.h"
-#endif
-
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>

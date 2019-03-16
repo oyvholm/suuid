@@ -11,41 +11,21 @@ TESTLOCKDIR = testlockdir
 CC = cc
 LD = cc
 
-UNAME := $(shell uname)
-
 CCFLAGS = -Wall -Wextra -Werror -O0 -c -g
 CCFLAGS += $$(test -n "$(GCOV)" && \
               echo -n "-fprofile-arcs -ftest-coverage")
 CCFLAGS += $$(test -n "$(VERIFY_UUID)" && \
               echo -n "-DVERIFY_UUID=$(VERIFY_UUID)")
 
-# sqlite3.c gives warnings on NetBSD and OpenBSD, as described in 
-# ../doc/netbsd.txt and ../doc/openbsd.txt. Temporarily disable -Werror for 
-# sqlite3.c until this is sorted out.
-SQLITE_CCFLAGS = -Wall -O0 -c -g
-
 LDFLAGS = -Wall -Wextra -Werror
 
-# When compiling with SQLite, add these libraries to LIBS:
-# Linux (gcc)    : -lpthread -ldl
-# FreeBSD (clang): -lpthread
 LIBS =
-ifdef USE_SQLITE
-	LIBS += -lpthread
-	ifeq ($(UNAME), Linux)
-		LIBS += -ldl
-	endif
-endif
 LIBS += $$(test -n "$(GCOV)" && echo "-lgcov --coverage");
 
 # For regular use, it's not necessary to modify anything below this line.
 
-# If compiling with USE_SQLITE, add sqlite3.o to OBJS
 OBJS = suuid.o database.o environ.o genuuid.o io.o logfile.o \
        rcfile.o selftest.o sessvar.o string.o tag.o uuid.o
-ifdef USE_SQLITE
-	OBJS += sqlite3.o
-endif
 
 CFILES = suuid.c database.c environ.c genuuid.c io.c logfile.c \
          rcfile.c selftest.c sessvar.c string.c tag.c uuid.c
@@ -91,9 +71,6 @@ selftest.o: selftest.c $(DEPS)
 sessvar.o: sessvar.c $(DEPS)
 	$(CC) $(CCFLAGS) sessvar.c
 
-sqlite3.o: sqlite3.c
-	$(CC) $(SQLITE_CCFLAGS) -DSQLITE_ENABLE_JSON1 sqlite3.c
-
 string.o: string.c $(DEPS)
 	$(CC) $(CCFLAGS) string.c
 
@@ -108,14 +85,12 @@ clean:
 	rm -f $(EXEC) $(OBJS)
 	rm -f *.gcda *.gcno *.gcov
 	rm -f version.h
-	rm -f sqlite3.o
 	rm -fr $(TESTLOCKDIR)
 	cd t && $(MAKE) clean
 
 .PHONY: edit
 edit: tags
-	$(EDITOR) $$(git ls-files | grep -v -e ^COPYING -e ^sqlite3 \
-	                                    -e \\.gitignore)
+	$(EDITOR) $$(git ls-files | grep -v -e ^COPYING -e \\.gitignore)
 
 .PHONY: gcov
 gcov:
@@ -154,30 +129,17 @@ testall:
 
 .PHONY: testboth
 testboth:
-	$(MAKE) clean test USE_SQLITE=1
-	$(MAKE) clean test USE_SQLITE=
 
 .PHONY: testcomb
 testcomb: clean $(WHAT)
 	# FAKE_HOST=
 	$(MAKE) clean $(WHAT) FAKE_HOST=
-	$(MAKE) clean $(WHAT) FAKE_HOST= USE_SQLITE=
-	$(MAKE) clean $(WHAT) FAKE_HOST= USE_SQLITE=1
 	# FAKE_HOST=1
 	$(MAKE) clean $(WHAT) FAKE_HOST=1
-	$(MAKE) clean $(WHAT) FAKE_HOST=1 USE_SQLITE=
-	$(MAKE) clean $(WHAT) FAKE_HOST=1 USE_SQLITE=1
-	# USE_SQLITE
-	$(MAKE) clean $(WHAT) USE_SQLITE=
-	$(MAKE) clean $(WHAT) USE_SQLITE=1
 	# TEST_FUNC=
 	$(MAKE) clean $(WHAT) TEST_FUNC=
-	$(MAKE) clean $(WHAT) TEST_FUNC= USE_SQLITE=
-	$(MAKE) clean $(WHAT) TEST_FUNC= USE_SQLITE=1
 	# TEST_FUNC=1
 	$(MAKE) clean $(WHAT) TEST_FUNC=1
-	$(MAKE) clean $(WHAT) TEST_FUNC=1 USE_SQLITE=
-	$(MAKE) clean $(WHAT) TEST_FUNC=1 USE_SQLITE=1
 
 .PHONY: testhist
 testhist: test
@@ -214,5 +176,3 @@ valgrindall:
 
 .PHONY: valgrindboth
 valgrindboth:
-	$(MAKE) clean valgrind USE_SQLITE=1
-	$(MAKE) clean valgrind USE_SQLITE=

@@ -29,8 +29,6 @@ skip function print_version
 skip function read_rcfile
 skip function rewind_tag
 skip function scan_for_uuid
-skip function sqlite3_close_v2
-skip function sqlite3_open_v2
 skip function suuid_xml
 skip function trim_str_end
 skip function trim_str_front
