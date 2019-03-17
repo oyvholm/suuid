@@ -110,7 +110,7 @@ sub main {
 	delete $ENV{'SUUID_LOGDIR'};
 
 	test_standard_options();
-	test_executable();
+	test_suuid_selftest();
 	test_test_functions();
 	test_suuid_executable();
 
@@ -181,7 +181,7 @@ sub test_standard_options {
 	return;
 }
 
-sub test_executable {
+sub test_suuid_selftest {
 	$SELFTEST || return;
 	diag("--selftest");
 	testcmd("$CMD --selftest",
