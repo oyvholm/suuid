@@ -92,7 +92,8 @@ sub main {
             msg(2, "\$chk_swap = '$chk_swap'");
 
             if (-e $chk_swap) {
-                die("$progname: $curr_arg: Swap file $chk_swap exists, seems as the file is being edited already\n");
+                die("$progname: $curr_arg: Swap file $chk_swap exists, " .
+                    "seems as the file is being edited already\n");
             }
 
             unless (@stat_array = stat($curr_arg)) {
@@ -104,9 +105,11 @@ sub main {
 
             chomp(my $file_id = `finduuid "$curr_arg" | $head_str -1`);
             chomp($smsum{"o.$curr_arg"} = `smsum <"$curr_arg"`);
-            length($smsum{"o.$curr_arg"}) || die("$progname: Error calculating smsum\n");
+            length($smsum{"o.$curr_arg"}) ||
+                die("$progname: Error calculating smsum\n");
             chomp($gitsum{"o.$curr_arg"} = `git hash-object "$curr_arg"`);
-            length($gitsum{"o.$curr_arg"}) || die("$progname: Error calculating gitsum\n");
+            length($gitsum{"o.$curr_arg"}) ||
+                die("$progname: Error calculating gitsum\n");
 
             push(@Files, $curr_arg);
             push(@Fancy,
@@ -127,7 +130,9 @@ sub main {
     }
 
     my $cmd_str = suuid_xml(join(" ", @Fancy), 1);
-    chomp(my $uuid=`suuid --raw -t $Opt{'tag'}_begin -w eo -c '<$Opt{'tag'} w="begin"> $cmd_str$comm_str </$Opt{'tag'}>'`);
+    my $exec_str = "suuid --raw -t $Opt{'tag'}_begin -w eo -c '<$Opt{'tag'} " .
+                   "w=\"begin\"> $cmd_str$comm_str </$Opt{'tag'}>'";
+    chomp(my $uuid=`$exec_str`);
 
     if (!defined($uuid) || $uuid !~ /^$v1_templ$/) {
         die("$progname: suuid error\n");
@@ -223,7 +228,9 @@ sub main {
         $other_str = " <created>$other_str </created>";
     }
 
-    system("suuid --raw -t $Opt{'tag'}_end -c '<$Opt{'tag'} w=\"end\"> <finished>$uuid</finished>$change_str$gone_str$other_str </$Opt{'tag'}>'");
+    system("suuid --raw -t $Opt{'tag'}_end -c '<$Opt{'tag'} w=\"end\"> " .
+           "<finished>$uuid</finished>$change_str$gone_str$other_str " .
+           "</$Opt{'tag'}>'");
 
     return($Retval);
     # }}}
