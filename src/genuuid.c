@@ -220,7 +220,7 @@ char *process_uuid(struct Logs *logs,
 		memcpy(entry->uuid, opt->uuid, UUID_LENGTH + 1);
 	} else {
 		if (!generate_uuid(entry->uuid))
-			return NULL;
+			return NULL; /* gncov */
 		if (rc->macaddr)
 			memcpy(entry->uuid + 24, rc->macaddr,
 			       MACADDR_LENGTH * 2);
