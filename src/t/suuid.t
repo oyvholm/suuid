@@ -85,6 +85,9 @@ my $exec_version = `$CMD --version`;
 my $FAKE_HOST = ($exec_version =~ /has FAKE_HOST/s) ? 1 : 0;
 my $SELFTEST = ($exec_version =~ /has SELFTEST/s) ? 1 : 0;
 
+# Definitions from suuid.h
+my $MAX_TAGS = 1000;
+
 if ($Opt{'valgrind'}) {
 	$CMD = "valgrind -q --leak-check=full --show-leak-kinds=all -- " .
 	       "../$CMD_BASENAME";
@@ -632,6 +635,18 @@ sub test_suuid_executable {
 			s_suuid('tag' => 'snaddertag'),
 		),
 		"Log contents OK after tag",
+	);
+
+	# }}}
+	my $manytags = "";
+	for (my $i = 1; $i <= $MAX_TAGS + 1; $i++) {
+		$manytags .= " -tt$i";
+	}
+	likecmd("$CMD $manytags -l $Outdir", # {{{
+		'/^$/',
+		"/: Maximum number of tags \\($MAX_TAGS\\) exceeded/",
+		1,
+		"Number of tags is greater than MAX_TAGS",
 	);
 
 	# }}}
