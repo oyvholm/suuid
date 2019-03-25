@@ -945,24 +945,26 @@ sub test_suuid_comment {
 	);
 
 	# }}}
-	testcmd("$CMD -c \"F\xf8kka \xf8pp\" -l $Outdir", # {{{
-		"",
-		"../suuid: Comment contains illegal characters " .
-		    "or is not valid UTF-8\n",
-		1,
-		"Refuse non-UTF-8 text to --comment option",
-	);
-
-	# }}}
-	testcmd("$CMD -c \"Ctrl-d: \x04\" -l $Outdir", # {{{
-		"",
-		"../suuid: Comment contains illegal characters " .
-		    "or is not valid UTF-8\n",
-		1,
-		"Reject Ctrl-d in comment",
-	);
-
-	# }}}
+	test_invalid_comment($CMD, 0, "F\xf8kka \xf8pp", $Outdir,
+	    "Refuse non-UTF-8 text to --comment option");
+	test_invalid_comment($CMD, 0, "Ctrl-d: \x04", $Outdir,
+	    "Reject Ctrl-d in comment");
+	test_invalid_comment($CMD, 0, "\x7F", $Outdir,
+	    "Reject U+007F (DELETE) in comment");
+	test_invalid_comment($CMD, 0, "\xC1\xBF", $Outdir,
+	    "Overlong UTF-8 char in comment, 2 bytes");
+	test_invalid_comment($CMD, 0, "\xE0\x80\xAF", $Outdir,
+	    "Overlong UTF-8 char in comment, 3 bytes");
+	test_invalid_comment($CMD, 0, "\xF0\x80\x80\xAF", $Outdir,
+	    "Overlong UTF-8 char in comment, 4 bytes");
+	test_invalid_comment($CMD, 0, "\xED\xA0\x80", $Outdir,
+	    "UTF-8 contains UTF-16 surrogate char U+D800");
+	test_invalid_comment($CMD, 0, "\xEF\xBF\xBE", $Outdir,
+	    "UTF-8 contains U+FFFE");
+	test_invalid_comment($CMD, 0, "\xEF\xBF\xBF", $Outdir,
+	    "UTF-8 contains U+FFFF");
+	test_invalid_comment($CMD, 0, "\xF4\x90\x80\x80", $Outdir,
+	    "UTF-8 contains U+110000, is above U+10FFFF");
 	likecmd("echo \"Great test\" | $CMD -c - -l $Outdir", # {{{
 		"/^$v1_templ\n\$/s",
 		'/^$/',
@@ -971,30 +973,50 @@ sub test_suuid_comment {
 	);
 
 	# }}}
-	testcmd("echo \"F\xf8kka \xf8pp\" | $CMD -c - -l $Outdir", # {{{
-		"",
-		"../suuid: Comment contains illegal characters " .
-		    "or is not valid UTF-8\n",
-		1,
-		"Reject non-UTF-8 comment from stdin",
-	);
-
-	# }}}
-	testcmd("echo \"Ctrl-d: \x04\" | $CMD -c - -l $Outdir", # {{{
-		"",
-		"../suuid: Comment contains illegal characters " .
-		    "or is not valid UTF-8\n",
-		1,
-		"Reject Ctrl-d in comment from stdin",
-	);
-
-	# }}}
+	test_invalid_comment($CMD, 1, "F\xf8kka \xf8pp", $Outdir,
+	    "Reject non-UTF-8 comment from stdin");
+	test_invalid_comment($CMD, 1, "Ctrl-d: \x04", $Outdir,
+	    "Reject Ctrl-d in comment from stdin");
 	like(file_data($Outfile), # {{{
 		s_top(
 			s_suuid('txt' => 'Great test') .
 			s_suuid('txt' => 'Great test', 'tty' => ''),
 		),
 		"Log contents OK after comment",
+	);
+
+	# }}}
+	ok(unlink($Outfile), "Delete [Outfile]");
+	likecmd("echo \"\xE0\xAD\xB2\" | $CMD -c - -l $Outdir", # {{{
+		"/^$v1_templ\n\$/s",
+		'/^$/',
+		0,
+		"Read comment from stdin with 3 byte UTF-8 sequence",
+	);
+
+	# }}}
+	like(file_data($Outfile), # {{{
+		s_top(
+			s_suuid('txt' => "\xE0\xAD\xB2", 'tty' => ''),
+		),
+		"Log contents OK after 3-byte UTF-8 sequence",
+	);
+
+	# }}}
+	ok(unlink($Outfile), "Delete [Outfile]");
+	likecmd("echo \"\xF0\x9D\x85\x9D\" | $CMD -c - -l $Outdir", # {{{
+		"/^$v1_templ\n\$/s",
+		'/^$/',
+		0,
+		"Read comment from stdin with 4 byte UTF-8 sequence",
+	);
+
+	# }}}
+	like(file_data($Outfile), # {{{
+		s_top(
+			s_suuid('txt' => "\xF0\x9D\x85\x9D", 'tty' => ''),
+		),
+		"Log contents OK after 4-byte UTF-8 sequence",
 	);
 
 	# }}}
@@ -1155,6 +1177,22 @@ sub editor_fail {
 
 	# }}}
 	ok(!-e $Outfile, "[Outfile] doesn't exist");
+	# }}}
+}
+
+sub test_invalid_comment {
+	my ($CMD, $from_stdin, $txt, $Outdir, $desc) = @_;
+	my $c_str = $from_stdin ? "echo \"$txt\" | $CMD -c - -l $Outdir"
+	                        : "$CMD -c \"$txt\" -l $Outdir";
+
+	testcmd($c_str, # {{{
+		"",
+		"../suuid: Comment contains illegal characters " .
+		    "or is not valid UTF-8\n",
+		1,
+		$desc,
+	);
+
 	# }}}
 }
 
