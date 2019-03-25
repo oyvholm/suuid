@@ -30,7 +30,6 @@ int selftest(void)
 {
 	char buf1[] = "ABCÅÆØ";
 	char buf2[DATE_LENGTH + 1];
-	char buf3[UUID_LENGTH + 1];
 
 	errno = EACCES;
 	puts("# myerror(\"errno is EACCES\")");
@@ -81,13 +80,6 @@ int selftest(void)
 	printf("valid_uuid(\"c9ffa9cb-708d-454b-b1f2-f18f609cb825\", 1) "
 	       "= %d\n",
 	       valid_uuid("c9ffa9cb-708d-454b-b1f2-f18f609cb825", 1));
-
-	strncpy(buf3, "acdaf974-e78e-11e7-87d5-f74d993421b0", UUID_LENGTH + 1);
-	printf("scramble_mac_address(buf3) = %d\n",
-	       scramble_mac_address(buf3) != NULL);
-	buf3[0] = 'g';
-	printf("scramble_mac_address(buf3) = %d\n",
-	       scramble_mac_address(buf3) != NULL);
 
 	return EXIT_SUCCESS;
 }

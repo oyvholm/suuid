@@ -224,8 +224,8 @@ char *process_uuid(struct Logs *logs,
 		if (rc->macaddr)
 			memcpy(entry->uuid + 24, rc->macaddr,
 			       MACADDR_LENGTH * 2);
-		if (opt->random_mac && !scramble_mac_address(entry->uuid))
-			return NULL;
+		if (opt->random_mac)
+			scramble_mac_address(entry->uuid + 24);
 	}
 	if (!valid_uuid(entry->uuid, true)) {
 		fprintf(stderr, "%s: UUID generation failed\n", progname);

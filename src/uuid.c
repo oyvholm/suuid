@@ -259,24 +259,17 @@ void generate_macaddr(unsigned char *dest)
 }
 
 /*
- * scramble_mac_address() - Overwrite the last 12 characters of the received 
- * pointer to an UUID with random bytes as specified by RFC 4122. Return 
- * pointer to the UUID if successful, or NULL if an invalid UUID was received.
+ * scramble_mac_address() - Overwrite MAC address in `dest` with random 
+ * hexadecimal digits as specified by RFC 4122. Returns nothing.
  */
 
-char *scramble_mac_address(char *uuid)
+void scramble_mac_address(char *dest)
 {
 	unsigned char buf[MACADDR_LENGTH];
-	char *macaddr;
 
-	assert(uuid);
-	macaddr = uuid + 24;
-	if (!valid_uuid(uuid, false))
-		return NULL;
+	assert(dest);
 	generate_macaddr(buf);
-	write_hex(macaddr, buf, MACADDR_LENGTH);
-
-	return uuid;
+	write_hex(dest, buf, MACADDR_LENGTH);
 }
 
 /*
