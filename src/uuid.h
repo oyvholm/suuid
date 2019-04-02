@@ -46,7 +46,7 @@ extern char *scan_for_uuid(const char *s);
 extern bool valid_macaddr(const char *macaddr);
 extern void scramble_mac_address(char *dest);
 extern char *generate_uuid(char *uuid);
-extern bool is_valid_date(const char *s, const bool check_len);
+extern bool is_valid_date(const char *src, const bool check_len);
 extern char *uuid_date(char *dest, const char *uuid);
 #ifdef VERIFY_UUID
 extern char *uuid_date_from_uuid(char *dest, const char *uuid);

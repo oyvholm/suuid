@@ -75,7 +75,7 @@ char *get_desc_from_command(const char *cmd)
 	while (strchr("./", *p))
 		p++;
 	p2 = p;
-	while (*p2 && !isspace((int)*p2))
+	while (*p2 && !isspace((unsigned char)*p2))
 		p2++;
 	if (p2 > p)
 		*p2 = '\0';

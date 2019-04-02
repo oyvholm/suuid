@@ -323,32 +323,34 @@ char *generate_uuid(char *uuid)
  * Return 1 if ok, 0 if invalid.
  */
 
-bool is_valid_date(const char *s, const bool check_len)
+bool is_valid_date(const char *src, const bool check_len)
 {
+	const unsigned char *s = (unsigned char *)src;
+
 	assert(s);
 	assert(check_len == false || check_len == true);
 
-	if (check_len && strlen(s) != DATE_LENGTH)
+	if (check_len && strlen((char *)s) != DATE_LENGTH)
 		return false;
 
 	if (s[0] != '2' || s[1] != '0' || /* Yay for Y2.1K */
-	    !isdigit((int)s[2]) || !isdigit((int)s[3]) || /* Two last digits 
-	                                                     in year */
+	    !isdigit(s[2]) || !isdigit(s[3]) || /* Two last digits 
+	                                           in year */
 	    s[4] != '-' ||
-	    !strchr("01", s[5]) || !isdigit((int)s[6]) || /* Month */
+	    !strchr("01", s[5]) || !isdigit(s[6]) || /* Month */
 	    s[7] != '-' ||
-	    !strchr("0123", s[8]) || !isdigit((int)s[9]) || /* Day */
+	    !strchr("0123", s[8]) || !isdigit(s[9]) || /* Day */
 	    s[10] != 'T' ||
-	    !strchr("012", s[11]) || !isdigit((int)s[12]) || /* Hour */
+	    !strchr("012", s[11]) || !isdigit(s[12]) || /* Hour */
 	    s[13] != ':' ||
-	    !strchr("012345", s[14]) || !isdigit((int)s[15]) || /* Minute */
+	    !strchr("012345", s[14]) || !isdigit(s[15]) || /* Minute */
 	    s[16] != ':' ||
-	    !strchr("0123456", s[17]) || !isdigit((int)s[18]) || /* Second */
+	    !strchr("0123456", s[17]) || !isdigit(s[18]) || /* Second */
 	    s[19] != '.' ||
-	    !isdigit((int)s[20])     || !isdigit((int)s[21]) ||
-	        !isdigit((int)s[22]) || !isdigit((int)s[23]) ||
-	        !isdigit((int)s[24]) || !isdigit((int)s[25]) ||
-	        !isdigit((int)s[26]) || /* Nanoseconds */
+	    !isdigit(s[20])     || !isdigit(s[21]) ||
+	        !isdigit(s[22]) || !isdigit(s[23]) ||
+	        !isdigit(s[24]) || !isdigit(s[25]) ||
+	        !isdigit(s[26]) || /* Nanoseconds */
 	    s[27] != 'Z')
 		return false;
 	else

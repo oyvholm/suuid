@@ -100,7 +100,7 @@ char *string_to_lower(char *str)
 		return p;
 
 	while (*p) {
-		*p = tolower((int)*p);
+		*p = tolower((unsigned char)*p);
 		p++;
 	}
 
@@ -119,7 +119,7 @@ char *trim_str_front(char *dest)
 	assert(dest);
 
 	size = strlen(dest);
-	while (p < dest + size && isspace((int)*p))
+	while (p < dest + size && isspace((unsigned char)*p))
 		p++;
 	if (p == dest)
 		return dest; /* Nothing needs to be done */
@@ -144,7 +144,7 @@ char *trim_str_end(char *dest)
 	if (!size)
 		return dest;
 	p = dest + size - 1;
-	while (p > dest && isspace((int)*p))
+	while (p > dest && isspace((unsigned char)*p))
 		*p-- = '\0';
 
 	return dest;
