@@ -14,8 +14,6 @@ LD = cc
 CCFLAGS = -Wall -Wextra -Werror -O0 -c -g
 CCFLAGS += $$(test -n "$(GCOV)" && \
               echo -n "-fprofile-arcs -ftest-coverage")
-CCFLAGS += $$(test -n "$(VERIFY_UUID)" && \
-              echo -n "-DVERIFY_UUID=$(VERIFY_UUID)")
 
 LDFLAGS = -Wall -Wextra -Werror
 
