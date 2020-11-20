@@ -24,8 +24,8 @@ use Getopt::Long;
 
 local $| = 1;
 
-our $CMD_BASENAME = "suuid";
-our $CMD = "../$CMD_BASENAME";
+our $CMDB = "suuid";
+our $CMD = "../$CMDB";
 $ENV{'SESS_UUID'} = "";
 
 our %Opt = (
@@ -90,7 +90,7 @@ my $MAX_TAGS = 1000;
 
 if ($Opt{'valgrind'}) {
 	$CMD = "valgrind -q --leak-check=full --show-leak-kinds=all -- " .
-	       "../$CMD_BASENAME";
+	       "../$CMDB";
 }
 
 exit(main());
@@ -176,8 +176,8 @@ sub test_standard_options {
 	diag('Unknown option');
 	likecmd("$CMD --gurgle",
 	        '/^$/',
-	        "/\\.\\.\\/$CMD_BASENAME: Option error\\n" .
-	        "\\nType \"\\.\\.\\/$CMD_BASENAME --help\" for help screen\\. " .
+	        "/\\.\\.\\/$CMDB: Option error\\n" .
+	        "\\nType \"\\.\\.\\/$CMDB --help\" for help screen\\. " .
 	        "Returning with value 1\\.\\n/s",
 	        1,
 	        'Unknown option specified');
@@ -211,7 +211,7 @@ valid_uuid("acdaf974-e78e-11e7-87d5-f74d993421b0123", 1) = 0
 valid_uuid("c9ffa9cb-708d-454b-b1f2-f18f609cb825", 1) = 0
 END
 	        <<END,
-../$CMD_BASENAME: errno is EACCES: Permission denied
+../$CMDB: errno is EACCES: Permission denied
 END
 	        0,
 	        '--selftest');
@@ -775,9 +775,9 @@ sub test_suuid_executable {
 	diag("Testing -n (--count) option...");
 	testcmd("$CMD --count j", # {{{
 		"",
-		"../$CMD_BASENAME: Error in -n/--count argument\n" .
-		"../$CMD_BASENAME: Option error\n" .
-		"\nType \"../$CMD_BASENAME --help\" for help screen. " .
+		"../$CMDB: Error in -n/--count argument\n" .
+		"../$CMDB: Option error\n" .
+		"\nType \"../$CMDB --help\" for help screen. " .
 		"Returning with value 1.\n",
 		1,
 		"Invalid value in --count argument",
@@ -1124,7 +1124,7 @@ sub test_suuid_editor {
 	is(glob(".tmp-suuid.*"), undef, "No .tmp-suuid.* files exist");
 	likecmd("$CMD --comment -- -l $Outdir", # {{{
 		'/^$/s',
-		"/\\.\\.\\/$CMD_BASENAME: read_from_editor\\(\\): Cannot execute " .
+		"/\\.\\.\\/$CMDB: read_from_editor\\(\\): Cannot execute " .
 		"\"\\.\\/not-exist \\.tmp-suuid\\./",
 		1,
 		"\"--comment --\", SUUID_EDITOR is undefined, " .
@@ -1182,7 +1182,7 @@ sub editor_fail {
 
 	testcmd("$CMD -c -- -l $Outdir", # {{{
 		"",
-		"../$CMD_BASENAME: Environment variables SUUID_EDITOR and EDITOR " .
+		"../$CMDB: Environment variables SUUID_EDITOR and EDITOR " .
 		"aren't defined, cannot start editor\n",
 		1,
 		"\"-c --\", $msg",
@@ -1674,7 +1674,7 @@ sub test_invalid_hostname {
 sub test_suuid_signal {
 	# {{{
 	my $Outfile = shift;
-	my $sigpipe_stderr = "$CMD_BASENAME-stderr.tmp";
+	my $sigpipe_stderr = "$CMDB-stderr.tmp";
 
 	diag("Receive SIGPIPE signal");
 	likecmd("$CMD -l $Outdir -n 1000 -wo 2>\"$sigpipe_stderr\" | true",
@@ -1732,9 +1732,9 @@ sub invalid_macaddr_in_rcfile {
 	my ($Outdir, $Outfile, $mac, $errmsg, $desc) = @_;
 
 	create_file("rc-macaddr", "macaddr =$mac\n");
-	testcmd("../$CMD_BASENAME --rcfile rc-macaddr -l $Outdir",
+	testcmd("../$CMDB --rcfile rc-macaddr -l $Outdir",
 		"",
-		src($errmsg, ('cmd' => "../$CMD_BASENAME")),
+		src($errmsg, ('cmd' => "../$CMDB")),
 		1,
 		$desc,
 	);
@@ -1909,7 +1909,7 @@ sub testcmd {
 	my $cmd_outp_str = $Opt{'verbose'} >= 1 ? "\"$Cmd\" - " : '';
 	my $Txt = join('', $cmd_outp_str, defined($Desc) ? $Desc : '');
 	$Txt =~ s/$Outdir/[Outdir]/g;
-	my $TMP_STDERR = "$CMD_BASENAME-stderr.tmp";
+	my $TMP_STDERR = "$CMDB-stderr.tmp";
 	my $retval = 1;
 
 	if (defined($Exp_stderr)) {
@@ -1938,7 +1938,7 @@ sub likecmd {
 	my $cmd_outp_str = $Opt{'verbose'} >= 1 ? "\"$Cmd\" - " : '';
 	my $Txt = join('', $cmd_outp_str, defined($Desc) ? $Desc : '');
 	$Txt =~ s/$Outdir/[Outdir]/g;
-	my $TMP_STDERR = "$CMD_BASENAME-stderr.tmp";
+	my $TMP_STDERR = "$CMDB-stderr.tmp";
 	my $retval = 1;
 
 	if (defined($Exp_stderr)) {
@@ -2003,7 +2003,7 @@ sub usage {
 
 Usage: $progname [options]
 
-Contains tests for the $CMD_BASENAME(1) program.
+Contains tests for the $CMDB(1) program.
 
 Options:
 
