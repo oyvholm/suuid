@@ -18,7 +18,7 @@ CCFLAGS += $$(test -n "$(GCOV)" && \
 LDFLAGS = -Wall -Wextra -Werror
 
 LIBS =
-LIBS += $$(test -n "$(GCOV)" && echo "-lgcov --coverage");
+LIBS += $$(test -n "$(GCOV)" && echo "-lgcov --coverage")
 
 # For regular use, it's not necessary to modify anything below this line.
 
