@@ -113,9 +113,9 @@ sub main {
     length($Opt{'host'}) || die("$progname: --host option not specified\n");
 
     print(<<'END');
-    <?xml version="1.0" encoding="UTF-8"?>
-    <!DOCTYPE suuids SYSTEM "dtd/suuids.dtd">
-    <suuids>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suuids SYSTEM "dtd/suuids.dtd">
+<suuids>
 END
 
     while (my $Curr = <>) {
