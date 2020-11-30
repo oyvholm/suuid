@@ -150,9 +150,10 @@ char *allocate_elem(const char *elem, const char *src)
 	if (!src)
 		return mystrdup("");
 
-	size += strlen("<") + strlen(elem) + strlen(">") +
-	        strlen(src) * MAX_GROWTH +
-	        strlen("<") + strlen(elem) + strlen("/> ") + 1;
+	size += strlen("<") + strlen(elem) + strlen(">")
+	        + strlen(src) * MAX_GROWTH
+	        + strlen("<") + strlen(elem) + strlen("/> ")
+	        + 1;
 
 	retval = mymalloc(size + 1);
 	if (!retval)
@@ -185,8 +186,8 @@ char *alloc_attr(const char *attr, const char *data)
 	assert(attr);
 	assert(strlen(attr));
 
-	size = strlen(" ") + strlen(attr) + strlen("=\"") + strlen(data) +
-	       strlen("\"") + 1;
+	size = strlen(" ") + strlen(attr) + strlen("=\"") + strlen(data)
+	       + strlen("\"") + 1;
 
 	retval = mymalloc(size + 1);
 	if (!retval)
@@ -230,11 +231,12 @@ char *get_xml_tags(const struct Entry *entry)
 		}
 	} while (p);
 
-	if (!size)
+	if (!size) {
 		/*
 		 * No tags found, return empty string,
 		 */
 		return mystrdup("");
+	}
 
 	buf = mymalloc(size);
 	if (!buf)
@@ -310,11 +312,12 @@ char *create_sess_xml(const struct Entry *entry)
 		i++;
 	}
 
-	if (!size)
+	if (!size) {
 		/*
 		 * No elements in the sess array, return empty string.
 		 */
 		return mystrdup("");
+	}
 
 	/*
 	 * Allocate space for the final string and a temporary work buffer.
@@ -343,11 +346,12 @@ char *create_sess_xml(const struct Entry *entry)
 
 		u = entry->sess[i].uuid;
 		d = entry->sess[i].desc;
-		if (d)
+		if (d) {
 			snprintf(tmpbuf, tmpsize,
 			         "<sess desc=\"%s\">%s</sess> ", d, u);
-		else
+		} else {
 			snprintf(tmpbuf, tmpsize, "<sess>%s</sess> ", u);
+		}
 		strncat(buf, tmpbuf, size - strlen(buf));
 		i++;
 	}
@@ -423,8 +427,8 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 		int size;
 		char *txt_space;
 
-		size = strlen("<txt> ") + strlen(entry->txt) +
-		       strlen(" </txt> ") + 1;
+		size = strlen("<txt> ") + strlen(entry->txt)
+		       + strlen(" </txt> ") + 1;
 		e.txt = mymalloc(size);
 		if (!e.txt) {
 			retval = NULL; /* gncov */
@@ -433,11 +437,12 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 		txt_space = entry->txt[0] == '<' ? " " : "";
 		snprintf(e.txt, size, "<txt>%s%s%s</txt> ",
 		                      txt_space, entry->txt, txt_space);
-	} else
+	} else {
 		/*
 		 * Write escaped XML to the buffer.
 		 */
 		e.txt = allocate_elem("txt", entry->txt);
+	}
 
 	e.host = allocate_elem("host", entry->host);
 	e.cwd = allocate_elem("cwd", entry->cwd);
@@ -448,9 +453,9 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 	 * Allocate space for the final XML string.
 	 */
 
-	size = DATE_LENGTH + UUID_LENGTH + strlen(tag_xml) + strlen(e.txt) +
-	       strlen(e.host) + strlen(e.cwd) + strlen(e.user) +
-	       strlen(e.tty) + strlen(sess_xml) + 128;
+	size = DATE_LENGTH + UUID_LENGTH + strlen(tag_xml) + strlen(e.txt)
+	       + strlen(e.host) + strlen(e.cwd) + strlen(e.user)
+	       + strlen(e.tty) + strlen(sess_xml) + 128;
 	retval = mymalloc(size);
 	if (!retval) {
 		retval = NULL; /* gncov */
@@ -597,13 +602,13 @@ FILE *check_last_log_line(FILE *fp, const char *fname)
 	}
 	filepos = ftell(fp);
 	if (filepos == -1) {
-		myerror("%s: Cannot get file position of " /* gncov */
-		        "end line", fname);
+		myerror("%s: Cannot get file position of" /* gncov */
+		        " end line", fname);
 		return NULL; /* gncov */
 	}
 	if (!fgets(check_line, 10, fp)) {
-		myerror("Error when reading end line from log " /* gncov */
-		        "file \"%s\"", fname);
+		myerror("Error when reading end line from log" /* gncov */
+		        " file \"%s\"", fname);
 		return NULL; /* gncov */
 	}
 	if (strcmp(check_line, "</suuids>"))
@@ -721,9 +726,10 @@ int add_to_logfile(FILE *fp, const struct Entry *entry, const bool raw)
 		retval = EXIT_FAILURE; /* gncov */
 	if (fputc('\n', fp) == EOF)
 		retval = EXIT_FAILURE; /* gncov */
-	if (retval == EXIT_FAILURE)
-		myerror("add_to_logfile(): Cannot write to the " /* gncov */
-		        "log file");
+	if (retval == EXIT_FAILURE) {
+		myerror("add_to_logfile(): Cannot write to the" /* gncov */
+		        " log file");
+	}
 
 	free(ap);
 

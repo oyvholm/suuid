@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-#=======================================================================
+#==============================================================================
 # sess.t
 # File ID: b9f9e134-fb83-11dd-b202-000475e441b9
 #
@@ -8,9 +8,9 @@
 #
 # Character set: UTF-8
 # ©opyleft 2009– Øyvind A. Holm <sunny@sunbase.org>
-# License: GNU General Public License version 2 or later, see end of 
-# file for legal stuff.
-#=======================================================================
+# License: GNU General Public License version 2 or later, see end of file for 
+# legal stuff.
+#==============================================================================
 
 use strict;
 use warnings;
@@ -48,12 +48,12 @@ my $Lh = "[0-9a-fA-F]";
 my $Templ = "$Lh\{8}-$Lh\{4}-$Lh\{4}-$Lh\{4}-$Lh\{12}";
 my $v1_templ = "$Lh\{8}-$Lh\{4}-1$Lh\{3}-$Lh\{4}-$Lh\{12}";
 my $v1rand_templ = "$Lh\{8}-$Lh\{4}-1$Lh\{3}-$Lh\{4}-$Lh\[37bf]$Lh\{10}";
-my $date_templ = '20[0-9][0-9]-[0-1][0-9]-[0-3][0-9]T[0-2][0-9]:[0-5][0-9]:[0-6][0-9]\.\d+Z';
+my $date_templ = '20[0-9][0-9]-[0-1][0-9]-[0-3][0-9]T'
+                 . '[0-2][0-9]:[0-5][0-9]:[0-6][0-9]\.\d+Z';
 my $xml_header = join("",
-    '<\?xml version="1\.0" encoding="UTF-8"\?>\n',
-    '<!DOCTYPE suuids SYSTEM "dtd\/suuids\.dtd">\n',
-    '<suuids>\n',
-);
+                      '<\?xml version="1\.0" encoding="UTF-8"\?>\n',
+                      '<!DOCTYPE suuids SYSTEM "dtd\/suuids\.dtd">\n',
+                      '<suuids>\n');
 
 my %descriptions = ();
 
@@ -80,7 +80,6 @@ if ($Opt{'version'}) {
 exit(main());
 
 sub main {
-    # {{{
     my $Retval = 0;
     my $logdir = "tmp-sess-t-logdir";
     my $CMD;
@@ -90,8 +89,8 @@ sub main {
     $ENV{'PATH'} = "../src:$ENV{'PATH'}";
 
     if ($Opt{'valgrind'}) {
-        $valgrind_str = " valgrind -q " .
-                        "--leak-check=full --show-leak-kinds=all --";
+        $valgrind_str = " valgrind -q"
+                        . " --leak-check=full --show-leak-kinds=all --";
     } else {
         $valgrind_str = "";
     }
@@ -106,107 +105,80 @@ sub main {
         goto todo_section;
     }
 
-=pod
-
-    testcmd("$CMD command", # {{{
-        <<'END',
-[expected stdout]
-END
-        '',
-        0,
-        'description',
-    );
-
-    # }}}
-
-=cut
-
     diag('Testing -h (--help) option...');
-    likecmd("$CMD -h", # {{{
-        '/  Show this help/i',
-        '/^$/',
-        0,
-        'Option -h prints help screen',
-    );
+    likecmd("$CMD -h",
+            '/  Show this help/i',
+            '/^$/',
+            0,
+            'Option -h prints help screen');
 
-    # }}}
     diag('Testing -v (--verbose) option...');
-    likecmd("$CMD -hv", # {{{
-        '/^\n\S+ \d+\.\d+\.\d+/s',
-        '/^$/',
-        0,
-        'Option -v with -h returns version number and help screen',
-    );
+    likecmd("$CMD -hv",
+            '/^\n\S+ \d+\.\d+\.\d+/s',
+            '/^$/',
+            0,
+            'Option -v with -h returns version number and help screen');
 
-    # }}}
     diag('Testing --version option...');
-    likecmd("$CMD --version", # {{{
-        '/^\S+ \d+\.\d+\.\d+/',
-        '/^$/',
-        0,
-        'Option --version returns version number',
-    );
-
-    # }}}
+    likecmd("$CMD --version",
+            '/^\S+ \d+\.\d+\.\d+/',
+            '/^$/',
+            0,
+            'Option --version returns version number');
 
     system("rm -rf $logdir");
     ok(!-d $logdir, "$logdir doesn't exist");
-    ok(mkdir($logdir), "mkdir $logdir") or die("$progname: $logdir: Cannot create directory, skipping tests");
-    testcmd("$CMD", # {{{
-        '',
-        "sess: No command specified. Use -h for help.\n",
-        1,
-        'Invoked with no arguments',
-    );
+    ok(mkdir($logdir), "mkdir $logdir")
+    or die("$progname: $logdir: Cannot create directory, skipping tests");
+    testcmd("$CMD",
+            '',
+            "sess: No command specified. Use -h for help.\n",
+            1,
+            'Invoked with no arguments');
 
-    # }}}
-    likecmd("$CMD echo yess mainn", # {{{
-        "/^yess mainn\\n\$/",
-        "/^sess.begin:echo/$v1_templ\\n" .
-            "sess.end:echo/$v1_templ -- 00:00:\\d\\d.\\d+, exit code '0'\\.\\n\$/",
-        0,
-        'Execute "echo yess mainn"',
-    );
+    likecmd("$CMD echo yess mainn",
+            "/^yess mainn\\n\$/",
+            "/^sess.begin:echo/$v1_templ\\n"
+            . "sess.end:echo/$v1_templ -- 00:00:\\d\\d.\\d+,"
+            . " exit code '0'\\.\\n\$/",
+            0,
+            'Execute "echo yess mainn"');
 
-    # }}}
     my $logfile = glob("$logdir/*.xml");
-    like(file_data($logfile), # {{{
-        '/^' . $xml_header .
-        join(' ',
-              "<suuid t=\"$date_templ\" u=\"$v1_templ\">",
-                "<txt>",
-                  "<sess_begin>",
-                    "<cmd>echo yess mainn<\/cmd>",
-                  "<\/sess_begin>",
-                "<\/txt>",
-                "<host>$cdata<\/host>",
-                "<cwd>$cdata<\/cwd>",
-                "<user>$cdata<\/user>",
-                "<tty>$cdata<\/tty>",
-              "<\/suuid>",
-        ) . '\n' . join(' ',
-              "<suuid t=\"$date_templ\" u=\"$v1_templ\">",
-                "<txt>",
-                  "<sess_end>",
-                    "<finished>$v1_templ<\/finished>",
-                    "<cmd>echo yess mainn<\/cmd>",
-                    "<duration>",
-                      "<totsecs>\\d.\\d+<\/totsecs>",
-                      "<seconds>\\d.\\d+<\/seconds>",
-                    "<\/duration>",
-                    "<exit>0<\/exit>",
-                  "<\/sess_end>",
-                "<\/txt>",
-                "<host>$cdata<\/host>",
-                "<cwd>$cdata<\/cwd>",
-                "<user>$cdata<\/user>",
-                "<tty>$cdata<\/tty>",
-              "<\/suuid>",
-        ) . '\n<\/suuids>\n$/s',
-        "$logfile looks OK"
-    );
-
-    # }}}
+    like(file_data($logfile),
+         '/^' . $xml_header
+         . join(' ',
+               "<suuid t=\"$date_templ\" u=\"$v1_templ\">",
+                 "<txt>",
+                   "<sess_begin>",
+                     "<cmd>echo yess mainn<\/cmd>",
+                   "<\/sess_begin>",
+                 "<\/txt>",
+                 "<host>$cdata<\/host>",
+                 "<cwd>$cdata<\/cwd>",
+                 "<user>$cdata<\/user>",
+                 "<tty>$cdata<\/tty>",
+               "<\/suuid>",
+         ) . '\n' . join(' ',
+               "<suuid t=\"$date_templ\" u=\"$v1_templ\">",
+                 "<txt>",
+                   "<sess_end>",
+                     "<finished>$v1_templ<\/finished>",
+                     "<cmd>echo yess mainn<\/cmd>",
+                     "<duration>",
+                       "<totsecs>\\d.\\d+<\/totsecs>",
+                       "<seconds>\\d.\\d+<\/seconds>",
+                     "<\/duration>",
+                     "<exit>0<\/exit>",
+                   "<\/sess_end>",
+                 "<\/txt>",
+                 "<host>$cdata<\/host>",
+                 "<cwd>$cdata<\/cwd>",
+                 "<user>$cdata<\/user>",
+                 "<tty>$cdata<\/tty>",
+               "<\/suuid>",
+         ) . '\n<\/suuids>\n$/s',
+         "$logfile looks OK");
 
     diag("Test exit values");
     test_exit_value($CMD, 0);
@@ -224,7 +196,7 @@ END
     ;
 
     if ($Opt{'all'} || $Opt{'todo'}) {
-        diag('Running TODO tests...'); # {{{
+        diag('Running TODO tests...');
 
         TODO: {
 
@@ -232,34 +204,31 @@ END
             # Insert TODO tests here.
 
         }
-        # TODO tests }}}
     }
 
     diag('Testing finished.');
+
     return $Retval;
-    # }}}
-} # main()
+}
 
 sub test_exit_value {
     my ($cmd, $val) = @_;
 
     likecmd("$cmd ./retval.sh $val",
-        "/^Exit value $val\\n\$/",
-        "/^sess.begin:retval\\.sh/$v1_templ\\n" .
-            "sess.end:retval\\.sh/$v1_templ -- 00:00:\\d\\d.\\d+, " .
-            "exit code '$val'\\.\\n\$/",
+            "/^Exit value $val\\n\$/",
+            "/^sess.begin:retval\\.sh/$v1_templ\\n"
+            . "sess.end:retval\\.sh/$v1_templ -- 00:00:\\d\\d.\\d+,"
+            . " exit code '$val'\\.\\n\$/",
             $val,
-            "Exit value $val"
-    );
+            "Exit value $val");
 
     return;
 }
 
 sub testcmd {
-    # {{{
     my ($Cmd, $Exp_stdout, $Exp_stderr, $Exp_retval, $Desc) = @_;
-    defined($descriptions{$Desc}) &&
-        BAIL_OUT("testcmd(): '$Desc' description is used twice");
+    defined($descriptions{$Desc})
+    && BAIL_OUT("testcmd(): '$Desc' description is used twice");
     $descriptions{$Desc} = 1;
     my $stderr_cmd = '';
     my $cmd_outp_str = $Opt{'verbose'} >= 1 ? "\"$Cmd\" - " : '';
@@ -281,14 +250,12 @@ sub testcmd {
     $retval &= is($ret_val >> 8, $Exp_retval, "$Txt (retval)");
 
     return $retval;
-    # }}}
-} # testcmd()
+}
 
 sub likecmd {
-    # {{{
     my ($Cmd, $Exp_stdout, $Exp_stderr, $Exp_retval, $Desc) = @_;
-    defined($descriptions{$Desc}) &&
-        BAIL_OUT("likecmd(): '$Desc' description is used twice");
+    defined($descriptions{$Desc})
+    && BAIL_OUT("likecmd(): '$Desc' description is used twice");
     $descriptions{$Desc} = 1;
     my $stderr_cmd = '';
     my $cmd_outp_str = $Opt{'verbose'} >= 1 ? "\"$Cmd\" - " : '';
@@ -310,11 +277,10 @@ sub likecmd {
     $retval &= is($ret_val >> 8, $Exp_retval, "$Txt (retval)");
 
     return $retval;
-    # }}}
-} # likecmd()
+}
 
 sub file_data {
-    # Return file content as a string {{{
+    # Return file content as a string
     my $File = shift;
     my $Txt;
 
@@ -323,18 +289,16 @@ sub file_data {
     $Txt = <$fp>;
     close($fp);
     return $Txt;
-    # }}}
-} # file_data()
+}
 
 sub print_version {
-    # Print program version {{{
+    # Print program version
     print("$progname $VERSION\n");
     return;
-    # }}}
-} # print_version()
+}
 
 sub usage {
-    # Send the help message to stdout {{{
+    # Send the help message to stdout
     my $Retval = shift;
 
     if ($Opt{'verbose'}) {
@@ -367,33 +331,31 @@ Options:
 
 END
     exit($Retval);
-    # }}}
-} # usage()
+}
 
 sub msg {
-    # Print a status message to stderr based on verbosity level {{{
+    # Print a status message to stderr based on verbosity level
     my ($verbose_level, $Txt) = @_;
 
     $verbose_level > $Opt{'verbose'} && return;
     print(STDERR "$progname: $Txt\n");
     return;
-    # }}}
-} # msg()
+}
 
 __END__
 
-# This program is free software; you can redistribute it and/or modify 
-# it under the terms of the GNU General Public License as published by 
-# the Free Software Foundation; either version 2 of the License, or (at 
-# your option) any later version.
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License as published by the Free Software 
+# Foundation; either version 2 of the License, or (at your option) any later 
+# version.
 #
-# This program is distributed in the hope that it will be useful, but 
-# WITHOUT ANY WARRANTY; without even the implied warranty of 
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# This program is distributed in the hope that it will be useful, but WITHOUT 
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+# FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License 
-# along with this program.
+# You should have received a copy of the GNU General Public License along with 
+# this program.
 # If not, see L<http://www.gnu.org/licenses/>.
 
 # vim: set fenc=UTF-8 ft=perl fdm=marker ts=4 sw=4 sts=4 et fo+=w :

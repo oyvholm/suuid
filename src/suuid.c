@@ -63,6 +63,7 @@ int msg(const int verbose, const char *format, ...)
 
 	if (verbose_level(0) >= verbose) {
 		va_list ap;
+
 		va_start(ap, format);
 		retval = fprintf(stddebug, "%s: ", progname);
 		retval += vfprintf(stddebug, format, ap);
@@ -109,24 +110,24 @@ int print_license(void)
 {
 	puts("(C)opyleft 2016- Øyvind A. Holm <sunny@sunbase.org>");
 	puts("");
-	puts("This program is free software; you can redistribute it "
-	     "and/or modify it \n"
-	     "under the terms of the GNU General Public License as "
-	     "published by the \n"
-	     "Free Software Foundation; either version 2 of the License, "
-	     "or (at your \n"
+	puts("This program is free software; you can redistribute it"
+	     " and/or modify it \n"
+	     "under the terms of the GNU General Public License as"
+	     " published by the \n"
+	     "Free Software Foundation; either version 2 of the License,"
+	     " or (at your \n"
 	     "option) any later version.");
 	puts("");
-	puts("This program is distributed in the hope that it will be "
-	     "useful, but \n"
+	puts("This program is distributed in the hope that it will be"
+	     " useful, but \n"
 	     "WITHOUT ANY WARRANTY; without even the implied warranty of \n"
 	     "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.");
 	puts("See the GNU General Public License for more details.");
 	puts("");
-	puts("You should have received a copy of "
-	     "the GNU General Public License along \n"
-	     "with this program. If not, see "
-	     "<http://www.gnu.org/licenses/>.");
+	puts("You should have received a copy of"
+	     " the GNU General Public License along \n"
+	     "with this program. If not, see"
+	     " <http://www.gnu.org/licenses/>.");
 
 	return EXIT_SUCCESS;
 }
@@ -176,8 +177,8 @@ int usage(const int retval)
 	char *logdir;
 
 	if (retval != EXIT_SUCCESS) {
-		fprintf(stderr, "\nType \"%s --help\" for help screen. "
-		                "Returning with value %d.\n",
+		fprintf(stderr, "\nType \"%s --help\" for help screen."
+		                " Returning with value %d.\n",
 		                progname, retval);
 		return retval;
 	}
@@ -191,22 +192,22 @@ int usage(const int retval)
 	}
 	printf("Usage: %s [options]\n", progname);
 	printf("\n");
-	printf("Generates one or more UUIDs and stores it to a log file with "
-	       "optional \n"
+	printf("Generates one or more UUIDs and stores it to a log file with"
+	       " optional \n"
 	       "comment or tag/category.\n");
 	printf("\n");
 	printf("Options:\n");
 	printf("\n");
 	printf("  -c x, --comment x\n"
-	       "    Store comment x in the log file. If \"-\" is specified as "
-	       "comment, the \n"
-	       "    program will read the comment from stdin. Two hyphens "
-	       "(\"--\") as a \n"
-	       "    comment opens the editor defined in the environment "
-	       "variable \n"
+	       "    Store comment x in the log file. If \"-\" is specified as"
+	       " comment, the \n"
+	       "    program will read the comment from stdin. Two hyphens"
+	       " (\"--\") as a \n"
+	       "    comment opens the editor defined in the environment"
+	       " variable \n"
 	       "    %s to edit the message. If %s is not defined, \n"
-	       "    the value from EDITOR is used. If none of these variables "
-	       "are \n"
+	       "    the value from EDITOR is used. If none of these variables"
+	       " are \n"
 	       "    defined, the program aborts.\n", ENV_EDITOR, ENV_EDITOR);
 	printf("  -h, --help\n"
 	       "    Show this help.\n");
@@ -214,22 +215,22 @@ int usage(const int retval)
 	       "    Print the software license.\n");
 	printf("  -l x, --logdir x\n"
 	       "    Store log files in directory x.\n"
-	       "    If the %s environment variable is defined, "
-	       "that value is \n"
+	       "    If the %s environment variable is defined,"
+	       " that value is \n"
 	       "    used. Otherwise the value \"$HOME/uuids\" is used.\n"
 	       "    Current default: %s\n", ENV_LOGDIR, logdir);
 	printf("  -m, --random-mac\n"
-	       "    Don't use the hardware MAC address, generate a random "
-	       "address field.\n");
+	       "    Don't use the hardware MAC address, generate a random"
+	       " address field.\n");
 	printf("  -n x, --count x\n"
 	       "    Print and store x UUIDs.\n");
 	printf("  -q, --quiet\n"
 	       "    Be more quiet. Can be repeated to increase silence.\n");
 	printf("  --raw\n"
-	       "    Don't convert <txt> element to XML. When using this "
-	       "option, it is \n"
-	       "    expected that the value of the -c/--comment option is "
-	       "valid XML, \n"
+	       "    Don't convert <txt> element to XML. When using this"
+	       " option, it is \n"
+	       "    expected that the value of the -c/--comment option is"
+	       " valid XML, \n"
 	       "    otherwise it will create corrupted log files.\n");
 	printf("  --rcfile X\n"
 	       "    Use file X instead of '%s/%s'.\n",
@@ -245,8 +246,8 @@ int usage(const int retval)
 	printf("  --version\n"
 	       "    Print version information.\n");
 	printf("  -w x, --whereto x\n"
-	       "    x is a string which decides where the UUID will be "
-	       "written:\n"
+	       "    x is a string which decides where the UUID will be"
+	       " written:\n"
 	       "      The string contains 'e' - stderr\n"
 	       "      The string contains 'o' - stdout\n"
 	       "    All other characters will be ignored. Examples:\n"
@@ -260,17 +261,17 @@ int usage(const int retval)
 	       "        Don't output anything.\n"
 	       "    Default: \"o\"\n");
 	printf("\n");
-	printf("If the %s environment variable is defined by "
-	       "sess(1) or another \n"
+	printf("If the %s environment variable is defined by"
+	       " sess(1) or another \n"
 	       "program, the value is logged if it is an UUID.\n", ENV_SESS);
 	printf("\n");
-	printf("A different hostname can be specified in the environment "
-	       "variable \n"
+	printf("A different hostname can be specified in the environment"
+	       " variable \n"
 	       "%s, or in the rc file %s/%s with the format \n"
 	       "\"hostname = xxx\".\n",
 	       ENV_HOSTNAME, getenv("HOME"), STD_RCFILE);
-	printf("To use a specific MAC address all the time, add it to the rc "
-	       "file using \n"
+	printf("To use a specific MAC address all the time, add it to the rc"
+	       " file using \n"
 	       "the format \"macaddr = xxxxxxxxxxxx\".\n");
 	printf("\n");
 
@@ -333,8 +334,8 @@ int choose_opt_action(struct Options *dest,
 		break;
 	case 't':
 		if (tag_count >= MAX_TAGS) {
-			fprintf(stderr, "%s: Maximum number of tags (%u) "
-			                "exceeded\n", progname, MAX_TAGS);
+			fprintf(stderr, "%s: Maximum number of tags (%u)"
+			                " exceeded\n", progname, MAX_TAGS);
 			retval = EXIT_FAILURE;
 		}
 		dest->tag[tag_count++] = optarg;

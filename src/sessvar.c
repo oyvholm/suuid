@@ -102,23 +102,23 @@ int fill_sess(struct Entry *dest, const char *uuid,
 	assert(valid_uuid(uuid, false));
 
 	if (sessind >= MAX_SESS) {
-		fprintf(stderr, "%s: Maximum number of sess entries (%u) "
-		                "exceeded\n", progname, MAX_SESS);
+		fprintf(stderr, "%s: Maximum number of sess entries (%u)"
+		                " exceeded\n", progname, MAX_SESS);
 		return EXIT_FAILURE;
 	}
 
 	auuid = strndup(uuid, UUID_LENGTH);
 	if (!auuid) {
-		myerror("fill_sess(): Memory allcation error, " /* gncov */
-		        "could not duplicate UUID");
+		myerror("fill_sess(): Memory allcation error," /* gncov */
+		        " could not duplicate UUID");
 		return EXIT_FAILURE; /* gncov */
 	}
 
 	if (desc && desclen) {
 		adesc = strndup(desc, desclen);
 		if (!adesc) {
-			myerror("fill_sess(): Memory allocation " /* gncov */
-			        "error, could not duplicate desc");
+			myerror("fill_sess(): Memory allocation" /* gncov */
+			        " error, could not duplicate desc");
 			free(auuid); /* gncov */
 			return EXIT_FAILURE; /* gncov */
 		}
@@ -162,11 +162,13 @@ int get_sess_info(struct Entry *entry)
 		if (valid_uuid(p, false)) {
 			size_t desclen = 0;
 
-			if (desc_found && !desc_end)
-				desc_end = p; /* There was no slash between 
-				               * desc and uuid, so desc_end 
-				               * hasn't been set.
-				               */
+			if (desc_found && !desc_end) {
+				/*
+				 * There was no slash between desc and uuid, so 
+				 * desc_end hasn't been set.
+				 */
+				desc_end = p;
+			}
 
 			if (desc_end > desc_found)
 				desclen = desc_end - desc_found;
@@ -185,8 +187,9 @@ int get_sess_info(struct Entry *entry)
 		} else if (*p == '/') {
 			if (desc_found)
 				desc_end = p;
-		} else
+		} else {
 			desc_found = desc_end = NULL;
+		}
 		p++;
 	}
 	free(s);
@@ -301,13 +304,14 @@ const char *add_to_sessvar(const char *desc, const char *uuid)
 		clean_up_sessvar(ap);
 		sessvar = mystrdup(ap);
 		free(ap);
-	} else
+	} else {
 		sessvar = mystrdup("");
+	}
 	if (!sessvar)
 		return NULL;
 
-	envlen = strlen(ENV_SESS) + 1 + strlen(sessvar) + 1 +
-	         strlen(desc) + 1 + UUID_LENGTH + 1 + 1;
+	envlen = strlen(ENV_SESS) + 1 + strlen(sessvar) + 1
+	         + strlen(desc) + 1 + UUID_LENGTH + 1 + 1;
 	envbuf = mymalloc(envlen);
 	if (!envbuf) {
 		free(sessvar);
@@ -393,7 +397,7 @@ cleanup:
 	free(cmd_desc);
 	free(cmd);
 
-	return(retval);
+	return retval;
 }
 #endif
 

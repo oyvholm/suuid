@@ -105,9 +105,8 @@ msg() {
 
 is_uuid() {
 	local x="[[:xdigit:]]"
-	echo "$1" | grep -q -E "^$x{8}-$x{4}-$x{4}-$x{4}-$x{12}\$" &&
-		echo 1 ||
-		echo 0
+	echo "$1" | grep -q -E "^$x{8}-$x{4}-$x{4}-$x{4}-$x{12}\$" \
+	&& echo 1 || echo 0
 }
 
 search_str=
@@ -115,7 +114,7 @@ stdin=
 andor=OR
 
 if test ! -t 0; then
-	stdin="`finduuid -u`"
+	stdin="$(finduuid -u)"
 fi
 
 unset add_str
@@ -146,7 +145,8 @@ for f in "$@" $stdin; do
 		if test "$next_is_uuid" = "1" -a "$(is_uuid "$f")" = "1"; then
 			search_str="$search_str ${or_str}u = '$f'"
 		else
-			search_str="$search_str ${or_str}s::varchar $like_str '%$f%'"
+			search_str="$search_str ${or_str}s::varchar"
+			search_str="$search_str $like_str '%$f%'"
 		fi
 		add_str="1"
 		;;
@@ -165,11 +165,11 @@ if test -n "$test_simul" -o -n "$opt_sql"; then
 	# been done
 	echo "$sql_str"
 else
-	echo "$sql_str" |
-	psql -X -q suuids |
-	perl -pe 's/\\\\/\\/g; s/\x27\x27/\x27/g;' |
-	sort -u |
-	less
+	echo "$sql_str" \
+	| psql -X -q suuids \
+	| perl -pe 's/\\\\/\\/g; s/\x27\x27/\x27/g;' \
+	| sort -u \
+	| less
 fi
 
 # vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 :

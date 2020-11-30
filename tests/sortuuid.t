@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-#=======================================================================
+#==============================================================================
 # sortuuid.t
 # File ID: f83a2d54-fa1c-11dd-b34c-000475e441b9
 #
@@ -8,9 +8,9 @@
 #
 # Character set: UTF-8
 # ©opyleft 2009– Øyvind A. Holm <sunny@sunbase.org>
-# License: GNU General Public License version 2 or later, see end of 
-# file for legal stuff.
-#=======================================================================
+# License: GNU General Public License version 2 or later, see end of file for 
+# legal stuff.
+#==============================================================================
 
 use strict;
 use warnings;
@@ -63,61 +63,38 @@ if ($Opt{'version'}) {
 exit(main());
 
 sub main {
-    # {{{
     my $Retval = 0;
 
     diag(sprintf('========== Executing %s v%s ==========',
-        $progname,
-        $VERSION));
+                 $progname, $VERSION));
 
     if ($Opt{'todo'} && !$Opt{'all'}) {
         goto todo_section;
     }
 
-=pod
-
-    testcmd("$CMD command", # {{{
-        <<'END',
-[expected stdout]
-END
-        '',
-        0,
-        'description',
-    );
-
-    # }}}
-
-=cut
-
     diag('Testing -h (--help) option...');
-    likecmd("$CMD -h", # {{{
-        '/  Show this help\./',
-        '/^$/',
-        0,
-        'Option -h prints help screen',
-    );
+    likecmd("$CMD -h",
+            '/  Show this help\./',
+            '/^$/',
+            0,
+            'Option -h prints help screen');
 
-    # }}}
     diag('Testing -v (--verbose) option...');
-    likecmd("$CMD -hv", # {{{
-        '/^\n\S+ \d+\.\d+\.\d+(\+git)?\n/s',
-        '/^$/',
-        0,
-        'Option -v with -h returns version number and help screen',
-    );
+    likecmd("$CMD -hv",
+            '/^\n\S+ \d+\.\d+\.\d+(\+git)?\n/s',
+            '/^$/',
+            0,
+            'Option -v with -h returns version number and help screen');
 
-    # }}}
     diag('Testing --version option...');
-    likecmd("$CMD --version", # {{{
-        '/^\S+ \d+\.\d+\.\d+(\+git)?\n/',
-        '/^$/',
-        0,
-        'Option --version returns version number',
-    );
+    likecmd("$CMD --version",
+            '/^\S+ \d+\.\d+\.\d+(\+git)?\n/',
+            '/^$/',
+            0,
+            'Option --version returns version number');
 
-    # }}}
-    testcmd("$CMD", # Sort list of UUIDs {{{
-        <<'END',
+    testcmd("$CMD", # Sort list of UUIDs
+            <<'END',
 922052ac-750e-11dd-9335-000475e441b9 2008-08-28T14:35:33.2566700Z
 af06e4fe-c421-11de-8250-0ff74f20b9f9 2009-10-29T00:26:21.7123070Z
 f212ae26-4ea6-11df-8aca-90e6ba3022ac 2010-04-23T07:07:57.7252390Z
@@ -160,9 +137,8 @@ af06e4fe-c421-11de-8250-0ff74f20b9f9 2009-10-29T00:26:21.7123070Z
 END
     );
 
-    # }}}
-    testcmd("$CMD", # UUID is not in first column {{{
-        <<'END',
+    testcmd("$CMD", # UUID is not in first column
+            <<'END',
 08-28T14:35:33.2566700Z 922052ac-750e-11dd-9335-000475e441b9
 kjbshd  jsd2009-10-29T00:26:21.7123070Z af06e4fe-c421-11de-8250-0ff74f20b9f9
 f212ae26-4ea6-11df-8aca-90e6ba3022ac
@@ -179,10 +155,10 @@ fa606a5c-e67a-11e4-af17-000df06acc56
 sd as vf vfsdv ;3ed8edca-1237-11e5-a4b0-000df06acc56
 888d36ee-2b12-11e5-b816-000df06acc56
 END
-        '',
-        0,
-        'UUID is not in first column',
-        <<END,
+            '',
+            0,
+            'UUID is not in first column',
+            <<END,
 æløå-OC2012-12-13T18:16:12.2323150Z 2ce3b0ce-4551-11e2-a915-0016d364066c
 2012-10-25T05:28:06.1972850Z c13b1172-1e64-11e2-bc9b-fefdb24f8e10
 2011-0→524080Z 5b1d7e70-6123-11e0-8cac-e780c6f55a8
@@ -203,18 +179,17 @@ fa606a5c-e67a-11e4-af17-000df06acc56
 END
     );
 
-    # }}}
-    testcmd("$CMD", # Lines without UUIDs are removed from output by default {{{
-        <<'END',
+    testcmd("$CMD", # Lines without UUIDs are removed from output by default
+            <<'END',
 2010-08-24T21:39:36.3707710Z 174def3e-afc8-11df-8d8f-952aaa41f63e
 2011-04-07T14:28:50.1524080Z 5b1d7e70-6123-11e0-8cac-e7080c6f55a8
 2012-10-25T05:28:06.1972850Z c13b1172-1e64-11e2-bc9b-fefdb24f8e10
 2015-07-15T16:57:10.5029870Z 888d36ee-2b12-11e5-b816-000df06acc56
 END
-        '',
-        0,
-        'Lines without UUIDs are removed from output by default',
-        <<END,
+            '',
+            0,
+            'Lines without UUIDs are removed from output by default',
+            <<END,
 2012-10-25T05:28:06.1972850Z c13b1172-1e64-11e2-bc9b-fefdb24f8e10
 .
 2011-04-07T14:28:50.1524080Z 5b1d7e70-6123-11e0-8cac-e7080c6f55a8
@@ -228,18 +203,17 @@ erf
 END
     );
 
-    # }}}
-    testcmd("$CMD", # UUIDs v4 are skipped {{{
-        <<'END',
+    testcmd("$CMD", # UUIDs v4 are skipped
+            <<'END',
 2010-08-24T21:39:36.3707710Z 174def3e-afc8-11df-8d8f-952aaa41f63e
 2011-04-07T14:28:50.1524080Z 5b1d7e70-6123-11e0-8cac-e7080c6f55a8
 2012-10-25T05:28:06.1972850Z c13b1172-1e64-11e2-bc9b-fefdb24f8e10
 2015-07-15T16:57:10.5029870Z 888d36ee-2b12-11e5-b816-000df06acc56
 END
-        '',
-        0,
-        'UUIDs v4 are skipped',
-        <<END,
+            '',
+            0,
+            'UUIDs v4 are skipped',
+            <<END,
 2012-10-25T05:28:06.1972850Z c13b1172-1e64-11e2-bc9b-fefdb24f8e10
 2011-04-07T14:28:50.1524080Z 5b1d7e70-6123-11e0-8cac-e7080c6f55a8
 afc4d374-f7a8-4b99-be36-e322af41d122
@@ -250,9 +224,9 @@ afc4d374-f7a8-4b99-be36-e322af41d122
 END
     );
 
-    # }}}
-    testcmd("$CMD -a", # -a includes lines without UUID, listed unsorted at the end {{{
-        <<'END',
+    # -a includes lines without UUID, listed unsorted at the end
+    testcmd("$CMD -a",
+            <<'END',
 2010-08-24T21:39:36.3707710Z 174def3e-afc8-11df-8d8f-952aaa41f63e
 2011-04-07T14:28:50.1524080Z 5b1d7e70-6123-11e0-8cac-e7080c6f55a8 🌌
 2012-10-25T05:28:06.1972850Z c13b1172-1e64-11e2-bc9b-fefdb24f8e10
@@ -265,10 +239,10 @@ erf
 
 🚁 139783193
 END
-        '',
-        0,
-        '-a includes lines without UUID, listed unsorted at the end',
-        <<END,
+            '',
+            0,
+            '-a includes lines without UUID, listed unsorted at the end',
+            <<END,
 2012-10-25T05:28:06.1972850Z c13b1172-1e64-11e2-bc9b-fefdb24f8e10
 .
 2011-04-07T14:28:50.1524080Z 5b1d7e70-6123-11e0-8cac-e7080c6f55a8 🌌
@@ -283,13 +257,11 @@ erf
 END
     );
 
-    # }}}
-
     todo_section:
     ;
 
     if ($Opt{'all'} || $Opt{'todo'}) {
-        diag('Running TODO tests...'); # {{{
+        diag('Running TODO tests...');
 
         TODO: {
 
@@ -297,17 +269,15 @@ END
             # Insert TODO tests here.
 
         }
-        # TODO tests }}}
     }
 
     diag('Testing finished.');
-    # }}}
-} # main()
+}
 
 sub testcmd {
-    # {{{
     my ($Cmd, $Exp_stdout, $Exp_stderr, $Exp_retval, $Desc, $Input) = @_;
-    defined($descriptions{$Desc}) && BAIL_OUT("testcmd(): '$Desc' description is used twice");
+    defined($descriptions{$Desc})
+    && BAIL_OUT("testcmd(): '$Desc' description is used twice");
     $descriptions{$Desc} = 1;
     my $stderr_cmd = '';
     my $Txt = join('',
@@ -325,7 +295,7 @@ sub testcmd {
     if (defined($Input)) {
         my $tmp_input = 'sortuuid-stdin.tmp';
         open(my $tmpinpfp, ">$tmp_input") or
-            return("$tmp_input: Cannot create file: $!");
+            return "$tmp_input: Cannot create file: $!";
         print($tmpinpfp $Input);
         close($tmpinpfp);
         is(`$Cmd$stderr_cmd <$tmp_input`, "$Exp_stdout", "$Txt (stdout)");
@@ -341,14 +311,14 @@ sub testcmd {
         diag("Warning: stderr not defined for '$Txt'");
     }
     $retval &= is($ret_val >> 8, $Exp_retval, "$Txt (retval)");
-    return($retval);
-    # }}}
-} # testcmd()
+
+    return $retval;
+}
 
 sub likecmd {
-    # {{{
     my ($Cmd, $Exp_stdout, $Exp_stderr, $Exp_retval, $Desc) = @_;
-    defined($descriptions{$Desc}) && BAIL_OUT("likecmd(): '$Desc' description is used twice");
+    defined($descriptions{$Desc})
+    && BAIL_OUT("likecmd(): '$Desc' description is used twice");
     $descriptions{$Desc} = 1;
     my $stderr_cmd = '';
     my $Txt = join('',
@@ -372,34 +342,33 @@ sub likecmd {
         diag("Warning: stderr not defined for '$Txt'");
     }
     $retval &= is($ret_val >> 8, $Exp_retval, "$Txt (retval)");
-    return($retval);
-    # }}}
-} # likecmd()
+
+    return $retval;
+}
 
 sub file_data {
-    # Return file content as a string {{{
+    # Return file content as a string
     my $File = shift;
     my $Txt;
+
     if (open(my $fp, '<', $File)) {
         local $/ = undef;
         $Txt = <$fp>;
         close($fp);
-        return($Txt);
+        return $Txt;
     } else {
         return;
     }
-    # }}}
-} # file_data()
+}
 
 sub print_version {
-    # Print program version {{{
+    # Print program version
     print("$progname $VERSION\n");
     return;
-    # }}}
-} # print_version()
+}
 
 sub usage {
-    # Send the help message to stdout {{{
+    # Send the help message to stdout
     my $Retval = shift;
 
     if ($Opt{'verbose'}) {
@@ -427,93 +396,32 @@ Options:
 
 END
     exit($Retval);
-    # }}}
-} # usage()
+}
 
 sub msg {
-    # Print a status message to stderr based on verbosity level {{{
+    # Print a status message to stderr based on verbosity level
     my ($verbose_level, $Txt) = @_;
 
     if ($Opt{'verbose'} >= $verbose_level) {
         print(STDERR "$progname: $Txt\n");
     }
     return;
-    # }}}
-} # msg()
+}
 
 __END__
 
-# Plain Old Documentation (POD) {{{
-
-=pod
-
-=head1 NAME
-
-run-tests.pl
-
-=head1 SYNOPSIS
-
-sortuuid.t [options] [file [files [...]]]
-
-=head1 DESCRIPTION
-
-Contains tests for the sortuuid(1) program.
-
-=head1 OPTIONS
-
-=over 4
-
-=item B<-a>, B<--all>
-
-Run all tests, also TODOs.
-
-=item B<-h>, B<--help>
-
-Print a brief help summary.
-
-=item B<-t>, B<--todo>
-
-Run only the TODO tests.
-
-=item B<-v>, B<--verbose>
-
-Increase level of verbosity. Can be repeated.
-
-=item B<--version>
-
-Print version information.
-
-=back
-
-=head1 AUTHOR
-
-Made by Øyvind A. Holm S<E<lt>sunny@sunbase.orgE<gt>>.
-
-=head1 COPYRIGHT
-
-Copyleft © Øyvind A. Holm E<lt>sunny@sunbase.orgE<gt>
-This is free software; see the file F<COPYING> for legalese stuff.
-
-=head1 LICENCE
-
-This program is free software; you can redistribute it and/or modify it 
-under the terms of the GNU General Public License as published by the 
-Free Software Foundation; either version 2 of the License, or (at your 
-option) any later version.
-
-This program is distributed in the hope that it will be useful, but 
-WITHOUT ANY WARRANTY; without even the implied warranty of 
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along 
-with this program.
-If not, see L<http://www.gnu.org/licenses/>.
-
-=head1 SEE ALSO
-
-=cut
-
-# }}}
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License as published by the Free Software 
+# Foundation; either version 2 of the License, or (at your option) any later 
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT 
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+# FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with 
+# this program.
+# If not, see L<http://www.gnu.org/licenses/>.
 
 # vim: set fenc=UTF-8 ft=perl fdm=marker ts=4 sw=4 sts=4 et fo+=w :

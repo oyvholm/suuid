@@ -29,9 +29,10 @@ void *mymalloc(const size_t size)
 {
 	void *v = malloc(size);
 
-	if (!v)
+	if (!v) {
 		myerror("Memory allocation error (%lu bytes)", /* gncov */
 		        size);
+	}
 
 	return v;
 }
@@ -45,9 +46,10 @@ char *mystrdup(const char *s)
 {
 	char *p = strdup(s);
 
-	if (!p)
-		myerror("Memory allocation error, cannot " /* gncov */
-		        "duplicate string");
+	if (!p) {
+		myerror("Memory allocation error, cannot" /* gncov */
+		        " duplicate string");
+	}
 
 	return p;
 }
@@ -182,40 +184,44 @@ char *utf8_check(const char *text)
 	assert(text);
 
 	while (*s) {
-		if (*s < 0x80)
+		if (*s < 0x80) {
 			/* 0xxxxxxx */
 			s++;
-		else if ((s[0] & 0xe0) == 0xc0) {
+		} else if ((s[0] & 0xe0) == 0xc0) {
 			/* 110XXXXx 10xxxxxx */
-			if ((s[1] & 0xc0) != 0x80 ||
-			    (s[0] & 0xfe) == 0xc0) /* overlong? */
+			if ((s[1] & 0xc0) != 0x80
+			    || (s[0] & 0xfe) == 0xc0) /* overlong? */
 				return (char *)s;
 			else
 				s += 2;
 		} else if ((s[0] & 0xf0) == 0xe0) {
 			/* 1110XXXX 10Xxxxxx 10xxxxxx */
-			if ((s[1] & 0xc0) != 0x80 || (s[2] & 0xc0) != 0x80 ||
-			    (s[0] == 0xe0 &&
-			    (s[1] & 0xe0) == 0x80) || /* overlong? */
-			    (s[0] == 0xed &&
-			    (s[1] & 0xe0) == 0xa0) || /* surrogate? */
-			    (s[0] == 0xef && s[1] == 0xbf &&
-			    (s[2] & 0xfe) == 0xbe)) /* U+FFFE or U+FFFF? */
+			if ((s[1] & 0xc0) != 0x80
+			    || (s[2] & 0xc0) != 0x80
+			    || (s[0] == 0xe0
+			        && (s[1] & 0xe0) == 0x80) /* overlong? */
+			    || (s[0] == 0xed
+			        && (s[1] & 0xe0) == 0xa0) /* surrogate? */
+			    || (s[0] == 0xef && s[1] == 0xbf
+			        && (s[2] & 0xfe) == 0xbe)) /* U+FFFE/U+FFFF? */
 				return (char *)s;
 			else
 				s += 3;
 		} else if ((s[0] & 0xf8) == 0xf0) {
 			/* 11110XXX 10XXxxxx 10xxxxxx 10xxxxxx */
-			if ((s[1] & 0xc0) != 0x80 || (s[2] & 0xc0) != 0x80 ||
-			    (s[3] & 0xc0) != 0x80 || (s[0] == 0xf0 &&
-			    (s[1] & 0xf0) == 0x80) || /* overlong? */
-			    (s[0] == 0xf4 && s[1] > 0x8f) ||
-			    s[0] > 0xf4) /* > U+10FFFF? */
+			if ((s[1] & 0xc0) != 0x80
+			    || (s[2] & 0xc0) != 0x80
+			    || (s[3] & 0xc0) != 0x80
+			    || (s[0] == 0xf0
+			        && (s[1] & 0xf0) == 0x80) /* overlong? */
+			    || (s[0] == 0xf4 && s[1] > 0x8f)
+			    || s[0] > 0xf4) /* > U+10FFFF? */
 				return (char *)s;
 			else
 				s += 4;
-		} else
+		} else {
 			return (char *)s;
+		}
 	}
 
 	return NULL;

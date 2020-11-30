@@ -32,13 +32,13 @@ int init_randomness(void)
 	struct timeval tv;
 
 	if (gettimeofday(&tv, NULL) == -1) {
-		myerror("Could not initialise randomness " /* gncov */
-		        "generator, gettimeofday() failed");
+		myerror("Could not initialise randomness" /* gncov */
+		        " generator, gettimeofday() failed");
 		return EXIT_FAILURE; /* gncov */
 	}
 
-	srandom((unsigned int)tv.tv_sec ^ (unsigned int)tv.tv_usec ^
-	        (unsigned int)getpid());
+	srandom((unsigned int)tv.tv_sec ^ (unsigned int)tv.tv_usec
+		^ (unsigned int)getpid());
 
 	return EXIT_SUCCESS;
 }
@@ -117,13 +117,14 @@ char *process_comment_option(const char *cmt)
 			return NULL; /* gncov */
 	}
 	if (!valid_xml_chars(retval)) {
-		fprintf(stderr, "%s: Comment contains illegal characters or "
-		                "is not valid UTF-8\n", progname);
+		fprintf(stderr, "%s: Comment contains illegal characters or"
+		                " is not valid UTF-8\n", progname);
 		free(retval);
 		return NULL;
 	}
 
-	/* FIXME: This is how it's done in the Perl version. I'm not sure if 
+	/*
+	 * FIXME: This is how it's done in the Perl version. I'm not sure if 
 	 * it's an ok thing to do, even though it looks nice in the log files 
 	 * and has worked great for years. Maybe this behaviour should be 
 	 * changed when the C version passes all tests in suuid.t .
@@ -168,9 +169,10 @@ int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
 	 * Store tags and comment in entry.
 	 */
 
-	for (i = 0; i < MAX_TAGS && opt->tag[i]; i++)
+	for (i = 0; i < MAX_TAGS && opt->tag[i]; i++) {
 		if (store_tag(entry, opt->tag[i]) == EXIT_FAILURE)
 			return EXIT_FAILURE;
+	}
 
 	if (opt->comment) {
 		entry->txt = process_comment_option(opt->comment);
@@ -213,17 +215,18 @@ char *process_uuid(struct Logs *logs,
 
 	if (opt->uuid) {
 		if (!valid_uuid(opt->uuid, true)) {
-			fprintf(stderr, "process_uuid(): UUID \"%s\" is not "
-			                "valid.\n", opt->uuid);
+			fprintf(stderr, "process_uuid(): UUID \"%s\" is not"
+			                " valid.\n", opt->uuid);
 			return NULL;
 		}
 		memcpy(entry->uuid, opt->uuid, UUID_LENGTH + 1);
 	} else {
 		if (!generate_uuid(entry->uuid))
 			return NULL; /* gncov */
-		if (rc->macaddr)
+		if (rc->macaddr) {
 			memcpy(entry->uuid + 24, rc->macaddr,
 			       MACADDR_LENGTH * 2);
+		}
 		if (opt->random_mac)
 			scramble_mac_address(entry->uuid + 24);
 	}
@@ -248,9 +251,9 @@ char *process_uuid(struct Logs *logs,
 	 * -w/--whereto argument.
 	 */
 
-	if (!opt->whereto)
+	if (!opt->whereto) {
 		puts(entry->uuid);
-	else {
+	} else {
 		if (strchr(opt->whereto, 'a') || strchr(opt->whereto, 'o'))
 			fprintf(stdout, "%s\n", entry->uuid);
 		if (strchr(opt->whereto, 'a') || strchr(opt->whereto, 'e'))
@@ -268,13 +271,14 @@ char *process_uuid(struct Logs *logs,
 
 void sighandler(const int sig)
 {
-	if (sig == SIGHUP || sig == SIGINT || sig == SIGQUIT ||
-	    sig == SIGPIPE || sig == SIGTERM)
-		fprintf(stderr, "%s: Termination signal (%s) received, "
-		                "aborting\n", progname, strsignal(sig));
-	else
-		myerror("sighandler(): Unknown signal %d (%s) received, "
-		        "should not happen\n", sig, strsignal(sig));
+	if (sig == SIGHUP || sig == SIGINT || sig == SIGQUIT
+	    || sig == SIGPIPE || sig == SIGTERM) {
+		fprintf(stderr, "%s: Termination signal (%s) received,"
+		                " aborting\n", progname, strsignal(sig));
+	} else {
+		myerror("sighandler(): Unknown signal %d (%s) received,"
+		        " should not happen\n", sig, strsignal(sig));
+	}
 	should_terminate = true;
 }
 
@@ -373,9 +377,10 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	 * Check that the correct amount of UUIDs were created.
 	 */
 
-	if (retval.count < opt->count)
+	if (retval.count < opt->count) {
 		fprintf(stderr, "%s: Generated only %u of %u UUIDs\n",
 		                progname, retval.count, opt->count);
+	}
 
 	/*
 	 * Close up the shop and go home.

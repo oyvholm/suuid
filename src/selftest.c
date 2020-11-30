@@ -68,17 +68,17 @@ int selftest(void)
 	       "acdaf974-e78e-11e7-87d5-g74d993421b0\") = %s\n",
 	       uuid_date(buf2, "acdaf974-e78e-11e7-87d5-g74d993421b0"));
 
-	printf("valid_uuid(\"acdaf974-e78e-11e7-87d5-f74d993421b0\", 1) "
-	       "= %d\n",
+	printf("valid_uuid(\"acdaf974-e78e-11e7-87d5-f74d993421b0\", 1)"
+	       " = %d\n",
 	       valid_uuid("acdaf974-e78e-11e7-87d5-f74d993421b0", 1));
-	printf("valid_uuid(\"acdaf974-e78e-11e7-87d5-f74d993421b0123\", 0) "
-	       "= %d\n",
+	printf("valid_uuid(\"acdaf974-e78e-11e7-87d5-f74d993421b0123\", 0)"
+	       " = %d\n",
 	       valid_uuid("acdaf974-e78e-11e7-87d5-f74d993421b0123", 0));
-	printf("valid_uuid(\"acdaf974-e78e-11e7-87d5-f74d993421b0123\", 1) "
-	       "= %d\n",
+	printf("valid_uuid(\"acdaf974-e78e-11e7-87d5-f74d993421b0123\", 1)"
+	       " = %d\n",
 	       valid_uuid("acdaf974-e78e-11e7-87d5-f74d993421b0123", 1));
-	printf("valid_uuid(\"c9ffa9cb-708d-454b-b1f2-f18f609cb825\", 1) "
-	       "= %d\n",
+	printf("valid_uuid(\"c9ffa9cb-708d-454b-b1f2-f18f609cb825\", 1)"
+	       " = %d\n",
 	       valid_uuid("c9ffa9cb-708d-454b-b1f2-f18f609cb825", 1));
 
 	return EXIT_SUCCESS;

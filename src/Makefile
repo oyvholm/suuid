@@ -11,24 +11,53 @@ TESTLOCKDIR = testlockdir
 CC = cc
 LD = cc
 
-CCFLAGS = -Wall -Wextra -Werror -O0 -c -g
-CCFLAGS += $$(test -n "$(GCOV)" && \
-              echo -n "-fprofile-arcs -ftest-coverage")
+CCFLAGS  =
+CCFLAGS += $$(test -n "$(GCOV)" && echo -n "-fprofile-arcs -ftest-coverage")
+CCFLAGS += -O0 -c -g
+CCFLAGS += -Wall
+CCFLAGS += -Werror
+CCFLAGS += -Wextra
 
-LDFLAGS = -Wall -Wextra -Werror
+LDFLAGS  =
+LDFLAGS += -Wall
+LDFLAGS += -Werror
+LDFLAGS += -Wextra
 
-LIBS =
+LIBS  =
 LIBS += $$(test -n "$(GCOV)" && echo "-lgcov --coverage")
 
 # For regular use, it's not necessary to modify anything below this line.
 
-OBJS = suuid.o environ.o genuuid.o io.o logfile.o \
-       rcfile.o selftest.o sessvar.o string.o tag.o uuid.o
+OBJS  =
+OBJS += suuid.o
 
-CFILES = suuid.c environ.c genuuid.c io.c logfile.c \
-         rcfile.c selftest.c sessvar.c string.c tag.c uuid.c
+OBJS += environ.o
+OBJS += genuuid.o
+OBJS += io.o
+OBJS += logfile.o
+OBJS += rcfile.o
+OBJS += selftest.o
+OBJS += sessvar.o
+OBJS += string.o
+OBJS += tag.o
+OBJS += uuid.o
 
-HFILES = suuid.h uuid.h
+CFILES  =
+CFILES += environ.c
+CFILES += genuuid.c
+CFILES += io.c
+CFILES += logfile.c
+CFILES += rcfile.c
+CFILES += selftest.c
+CFILES += sessvar.c
+CFILES += string.c
+CFILES += suuid.c
+CFILES += tag.c
+CFILES += uuid.c
+
+HFILES  =
+HFILES += suuid.h
+HFILES += uuid.h
 
 DEPS = $(HFILES) Makefile
 GNCOV_STR = $$(test -n "$(GNCOV)" && echo "-g")
@@ -92,10 +121,10 @@ gcov:
 	$(MAKE) clean test GCOV=1
 	gcov $(CFILES)
 	@echo $$(grep -E '^ +#####:' *.c.gcov | wc -l) untested lines >&2
-	@echo $$(grep -E '^ +#####:' *.c.gcov | grep -F '/* gncov */' | \
-	         wc -l) gncov lines >&2
-	@echo $$(grep -E '^ +#####:' *.c.gcov | grep -vF '/* gncov */' | \
-	         wc -l) testable lines >&2
+	@echo $$(grep -E '^ +#####:' *.c.gcov | grep -F '/* gncov */' \
+	         | wc -l) gncov lines >&2
+	@echo $$(grep -E '^ +#####:' *.c.gcov | grep -vF '/* gncov */' \
+	         | wc -l) testable lines >&2
 
 .PHONY: gcov-cmt
 gcov-cmt: gcov

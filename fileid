@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-#=======================================================================
+#==============================================================================
 # fileid
 # File ID: db86c666-f938-11dd-9040-0001805bf4b1
 #
@@ -8,9 +8,9 @@
 #
 # Character set: UTF-8
 # ©opyleft 2009– Øyvind A. Holm <sunny@sunbase.org>
-# License: GNU General Public License version 2 or later, see end of 
-# file for legal stuff.
-#=======================================================================
+# License: GNU General Public License version 2 or later, see end of file for 
+# legal stuff.
+#==============================================================================
 
 use strict;
 use warnings;
@@ -65,10 +65,10 @@ my $new_uuid = "";
 exit(main());
 
 sub main {
-    # {{{
     my $Retval = 0;
 
-    defined($ARGV[0]) || die("$progname: Filename not specified. Use -h for help.\n");
+    defined($ARGV[0])
+    || die("$progname: Filename not specified. Use -h for help.\n");
 
     my $Comment = "_%uuid%_\n";
     if ($Opt{'new'}) {
@@ -91,14 +91,16 @@ sub main {
         } elsif ($Opt{'type'} =~ /^(erlang|latex|tex)$/) {
             $Comment = ("% File ID: _%uuid%_\n");
         } else {
-            die("$progname: $Opt{'type'}: Unkown comment type. Use -h for help.\n");
+            die("$progname: $Opt{'type'}: Unkown comment type."
+                . " Use -h for help.\n");
         }
     }
     my @exec_array = (
         "suuid",
         "--raw",
         "-c",
-        # sprintf("\\<c_fileid\\> \\<filename\\>%s\\</filename\\>%s%s \\</c_fileid\\>",
+        # sprintf("\\<c_fileid\\> \\<filename\\>%s\\</filename\\>%s%s"
+        #         . " \\</c_fileid\\>",
         sprintf("\"<c_fileid> <filename>%s</filename>%s%s </c_fileid>\"",
             suuid_xml($file_name),
             length($Opt{'type'})
@@ -106,10 +108,9 @@ sub main {
                 : "",
             length($Opt{'comment'})
                 ? " <comment>" . suuid_xml($Opt{'comment'}) . "</comment>"
-                : "",
-        ),
+                : ""),
         "-t",
-        $progname,
+        $progname
     );
     $Opt{'random-mac'} && push(@exec_array, "-m");
     msg(1, "Executing '" . join("', '", @exec_array) . "'...");
@@ -120,12 +121,10 @@ sub main {
     $Comment =~ s/_%uuid%_/$uuid/gs;
     print($Comment);
 
-    return($Retval);
-    # }}}
-} # main()
+    return $Retval;
+}
 
 sub suuid_xml {
-    # {{{
     my ($Str, $skip_xml) = @_;
     defined($skip_xml) || ($skip_xml = 0);
     if (!$skip_xml) {
@@ -136,13 +135,13 @@ sub suuid_xml {
         $Str =~ s/\n/\\n/gs;
         $Str =~ s/\t/\\t/gs;
     }
-    return($Str);
-    # }}}
-} # suuid_xml()
+
+    return $Str;
+}
 
 sub new_uuid {
-    # {{{
     my $Old = shift;
+
     if (!length($new_uuid)) {
         my @cmd_arr = (
             "suuid",
@@ -150,7 +149,8 @@ sub new_uuid {
             "-t",
             $progname,
             "-c",
-            sprintf("\"<c_fileid> <change> <filename>%s</filename> <old>%s</old>%s%s </change> </c_fileid>\"",
+            sprintf("\"<c_fileid> <change> <filename>%s</filename>"
+                    . " <old>%s</old>%s%s </change> </c_fileid>\"",
                 suuid_xml($file_name),
                 suuid_xml($Old),
                 length($Opt{'type'})
@@ -159,7 +159,7 @@ sub new_uuid {
                 length($Opt{'comment'})
                     ? " <comment>" . suuid_xml($Opt{'comment'}) . "</comment>"
                     : "",
-            ),
+            )
         );
         $Opt{'random-mac'} && push(@cmd_arr, "-m");
         chomp($new_uuid = `@cmd_arr`);
@@ -167,19 +167,18 @@ sub new_uuid {
             die("$progname: new_uuid(): suuid error\n");
         }
     }
-    return($new_uuid);
-    # }}}
-} # new_uuid()
+
+    return $new_uuid;
+}
 
 sub print_version {
-    # Print program version {{{
+    # Print program version
     print("$progname $VERSION\n");
     return;
-    # }}}
-} # print_version()
+}
 
 sub usage {
-    # Send the help message to stdout {{{
+    # Send the help message to stdout
     my $Retval = shift;
 
     if ($Opt{'verbose'}) {
@@ -215,93 +214,32 @@ Options:
 
 END
     exit($Retval);
-    # }}}
-} # usage()
+}
 
 sub msg {
-    # Print a status message to stderr based on verbosity level {{{
+    # Print a status message to stderr based on verbosity level
     my ($verbose_level, $Txt) = @_;
 
     if ($Opt{'verbose'} >= $verbose_level) {
         print(STDERR "$progname: $Txt\n");
     }
     return;
-    # }}}
-} # msg()
+}
 
 __END__
 
-# Plain Old Documentation (POD) {{{
-
-=pod
-
-=head1 NAME
-
-
-
-=head1 SYNOPSIS
-
- [options] [file [files [...]]]
-
-=head1 DESCRIPTION
-
-
-
-=head1 OPTIONS
-
-=over 4
-
-=item B<-h>, B<--help>
-
-Print a brief help summary.
-
-=item B<-q>, B<--quiet>
-
-Be more quiet. Can be repeated to increase silence.
-
-=item B<-v>, B<--verbose>
-
-Increase level of verbosity. Can be repeated.
-
-=item B<--version>
-
-Print version information.
-
-=back
-
-=head1 BUGS
-
-
-
-=head1 AUTHOR
-
-Made by Øyvind A. Holm S<E<lt>sunny@sunbase.orgE<gt>>.
-
-=head1 COPYRIGHT
-
-Copyleft © Øyvind A. Holm E<lt>sunny@sunbase.orgE<gt>
-This is free software; see the file F<COPYING> for legalese stuff.
-
-=head1 LICENCE
-
-This program is free software; you can redistribute it and/or modify it 
-under the terms of the GNU General Public License as published by the 
-Free Software Foundation; either version 2 of the License, or (at your 
-option) any later version.
-
-This program is distributed in the hope that it will be useful, but 
-WITHOUT ANY WARRANTY; without even the implied warranty of 
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along 
-with this program.
-If not, see L<http://www.gnu.org/licenses/>.
-
-=head1 SEE ALSO
-
-=cut
-
-# }}}
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License as published by the Free Software 
+# Foundation; either version 2 of the License, or (at your option) any later 
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT 
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+# FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with 
+# this program.
+# If not, see L<http://www.gnu.org/licenses/>.
 
 # vim: set fenc=UTF-8 ft=perl fdm=marker ts=4 sw=4 sts=4 et fo+=w :

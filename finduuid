@@ -98,8 +98,9 @@ sub process_line {
 		$Scan =~ s{
 		    ($Templ)
 		}{
-		    defined($uuid_list{lc($1)}) ||
-			($print_line = 1), ""
+		    defined($uuid_list{lc($1)})
+		    || ($print_line = 1)
+		    , ""
 		}egx;
 		if ($print_line) {
 			if ($Opt{'unique'}) {
@@ -107,7 +108,8 @@ sub process_line {
 				$Scan =~ s{
 				    ($Templ)
 				}{
-				    $uuid_list{lc($1)} = 1, ""
+				    $uuid_list{lc($1)} = 1
+				    , ""
 				}egx;
 			}
 			$Opt{'date'} && ($Line =~ s{
@@ -117,19 +119,21 @@ sub process_line {
 			            $1, uuid_time2($1))
 			}egsx);
 			printf("%s%s\n", ($Opt{'filenames'}
-				? "$ARGV:"
-				: ""), $Line);
+			                  ? "$ARGV:"
+			                  : ""), $Line);
 			$exit_value = 0;
 		}
 	} else {
 		$Line =~ s/($Templ)/print_uuid($1)/ge;
 	}
+
 	return;
 }
 
 sub print_uuid {
 	my $uuid = shift;
 	my $lc_uuid = lc($uuid);
+
 	$Opt{'unique'} && defined($uuid_list{$lc_uuid}) && return "";
 	$Opt{'date'} && ($uuid =~ s{
 	    ($v1_templ)
@@ -139,6 +143,7 @@ sub print_uuid {
 	printf("%s%s\n", ($Opt{'filenames'} ? "$ARGV:" : ""), $uuid);
 	$uuid_list{$lc_uuid} = 1;
 	$exit_value = 0;
+
 	return "";
 }
 
@@ -152,8 +157,9 @@ sub uuid_time2 {
 	my $t = ($val / 10_000_000) - 12_219_292_800;
 	my @TA = gmtime($t);
 	$Retval = sprintf("%04u-%02u-%02uT%02u:%02u:%02u.%sZ",
-		$TA[5]+1900, $TA[4]+1, $TA[3],
-		$TA[2], $TA[1], $TA[0], $nano);
+	                  $TA[5]+1900, $TA[4]+1, $TA[3],
+	                  $TA[2], $TA[1], $TA[0], $nano);
+
 	return $Retval;
 }
 
@@ -180,6 +186,7 @@ sub uuid_hex_date {
 	# }}}
 	my $Retval = "$time_hi$time_mid$time_low";
 	# D("uuid_hex_date('$uuid') returns '$Retval'");
+
 	return $Retval;
 }
 
@@ -187,14 +194,16 @@ sub bighex {
 	my $Hex = scalar reverse shift;
 	my $Retval = 0;
 	my $Digit = 1;
+
 	$Hex =~ s{
 		([0-9A-Fa-f])
-	} {
+	}{
 		$Retval += hex($1) * $Digit;
 		$Digit *= 16;
 		"";
 	}gsex;
 	length($Hex) && ($Retval = NaN());
+
 	return $Retval;
 }
 

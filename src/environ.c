@@ -34,8 +34,8 @@ char *get_editor(void)
 		e = getenv("EDITOR");
 	if (e && strlen(e))
 		return mystrdup(e);
-	myerror("Environment variables %s and EDITOR aren't defined, "
-	        "cannot start editor", ENV_EDITOR);
+	myerror("Environment variables %s and EDITOR aren't defined,"
+	        " cannot start editor", ENV_EDITOR);
 
 	return NULL;
 }
@@ -51,8 +51,8 @@ bool valid_hostname(const char *s)
 
 	assert(s);
 
-	if (!strlen(s) || strlen(s) > MAX_HOSTNAME_LENGTH ||
-	    strstr(s, "..") || utf8_check(s))
+	if (!strlen(s) || strlen(s) > MAX_HOSTNAME_LENGTH
+	    || strstr(s, "..") || utf8_check(s))
 		return false;
 
 	p = (unsigned char *)s;
@@ -66,8 +66,8 @@ bool valid_hostname(const char *s)
 		 * it be allowed here? In the end it ends up as a file name 
 		 * anyway.
 		 */
-		if (strchr("!\"#$%&'()*+,/:;<=>?@[\\]^`{|}~", *p) ||
-		    *p < '!' || *p >= '\x7f')
+		if (strchr("!\"#$%&'()*+,/:;<=>?@[\\]^`{|}~", *p)
+		    || *p < '!' || *p >= '\x7f')
 			return false;
 		p++;
 	}
@@ -121,16 +121,16 @@ char *get_logdir(const struct Options *opt)
 {
 	char *p = NULL, *retval = NULL;
 
-	if (opt && opt->logdir)
+	if (opt && opt->logdir) {
 		p = opt->logdir;
-	else if (getenv(ENV_LOGDIR))
+	} else if (getenv(ENV_LOGDIR)) {
 		p = getenv(ENV_LOGDIR);
-	else if (getenv("HOME")) {
+	} else if (getenv("HOME")) {
 		/*
 		 * Use default hardcoded value.
 		 */
-		int size = strlen(getenv("HOME")) +
-		           strlen("/uuids") + 1; /* FIXME: slash */
+		int size = strlen(getenv("HOME"))
+		           + strlen("/uuids") + 1; /* FIXME: slash */
 
 		retval = mymalloc(size + 1);
 		if (!retval)
@@ -138,9 +138,9 @@ char *get_logdir(const struct Options *opt)
 		snprintf(retval, size, "%s/uuids", /* FIXME: slash */
 		                       getenv("HOME"));
 	} else {
-		fprintf(stderr, "%s: $%s and $HOME environment "
-		                "variables are not defined, cannot "
-		                "create logdir path\n", progname, ENV_LOGDIR);
+		fprintf(stderr, "%s: $%s and $HOME environment"
+		                " variables are not defined, cannot"
+		                " create logdir path\n", progname, ENV_LOGDIR);
 		return NULL;
 	}
 	if (p)
@@ -188,12 +188,12 @@ char *get_log_prefix(const struct Rc *rc, const struct Options *opt,
 		ext = "";
 
 	/*
-	 * Build the full log file path with extension if provided and 
-	 * return it as an allocated string.
+	 * Build the full log file path with extension if provided and return 
+	 * it as an allocated string.
 	 */
 
-	prefix_length = strlen(logdir) + strlen("/") + /* FIXME: slash */
-	                strlen(hostname) + strlen(ext) + 1;
+	prefix_length = strlen(logdir) + strlen("/") /* FIXME: slash */
+	                + strlen(hostname) + strlen(ext) + 1;
 	prefix = mymalloc(prefix_length + 1);
 	if (!prefix)
 		goto cleanup; /* gncov */
@@ -225,8 +225,8 @@ char *getpath(void)
 		size += BUFSIZ; /* gncov */
 		retval = realloc(retval, size); /* gncov */
 		if (!retval) { /* gncov */
-			myerror("getpath(): Could not " /* gncov */
-			        "reallocate %lu bytes", size);
+			myerror("getpath(): Could not" /* gncov */
+			        " reallocate %lu bytes", size);
 			return NULL; /* gncov */
 		}
 		p = getcwd(retval, size); /* gncov */
@@ -236,8 +236,8 @@ char *getpath(void)
 			 * problem that's not fixable by just allocating more 
 			 * memory.
 			 */
-			myerror("getpath(): Cannot get current " /* gncov */
-			        "directory");
+			myerror("getpath(): Cannot get current" /* gncov */
+			        " directory");
 			free(retval); /* gncov */
 			return NULL; /* gncov */
 		}

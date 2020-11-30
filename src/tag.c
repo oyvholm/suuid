@@ -46,9 +46,10 @@ bool tag_exists(const struct Entry *entry, const char *tag)
 	assert(entry->tag);
 	assert(tag);
 
-	for (i = 0; i < tag_count; i++)
+	for (i = 0; i < tag_count; i++) {
 		if (!strcmp(tag, entry->tag[i]))
 			return true;
+	}
 
 	return false;
 }

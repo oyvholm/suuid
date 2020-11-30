@@ -52,8 +52,8 @@ exit(main());
 
 sub main {
 	my $Line = "";
-	my $regexp = '^([[:xdigit:]]{8}-[[:xdigit:]]{4}-1[[:xdigit:]]{3}-' .
-	             '[89ab][[:xdigit:]]{3}-[[:xdigit:]]{12}|nouuid)$';
+	my $regexp = '^([[:xdigit:]]{8}-[[:xdigit:]]{4}-1[[:xdigit:]]{3}-'
+	             . '[89ab][[:xdigit:]]{3}-[[:xdigit:]]{12}|nouuid)$';
 
 	while (<>) {
 		chomp($Line = $_);

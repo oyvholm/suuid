@@ -40,8 +40,8 @@ char *read_from_fp(FILE *fp)
 		size_t bytes_read;
 
 		if (!new_mem) {
-			myerror("read_from_fp(): Cannot allocate " /* gncov */
-			        "memory for stream buffer");
+			myerror("read_from_fp(): Cannot allocate" /* gncov */
+			        " memory for stream buffer");
 			free(retval); /* gncov */
 			return NULL; /* gncov */
 		}
@@ -103,8 +103,8 @@ char *read_from_editor(const char *editor)
 	assert(strlen(editor));
 
 	if (mkstemp(tmpfile) == -1) {
-		myerror("read_from_editor(): Could not create " /* gncov */
-		        "file name for temporary file");
+		myerror("read_from_editor(): Could not create" /* gncov */
+		        " file name for temporary file");
 		return NULL; /* gncov */
 	}
 
@@ -117,9 +117,11 @@ char *read_from_editor(const char *editor)
 	r = system(cmdbuf);
 	if (r == -1 || r >> 8 == 127) {
 		myerror("read_from_editor(): Cannot execute \"%s\"", cmdbuf);
-		if (access(tmpfile, F_OK) != -1)
-			fprintf(stderr, "%s: File contents is stored in "
-			        "temporary file %s\n", progname, tmpfile);
+		if (access(tmpfile, F_OK) != -1) {
+			fprintf(stderr, "%s: File contents is stored in"
+			                " temporary file %s\n",
+			                progname, tmpfile);
+		}
 		retval = NULL;
 		goto cleanup;
 	}
@@ -130,9 +132,10 @@ char *read_from_editor(const char *editor)
 		goto cleanup;
 	}
 
-	if (remove(tmpfile) == -1)
-		myerror("Warning: Could not remove temporary " /* gncov */
-		        "file \"%s\"", tmpfile);
+	if (remove(tmpfile) == -1) {
+		myerror("Warning: Could not remove temporary" /* gncov */
+		        " file \"%s\"", tmpfile);
+	}
 
 cleanup:
 	free(cmdbuf);

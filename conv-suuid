@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-#=======================================================================
+#==============================================================================
 # conv-suuid
 # File ID: 39647b28-1261-11e5-9dd0-000df06acc56
 #
@@ -8,9 +8,9 @@
 #
 # Character set: UTF-8
 # ©opyleft 2015– Øyvind A. Holm <sunny@sunbase.org>
-# License: GNU General Public License version 2 or later, see end of 
-# file for legal stuff.
-#=======================================================================
+# License: GNU General Public License version 2 or later, see end of file for 
+# legal stuff.
+#==============================================================================
 
 use strict;
 use warnings;
@@ -55,7 +55,6 @@ if ($Opt{'version'}) {
 exit(main());
 
 sub main {
-    # {{{
     my $Retval = 0;
 
     my $Lh = "[0-9a-fA-F]";
@@ -75,7 +74,8 @@ sub main {
     }
 
     if ($Opt{'output-format'} eq 'postgres') {
-        print("COPY new (t, u, tag, host, cwd, username, tty, sess, txt, s) FROM stdin;\n");
+        print("COPY new (t, u, tag, host, cwd, username, tty, sess, txt, s)"
+              . " FROM stdin;\n");
     } elsif ($Opt{'output-format'} eq 'sqlite') {
         print("BEGIN TRANSACTION;\n");
     }
@@ -92,7 +92,8 @@ sub main {
             my $txt = '';
             my @tag = ();
             my @sess = ();
-            ($suuid =~ s/\s*<suuid t="(2\d\d\d-\d\d-\d\dT.+?Z).*?" u="(.*?)">\s*/ /) && (($date, $uuid) = ($1, $2));
+            ($suuid =~ s/\s*<suuid t="(2\d\d\d-\d\d-\d\dT.+?Z).*?" u="(.*?)">\s*/ /)
+            && (($date, $uuid) = ($1, $2));
             $suuid =~ s!</suuid>!!;
             ($suuid =~ s/\s*<txt>(.+)<\/txt>\s*/ /) && ($txt = $1);
             $suuid =~ s/\s*<tag>([^<]+)<\/tag>\s*/(push(@tag, $1), ' ')/ge;
@@ -118,7 +119,7 @@ sub main {
                 (
                     push(@sess, "$l_desc$l_uuid"),
                     msg(4, "push '$l_desc$l_uuid' to sess"),
-                    ' ',
+                    ' '
                 )
             }egx;
             $suuid =~ s/^\s+//;
@@ -131,45 +132,45 @@ sub main {
                 $txt =~ s/&lt;/</g;
                 $txt =~ s/&gt;/>/g;
                 $txt =~ s/(\\[\\nt])/unescape($1)/eg;
-                print("INSERT INTO uuids " .
-                    "(t,u,tag,host,cwd,username,tty,sess,txt,s) " .
-                    "VALUES(",
-                    join(",",
-                        "'$date'",
-                        "'$uuid'",
-                        scalar(@tag) ? ("'{\"" . join('","', @tag) . "\"}'")
-                                     : 'NULL',
-                        "'" . doublequote($host) . "'",
-                        "'" . doublequote($cwd) . "'",
-                        "'" . doublequote($username) . "'",
-                        "'" . doublequote($tty) . "'",
-                        "'" . scalar(@sess) ? ("'[\"" .
-                                                join('","', @sess) .
-                                              "\"]'")
-                                            : 'NULL',
-                        "'" . doublequote($txt) . "'",
-                        "'" . doublequote($line) . "'",
-                    ) . ");\n",
-                );
+                print("INSERT INTO uuids "
+                      . "(t,u,tag,host,cwd,username,tty,sess,txt,s) "
+                      . "VALUES(",
+                      join(",",
+                          "'$date'",
+                          "'$uuid'",
+                          scalar(@tag) ? ("'{\"" . join('","', @tag) . "\"}'")
+                                       : 'NULL',
+                          "'" . doublequote($host) . "'",
+                          "'" . doublequote($cwd) . "'",
+                          "'" . doublequote($username) . "'",
+                          "'" . doublequote($tty) . "'",
+                          "'" . scalar(@sess) ? ("'[\""
+                                                . join('","', @sess)
+                                                . "\"]'")
+                                              : 'NULL',
+                          "'" . doublequote($txt) . "'",
+                          "'" . doublequote($line) . "'",
+                      ) . ");\n");
             } elsif ($Opt{'output-format'} eq 'postgres') {
-                print(
-                    join("\t",
-                        $date,
-                        $uuid,
-                        scalar(@tag) ? ("{'" . join("','", @tag) . "'}") : '\N',
-                        safe_sql($host, 1),
-                        safe_sql($cwd, 1),
-                        safe_sql($username, 1),
-                        safe_sql($tty, 1),
-                        scalar(@sess) ? ("{'" . join("','", @sess) . "'}") : '\N',
-                        safe_sql($txt, 1),
-                        safe_sql($line, 1),
-                    ) . "\n",
-                );
+                print(join("\t",
+                           $date,
+                           $uuid,
+                           scalar(@tag) ? ("{'" . join("','", @tag) . "'}")
+                                        : '\N',
+                           safe_sql($host, 1),
+                           safe_sql($cwd, 1),
+                           safe_sql($username, 1),
+                           safe_sql($tty, 1),
+                           scalar(@sess) ? ("{'" . join("','", @sess) . "'}")
+                                         : '\N',
+                           safe_sql($txt, 1),
+                           safe_sql($line, 1),
+                      ) . "\n");
             } elsif ($Opt{'output-format'} eq 'xml') {
                 print("$line\n");
             } else {
-                warn("$progname: $Opt{'output-format'}: Unknown output format\n");
+                warn("$progname: $Opt{'output-format'}:"
+                     . " Unknown output format\n");
                 $Retval = 1;
                 last;
             }
@@ -182,8 +183,7 @@ sub main {
     }
 
     return $Retval;
-    # }}}
-} # main()
+}
 
 sub unescape {
     my $char = shift;
@@ -200,46 +200,46 @@ sub unescape {
 sub print_pg_table {
         print(<<END);
 CREATE TABLE uuids (
-    t timestamp,
-    u uuid,
-    tag varchar[],
-    host varchar,
-    cwd varchar,
-    username varchar,
-    tty varchar,
-    sess varchar[],
-    txt varchar,
-    s xml
+  t timestamp,
+  u uuid,
+  tag varchar[],
+  host varchar,
+  cwd varchar,
+  username varchar,
+  tty varchar,
+  sess varchar[],
+  txt varchar,
+  s xml
 );
 CREATE TABLE new AS
-    SELECT * FROM uuids LIMIT 0;
+  SELECT * FROM uuids LIMIT 0;
 CREATE TABLE new_rej AS
-    SELECT * FROM uuids LIMIT 0;
+  SELECT * FROM uuids LIMIT 0;
 
 CREATE OR REPLACE FUNCTION loop_new() RETURNS trigger AS \$\$
 DECLARE
-    curr_id uuid;
+  curr_id uuid;
 BEGIN
-    LOOP
-        curr_id = (SELECT u FROM new LIMIT 1);
-        IF curr_id IS NOT NULL THEN
-            IF (SELECT u FROM uuids WHERE u = curr_id LIMIT 1) IS NOT NULL THEN
-                INSERT INTO new_rej SELECT * FROM new WHERE u = curr_id;
-            ELSE
-                INSERT INTO uuids SELECT * FROM new WHERE u = curr_id;
-            END IF;
-            DELETE FROM new WHERE u = curr_id;
-        ELSE
-            EXIT;
-        END IF;
-    END LOOP;
-    RETURN NULL;
+  LOOP
+    curr_id = (SELECT u FROM new LIMIT 1);
+    IF curr_id IS NOT NULL THEN
+      IF (SELECT u FROM uuids WHERE u = curr_id LIMIT 1) IS NOT NULL THEN
+        INSERT INTO new_rej SELECT * FROM new WHERE u = curr_id;
+      ELSE
+        INSERT INTO uuids SELECT * FROM new WHERE u = curr_id;
+      END IF;
+      DELETE FROM new WHERE u = curr_id;
+    ELSE
+      EXIT;
+    END IF;
+  END LOOP;
+  RETURN NULL;
 END;
 \$\$ LANGUAGE plpgsql;
 
 CREATE TRIGGER trg_insert_new AFTER INSERT
-    ON new
-    EXECUTE PROCEDURE loop_new();
+  ON new
+  EXECUTE PROCEDURE loop_new();
 
 CREATE INDEX idx_uuids_u ON uuids (u);
 CREATE INDEX idx_uuids_t ON uuids (t);
@@ -252,18 +252,18 @@ END
 sub print_sqlite_table {
         print(<<END);
 CREATE TABLE IF NOT EXISTS uuids (
-    t TEXT,
-    u TEXT,
-    tag JSON,
-    host TEXT,
-    cwd TEXT,
-    username TEXT,
-    tty TEXT,
-    sess JSON,
-    txt TEXT,
-    s TEXT
-      UNIQUE
-        ON CONFLICT IGNORE
+  t TEXT,
+  u TEXT,
+  tag JSON,
+  host TEXT,
+  cwd TEXT,
+  username TEXT,
+  tty TEXT,
+  sess JSON,
+  txt TEXT,
+  s TEXT
+    UNIQUE
+      ON CONFLICT IGNORE
 );
 
 END
@@ -274,30 +274,30 @@ sub doublequote {
     my $txt = shift;
 
     $txt =~ s/'/''/gs;
+
     return $txt;
 }
 
 sub safe_sql {
-    # {{{
     my ($Text, $use_null) = @_;
+
     $Text =~ s/\\/\\\\/g;
     $Text =~ s/'/''/g;
     $Text =~ s/\n/\\n/g;
     $Text =~ s/\t/\\t/g;
     $use_null && !length($Text) && ($Text = '\N');
-    return($Text);
-    # }}}
-} # safe_sql()
+
+    return $Text;
+}
 
 sub print_version {
-    # Print program version {{{
+    # Print program version
     print("$progname $VERSION\n");
     return;
-    # }}}
-} # print_version()
+}
 
 sub usage {
-    # Send the help message to stdout {{{
+    # Send the help message to stdout
     my $Retval = shift;
 
     if ($Opt{'verbose'}) {
@@ -329,34 +329,32 @@ Options:
 
 END
     exit($Retval);
-    # }}}
-} # usage()
+}
 
 sub msg {
-    # Print a status message to stderr based on verbosity level {{{
+    # Print a status message to stderr based on verbosity level
     my ($verbose_level, $Txt) = @_;
 
     if ($Opt{'verbose'} >= $verbose_level) {
         print(STDERR "$progname: $Txt\n");
     }
     return;
-    # }}}
-} # msg()
+}
 
 __END__
 
-# This program is free software; you can redistribute it and/or modify 
-# it under the terms of the GNU General Public License as published by 
-# the Free Software Foundation; either version 2 of the License, or (at 
-# your option) any later version.
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License as published by the Free Software 
+# Foundation; either version 2 of the License, or (at your option) any later 
+# version.
 #
-# This program is distributed in the hope that it will be useful, but 
-# WITHOUT ANY WARRANTY; without even the implied warranty of 
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# This program is distributed in the hope that it will be useful, but WITHOUT 
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+# FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License 
-# along with this program.
+# You should have received a copy of the GNU General Public License along with 
+# this program.
 # If not, see L<http://www.gnu.org/licenses/>.
 
 # vim: set fenc=UTF-8 ft=perl fdm=marker ts=4 sw=4 sts=4 et fo+=w :

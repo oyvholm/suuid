@@ -36,8 +36,9 @@ char *get_rcfilename(const struct Options *opt)
 		return mystrdup(opt->rcfile);
 	env = getenv("HOME");
 	if (!env) {
-		fprintf(stderr, "%s: HOME environment variable not defined, "
-		                "cannot determine name of rcfile\n", progname);
+		fprintf(stderr, "%s: HOME environment variable not defined,"
+		                " cannot determine name of rcfile\n",
+		                progname);
 		return NULL;
 	}
 	size = strlen(env) + strlen(STD_RCFILE) + 32;
@@ -75,8 +76,9 @@ char *has_key(const char *line, const char *keyword)
 		retval = strchr(line, '=');
 		while (retval && (*retval == '=' || *retval == ' '))
 			retval++;
-	} else
+	} else {
 		retval = NULL;
+	}
 
 	return retval;
 }
@@ -128,11 +130,12 @@ int read_rcfile(const char *rcfile, struct Rc *rc)
 
 	fp = fopen(rcfile, "r");
 	if (!fp) {
+		/*
+		 * It's perfectly fine if it's not readable, that probably 
+		 * means it doesn't exist.
+		 */
 		errno = 0;
-		return EXIT_SUCCESS; /* It's perfectly fine if it's not 
-		                      * readable, that probably means it 
-		                      * doesn't exist.
-		                      */
+		return EXIT_SUCCESS;
 	}
 
 	do {

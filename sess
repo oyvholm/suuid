@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-#=======================================================================
+#==============================================================================
 # sess
 # File ID: a7bbac50-fb83-11dd-947c-000475e441b9
 #
@@ -8,9 +8,9 @@
 #
 # Character set: UTF-8
 # ©opyleft 2009– Øyvind A. Holm <sunny@sunbase.org>
-# License: GNU General Public License version 2 or later, see end of 
-# file for legal stuff.
-#=======================================================================
+# License: GNU General Public License version 2 or later, see end of file for 
+# legal stuff.
+#==============================================================================
 
 use strict;
 use warnings;
@@ -78,20 +78,18 @@ my $retval;
 exit(main());
 
 sub main {
-    # {{{
     my $Lh = "[0-9a-fA-F]";
     my $v1_templ = "$Lh\{8}-$Lh\{4}-1$Lh\{3}-$Lh\{4}-$Lh\{12}";
-
     my @Cmd = @ARGV;
 
     # Check that a command was specified on the command line
     if (!scalar(@Cmd)) {
         warn("$progname: No command specified. Use -h for help.\n");
-        return(1);
+        return 1;
     }
 
-    # $begin_cmd is the actual suuid command with custom XML written to 
-    # the log file
+    # $begin_cmd is the actual suuid command with custom XML written to the log 
+    # file
     my $begin_cmd = sprintf(
         "suuid --raw%s -c \"<sess_begin> <cmd>%s</cmd>%s </sess_begin>\"",
         (length($Opt{'tag'})
@@ -102,77 +100,71 @@ sub main {
         (length($Opt{'comment'})
             ? sprintf(" <comment>%s</comment>", suuid_xml($Opt{'comment'}))
             : ""
-        ),
+        )
     );
 
     # Generate session UUID and write it to the log file by executing 
     # $begin_cmd
     chomp($uuid = `$begin_cmd`);
 
-    # If the suuid(1) executable failed in some way, or it isn't 
-    # available, abort
+    # If the suuid(1) executable failed in some way, or it isn't available, 
+    # abort
     if (!defined($uuid) || $uuid !~ /^$v1_templ$/) {
         die("$progname: Error generating UUID, session not started\n");
     }
 
     defined($ENV{'SESS_UUID'}) || ($ENV{'SESS_UUID'} = "");
 
-    # Make sure there's no illegal characters in the -d/--description 
-    # argument
+    # Make sure there's no illegal characters in the -d/--description argument
     $descname = $Opt{'description'};
-    ($descname =~ /[^$legal_descchars]/) &&
-        die("$progname: $descname: Invalid characters in description\n");
+    ($descname =~ /[^$legal_descchars]/)
+    && die("$progname: $descname: Invalid characters in description\n");
 
-    # Remove all full stops from the beginning of the command to avoid 
-    # setting $descname to '.' when './command' is specified
+    # Remove all full stops from the beginning of the command to avoid setting 
+    # $descname to '.' when './command' is specified
     my $stripstr = $cmd_str;
     $stripstr =~ s/^\.+//;
 
-    # If -d/--description is used, set $descname to the first sequence 
-    # of legal characters
+    # If -d/--description is used, set $descname to the first sequence of legal 
+    # characters
     (!length($Opt{'description'})
-        && $stripstr =~ /^[^$legal_descchars]*([$legal_descchars]+).*/)
-        && ($descname = $1);
+     && $stripstr =~ /^[^$legal_descchars]*([$legal_descchars]+).*/)
+    && ($descname = $1);
     msg(1, "descname = '$descname'");
 
     $Opt{'quiet'} < 2 && print(STDERR "sess.begin:$descname/$uuid\n");
 
-    # Add current UUID to the $SESS_UUID environment variable to make it 
-    # appear in the environment of the executed command
+    # Add current UUID to the $SESS_UUID environment variable to make it appear 
+    # in the environment of the executed command
     my $env_str = $ENV{'SESS_UUID'};
     $env_str =~ s/,+$//;
     $env_str .= ",$descname/$uuid,";
     $ENV{'SESS_UUID'} = $env_str;
 
-    # Execute the command, log start and end time with sub-second 
-    # precision
+    # Execute the command, log start and end time with sub-second precision
     $begin_time = Time::HiRes::time();
     $retval = system(@Cmd) >> 8;
     $end_time = Time::HiRes::time();
 
     # Finish up by writing the end entry to the log file and then exit
     write_end_entry();
-    return($retval);
-    # }}}
-} # main()
+
+    return $retval;
+}
 
 sub remove_last_uuid {
-    # {{{
     my $txt = shift;
+
     $txt =~ s/$descname\/$uuid,?//;
-    return($txt);
-    # }}}
-} # remove_last_uuid()
+
+    return $txt;
+}
 
 sub write_end_entry {
-    # {{{
     my $end_cmd = sprintf(
-        "suuid --raw%s -c \"<sess_end> <finished>%s</finished> " .
-            "<cmd>%s</cmd>%s <duration>%s </duration>%s </sess_end>\"",
-        (length($Opt{'tag'})
-            ? " --tag $Opt{'tag'}"
-            : ""
-        ),
+        "suuid --raw%s -c \"<sess_end> <finished>%s</finished>"
+        . " <cmd>%s</cmd>%s <duration>%s </duration>%s </sess_end>\"",
+        (length($Opt{'tag'}) ? " --tag $Opt{'tag'}" : ""),
         $uuid,
         suuid_xml($cmd_str),
         (length($Opt{'comment'})
@@ -182,15 +174,15 @@ sub write_end_entry {
         xml_time_period($end_time - $begin_time),
         length($retval)
             ? " <exit>$retval</exit>"
-            : "",
+            : ""
     );
 
-    # Strip the current session UUID from the environment variable 
-    # $SESS_UUID to prevent it from appearing in a <sess> element
+    # Strip the current session UUID from the environment variable $SESS_UUID 
+    # to prevent it from appearing in a <sess> element
     $ENV{'SESS_UUID'} = remove_last_uuid($ENV{'SESS_UUID'});
 
-    # Generate UUID for the end entry and write it to the log file by 
-    # executing $end_cmd
+    # Generate UUID for the end entry and write it to the log file by executing 
+    # $end_cmd
     chomp(my $end_uuid = `$end_cmd`);
 
     $Opt{'quiet'} < 2 && print(STDERR "sess.end:$descname/$end_uuid");
@@ -198,11 +190,9 @@ sub write_end_entry {
                                 time_period($end_time - $begin_time), $retval);
     $Opt{'quiet'} < 2 && print(STDERR "\n");
     return;
-    # }}}
-} # write_end_entry()
+}
 
 sub handle_signal {
-    # {{{
     my $sig = shift;
     msg(0, "Received $sig signal, aborting");
     defined($end_time) || ($end_time = Time::HiRes::time());
@@ -211,16 +201,14 @@ sub handle_signal {
     # return, so blank it
     defined($retval) || ($retval = '');
 
-    # Write what we've got to the log file and then exit with an error 
-    # value
+    # Write what we've got to the log file and then exit with an error value
     write_end_entry();
     exit(1);
-    # }}}
-} # handle_signal()
+}
 
 sub suuid_xml {
-    # {{{
     my ($Str, $skip_xml) = @_;
+
     defined($skip_xml) || ($skip_xml = 0);
     if (!$skip_xml) {
         $Str =~ s/&/&amp;/gs;
@@ -230,19 +218,18 @@ sub suuid_xml {
     $Str =~ s/\\/\\\\/gs;
     $Str =~ s/\n/\\n/gs;
     $Str =~ s/\t/\\t/gs;
-    return($Str);
-    # }}}
-} # suuid_xml()
+
+    return $Str;
+}
 
 sub print_version {
-    # Print program version {{{
+    # Print program version
     print("$progname $VERSION\n");
     return;
-    # }}}
-} # print_version()
+}
 
 sub usage {
-    # Send the help message to stdout {{{
+    # Send the help message to stdout
     my $Retval = shift;
 
     if ($Opt{'verbose'}) {
@@ -280,147 +267,76 @@ Options:
 
 END
     exit($Retval);
-    # }}}
-} # usage()
+}
 
 sub time_period {
-	# {{{
-	my $secs = shift;
-	my ($Day, $Hour, $Min, $Sec) = (0, 0, 0, 0);
+    my $secs = shift;
+    my ($Day, $Hour, $Min, $Sec) = (0, 0, 0, 0);
 
-	$Day = int($secs / 86400);
-	$secs -= $Day * 86400;
+    $Day = int($secs / 86400);
+    $secs -= $Day * 86400;
 
-	$Hour = int($secs / 3600);
-	$secs -= $Hour * 3600;
+    $Hour = int($secs / 3600);
+    $secs -= $Hour * 3600;
 
-	$Min = int($secs / 60);
-	$secs -= $Min * 60;
+    $Min = int($secs / 60);
+    $secs -= $Min * 60;
 
-	$Sec = sprintf("%.7f", $secs);
-    $Sec =~ s/^(\d\..*)/0$1/; # WTF. %02.7f in sprintf() dosn't work, so this 
+    $Sec = sprintf("%.7f", $secs);
+    $Sec =~ s/^(\d\..*)/0$1/; # WTF. %02.7f in sprintf() doesn't work, so this 
                               # is necessary ATM.
 
-	return(
-        ($Day
-            ? sprintf("%s day%s, ", $Day, $Day == 1 ? "" : "s")
-            : ""
-        ) . sprintf("%02u:%02u:%s", $Hour, $Min, $Sec)
-    );
-	# }}}
-} # time_period()
+    return ($Day ? sprintf("%s day%s, ", $Day, $Day == 1 ? "" : "s") : "")
+           . sprintf("%02u:%02u:%s", $Hour, $Min, $Sec);
+}
 
 sub xml_time_period {
-	# {{{
-	my $secs = shift;
-	my ($Day, $Hour, $Min, $Sec) = (0, 0, 0, 0);
+    my $secs = shift;
+    my ($Day, $Hour, $Min, $Sec) = (0, 0, 0, 0);
     my $totsecs = sprintf("%.7f", $secs);
 
-	$Day = int($secs / 86400);
-	$secs -= $Day * 86400;
+    $Day = int($secs / 86400);
+    $secs -= $Day * 86400;
 
-	$Hour = int($secs / 3600);
-	$secs -= $Hour * 3600;
+    $Hour = int($secs / 3600);
+    $secs -= $Hour * 3600;
 
-	$Min = int($secs / 60);
-	$secs -= $Min * 60;
+    $Min = int($secs / 60);
+    $secs -= $Min * 60;
 
     $Sec = sprintf("%.7f", $secs);
 
-	return(
-        " <totsecs>$totsecs</totsecs>" .
-        ($Day ? " <days>$Day</days>" : "") .
-        ($Hour ? " <hours>$Hour</hours>" : "") .
-        ($Min ? " <minutes>$Min</minutes>" : "") .
-        ($Sec ? " <seconds>$Sec</seconds>" : "")
-    );
-	# }}}
-} # xml_time_period()
+    return " <totsecs>$totsecs</totsecs>"
+           . ($Day ? " <days>$Day</days>" : "")
+           . ($Hour ? " <hours>$Hour</hours>" : "")
+           . ($Min ? " <minutes>$Min</minutes>" : "")
+           . ($Sec ? " <seconds>$Sec</seconds>" : "");
+}
 
 sub msg {
-    # Print a status message to stderr based on verbosity level {{{
+    # Print a status message to stderr based on verbosity level
     my ($verbose_level, $Txt) = @_;
 
     if ($Opt{'verbose'} >= $verbose_level) {
         print(STDERR "$progname: $Txt\n");
     }
     return;
-    # }}}
-} # msg()
+}
 
 __END__
 
-# Plain Old Documentation (POD) {{{
-
-=pod
-
-=head1 NAME
-
-
-
-=head1 SYNOPSIS
-
- [options] [file [files [...]]]
-
-=head1 DESCRIPTION
-
-
-
-=head1 OPTIONS
-
-=over 4
-
-=item B<-h>, B<--help>
-
-Print a brief help summary.
-
-=item B<-q>, B<--quiet>
-
-Be more quiet. Can be repeated to increase silence.
-
-=item B<-v>, B<--verbose>
-
-Increase level of verbosity. Can be repeated.
-
-=item B<--version>
-
-Print version information.
-
-=back
-
-=head1 BUGS
-
-
-
-=head1 AUTHOR
-
-Made by Øyvind A. Holm S<E<lt>sunny@sunbase.orgE<gt>>.
-
-=head1 COPYRIGHT
-
-Copyleft © Øyvind A. Holm E<lt>sunny@sunbase.orgE<gt>
-This is free software; see the file F<COPYING> for legalese stuff.
-
-=head1 LICENCE
-
-This program is free software; you can redistribute it and/or modify it 
-under the terms of the GNU General Public License as published by the 
-Free Software Foundation; either version 2 of the License, or (at your 
-option) any later version.
-
-This program is distributed in the hope that it will be useful, but 
-WITHOUT ANY WARRANTY; without even the implied warranty of 
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along 
-with this program.
-If not, see L<http://www.gnu.org/licenses/>.
-
-=head1 SEE ALSO
-
-=cut
-
-# }}}
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License as published by the Free Software 
+# Foundation; either version 2 of the License, or (at your option) any later 
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT 
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+# FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with 
+# this program.
+# If not, see L<http://www.gnu.org/licenses/>.
 
 # vim: set fenc=UTF-8 ft=perl fdm=marker ts=4 sw=4 sts=4 et fo+=w :
