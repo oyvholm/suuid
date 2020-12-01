@@ -217,6 +217,32 @@ END
 	        '--selftest');
 }
 
+sub test_s_suuid_sess {
+	my ($l_desc, $l_slash, $l_uuid, $l_comma) = @_;
+	my $fail = 0;
+	my $str = "$l_desc$l_slash$l_uuid$l_comma";
+	my $humstr = sprintf("s_suuid_sess() %s desc, %s slash, %s uuid,"
+	                     . " %s comma",
+	                     length($l_desc) ? "with" : "without",
+	                     length($l_slash) ? "with" : "without",
+	                     length($l_uuid) ? "with" : "without",
+	                     length($l_comma) ? "with" : "without");
+	length($l_slash) || ($fail = 1);
+	length($l_comma) || ($fail = 1);
+	length($l_uuid)  || ($fail = 1);
+	if ($fail) {
+		if (length($str)) {
+			is(s_suuid_sess($str), undef, $humstr);
+		}
+	} else {
+		like(s_suuid_sess($str),
+		     '/^<sess( desc="deschere")?>'
+		     . 'ff529c20-4522-11e2-8c4a-0016d364066c'
+		     . '<\/sess> $/',
+		     $humstr)
+	}
+}
+
 sub test_test_functions {
 	diag("Testing s_top()...");
 	like("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
@@ -247,38 +273,8 @@ sub test_test_functions {
 			for my $l_uuid ('ff529c20-4522-11e2-8c4a-0016d364066c',
 			                '') {
 				for my $l_comma (',', '') {
-					my $fail = 0;
-					my $str = "$l_desc$l_slash"
-					          . "$l_uuid$l_comma";
-					my $humstr = sprintf(
-						"s_suuid_sess() %s desc,"
-						. " %s slash, %s uuid,"
-						. " %s comma",
-						length($l_desc) ? "with"
-						                : "without",
-						length($l_slash) ? "with"
-						                 : "without",
-						length($l_uuid) ? "with"
-						                : "without",
-						length($l_comma) ? "with"
-						                 : "without");
-					length($l_slash) || ($fail = 1);
-					length($l_comma) || ($fail = 1);
-					length($l_uuid)  || ($fail = 1);
-					if ($fail) {
-						if (length($str)) {
-							is(s_suuid_sess($str),
-							   undef, $humstr);
-						}
-					} else {
-						like(s_suuid_sess($str),
-						     '/^<sess('
-						     . ' desc="deschere")?>'
-						     . 'ff529c20-4522-11e2-'
-						     . '8c4a-0016d364066c'
-						     . '<\/sess> $/',
-						     $humstr)
-					}
+					test_s_suuid_sess($l_desc, $l_slash,
+					                  $l_uuid, $l_comma);
 				}
 			}
 		}
