@@ -1,5 +1,7 @@
 *.tmp
 .tmp-*
+/gmon.out
+/gmon.sum
 /log/
 rc-macaddr
 tmp-*

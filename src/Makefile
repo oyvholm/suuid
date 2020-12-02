@@ -13,12 +13,14 @@ LD = cc
 
 CCFLAGS  =
 CCFLAGS += $$(test -n "$(GCOV)" && echo -n "-fprofile-arcs -ftest-coverage")
+CCFLAGS += $$(test -n "$(PROF)" && echo -n "-pg")
 CCFLAGS += -O0 -c -g
 CCFLAGS += -Wall
 CCFLAGS += -Werror
 CCFLAGS += -Wextra
 
 LDFLAGS  =
+LDFLAGS += $$(test -n "$(PROF)" && echo -n "-pg")
 LDFLAGS += -Wall
 LDFLAGS += -Werror
 LDFLAGS += -Wextra
@@ -110,6 +112,7 @@ uuid.o: uuid.c $(DEPS)
 clean:
 	rm -f $(EXEC) $(OBJS)
 	rm -f *.gcda *.gcno *.gcov
+	rm -f gmon.out gmon.sum
 	rm -f version.h
 	rm -fr $(TESTLOCKDIR)
 	cd t && $(MAKE) clean
