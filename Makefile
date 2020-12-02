@@ -2,6 +2,21 @@
 # File ID: c9f9bc1a-28d8-11e5-b53c-fefdb24f8e10
 # Author: Øyvind A. Holm <sunny@sunbase.org>
 
+PREFIX = /usr/local
+
+EXECS  =
+EXECS += conv-suuid
+EXECS += fileid
+EXECS += finduuid
+EXECS += needuuid
+EXECS += sess
+EXECS += sortuuid
+EXECS += ti
+EXECS += tjah
+EXECS += uuiddate
+EXECS += v
+EXECS += wi
+
 .PHONY: all
 all:
 	cd doc && $(MAKE)
@@ -22,6 +37,8 @@ distclean: clean
 
 .PHONY: install
 install:
+	mkdir -p $(PREFIX)/bin
+	install $(EXECS) $(PREFIX)/bin
 	cd src && $(MAKE) install
 
 .PHONY: testlock
@@ -41,6 +58,7 @@ testall:
 
 .PHONY: uninstall
 uninstall:
+	cd $(PREFIX)/bin && rm -f $(EXECS)
 	cd src && $(MAKE) uninstall
 
 .PHONY: valgrind
