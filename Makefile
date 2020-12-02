@@ -56,6 +56,10 @@ testall:
 	cd src && $(MAKE) testall
 	cd tests && $(MAKE) testall
 
+.PHONY: tlok
+tlok:
+	@cd src && $(MAKE) -s tlok
+
 .PHONY: uninstall
 uninstall:
 	cd $(PREFIX)/bin && rm -f $(EXECS)
