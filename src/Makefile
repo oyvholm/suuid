@@ -114,7 +114,7 @@ clean:
 
 .PHONY: edit
 edit: tags
-	$(EDITOR) $$(git ls-files | grep -v -e ^COPYING -e \\.gitignore)
+	$(EDITOR) $$(git ls-files | grep -v -e ^COPYING)
 	rm tags
 
 .PHONY: gcov
