@@ -155,9 +155,6 @@ test: $(EXEC)
 testall:
 	$(MAKE) testcomb WHAT=test
 
-.PHONY: testboth
-testboth:
-
 .PHONY: testcomb
 testcomb:
 	$(MAKE) clean $(WHAT) FAKE_HOST=1
@@ -189,9 +186,6 @@ testlock: $(EXEC)
 	for f in $$(seq 1 500); do ./$(EXEC) -wn -l $(TESTLOCKDIR); done &
 	for f in $$(seq 1 500); do ./$(EXEC) -wn -l $(TESTLOCKDIR); done
 
-.PHONY: testnew
-testnew: test
-
 .PHONY: uninstall
 uninstall:
 	rm -f $(PREFIX)/bin/$(EXEC)
@@ -203,6 +197,3 @@ valgrind:
 .PHONY: valgrindall
 valgrindall:
 	$(MAKE) testcomb WHAT=valgrind
-
-.PHONY: valgrindboth
-valgrindboth:

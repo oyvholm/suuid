@@ -26,10 +26,6 @@ install:
 testlock:
 	cd src && $(MAKE) testlock
 
-.PHONY: testnew
-testnew: test
-	cd src && $(MAKE) testnew
-
 .PHONY: test
 test:
 	cd doc && $(MAKE) test
@@ -40,11 +36,6 @@ test:
 testall:
 	cd src && $(MAKE) testall
 	cd tests && $(MAKE) testall
-
-.PHONY: testboth
-testboth:
-	cd src && $(MAKE) testboth
-	cd tests && $(MAKE) testboth
 
 tags: src/*.c src/*.h
 	ctags src/*.c src/*.h
@@ -61,9 +52,4 @@ valgrind:
 .PHONY: valgrindall
 valgrindall:
 	cd src && $(MAKE) valgrindall
-	cd tests && $(MAKE) testall
-
-.PHONY: valgrindboth
-valgrindboth:
-	cd src && $(MAKE) valgrindboth
 	cd tests && $(MAKE) testall
