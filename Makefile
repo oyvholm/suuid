@@ -7,6 +7,9 @@ all:
 	cd doc && $(MAKE)
 	cd src && $(MAKE)
 
+tags: src/*.[ch]
+	ctags src/*.[ch]
+
 .PHONY: clean
 clean:
 	find . -name .testadd.tmp -type d -print0 | xargs -0r rm -rf
@@ -35,9 +38,6 @@ test:
 testall:
 	cd src && $(MAKE) testall
 	cd tests && $(MAKE) testall
-
-tags: src/*.c src/*.h
-	ctags src/*.c src/*.h
 
 .PHONY: uninstall
 uninstall:
