@@ -37,6 +37,7 @@ clean:
 .PHONY: edit
 edit: tags
 	$(EDITOR) $$(git ls-files)
+	rm tags
 
 .PHONY: gcov
 gcov:
