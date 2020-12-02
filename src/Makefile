@@ -144,8 +144,8 @@ install: $(PREFIX)/bin/$(EXEC)
 $(PREFIX)/bin/$(EXEC): $(EXEC)
 	install $(EXEC) $(PREFIX)/bin/$(EXEC)
 
-tags: $(CFILES) $(HFILES) t/suuid.t
-	ctags $(CFILES) $(HFILES) t/suuid.t
+tags: $(CFILES) $(HFILES)
+	ctags $(CFILES) $(HFILES)
 
 .PHONY: test
 test: $(EXEC)
