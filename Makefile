@@ -9,7 +9,7 @@ all:
 
 .PHONY: clean
 clean:
-	rm -f synced.sqlite.20*.bck tags
+	rm -f tags
 	find . -name .testadd.tmp -type d -print0 | xargs -0r rm -rf
 	cd doc && $(MAKE) clean
 	cd src && $(MAKE) clean
