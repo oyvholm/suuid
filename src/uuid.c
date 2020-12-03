@@ -396,9 +396,9 @@ char *uuid_date(char *dest, const char *uuid)
 	strftime(dest, DATE_LENGTH, "%Y-%m-%dT%H:%M:%S", tm);
 	p = dest + strlen(dest);
 	if (p - dest != 19) {
-		fprintf(stderr, "%s: %lu: Invalid date length," /* gncov */
+		fprintf(stderr, "%s: %td: Invalid date length," /* gncov */
 		                " should be 19\n", progname,
-		                (unsigned long)(p - dest)); /* gncov */
+		                (ptrdiff_t)(p - dest)); /* gncov */
 		return NULL; /* gncov */
 	}
 	snprintf(p, DATE_LENGTH - 19 + 1, ".%07uZ", nano);

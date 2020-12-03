@@ -226,7 +226,7 @@ char *getpath(void)
 		retval = realloc(retval, size); /* gncov */
 		if (!retval) { /* gncov */
 			myerror("getpath(): Could not" /* gncov */
-			        " reallocate %lu bytes", size);
+			        " reallocate %zu bytes", size);
 			return NULL; /* gncov */
 		}
 		p = getcwd(retval, size); /* gncov */
