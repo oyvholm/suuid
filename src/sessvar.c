@@ -109,16 +109,16 @@ int fill_sess(struct Entry *dest, const char *uuid,
 
 	auuid = strndup(uuid, UUID_LENGTH);
 	if (!auuid) {
-		myerror("fill_sess(): Memory allcation error," /* gncov */
-		        " could not duplicate UUID");
+		myerror("%s(): Memory allcation error," /* gncov */
+		        " could not duplicate UUID", __func__);
 		return EXIT_FAILURE; /* gncov */
 	}
 
 	if (desc && desclen) {
 		adesc = strndup(desc, desclen);
 		if (!adesc) {
-			myerror("fill_sess(): Memory allocation" /* gncov */
-			        " error, could not duplicate desc");
+			myerror("%s(): Memory allocation error," /* gncov */
+			        " could not duplicate desc", __func__);
 			free(auuid); /* gncov */
 			return EXIT_FAILURE; /* gncov */
 		}
@@ -389,8 +389,8 @@ int run_session(const struct Options *orig_opt,
 	 * ok.
 	 */
 	retval = system(cmd);
-	msg(2, "run_session(): retval from system() = %d (0x%x)",
-	       retval, retval);
+	msg(2, "%s(): retval from system() = %d (0x%x)",
+	       __func__, retval, retval);
 
 cleanup:
 	free(start_uuid);

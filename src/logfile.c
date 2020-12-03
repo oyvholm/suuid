@@ -727,8 +727,8 @@ int add_to_logfile(FILE *fp, const struct Entry *entry, const bool raw)
 	if (fputc('\n', fp) == EOF)
 		retval = EXIT_FAILURE; /* gncov */
 	if (retval == EXIT_FAILURE) {
-		myerror("add_to_logfile(): Cannot write to the" /* gncov */
-		        " log file");
+		myerror("%s(): Cannot write to the log file", /* gncov */
+		        __func__);
 	}
 
 	free(ap);

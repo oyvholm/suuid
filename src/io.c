@@ -40,8 +40,8 @@ char *read_from_fp(FILE *fp)
 		size_t bytes_read;
 
 		if (!new_mem) {
-			myerror("read_from_fp(): Cannot allocate" /* gncov */
-			        " memory for stream buffer");
+			myerror("%s(): Cannot allocate" /* gncov */
+			        " memory for stream buffer", __func__);
 			free(retval); /* gncov */
 			return NULL; /* gncov */
 		}
@@ -51,7 +51,7 @@ char *read_from_fp(FILE *fp)
 		total_bytes_read += bytes_read;
 		p[bytes_read] = '\0';
 		if (ferror(fp)) {
-			myerror("read_from_fp(): Read error");
+			myerror("%s(): Read error", __func__);
 			free(retval);
 			return NULL;
 		}
@@ -75,7 +75,7 @@ char *read_from_file(const char *fname)
 
 	fp = fopen(fname, "rb");
 	if (!fp) {
-		myerror("read_from_file(): Could not open file for read");
+		myerror("%s(): Could not open file for read", __func__);
 		return NULL;
 	}
 	retval = read_from_fp(fp);
@@ -103,8 +103,8 @@ char *read_from_editor(const char *editor)
 	assert(strlen(editor));
 
 	if (mkstemp(tmpfile) == -1) {
-		myerror("read_from_editor(): Could not create" /* gncov */
-		        " file name for temporary file");
+		myerror("%s(): Could not create" /* gncov */
+		        " file name for temporary file", __func__);
 		return NULL; /* gncov */
 	}
 
@@ -116,7 +116,7 @@ char *read_from_editor(const char *editor)
 
 	r = system(cmdbuf);
 	if (r == -1 || r >> 8 == 127) {
-		myerror("read_from_editor(): Cannot execute \"%s\"", cmdbuf);
+		myerror("%s(): Cannot execute \"%s\"", __func__, cmdbuf);
 		if (access(tmpfile, F_OK) != -1) {
 			fprintf(stderr, "%s: File contents is stored in"
 			                " temporary file %s\n",

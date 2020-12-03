@@ -215,8 +215,8 @@ char *process_uuid(struct Logs *logs,
 
 	if (opt->uuid) {
 		if (!valid_uuid(opt->uuid, true)) {
-			fprintf(stderr, "process_uuid(): UUID \"%s\" is not"
-			                " valid.\n", opt->uuid);
+			fprintf(stderr, "%s(): UUID \"%s\" is not valid.\n",
+			                __func__, opt->uuid);
 			return NULL;
 		}
 		memcpy(entry->uuid, opt->uuid, UUID_LENGTH + 1);
@@ -276,8 +276,8 @@ void sighandler(const int sig)
 		fprintf(stderr, "%s: Termination signal (%s) received,"
 		                " aborting\n", progname, strsignal(sig));
 	} else {
-		myerror("sighandler(): Unknown signal %d (%s) received,"
-		        " should not happen\n", sig, strsignal(sig));
+		myerror("%s(): Unknown signal %d (%s) received,"
+		        " should not happen\n", __func__, sig, strsignal(sig));
 	}
 	should_terminate = true;
 }

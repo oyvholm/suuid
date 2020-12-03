@@ -164,18 +164,19 @@ struct timeval *get_current_time(struct timeval *tv)
 
 	while (1) {
 		if (gettimeofday(&tvbuf, NULL)) {
-			fprintf(stderr, "%s: get_current_time():" /* gncov */
-			                " gettimeofday() failed\n", progname);
+			fprintf(stderr, "%s: %s():" /* gncov */
+			                " gettimeofday() failed\n",
+			                progname, __func__);
 			return NULL; /* gncov */
 		}
 		create_uuid_time(&utime, &tvbuf);
 		if (utime != prevtime)
 			break;
 		if (++count > maxcount) { /* gncov */
-			fprintf(stderr, "%s: get_current_time():" /* gncov */
+			fprintf(stderr, "%s: %s():" /* gncov */
 			                " Got the same timestamp after %lu"
 			                " tries. System clock broken?\n",
-			                progname, maxcount);
+			                progname, __func__, maxcount);
 			return NULL; /* gncov */
 		}
 	}
@@ -229,8 +230,9 @@ bool valid_macaddr(const char *macaddr)
 		return false;
 	}
 	if (sscanf(macaddr, "%2x", &first) != 1) {
-		fprintf(stderr, "%s: valid_macaddr(): sscanf() failed when"
-		                " scanning \"%s\"\n", progname, macaddr);
+		fprintf(stderr, "%s: %s(): sscanf() failed when"
+		                " scanning \"%s\"\n",
+		                progname, __func__, macaddr);
 		return false;
 	}
 	if (!(first & 0x01)) {
@@ -403,8 +405,9 @@ char *uuid_date(char *dest, const char *uuid)
 	}
 	snprintf(p, DATE_LENGTH - 19 + 1, ".%07uZ", nano);
 	if (!is_valid_date(dest, 1)) {
-		fprintf(stderr, "%s: uuid_date(): %s: Generated" /* gncov */
-		                " invalid timestamp\n", progname, dest);
+		fprintf(stderr, "%s: %s(): %s: Generated" /* gncov */
+		                " invalid timestamp\n",
+		                progname, __func__, dest);
 		return NULL; /* gncov */
 	}
 
@@ -412,18 +415,18 @@ char *uuid_date(char *dest, const char *uuid)
 	chkres = uuid_date_from_uuid(chkbuf, uuid);
 	if (chkres) {
 		if (strcmp(dest, chkbuf)) {
-			fprintf(stderr, "%s: uuid_date():"
-			                " UUID DATE DIFFERENCE:\n", progname);
-			fprintf(stderr, "%s: uuid_date(): dest   = \"%s\"\n",
-			                progname, dest);
-			fprintf(stderr, "%s: uuid_date(): chkbuf = \"%s\"\n",
-			                progname, chkbuf);
+			fprintf(stderr, "%s: %s(): UUID DATE DIFFERENCE:\n",
+			                progname, __func__);
+			fprintf(stderr, "%s: %s(): dest   = \"%s\"\n",
+			                progname, __func__, dest);
+			fprintf(stderr, "%s: %s(): chkbuf = \"%s\"\n",
+			                progname, __func__, chkbuf);
 			return NULL;
 		}
 	} else {
-		fprintf(stderr, "%s: uuid_date(): uuid_date_from_uuid()"
-		                " failed, cannot verify UUID timestamp\n",
-		                progname);
+		fprintf(stderr, "%s: %s(): uuid_date_from_uuid() failed,"
+		                " cannot verify UUID timestamp\n",
+		                progname, __func__);
 		return NULL;
 	}
 #endif
@@ -456,8 +459,8 @@ char *uuid_date_from_uuid(char *dest, const char *uuid)
 
 	fp = popen(cmd, "r");
 	if (!fp) {
-		fprintf(stderr, "%s: uuid_date_from_uuid():"
-		                " Could not exec \"%s\"\n", progname, cmd);
+		fprintf(stderr, "%s: %s(): Could not exec \"%s\"\n",
+		                progname, __func__, cmd);
 		return NULL;
 	}
 	ap = read_from_fp(fp);
@@ -465,14 +468,15 @@ char *uuid_date_from_uuid(char *dest, const char *uuid)
 
 	p = strstr(ap, "content: time:");
 	if (!p) {
-		fprintf(stderr, "%s: uuid_date_from_uuid(): Search string not"
-		                " found in uuid(1) output\n", progname);
+		fprintf(stderr, "%s: %s(): Search string not"
+		                " found in uuid(1) output\n",
+		                progname, __func__);
 		return NULL;
 	}
 	p = strstr(p, "20"); /* This is how you create Y2.1K problems, kids */
 	if (!p) {
-		fprintf(stderr, "%s: uuid_date_from_uuid(): Didn't find year"
-		                " in uuid(1) output\n", progname);
+		fprintf(stderr, "%s: %s(): Didn't find year"
+		                " in uuid(1) output\n", progname, __func__);
 		return NULL;
 	}
 
@@ -484,8 +488,8 @@ char *uuid_date_from_uuid(char *dest, const char *uuid)
 	strncpy(dest, p, DATE_LENGTH + 1);
 	free(ap);
 	if (!is_valid_date(dest, true)) {
-		fprintf(stderr, "uuid_date_from_uuid(): Generated date is"
-		                " invalid: \"%s\"\n", dest);
+		fprintf(stderr, "%s(): Generated date is"
+		                " invalid: \"%s\"\n", __func__, dest);
 		return NULL;
 	}
 
