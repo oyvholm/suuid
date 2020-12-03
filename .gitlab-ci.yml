@@ -8,4 +8,4 @@ suuid:linux:
   before_script:
     - apt-get update -qq && apt-get install -y uuid valgrind
   script:
-    - script -e -q -c "make test clean valgrind"
+    - script -e -q -c "make testall clean valgrind"
