@@ -22,7 +22,7 @@
 #define _UUID_H
 
 #define DATE_LENGTH  28 /* Length of ISO date format with nanoseconds */
-#define EPOCH_DIFF 12219292800
+#define EPOCH_DIFF 12219292800ULL
 #define MACADDR_LENGTH  6 /* Length of MAC address */
 #define UUID_LENGTH  36 /* Length of a standard UUID */
 

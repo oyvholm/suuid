@@ -123,9 +123,9 @@ void create_uuid_time(utime_t *utime, const struct timeval *tv)
 	assert(utime);
 	assert(tv);
 
-	*utime = ((utime_t)tv->tv_sec * 10000000)
-	         + ((utime_t)tv->tv_usec * 10)
-	         + EPOCH_DIFF * 10000000;
+	*utime = ((utime_t)tv->tv_sec * 10000000ULL)
+	         + ((utime_t)tv->tv_usec * 10ULL)
+	         + EPOCH_DIFF * 10000000ULL;
 }
 
 /*
@@ -158,7 +158,7 @@ struct timeval *get_current_time(struct timeval *tv)
 	utime_t utime;
 	unsigned long count = 0;
 	const unsigned long maxcount = 1000000;
-	static utime_t prevtime = 0;
+	static utime_t prevtime = 0ULL;
 
 	assert(tv);
 
@@ -390,8 +390,8 @@ char *uuid_date(char *dest, const char *uuid)
 	strncat(hexbuf, uuid, 8);
 
 	val = strtoull(hexbuf, NULL, 16);
-	nano = val % 10000000;
-	timeval = (val / 10000000) - EPOCH_DIFF;
+	nano = val % 10000000ULL;
+	timeval = (val / 10000000ULL) - EPOCH_DIFF;
 	tm = gmtime(&timeval);
 
 	memset(dest, 0, DATE_LENGTH + 1);

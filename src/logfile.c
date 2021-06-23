@@ -554,7 +554,7 @@ FILE *seek_to_eof(FILE *fp, const char *fname)
 	assert(fp);
 	assert(fname);
 
-	if (fseek(fp, 0, SEEK_END) == -1) {
+	if (fseek(fp, 0L, SEEK_END) == -1) {
 		myerror("%s: Cannot seek to end of file", fname); /* gncov */
 		return NULL; /* gncov */
 	}
@@ -596,12 +596,12 @@ FILE *check_last_log_line(FILE *fp, const char *fname)
 	assert(fp);
 	assert(fname);
 
-	if (fseek(fp, -10, SEEK_END) == -1) {
+	if (fseek(fp, -10L, SEEK_END) == -1) {
 		myerror("%s: Could not seek in log file", fname); /* gncov */
 		return NULL; /* gncov */
 	}
 	filepos = ftell(fp);
-	if (filepos == -1) {
+	if (filepos == -1L) {
 		myerror("%s: Cannot get file position of" /* gncov */
 		        " end line", fname);
 		return NULL; /* gncov */
@@ -639,14 +639,14 @@ FILE *seek_to_entry_pos(FILE *fp, const char *fname)
 	if (!seek_to_eof(fp, fname))
 		return NULL; /* gncov */
 	filepos = ftell(fp);
-	if (filepos == -1) {
+	if (filepos == -1L) {
 		myerror("%s: Cannot get file position at EOF", /* gncov */
 		        fname);
 		return NULL; /* gncov */
 	}
-	if (filepos > 10)
+	if (filepos > 10L)
 		return check_last_log_line(fp, fname);
-	if (filepos == 0)
+	if (filepos == 0L)
 		return write_xml_header(fp);
 
 	return unknown_end_line(fp, fname);
