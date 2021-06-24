@@ -29,9 +29,9 @@
 typedef unsigned long long utime_t;
 
 struct uuid_time {
-	unsigned short hi;
-	unsigned short mid;
 	unsigned long low;
+	unsigned short mid;
+	unsigned short hi;
 };
 struct uuid {
 	struct uuid_time time;
