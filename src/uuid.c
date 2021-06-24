@@ -367,7 +367,7 @@ char *uuid_date(char *dest, const char *uuid)
 {
 	char hexbuf[16];
 	utime_t val;
-	unsigned int nano;
+	utime_t nano; /* Same type as `val` due to modulus */
 	time_t timeval;
 	struct tm *tm;
 	char *p;
@@ -391,7 +391,7 @@ char *uuid_date(char *dest, const char *uuid)
 
 	val = strtoull(hexbuf, NULL, 16);
 	nano = val % 10000000ULL;
-	timeval = (val / 10000000ULL) - EPOCH_DIFF;
+	timeval = (time_t)((val / 10000000ULL) - EPOCH_DIFF);
 	tm = gmtime(&timeval);
 
 	memset(dest, 0, DATE_LENGTH + 1);
@@ -403,7 +403,7 @@ char *uuid_date(char *dest, const char *uuid)
 		                (ptrdiff_t)(p - dest)); /* gncov */
 		return NULL; /* gncov */
 	}
-	snprintf(p, DATE_LENGTH - 19 + 1, ".%07uZ", nano);
+	snprintf(p, DATE_LENGTH - 19 + 1, ".%07lluZ", nano);
 	if (!is_valid_date(dest, 1)) {
 		fprintf(stderr, "%s: %s(): %s: Generated" /* gncov */
 		                " invalid timestamp\n",
