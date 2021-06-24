@@ -140,9 +140,9 @@ void fill_uuid_time(struct uuid_time *ut, const struct timeval *tv)
 	assert(tv);
 
 	create_uuid_time(&utime, tv);
-	ut->low = (unsigned long)(utime & 0xFFFFFFFF);
-	ut->mid = (unsigned short)((utime >> 32) & 0xFFFF);
-	ut->hi = (unsigned short)((utime >> 48) & 0xFFF);
+	ut->low = (utime & 0xFFFFFFFFUL);
+	ut->mid = ((utime >> 32) & 0xFFFF);
+	ut->hi = ((utime >> 48) & 0xFFF);
 	ut->hi |= (1 << 12);
 }
 
@@ -284,8 +284,8 @@ char *finish_uuid(char *dest, const struct uuid *u)
 	assert(dest);
 	assert(u);
 
-	sprintf(dest, "%08x-%04x-1%03x-%02x%02x-",
-	              u->time.low & 0xFFFFFFFF,
+	sprintf(dest, "%08lx-%04x-1%03x-%02x%02x-",
+	              u->time.low & 0xFFFFFFFFUL,
 	              u->time.mid & 0xFFFF,
 	              u->time.hi & 0xFFF,
 	              u->clseq_hi & 0xFF,
