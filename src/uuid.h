@@ -35,8 +35,8 @@ struct uuid_time {
 };
 struct uuid {
 	struct uuid_time time;
-	unsigned int clseq_hi;
-	unsigned int clseq_lo;
+	unsigned char clseq_hi;
+	unsigned char clseq_lo;
 	unsigned char node[MACADDR_LENGTH];
 };
 

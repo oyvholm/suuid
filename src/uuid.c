@@ -193,9 +193,9 @@ struct timeval *get_current_time(struct timeval *tv)
 
 void get_clockseq(struct uuid *u)
 {
-	static unsigned int seq;
+	static unsigned short seq;
 	static bool done_init = false;
-	unsigned int val;
+	unsigned short val;
 
 	assert(u);
 
