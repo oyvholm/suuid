@@ -112,7 +112,7 @@ struct Logs {
 };
 struct Options {
 	char *comment;
-	unsigned int count;
+	unsigned long count;
 	bool help;
 	bool license;
 	char *logdir;
@@ -129,7 +129,7 @@ struct Options {
 	char *whereto;
 };
 struct uuid_result {
-	unsigned int count;
+	unsigned long count;
 	char lastuuid[UUID_LENGTH + 1];
 	bool success;
 };

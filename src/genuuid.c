@@ -297,7 +297,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	struct uuid_result retval;
 	char *rcfile = NULL;
 	char *logfile = NULL;
-	unsigned int i, count;
+	unsigned long l, count;
 	struct Rc rc;
 	struct Entry entry;
 	struct Logs logs;
@@ -307,7 +307,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	memset(&rc, 0, sizeof(rc));
 	logs.logfp = NULL;
 	count = opt->count;
-	retval.count = 0;
+	retval.count = 0UL;
 	memset(retval.lastuuid, 0, UUID_LENGTH + 1);
 	retval.success = true;
 	init_xml_entry(&entry);
@@ -360,8 +360,8 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	 */
 
 	if (opt->uuid)
-		count = 1;
-	for (i = 0; i < count; i++) {
+		count = 1UL;
+	for (l = 0UL; l < count; l++) {
 		if (!process_uuid(&logs, &rc, opt, &entry)) {
 			retval.success = false;
 			goto cleanup;
@@ -378,7 +378,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	 */
 
 	if (retval.count < opt->count) {
-		fprintf(stderr, "%s: Generated only %u of %u UUIDs\n",
+		fprintf(stderr, "%s: Generated only %lu of %lu UUIDs\n",
 		                progname, retval.count, opt->count);
 	}
 
