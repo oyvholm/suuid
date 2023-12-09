@@ -36,9 +36,9 @@ our %Opt = (
 
 our $progname = $0;
 $progname =~ s/^.*\/(.*?)$/$1/;
-our $VERSION = '0.3.0';
+our $VERSION = '0.4.0';
 
-Getopt::Long::Configure('bundling');
+Getopt::Long::Configure('bundling', 'require_order');
 GetOptions(
 
     'comment|c=s' => \$Opt{'comment'},
@@ -240,10 +240,8 @@ sub usage {
 
 Usage: $progname [options] [--] command
 
-Execute a command and log start and end time with suuid(1). If the 
-command contains options, include the -- option to switch off parameter 
-parsing of the command. The uuid of the session can be read from the 
-SESS_UUID environment variable.
+Execute a command and log start and end time with suuid(1). The uuid of 
+the session can be read from the SESS_UUID environment variable.
 
 Options:
 
