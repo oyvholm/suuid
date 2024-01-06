@@ -8,5 +8,4 @@ suuid:linux:
   before_script:
     - apt-get update -qq && apt-get install -y uuid valgrind
   script:
-    # FIXME: Have removed valgrind, it doesn't work on Gitlab atm.
-    - script -e -q -c "make testall clean"
+    - script -e -q -c "make testall clean valgrind"
