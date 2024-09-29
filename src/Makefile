@@ -11,13 +11,13 @@ TESTLOCKDIR = testlockdir
 CC = cc
 LD = cc
 
-CCFLAGS  =
-CCFLAGS += $$(test -n "$(GCOV)" && echo -n "-fprofile-arcs -ftest-coverage")
-CCFLAGS += $$(test -n "$(PROF)" && echo -n "-pg")
-CCFLAGS += -O0 -c -g
-CCFLAGS += -Wall
-CCFLAGS += -Werror
-CCFLAGS += -Wextra
+CFLAGS  =
+CFLAGS += $$(test -n "$(GCOV)" && echo -n "-fprofile-arcs -ftest-coverage")
+CFLAGS += $$(test -n "$(PROF)" && echo -n "-pg")
+CFLAGS += -O0 -c -g
+CFLAGS += -Wall
+CFLAGS += -Werror
+CFLAGS += -Wextra
 
 LDFLAGS  =
 LDFLAGS += $$(test -n "$(PROF)" && echo -n "-pg")
@@ -76,37 +76,37 @@ version.h: Gen-version $(CFILES) $(DEPS)
 	./Gen-version
 
 suuid.o: version.h suuid.c $(DEPS)
-	$(CC) $(CCFLAGS) suuid.c
+	$(CC) $(CFLAGS) suuid.c
 
 environ.o: environ.c $(DEPS)
-	$(CC) $(CCFLAGS) environ.c
+	$(CC) $(CFLAGS) environ.c
 
 genuuid.o: genuuid.c $(DEPS)
-	$(CC) $(CCFLAGS) genuuid.c
+	$(CC) $(CFLAGS) genuuid.c
 
 io.o: io.c $(DEPS)
-	$(CC) $(CCFLAGS) io.c
+	$(CC) $(CFLAGS) io.c
 
 logfile.o: logfile.c $(DEPS)
-	$(CC) $(CCFLAGS) logfile.c
+	$(CC) $(CFLAGS) logfile.c
 
 rcfile.o: rcfile.c $(DEPS)
-	$(CC) $(CCFLAGS) rcfile.c
+	$(CC) $(CFLAGS) rcfile.c
 
 selftest.o: selftest.c $(DEPS)
-	$(CC) $(CCFLAGS) selftest.c
+	$(CC) $(CFLAGS) selftest.c
 
 sessvar.o: sessvar.c $(DEPS)
-	$(CC) $(CCFLAGS) sessvar.c
+	$(CC) $(CFLAGS) sessvar.c
 
 string.o: string.c $(DEPS)
-	$(CC) $(CCFLAGS) string.c
+	$(CC) $(CFLAGS) string.c
 
 tag.o: tag.c $(DEPS)
-	$(CC) $(CCFLAGS) tag.c
+	$(CC) $(CFLAGS) tag.c
 
 uuid.o: uuid.c $(DEPS)
-	$(CC) $(CCFLAGS) uuid.c
+	$(CC) $(CFLAGS) uuid.c
 
 .PHONY: clean
 clean:

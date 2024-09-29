@@ -5,8 +5,8 @@ EXEC = uuid
 
 CC = cc
 LD = cc
-CCFLAGS = -Wall -Wextra -Werror -O0 -c -g
-CCFLAGS += $$(test -n "$(GCOV)" && echo -n "-fprofile-arcs -ftest-coverage")
+CFLAGS = -Wall -Wextra -Werror -O0 -c -g
+CFLAGS += $$(test -n "$(GCOV)" && echo -n "-fprofile-arcs -ftest-coverage")
 LDFLAGS = -Wall -Wextra -Werror
 LIBS =
 LIBS += $$(test -n "$(GCOV)" && echo "-lgcov --coverage");
@@ -23,10 +23,10 @@ $(EXEC): $(OBJS)
 	$(LD) -o $(EXEC) $(LDFLAGS) $(OBJS) $(LIBS)
 
 sysdep.o: sysdep.c $(DEPS)
-	$(CC) $(CCFLAGS) sysdep.c
+	$(CC) $(CFLAGS) sysdep.c
 
 uuid.o: uuid.c $(DEPS)
-	$(CC) $(CCFLAGS) uuid.c
+	$(CC) $(CFLAGS) uuid.c
 
 .PHONY: clean
 clean:
