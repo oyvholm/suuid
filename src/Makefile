@@ -191,6 +191,14 @@ testlock: $(EXEC)
 	for f in $$(seq 1 500); do ./$(EXEC) -wn -l $(TESTLOCKDIR); done &
 	for f in $$(seq 1 500); do ./$(EXEC) -wn -l $(TESTLOCKDIR); done
 
+.PHONY: testsrc
+testsrc:
+	@echo Check files for long lines
+	@for f in $(CFILES) $(HFILES) Gen-version Makefile; do \
+		[ -f "$$f" ] && expand "$$f" | sed 's/ $$//;' \
+		| grep -q -E '.{80}' && echo "$$f"; \
+	done | grep . && exit 1 || true
+
 .PHONY: tlok
 tlok:
 	@$(MAKE) -s gcov 2>.make-tlok.tmp >&2; res=$$?; \
