@@ -706,14 +706,14 @@ FILE *open_logfile(const char *fname)
 }
 
 /*
- * add_to_logfile() - Add the contents of *entry to the logfile stream. Return 
- * EXIT_SUCCESS or EXIT_FAILURE.
+ * add_to_logfile() - Add the contents of *entry to the logfile stream. Returns 
+ * 0 if ok or 1 if any errors.
  */
 
 int add_to_logfile(FILE *fp, const struct Entry *entry, const bool raw)
 {
 	char *ap;
-	int retval = EXIT_SUCCESS;
+	int retval = 0;
 
 	assert(fp);
 	assert(entry);
@@ -721,12 +721,12 @@ int add_to_logfile(FILE *fp, const struct Entry *entry, const bool raw)
 
 	ap = xml_entry(entry, raw);
 	if (!ap)
-		return EXIT_FAILURE;
+		return 1;
 	if (fputs(ap, fp) < 0)
-		retval = EXIT_FAILURE; /* gncov */
+		retval = 1; /* gncov */
 	if (fputc('\n', fp) == EOF)
-		retval = EXIT_FAILURE; /* gncov */
-	if (retval == EXIT_FAILURE) {
+		retval = 1; /* gncov */
+	if (retval) {
 		myerror("%s(): Cannot write to the log file", /* gncov */
 		        __func__);
 	}
@@ -738,25 +738,25 @@ int add_to_logfile(FILE *fp, const struct Entry *entry, const bool raw)
 
 /*
  * close_logfile() - Do the finishing changes on FILE stream fp, add end tag 
- * and close the stream. Return EXIT_SUCCESS if no errors, if any errors were 
- * detected, return EXIT_FAILURE.
+ * and close the stream. Return 0 if no errors, if any errors were detected, 
+ * return 1.
  */
 
 int close_logfile(FILE *fp)
 {
-	int retval = EXIT_SUCCESS;
+	int retval = 0;
 
 	assert(fp);
 
 	if (fprintf(fp, "</suuids>\n") != 10)
-		retval = EXIT_FAILURE; /* gncov */
+		retval = 1; /* gncov */
 	if (fflush(fp) == EOF)
-		retval = EXIT_FAILURE; /* gncov */
+		retval = 1; /* gncov */
 	flock(fileno(fp), LOCK_UN);
 	if (fclose(fp) == EOF)
-		retval = EXIT_FAILURE; /* gncov */
+		retval = 1; /* gncov */
 
-	if (retval == EXIT_FAILURE)
+	if (retval)
 		myerror("Error when closing log file"); /* gncov */
 
 	return retval;

@@ -287,13 +287,13 @@ int usage(const int retval)
  * choose_opt_action() - Decide what to do when option c is found. Store 
  * changes in dest. opts is the struct with the definitions for the long 
  * options.
- * Return EXIT_SUCCESS if ok, EXIT_FAILURE if c is unknown or anything fails.
+ * Return 0 if ok, 1 if c is unknown or anything fails.
  */
 
 int choose_opt_action(struct Options *dest,
                       const int c, const struct option *opts)
 {
-	int retval = EXIT_SUCCESS;
+	int retval = 0;
 	static unsigned int tag_count = 0;
 
 	assert(dest);
@@ -329,7 +329,7 @@ int choose_opt_action(struct Options *dest,
 	case 'n':
 		if (!sscanf(optarg, "%lu", &dest->count)) {
 			myerror("Error in -n/--count argument");
-			retval = EXIT_FAILURE;
+			retval = 1;
 		}
 		break;
 	case 'q':
@@ -339,7 +339,7 @@ int choose_opt_action(struct Options *dest,
 		if (tag_count >= MAX_TAGS) {
 			fprintf(stderr, "%s: Maximum number of tags (%u)"
 			                " exceeded\n", progname, MAX_TAGS);
-			retval = EXIT_FAILURE;
+			retval = 1;
 		}
 		dest->tag[tag_count++] = optarg;
 		break;
@@ -351,7 +351,7 @@ int choose_opt_action(struct Options *dest,
 		break;
 	default:
 		msg(3, "getopt_long() returned character code %d", c);
-		retval = EXIT_FAILURE;
+		retval = 1;
 		break;
 	}
 
@@ -360,19 +360,19 @@ int choose_opt_action(struct Options *dest,
 
 /*
  * parse_options() - Parse command line options.
- * Returns EXIT_SUCCESS if ok, EXIT_FAILURE if error.
+ * Returns 0 if ok, 1 if error.
  */
 
 int parse_options(struct Options *dest, const int argc, char * const argv[])
 {
-	int retval = EXIT_SUCCESS;
+	int retval = 0;
 
 	assert(dest);
 	assert(argv);
 
 	init_opt(dest);
 
-	while (retval == EXIT_SUCCESS) {
+	while (!retval) {
 		int c;
 		int option_index = 0;
 		static struct option long_options[] = {
@@ -424,15 +424,14 @@ int parse_options(struct Options *dest, const int argc, char * const argv[])
 
 int main(int argc, char *argv[])
 {
-	int retval;
+	int retval = 0;
 	struct uuid_result result;
 	struct Options opt;
 
 	progname = argv[0];
 	errno = 0;
 
-	retval = parse_options(&opt, argc, argv);
-	if (retval != EXIT_SUCCESS) {
+	if (parse_options(&opt, argc, argv)) {
 		myerror("Option error");
 		return usage(EXIT_FAILURE);
 	}

@@ -86,7 +86,7 @@ char *has_key(const char *line, const char *keyword)
 /*
  * parse_rc_line() - Receive a line from the rcfile and check for each keyword 
  * by sending it to check_rc() which will set the struct variable accordingly. 
- * If ok, return EXIT_SUCCESS. If strdup() failed, return EXIT_FAILURE.
+ * If ok, return 0. If strdup() failed, return 1.
  */
 
 int parse_rc_line(const char *line, struct Rc *rc)
@@ -97,22 +97,22 @@ int parse_rc_line(const char *line, struct Rc *rc)
 	if (has_key(line, "hostname")) {
 		rc->hostname = mystrdup(has_key(line, "hostname"));
 		if (!rc->hostname)
-			return EXIT_FAILURE; /* gncov */
+			return 1; /* gncov */
 	}
 	if (has_key(line, "macaddr")) {
 		rc->macaddr = mystrdup(has_key(line, "macaddr"));
 		if (!rc->macaddr)
-			return EXIT_FAILURE; /* gncov */
+			return 1; /* gncov */
 		string_to_lower(rc->macaddr);
 	}
 
-	return EXIT_SUCCESS;
+	return 0;
 }
 
 /*
  * read_rcfile() - Read contents of rcfile into rc. rcfile is allowed to be 
  * NULL, that means it wasn't found.
- * Returns EXIT_SUCCESS or EXIT_FAILURE.
+ * Returns 0 if success or 1 if error.
  */
 
 int read_rcfile(const char *rcfile, struct Rc *rc)
@@ -126,7 +126,7 @@ int read_rcfile(const char *rcfile, struct Rc *rc)
 	rc->macaddr = NULL;
 
 	if (!rcfile)
-		return EXIT_SUCCESS;
+		return 0;
 
 	fp = fopen(rcfile, "r");
 	if (!fp) {
@@ -135,7 +135,7 @@ int read_rcfile(const char *rcfile, struct Rc *rc)
 		 * means it doesn't exist.
 		 */
 		errno = 0;
-		return EXIT_SUCCESS;
+		return 0;
 	}
 
 	do {
@@ -143,13 +143,13 @@ int read_rcfile(const char *rcfile, struct Rc *rc)
 			myerror("%s: Could not read from rcfile", /* gncov */
 			        rcfile);
 			fclose(fp); /* gncov */
-			return EXIT_FAILURE; /* gncov */
+			return 1; /* gncov */
 		}
 		trim_str_front(buf);
 		trim_str_end(buf);
-		if (parse_rc_line(buf, rc) == EXIT_FAILURE) {
+		if (parse_rc_line(buf, rc)) {
 			fclose(fp); /* gncov */
-			return EXIT_FAILURE; /* gncov */
+			return 1; /* gncov */
 		}
 		*buf = '\0';
 	} while (!feof(fp));
@@ -162,9 +162,9 @@ int read_rcfile(const char *rcfile, struct Rc *rc)
 		rc->macaddr = NULL;
 	}
 	if (rc->macaddr && !valid_macaddr(rc->macaddr))
-		return EXIT_FAILURE;
+		return 1;
 
-	return EXIT_SUCCESS;
+	return 0;
 }
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */

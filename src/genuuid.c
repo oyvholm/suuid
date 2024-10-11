@@ -23,8 +23,8 @@
 bool should_terminate = false;
 
 /*
- * init_randomness() - Initialise the random number generator. Returns 
- * EXIT_SUCCESS or EXIT_FAILURE.
+ * init_randomness() - Initialise the random number generator. Returns 0 if ok, 
+ * or 1 if `gettimeofday()` fails.
  */
 
 int init_randomness(void)
@@ -34,13 +34,13 @@ int init_randomness(void)
 	if (gettimeofday(&tv, NULL) == -1) {
 		myerror("Could not initialise randomness" /* gncov */
 		        " generator, gettimeofday() failed");
-		return EXIT_FAILURE; /* gncov */
+		return 1; /* gncov */
 	}
 
 	srandom((unsigned int)tv.tv_sec ^ (unsigned int)tv.tv_usec
 		^ (unsigned int)getpid());
 
-	return EXIT_SUCCESS;
+	return 0;
 }
 
 /*
@@ -138,7 +138,7 @@ char *process_comment_option(const char *cmt)
 /*
  * fill_entry_struct() - Fill the entry struct with information from the opt 
  * struct and the environment, like current directory, hostname, comment, etc.
- * Returns EXIT_SUCCESS if no errors, EXIT_FAILURE if errors.
+ * Returns 0 if no errors, 1 if errors.
  */
 
 int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
@@ -160,7 +160,7 @@ int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
 
 	entry->host = get_hostname(rc);
 	if (!entry->host)
-		return EXIT_FAILURE;
+		return 1;
 	entry->cwd = getpath();
 	entry->user = get_username();
 	entry->tty = get_tty();
@@ -170,26 +170,26 @@ int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
 	 */
 
 	for (i = 0; i < MAX_TAGS && opt->tag[i]; i++) {
-		if (store_tag(entry, opt->tag[i]) == EXIT_FAILURE)
-			return EXIT_FAILURE;
+		if (store_tag(entry, opt->tag[i]))
+			return 1;
 	}
 
 	if (opt->comment) {
 		entry->txt = process_comment_option(opt->comment);
 		if (!entry->txt)
-			return EXIT_FAILURE;
+			return 1;
 	}
 
 	/*
 	 * Store session information from the environment variable.
 	 */
 
-	if (get_sess_info(entry) == EXIT_FAILURE) {
+	if (get_sess_info(entry)) {
 		free(entry->txt);
-		return EXIT_FAILURE;
+		return 1;
 	}
 
-	return EXIT_SUCCESS;
+	return 0;
 }
 
 /*
@@ -243,7 +243,7 @@ char *process_uuid(struct Logs *logs,
 	if (!uuid_date(entry->date, entry->uuid))
 		return NULL;
 
-	if (add_to_logfile(logs->logfp, entry, opt->raw) == EXIT_FAILURE)
+	if (add_to_logfile(logs->logfp, entry, opt->raw))
 		return NULL;
 
 	/*
@@ -317,18 +317,18 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	 * tty, location of rc file and log directory, etc.
 	 */
 
-	if (init_randomness() == EXIT_FAILURE) {
+	if (init_randomness()) {
 		retval.success = false; /* gncov */
 		goto cleanup; /* gncov */
 	}
 
 	rcfile = get_rcfilename(opt);
-	if (read_rcfile(rcfile, &rc) == EXIT_FAILURE) {
+	if (read_rcfile(rcfile, &rc)) {
 		retval.success = false;
 		goto cleanup;
 	}
 
-	if (fill_entry_struct(&entry, &rc, opt) == EXIT_FAILURE) {
+	if (fill_entry_struct(&entry, &rc, opt)) {
 		retval.success = false;
 		goto cleanup;
 	}
@@ -387,7 +387,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	 */
 
 cleanup:
-	if (logs.logfp && (close_logfile(logs.logfp) == EXIT_FAILURE))
+	if (logs.logfp && close_logfile(logs.logfp))
 		retval.success = false; /* gncov */
 
 	free(logfile);

@@ -71,27 +71,26 @@ char *get_next_tag(const struct Entry *entry)
 }
 
 /*
- * store_tag() - Store a new tag in the array. Return EXIT_SUCCESS if the tag 
- * was successfully added or it existed from before, or EXIT_FAILURE if 
- * something failed.
+ * store_tag() - Store a new tag in the array. Return 0 if the tag was 
+ * successfully added or it existed from before, or 1 if something failed.
  */
 
 int store_tag(struct Entry *entry, const char *arg)
 {
 	char *tag, *p;
-	int retval = EXIT_SUCCESS;
+	int retval = 0;
 
 	assert(entry);
 	assert(arg);
 
 	tag = mystrdup(arg); /* Don't modify the source */
 	if (!tag)
-		return EXIT_FAILURE; /* gncov */
+		return 1; /* gncov */
 
 	while ((p = strchr(tag, ','))) {
 		*p++ = '\0';
-		if (store_tag(entry, tag) == EXIT_FAILURE) {
-			retval = EXIT_FAILURE;
+		if (store_tag(entry, tag)) {
+			retval = 1;
 			goto cleanup;
 		}
 		if (p && strlen(p)) {
@@ -106,7 +105,7 @@ int store_tag(struct Entry *entry, const char *arg)
 
 			tag2 = mymalloc(strlen(p) + 1);
 			if (!tag2) {
-				retval = EXIT_FAILURE; /* gncov */
+				retval = 1; /* gncov */
 				goto cleanup; /* gncov */
 			}
 			strcpy(tag2, p);
@@ -120,19 +119,19 @@ int store_tag(struct Entry *entry, const char *arg)
 		goto cleanup;
 	if (utf8_check(tag)) {
 		fprintf(stderr, "%s: Tags have to be in UTF-8\n", progname);
-		retval = EXIT_FAILURE;
+		retval = 1;
 		goto cleanup;
 	}
 
 	if (tag_count >= MAX_TAGS) {
 		fprintf(stderr, "%s: Maximum number of tags (%u) exceeded\n",
 		                progname, MAX_TAGS);
-		retval = EXIT_FAILURE;
+		retval = 1;
 		goto cleanup;
 	}
 
 	if (!(entry->tag[tag_count++] = mystrdup(tag)))
-		retval = EXIT_FAILURE; /* gncov */
+		retval = 1; /* gncov */
 
 cleanup:
 	free(tag);
