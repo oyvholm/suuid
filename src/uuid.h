@@ -42,7 +42,7 @@ struct uuid {
 
 /* uuid.c */
 extern bool valid_uuid(const char *u, const bool check_len);
-extern char *scan_for_uuid(const char *s);
+extern const char *scan_for_uuid(const char *s);
 extern bool valid_macaddr(const char *macaddr);
 extern void scramble_mac_address(char *dest);
 extern char *generate_uuid(char *uuid);

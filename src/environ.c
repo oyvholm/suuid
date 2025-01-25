@@ -47,7 +47,7 @@ char *get_editor(void)
 
 bool valid_hostname(const char *s)
 {
-	unsigned char *p;
+	const unsigned char *p;
 
 	assert(s);
 
@@ -55,7 +55,7 @@ bool valid_hostname(const char *s)
 	    || strstr(s, "..") || utf8_check(s))
 		return false;
 
-	p = (unsigned char *)s;
+	p = (const unsigned char *)s;
 	while (*p) {
 		/*
 		 * FIXME: Check up on some RFC or something so the correct 

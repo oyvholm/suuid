@@ -177,9 +177,9 @@ char *trim_str_end(char *dest)
  *   2016-07-09 - Add const modifier to text argument.
  */
 
-char *utf8_check(const char *text)
+const char *utf8_check(const char *text)
 {
-	unsigned char *s = (unsigned char *)text;
+	const unsigned char *s = (const unsigned char *)text;
 
 	assert(text);
 
@@ -191,7 +191,7 @@ char *utf8_check(const char *text)
 			/* 110XXXXx 10xxxxxx */
 			if ((s[1] & 0xc0) != 0x80
 			    || (s[0] & 0xfe) == 0xc0) /* overlong? */
-				return (char *)s;
+				return (const char *)s;
 			else
 				s += 2;
 		} else if ((s[0] & 0xf0) == 0xe0) {
@@ -204,7 +204,7 @@ char *utf8_check(const char *text)
 			        && (s[1] & 0xe0) == 0xa0) /* surrogate? */
 			    || (s[0] == 0xef && s[1] == 0xbf
 			        && (s[2] & 0xfe) == 0xbe)) /* U+FFFE/U+FFFF? */
-				return (char *)s;
+				return (const char *)s;
 			else
 				s += 3;
 		} else if ((s[0] & 0xf8) == 0xf0) {
@@ -216,11 +216,11 @@ char *utf8_check(const char *text)
 			        && (s[1] & 0xf0) == 0x80) /* overlong? */
 			    || (s[0] == 0xf4 && s[1] > 0x8f)
 			    || s[0] > 0xf4) /* > U+10FFFF? */
-				return (char *)s;
+				return (const char *)s;
 			else
 				s += 4;
 		} else {
-			return (char *)s;
+			return (const char *)s;
 		}
 	}
 

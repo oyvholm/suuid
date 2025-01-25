@@ -26,7 +26,7 @@
  * or NULL if everything is ok.
  */
 
-char *check_hex(const char *hex, const size_t len)
+const char *check_hex(const char *hex, const size_t len)
 {
 	const char *p;
 
@@ -34,7 +34,7 @@ char *check_hex(const char *hex, const size_t len)
 
 	for (p = hex; p < hex + len; p++) {
 		if (!strchr("0123456789abcdef", *p))
-			return (char *)p;
+			return p;
 	}
 
 	return NULL;
@@ -98,7 +98,7 @@ bool valid_uuid(const char *u, const bool check_len)
  * NULL if no UUID was found.
  */
 
-char *scan_for_uuid(const char *s)
+const char *scan_for_uuid(const char *s)
 {
 	const char *p = s;
 
@@ -106,7 +106,7 @@ char *scan_for_uuid(const char *s)
 
 	while (strlen(p) >= UUID_LENGTH) {
 		if (valid_uuid(p, false))
-			return (char *)p;
+			return p;
 		p++;
 	}
 
@@ -327,12 +327,12 @@ char *generate_uuid(char *uuid)
 
 bool is_valid_date(const char *src, const bool check_len)
 {
-	const unsigned char *s = (unsigned char *)src;
+	const unsigned char *s = (const unsigned char *)src;
 
 	assert(s);
 	assert(check_len == false || check_len == true);
 
-	if (check_len && strlen((char *)s) != DATE_LENGTH)
+	if (check_len && strlen((const char *)s) != DATE_LENGTH)
 		return false;
 
 	if (s[0] != '2' || s[1] != '0' /* Yay for Y2.1K */

@@ -11,7 +11,6 @@ TESTLOCKDIR = testlockdir
 CC = cc
 LD = cc
 
-# DEVFLAGS += -Wcast-qual
 # DEVFLAGS += -Wconversion
 # DEVFLAGS += -Wformat-signedness
 # DEVFLAGS += -Wshadow
@@ -25,6 +24,7 @@ CFLAGS += -c
 DEVFLAGS += $$(test "$$(uname -o)" = "Android" || echo -fcf-protection=full)
 DEVFLAGS += -Wbad-function-cast
 DEVFLAGS += -Wcast-align
+DEVFLAGS += -Wcast-qual
 DEVFLAGS += -Wchar-subscripts
 DEVFLAGS += -Wdangling-else
 DEVFLAGS += -Wdate-time

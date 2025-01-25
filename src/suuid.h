@@ -188,7 +188,7 @@ extern char *squeeze_chars(char *s, const char *chars);
 extern char *string_to_lower(char *str);
 extern char *trim_str_front(char *dest);
 extern char *trim_str_end(char *dest);
-extern char *utf8_check(const char *text);
+extern const char *utf8_check(const char *text);
 
 /* suuid.c */
 extern int msg(const int verbose, const char *format, ...);

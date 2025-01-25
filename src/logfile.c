@@ -34,7 +34,7 @@ const size_t MAX_GROWTH = 5;
 
 bool valid_xml_chars(const char *s)
 {
-	unsigned char *p = (unsigned char *)s;
+	const unsigned char *p = (const unsigned char *)s;
 
 	assert(s);
 
