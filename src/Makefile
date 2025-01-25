@@ -11,7 +11,6 @@ TESTLOCKDIR = testlockdir
 CC = cc
 LD = cc
 
-# DEVFLAGS += -Wformat-signedness
 CFLAGS  =
 CFLAGS += $$($(IS_DEV) && echo -O0 || echo -O2)
 CFLAGS += $$(test -n "$(GCOV)" && echo -n "-fprofile-arcs -ftest-coverage")
@@ -35,6 +34,7 @@ DEVFLAGS += -Wfloat-conversion
 DEVFLAGS += -Wformat
 DEVFLAGS += -Wformat-overflow
 DEVFLAGS += -Wformat-security
+DEVFLAGS += -Wformat-signedness
 DEVFLAGS += -Wformat-truncation
 DEVFLAGS += -Wformat-y2k
 DEVFLAGS += -Winit-self

@@ -286,10 +286,10 @@ char *finish_uuid(char *dest, const struct uuid *u)
 
 	sprintf(dest, "%08lx-%04x-1%03x-%02x%02x-",
 	              u->time.low & 0xFFFFFFFFUL,
-	              u->time.mid & 0xFFFF,
-	              u->time.hi & 0xFFF,
-	              u->clseq_hi & 0xFF,
-	              u->clseq_lo & 0xFF);
+	              (unsigned int)u->time.mid & 0xFFFF,
+	              (unsigned int)u->time.hi  & 0xFFF,
+	              (unsigned int)u->clseq_hi & 0xFF,
+	              (unsigned int)u->clseq_lo & 0xFF);
 	write_hex(dest + 24, u->node, MACADDR_LENGTH);
 
 	return dest;

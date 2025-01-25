@@ -124,7 +124,7 @@ int store_tag(struct Entry *entry, const char *arg)
 	}
 
 	if (tag_count >= MAX_TAGS) {
-		fprintf(stderr, "%s: Maximum number of tags (%u) exceeded\n",
+		fprintf(stderr, "%s: Maximum number of tags (%d) exceeded\n",
 		                progname, MAX_TAGS);
 		retval = 1;
 		goto cleanup;

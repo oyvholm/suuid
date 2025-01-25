@@ -102,7 +102,7 @@ int fill_sess(struct Entry *dest, const char *uuid,
 	assert(valid_uuid(uuid, false));
 
 	if (sessind >= MAX_SESS) {
-		fprintf(stderr, "%s: Maximum number of sess entries (%u)"
+		fprintf(stderr, "%s: Maximum number of sess entries (%d)"
 		                " exceeded\n", progname, MAX_SESS);
 		return 1;
 	}
