@@ -11,15 +11,66 @@ TESTLOCKDIR = testlockdir
 CC = cc
 LD = cc
 
+# DEVFLAGS += -Wcast-qual
+# DEVFLAGS += -Wconversion
+# DEVFLAGS += -Wformat-signedness
+# DEVFLAGS += -Wshadow
 CFLAGS  =
+CFLAGS += $$($(IS_DEV) && echo -O0 || echo -O2)
 CFLAGS += $$(test -n "$(GCOV)" && echo -n "-fprofile-arcs -ftest-coverage")
 CFLAGS += $$(test -n "$(PROF)" && echo -n "-pg")
-CFLAGS += -O0
+CFLAGS += $(DEVFLAGS_STR)
 CFLAGS += -Wall
-CFLAGS += -Werror
-CFLAGS += -Wextra
 CFLAGS += -c
-CFLAGS += -g
+DEVFLAGS += $$(test "$$(uname -o)" = "Android" || echo -fcf-protection=full)
+DEVFLAGS += -Wbad-function-cast
+DEVFLAGS += -Wcast-align
+DEVFLAGS += -Wchar-subscripts
+DEVFLAGS += -Wdangling-else
+DEVFLAGS += -Wdate-time
+DEVFLAGS += -Wdouble-promotion
+DEVFLAGS += -Werror
+DEVFLAGS += -Werror=implicit-function-declaration
+DEVFLAGS += -Wextra
+DEVFLAGS += -Wfloat-conversion
+DEVFLAGS += -Wformat
+DEVFLAGS += -Wformat-overflow
+DEVFLAGS += -Wformat-security
+DEVFLAGS += -Wformat-truncation
+DEVFLAGS += -Wformat-y2k
+DEVFLAGS += -Winit-self
+DEVFLAGS += -Wint-in-bool-context
+DEVFLAGS += -Wlogical-not-parentheses
+DEVFLAGS += -Wmisleading-indentation
+DEVFLAGS += -Wmissing-braces
+DEVFLAGS += -Wold-style-definition
+DEVFLAGS += -Woverlength-strings
+DEVFLAGS += -Wpedantic
+DEVFLAGS += -Wredundant-decls
+DEVFLAGS += -Wstrict-aliasing
+DEVFLAGS += -Wstrict-overflow=5
+DEVFLAGS += -Wstrict-prototypes
+DEVFLAGS += -Wunused-const-variable
+DEVFLAGS += -Wunused-function
+DEVFLAGS += -fno-common
+DEVFLAGS += -fstack-protector-strong
+DEVFLAGS += -fwrapv
+DEVFLAGS += -g3
+DEVFLAGS += -pedantic
+DEVFLAGS_STR = $$($(IS_DEV) && echo $(DEVFLAGS))
+
+#  Not in Clang
+# DEVFLAGS += -Wc99-c11-compat
+# DEVFLAGS += -Wduplicated-branches
+# DEVFLAGS += -Wformat-overflow=2
+# DEVFLAGS += -Wjump-misses-init
+# DEVFLAGS += -Wlogical-op
+
+#  Don't use yet
+# DEVFLAGS += -Waggregate-return
+# DEVFLAGS += -Wformat=2
+# DEVFLAGS += -Wmissing-declarations
+# DEVFLAGS += -Wpadded
 
 LDFLAGS  =
 LDFLAGS += $$(test -n "$(PROF)" && echo -n "-pg")
@@ -62,6 +113,8 @@ HFILES += uuid.h
 
 DEPS = $(HFILES) Makefile
 GNCOV_STR = $$(test -n "$(GNCOV)" && echo "-g")
+IS_DEV = [ -z "$(NODEVEL)" \
+           -a \( -e .devel -o -e ../.git/.devel -o -n "$(DEVEL)" \) ]
 TESTABLE_LINES = $$(grep -E '^ +\#\#\#\#\#:' *.c.gcov \
                     | grep -vF '/* gncov */' | wc -l)
 
@@ -106,6 +159,10 @@ tag.o: tag.c $(DEPS)
 
 uuid.o: uuid.c $(DEPS)
 	$(CC) $(CFLAGS) uuid.c
+
+.PHONY: cflags
+cflags:
+	@echo $(CFLAGS)
 
 .PHONY: clean
 clean:

@@ -25,6 +25,10 @@ all:
 tags: src/*.[ch]
 	ctags src/*.[ch]
 
+.PHONY: cflags
+cflags:
+	@cd src && $(MAKE) -s $@
+
 .PHONY: clean
 clean:
 	find . -name .testadd.tmp -type d -print0 | xargs -0r rm -rf
