@@ -13,7 +13,6 @@ LD = cc
 
 # DEVFLAGS += -Wconversion
 # DEVFLAGS += -Wformat-signedness
-# DEVFLAGS += -Wshadow
 CFLAGS  =
 CFLAGS += $$($(IS_DEV) && echo -O0 || echo -O2)
 CFLAGS += $$(test -n "$(GCOV)" && echo -n "-fprofile-arcs -ftest-coverage")
@@ -47,6 +46,7 @@ DEVFLAGS += -Wold-style-definition
 DEVFLAGS += -Woverlength-strings
 DEVFLAGS += -Wpedantic
 DEVFLAGS += -Wredundant-decls
+DEVFLAGS += -Wshadow
 DEVFLAGS += -Wstrict-aliasing
 DEVFLAGS += -Wstrict-overflow=5
 DEVFLAGS += -Wstrict-prototypes

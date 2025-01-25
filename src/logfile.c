@@ -424,19 +424,19 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 		 * file won't validate. The XML doesn't need to have a single 
 		 * root, as it will be enclosed inside the <txt> element.
 		 */
-		int size;
+		int txt_size;
 		char *txt_space;
 
-		size = strlen("<txt> ") + strlen(entry->txt)
-		       + strlen(" </txt> ") + 1;
-		e.txt = mymalloc(size);
+		txt_size = strlen("<txt> ") + strlen(entry->txt)
+		           + strlen(" </txt> ") + 1;
+		e.txt = mymalloc(txt_size);
 		if (!e.txt) {
 			retval = NULL; /* gncov */
 			goto cleanup; /* gncov */
 		}
 		txt_space = entry->txt[0] == '<' ? " " : "";
-		snprintf(e.txt, size, "<txt>%s%s%s</txt> ",
-		                      txt_space, entry->txt, txt_space);
+		snprintf(e.txt, txt_size, "<txt>%s%s%s</txt> ",
+		                          txt_space, entry->txt, txt_space);
 	} else {
 		/*
 		 * Write escaped XML to the buffer.
