@@ -129,8 +129,8 @@ char *get_logdir(const struct Options *opt)
 		/*
 		 * Use default hardcoded value.
 		 */
-		int size = strlen(getenv("HOME"))
-		           + strlen("/uuids") + 1; /* FIXME: slash */
+		size_t size = strlen(getenv("HOME"))
+		              + strlen("/uuids") + 1; /* FIXME: slash */
 
 		retval = mymalloc(size + 1);
 		if (!retval)

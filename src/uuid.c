@@ -200,13 +200,13 @@ void get_clockseq(struct uuid *u)
 	assert(u);
 
 	if (!done_init) {
-		seq = random() & 0xFFFF;
+		seq = (unsigned short)random() & 0xFFFF;
 		done_init = true;
 	}
 	val = ++seq;
 
-	u->clseq_lo = val & 0xFF;
-	u->clseq_hi = (val & 0x3F00) >> 8;
+	u->clseq_lo = (unsigned char)val & 0xFF;
+	u->clseq_hi = (unsigned char)((val & 0x3F00) >> 8);
 	u->clseq_hi |= 0x80;
 }
 
@@ -256,7 +256,7 @@ void generate_macaddr(unsigned char *dest)
 	assert(dest);
 
 	for (i = 0; i < MACADDR_LENGTH; i++)
-		dest[i] = random() & 0xFF;
+		dest[i] = (unsigned char)random() & 0xFF;
 	dest[0] |= 0x01;
 }
 

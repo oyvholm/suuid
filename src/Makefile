@@ -11,7 +11,6 @@ TESTLOCKDIR = testlockdir
 CC = cc
 LD = cc
 
-# DEVFLAGS += -Wconversion
 # DEVFLAGS += -Wformat-signedness
 CFLAGS  =
 CFLAGS += $$($(IS_DEV) && echo -O0 || echo -O2)
@@ -25,6 +24,7 @@ DEVFLAGS += -Wbad-function-cast
 DEVFLAGS += -Wcast-align
 DEVFLAGS += -Wcast-qual
 DEVFLAGS += -Wchar-subscripts
+DEVFLAGS += -Wconversion
 DEVFLAGS += -Wdangling-else
 DEVFLAGS += -Wdate-time
 DEVFLAGS += -Wdouble-promotion

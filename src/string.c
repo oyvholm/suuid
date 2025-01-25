@@ -102,7 +102,7 @@ char *string_to_lower(char *str)
 		return p;
 
 	while (*p) {
-		*p = tolower((unsigned char)*p);
+		*p = (char)tolower(*p);
 		p++;
 	}
 

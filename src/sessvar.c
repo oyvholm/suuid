@@ -25,7 +25,7 @@
  * use in the desc attribute in <sess> elements, false if not.
  */
 
-bool is_legal_desc_char(const unsigned char c)
+bool is_legal_desc_char(const char c)
 {
 	return strchr(DESC_LEGAL, c) ? true : false;
 }
@@ -171,7 +171,7 @@ int get_sess_info(struct Entry *entry)
 			}
 
 			if (desc_end > desc_found)
-				desclen = desc_end - desc_found;
+				desclen = (size_t)(desc_end - desc_found);
 
 			if (fill_sess(entry, p, desc_found, desclen)) {
 				free(s);
@@ -262,7 +262,7 @@ char *concat_cmd_string(const int argc, char * const argv[])
 
 char *clean_up_sessvar(char *dest)
 {
-	unsigned int i;
+	size_t i;
 
 	assert(dest);
 

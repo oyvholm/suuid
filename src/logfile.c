@@ -181,7 +181,7 @@ char *allocate_elem(const char *elem, const char *src)
 char *alloc_attr(const char *attr, const char *data)
 {
 	char *retval = NULL;
-	int size;
+	size_t size;
 
 	assert(attr);
 	assert(strlen(attr));
@@ -424,7 +424,7 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 		 * file won't validate. The XML doesn't need to have a single 
 		 * root, as it will be enclosed inside the <txt> element.
 		 */
-		int txt_size;
+		size_t txt_size;
 		char *txt_space;
 
 		txt_size = strlen("<txt> ") + strlen(entry->txt)
