@@ -27,8 +27,6 @@
 #define T_RED    "\x1b[31m"
 #define T_GREEN  "\x1b[32m"
 
-#define stddebug  stderr
-
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>
