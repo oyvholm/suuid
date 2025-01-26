@@ -82,7 +82,6 @@ my $Outdir = "tmp-suuid-t-$$-" . substr(rand, 2, 8);
 
 my $exec_version = `$CMD --version`;
 my $FAKE_HOST = ($exec_version =~ /has FAKE_HOST/s) ? 1 : 0;
-my $SELFTEST = ($exec_version =~ /has SELFTEST/s) ? 1 : 0;
 
 # Definitions from suuid.h
 my $MAX_TAGS = 1000;
@@ -185,7 +184,6 @@ sub test_standard_options {
 }
 
 sub test_suuid_selftest {
-	$SELFTEST || return;
 	diag("--selftest");
 	testcmd("$CMD --selftest",
 	        <<END,
