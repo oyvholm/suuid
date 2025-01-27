@@ -186,6 +186,7 @@ extern const char *utf8_check(const char *text);
 
 /* suuid.c */
 extern int msg(const int verbose, const char *format, ...);
+const char *std_strerror(const int errnum);
 extern int myerror(const char *format, ...);
 
 /* tag.c */

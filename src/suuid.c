@@ -55,6 +55,31 @@ int msg(const int verbose, const char *format, ...)
 }
 
 /*
+ * std_strerror() - Replacement for `strerror()` that returns a predictable 
+ * error message on every platform so the tests work everywhere.
+ */
+
+const char *std_strerror(const int errnum)
+{
+	switch (errnum) {
+	case EACCES:
+		return "Permission denied";
+	case EISDIR:
+		return "Is a directory";
+	default:
+		/*
+		 * Should never happen. If this line is executed, an `errno` 
+		 * value is missing from `std_strerror()`, and tests may fail 
+		 * on other platforms.
+		 */
+		fprintf(stderr,
+		        "%s: %s(): Unknown errnum received: %d, \"%s\"\n",
+		        progname, __func__, errnum, strerror(errnum));
+		return strerror(errnum);
+	}
+}
+
+/*
  * myerror() - Print an error message to stderr using this format:
  *   a: b: c
  * where a is the name of the program (progname), b is the output from the 
@@ -76,7 +101,7 @@ int myerror(const char *format, ...)
 	retval += vfprintf(stderr, format, ap);
 	va_end(ap);
 	if (orig_errno)
-		retval += fprintf(stderr, ": %s", strerror(orig_errno));
+		retval += fprintf(stderr, ": %s", std_strerror(orig_errno));
 	retval += fprintf(stderr, "\n");
 
 	return retval;
