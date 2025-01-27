@@ -36,7 +36,6 @@ skip function utf8_check
 skip function valid_hostname
 skip function valid_macaddr
 skip function valid_uuid
-skip function verbose_level
 tui enable
 
 b main
