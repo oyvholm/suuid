@@ -211,11 +211,20 @@ tags: $(CFILES) $(HFILES)
 
 .PHONY: test
 test: $(EXEC)
-	cd t && $(MAKE) test
+	./$(EXEC) --selftest
 
 .PHONY: testall
 testall:
-	$(MAKE) testcomb WHAT=test
+	$(MAKE) -s testcomb WHAT=testold
+	$(MAKE) -s testcomb WHAT=test
+
+.PHONY: testold
+testold: $(EXEC)
+	cd t && $(MAKE) test
+
+.PHONY: testoldall
+testoldall:
+	$(MAKE) testcomb WHAT=testold
 
 .PHONY: testcomb
 testcomb:
