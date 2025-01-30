@@ -135,65 +135,65 @@ struct uuid_result {
  */
 
 /* environ.c */
-extern char *get_editor(void);
-extern bool valid_hostname(const char *s);
-extern char *get_hostname(const struct Rc *rc);
-extern char *get_logdir(const struct Options *opt);
-extern char *get_log_prefix(const struct Rc *rc, const struct Options *opt,
-                            const char *ext);
-extern char *getpath(void);
-extern char *get_username(void);
-extern char *get_tty(void);
+char *get_editor(void);
+bool valid_hostname(const char *s);
+char *get_hostname(const struct Rc *rc);
+char *get_logdir(const struct Options *opt);
+char *get_log_prefix(const struct Rc *rc, const struct Options *opt,
+                     const char *ext);
+char *getpath(void);
+char *get_username(void);
+char *get_tty(void);
 
 /* genuuid.c */
-extern void init_opt(struct Options *dest);
-extern struct uuid_result create_and_log_uuids(const struct Options *opt);
+void init_opt(struct Options *dest);
+struct uuid_result create_and_log_uuids(const struct Options *opt);
 
 /* io.h */
-extern char *read_from_fp(FILE *fp);
-extern char *read_from_editor(const char *editor);
+char *read_from_fp(FILE *fp);
+char *read_from_editor(const char *editor);
 
 /* logfile.c */
-extern bool valid_xml_chars(const char *s);
-extern void init_xml_entry(struct Entry *e);
-extern FILE *open_logfile(const char *fname);
-extern int add_to_logfile(FILE *fp, const struct Entry *entry, const bool raw);
-extern int close_logfile(FILE *fp);
+bool valid_xml_chars(const char *s);
+void init_xml_entry(struct Entry *e);
+FILE *open_logfile(const char *fname);
+int add_to_logfile(FILE *fp, const struct Entry *entry, const bool raw);
+int close_logfile(FILE *fp);
 
 /* rcfile.c */
-extern char *get_rcfilename(const struct Options *opt);
-extern int read_rcfile(const char *rcfile, struct Rc *rc);
+char *get_rcfilename(const struct Options *opt);
+int read_rcfile(const char *rcfile, struct Rc *rc);
 
 /* selftest.c */
-extern int selftest(void);
+int selftest(void);
 
 /* sessvar.c */
-extern int get_sess_info(struct Entry *entry);
-extern void free_sess(struct Entry *entry);
-extern int run_session(const struct Options *orig_opt,
-                       const int argc, char * const argv[]);
+int get_sess_info(struct Entry *entry);
+void free_sess(struct Entry *entry);
+int run_session(const struct Options *orig_opt,
+                const int argc, char * const argv[]);
 
 /* string.c */
-extern void *mymalloc(const size_t size);
-extern char *mystrdup(const char *s);
+void *mymalloc(const size_t size);
+char *mystrdup(const char *s);
 #if defined(UNUSED) || defined(TEST_FUNC)
-extern char *squeeze_chars(char *s, const char *chars);
+char *squeeze_chars(char *s, const char *chars);
 #endif
-extern char *string_to_lower(char *str);
-extern char *trim_str_front(char *dest);
-extern char *trim_str_end(char *dest);
-extern const char *utf8_check(const char *text);
+char *string_to_lower(char *str);
+char *trim_str_front(char *dest);
+char *trim_str_end(char *dest);
+const char *utf8_check(const char *text);
 
 /* suuid.c */
-extern int msg(const int verbose, const char *format, ...);
+int msg(const int verbose, const char *format, ...);
 const char *std_strerror(const int errnum);
-extern int myerror(const char *format, ...);
+int myerror(const char *format, ...);
 
 /* tag.c */
-extern void rewind_tag(void);
-extern char *get_next_tag(const struct Entry *entry);
-extern int store_tag(struct Entry *entry, const char *arg);
-extern void free_tags(struct Entry *entry);
+void rewind_tag(void);
+char *get_next_tag(const struct Entry *entry);
+int store_tag(struct Entry *entry, const char *arg);
+void free_tags(struct Entry *entry);
 
 /*
  * Global variables

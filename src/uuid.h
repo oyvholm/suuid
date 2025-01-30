@@ -41,15 +41,15 @@ struct uuid {
 };
 
 /* uuid.c */
-extern bool valid_uuid(const char *u, const bool check_len);
-extern const char *scan_for_uuid(const char *s);
-extern bool valid_macaddr(const char *macaddr);
-extern void scramble_mac_address(char *dest);
-extern char *generate_uuid(char *uuid);
-extern bool is_valid_date(const char *src, const bool check_len);
-extern char *uuid_date(char *dest, const char *uuid);
+bool valid_uuid(const char *u, const bool check_len);
+const char *scan_for_uuid(const char *s);
+bool valid_macaddr(const char *macaddr);
+void scramble_mac_address(char *dest);
+char *generate_uuid(char *uuid);
+bool is_valid_date(const char *src, const bool check_len);
+char *uuid_date(char *dest, const char *uuid);
 #ifdef VERIFY_UUID
-extern char *uuid_date_from_uuid(char *dest, const char *uuid);
+char *uuid_date_from_uuid(char *dest, const char *uuid);
 #endif
 
 #endif /* ifndef _UUID_H */
