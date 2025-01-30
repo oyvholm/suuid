@@ -165,7 +165,7 @@ char *get_rcfilename(const struct Options *opt);
 int read_rcfile(const char *rcfile, struct Rc *rc);
 
 /* selftest.c */
-int selftest(void);
+int opt_selftest(char *execname);
 
 /* sessvar.c */
 int get_sess_info(struct Entry *entry);
