@@ -2,6 +2,7 @@
 /*.gcda
 /*.gcno
 /*.gcov
+/.devel
 /gmon.out
 /gmon.sum
 /logdir/
