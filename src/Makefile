@@ -265,7 +265,7 @@ testsrc:
 
 .PHONY: tlok
 tlok:
-	@$(MAKE) -s gcov 2>.make-tlok.tmp >&2; res=$$?; \
+	@$(MAKE) -s gcov DEVEL=1 2>.make-tlok.tmp >&2; res=$$?; \
 	if test $$res -eq 0; then \
 		printf '%u:%u\n' \
 		       "$(TESTABLE_LINES)" \
