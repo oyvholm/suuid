@@ -375,6 +375,148 @@ free_p:
 }
 
 /*
+ * test_string_to_lower() - Tests the string_to_lower() function. Returns the 
+ * number of failed tests.
+ */
+
+static int test_string_to_lower(void)
+{
+	int r = 0;
+	char s1[] = "ABCÅÆØ";
+
+	diag("Test string_to_lower()");
+	r += ok(!(string_to_lower(NULL) == NULL), "string_to_lower(NULL)");
+	r += ok(!!strcmp(string_to_lower(s1), "abcÅÆØ"),
+	        "string_to_lower(\"ABCÅÆØ\")");
+
+	return r;
+}
+
+/*
+ * chk_ivd() - Used by test_is_valid_date(). Checks that `is_valid_date(date, 
+ * check_len)` returns the value in `exp`. Returns the number of failed tests.
+ */
+
+static int chk_ivd(const char *date, const bool check_len, const int exp)
+{
+	int r = 0, res;
+
+	res = is_valid_date(date, check_len);
+	r += ok(!(res == exp),
+	        "is_valid_date(\"%s\", %s), expecting %d",
+	        date, check_len ? "true" : "false", res);
+
+	return r;
+}
+
+/*
+ * test_is_valid_date() - Tests the is_valid_date() function. Returns the 
+ * number of failed tests.
+ */
+
+static int test_is_valid_date(void)
+{
+	int r = 0;
+
+	diag("Test is_valid_date()");
+	r += chk_ivd("2017-12-23T02:33:57Z", true, 0);
+	r += chk_ivd("2017-12-23T02:33:57Z", false, 0);
+	r += chk_ivd("2017-12-23T02:33:57.1234567Z", true, 1);
+	r += chk_ivd("2017-12-23T02:33:57.1234567Z", false, 1);
+	r += chk_ivd("2017-12-23T02:33:57.1234567Zabcd", false, 1);
+
+	return r;
+}
+
+/*
+ * chk_ud() - Used by test_uuid_date(). The function first checks that 
+ * uuid_date() returns the correct value, i.e. that `uuid` is a valid v1 UUID. 
+ * This value is specified in `exp_ret`: 0 if uuid_date() is expected to return 
+ * NULL, otherwise 1. It then checks that the generated timestamp is as 
+ * expected.
+ *
+ * Returns the number of failed tests.
+ */
+
+static int chk_ud(const char *uuid, const int exp_ret, const char *exp_date)
+{
+	int r = 0, ret;
+	char buf[DATE_LENGTH + 1];
+
+	assert(uuid);
+	assert(exp_date);
+
+	ret = !!uuid_date(buf, uuid);
+	r += ok(!(ret == exp_ret),
+	        "uuid_date(): \"%s\" is%s a valid v1 UUID",
+	        uuid, exp_ret ? "" : " not");
+	if (!ret)
+		return r;
+	r += ok(!!strcmp(buf, exp_date), "uuid_date(\"%s\")", uuid);
+	print_gotexp(buf, exp_date);
+
+	return r;
+}
+
+/*
+ * test_uuid_date() - Tests the uuid_date() function. Returns the number of 
+ * failed tests.
+ */
+
+static int test_uuid_date(void)
+{
+	int r = 0;
+
+	diag("Test uuid_date()");
+	r += chk_ud("00000000-0000-11e7-87d5-f74d993421b0", 1,
+	            "2017-03-03T10:56:05.8089472Z");
+	r += chk_ud("acdaf974-e78e-11e7-87d5-f74d993421b0", 1,
+	            "2017-12-23T03:09:22.9493620Z");
+	r += chk_ud("notvalid", 0, "");
+	r += chk_ud("", 0, "");
+	r += chk_ud("c9ffa9cb-708d-454b-b1f2-f18f609cb825", 0, "");
+	r += chk_ud("acdaf974-e78e-11e7-87d5-g74d993421b0", 0, "");
+
+	return r;
+}
+
+/*
+ * chk_vu() - Used by test_valid_uuid(). Checks that `valid_uuid(uuid, 
+ * check_len)` returns `exp_valid`. Returns the number of failed tests.
+ */
+
+static int chk_vu(const char *uuid, const bool check_len, const bool exp_valid)
+{
+	int r = 0;
+	bool res;
+
+	res = valid_uuid(uuid, check_len);
+	r += ok(!(res == exp_valid), "valid_uuid(\"%s\", %s) should return %s",
+	        uuid, check_len ? "true" : "false",
+	        exp_valid ? "true" : "false");
+
+	return r;
+}
+
+/*
+ * test_valid_uuid() - Tests the valid_uuid() function. Returns the number of 
+ * failed tests.
+ */
+
+static int test_valid_uuid(void)
+{
+	int r = 0;
+
+	diag("Test valid_uuid()");
+	chk_vu("acdaf974-e78e-11e7-87d5-f74d993421b0", true, true);
+	chk_vu("acdaf974-e78e-11e7-87d5-f74d993421b0123", false, true);
+	chk_vu("acdaf974-e78e-11e7-87d5-f74d993421b0123", true, false);
+	chk_vu("c9ffa9cb-708d-454b-b1f2-f18f609cb825", true, false);
+
+	return r;
+}
+
+/*
  * selftest() - Run internal testing to check that it works on the current 
  * system. Executed if --selftest is used.
  */
@@ -460,6 +602,10 @@ static int test_functions(void)
 	diag("Test std_strerror()");
 	r += ok(!(std_strerror(0) != NULL), "std_strerror(0)");
 	r += test_allocstr();
+	r += test_string_to_lower();
+	r += test_is_valid_date();
+	r += test_uuid_date();
+	r += test_valid_uuid();
 
 	return r;
 }
