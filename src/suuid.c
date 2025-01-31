@@ -134,8 +134,7 @@ static int print_license(void)
 	puts("");
 	puts("You should have received a copy of"
 	     " the GNU General Public License along \n"
-	     "with this program. If not, see"
-	     " <http://www.gnu.org/licenses/>.");
+	     "with this program. If not, see <http://www.gnu.org/licenses/>.");
 
 	return EXIT_SUCCESS;
 }
@@ -304,16 +303,17 @@ static int choose_opt_action(struct Options *dest,
 
 	switch (c) {
 	case 0:
-		if (!strcmp(opts->name, "license"))
+		if (!strcmp(opts->name, "license")) {
 			dest->license = true;
-		else if (!strcmp(opts->name, "raw"))
+		} else if (!strcmp(opts->name, "raw")) {
 			dest->raw = true;
-		else if (!strcmp(opts->name, "rcfile"))
+		} else if (!strcmp(opts->name, "rcfile")) {
 			dest->rcfile = optarg;
-		else if (!strcmp(opts->name, "selftest"))
+		} else if (!strcmp(opts->name, "selftest")) {
 			dest->selftest = true;
-		else if (!strcmp(opts->name, "version"))
+		} else if (!strcmp(opts->name, "version")) {
 			dest->version = true;
+		}
 		break;
 	case 'c':
 		dest->comment = optarg;
@@ -378,20 +378,20 @@ static int parse_options(struct Options *dest,
 		int c;
 		int option_index = 0;
 		static const struct option long_options[] = {
-			{"comment", required_argument, 0, 'c'},
-			{"count", required_argument, 0, 'n'},
-			{"help", no_argument, 0, 'h'},
-			{"license", no_argument, 0, 0},
-			{"logdir", required_argument, 0, 'l'},
-			{"quiet", no_argument, 0, 'q'},
-			{"random-mac", no_argument, 0, 'm'},
-			{"raw", no_argument, 0, 0},
-			{"rcfile", required_argument, 0, 0},
-			{"selftest", no_argument, 0, 0},
-			{"tag", required_argument, 0, 't'},
-			{"verbose", no_argument, 0, 'v'},
-			{"version", no_argument, 0, 0},
-			{"whereto", required_argument, 0, 'w'},
+			{"comment", required_argument, NULL, 'c'},
+			{"count", required_argument, NULL, 'n'},
+			{"help", no_argument, NULL, 'h'},
+			{"license", no_argument, NULL, 0},
+			{"logdir", required_argument, NULL, 'l'},
+			{"quiet", no_argument, NULL, 'q'},
+			{"random-mac", no_argument, NULL, 'm'},
+			{"raw", no_argument, NULL, 0},
+			{"rcfile", required_argument, NULL, 0},
+			{"selftest", no_argument, NULL, 0},
+			{"tag", required_argument, NULL, 't'},
+			{"verbose", no_argument, NULL, 'v'},
+			{"version", no_argument, NULL, 0},
+			{"whereto", required_argument, NULL, 'w'},
 			{0, 0, 0, 0}
 		};
 
@@ -406,10 +406,8 @@ static int parse_options(struct Options *dest,
 		                "v"  /* --verbose */
 		                "w:" /* --whereto */
 		                , long_options, &option_index);
-
 		if (c == -1)
 			break;
-
 		retval = choose_opt_action(dest,
 		                           c, &long_options[option_index]);
 	}
