@@ -149,7 +149,7 @@ char *get_tty(void);
 void init_opt(struct Options *dest);
 struct uuid_result create_and_log_uuids(const struct Options *opt);
 
-/* io.h */
+/* io.c */
 char *read_from_fp(FILE *fp);
 char *read_from_editor(const char *editor);
 
