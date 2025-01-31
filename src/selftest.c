@@ -25,6 +25,8 @@
  * in Perl 5 as far as possible.
  */
 
+#define chp  (char *[])
+
 static int testnum = 0;
 
 /*
@@ -547,6 +549,44 @@ static int test_functions(void)
 	return r;
 }
 
+static int print_version_info(char *execname)
+{
+	struct streams ss;
+	int res;
+
+	streams_init(&ss);
+	res = streams_exec(&ss, chp{ execname, "--version", NULL });
+	ok(!!res, "streams_exec() with --version works");
+	if (res) {
+		diag("%s(): streams_exec() failed:\n%s",
+		     __func__, ss.err.buf ? ss.err.buf : "(null)");
+		return 1;
+	}
+	diag("========== BEGIN version info ==========\n"
+	     "%s"
+	     "=========== END version info ===========",
+	     ss.out.buf ? ss.out.buf : "(null)");
+	streams_free(&ss);
+
+	return 0;
+}
+
+/*
+ * test_executable() - Run various tests with the executable and verify that 
+ * stdout, stderr and the return value are as expected. Returns the number of 
+ * failed tests.
+ */
+
+static int test_executable(char *execname)
+{
+	int r = 0;
+
+	diag("Test the executable");
+	print_version_info(execname);
+
+	return r;
+}
+
 /*
  * opt_selftest() - Run internal testing to check that it works on the current 
  * system. Executed if --selftest is used. Returns `EXIT_FAILURE` if any tests 
@@ -561,6 +601,7 @@ int opt_selftest(char *execname)
 	     execname, EXEC_VERSION, EXEC_DATE);
 
 	r += test_functions();
+	r += test_executable(execname);
 
 	printf("1..%d\n", testnum);
 	if (r) {
@@ -570,5 +611,7 @@ int opt_selftest(char *execname)
 
 	return r ? EXIT_FAILURE : EXIT_SUCCESS;
 }
+
+#undef chp
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */

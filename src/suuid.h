@@ -42,6 +42,8 @@
 #include <string.h>
 #include <sys/file.h>
 #include <sys/time.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -125,6 +127,12 @@ struct Options {
 	bool version;
 	char *whereto;
 };
+struct streams {
+	struct binbuf in;
+	struct binbuf out;
+	struct binbuf err;
+	int ret;
+};
 struct uuid_result {
 	unsigned long count;
 	char lastuuid[UUID_LENGTH + 1];
@@ -151,8 +159,11 @@ void init_opt(struct Options *dest);
 struct uuid_result create_and_log_uuids(const struct Options *opt);
 
 /* io.c */
+void streams_init(struct streams *dest);
+void streams_free(struct streams *dest);
 char *read_from_fp(FILE *fp, struct binbuf *dest);
 char *read_from_editor(const char *editor);
+int streams_exec(struct streams *dest, char *cmd[]);
 
 /* logfile.c */
 bool valid_xml_chars(const char *s);
