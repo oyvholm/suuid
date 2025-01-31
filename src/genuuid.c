@@ -86,7 +86,7 @@ char *process_comment_option(const char *cmt)
 		/*
 		 * Read comment from stdin.
 		 */
-		retval = read_from_fp(stdin);
+		retval = read_from_fp(stdin, NULL);
 		if (!retval) {
 			myerror("Could not read data from stdin"); /* gncov */
 			return NULL; /* gncov */

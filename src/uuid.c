@@ -463,7 +463,7 @@ char *uuid_date_from_uuid(char *dest, const char *uuid)
 		                progname, __func__, cmd);
 		return NULL;
 	}
-	ap = read_from_fp(fp);
+	ap = read_from_fp(fp, NULL);
 	pclose(fp);
 
 	p = strstr(ap, "content: time:");

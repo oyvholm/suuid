@@ -8,6 +8,7 @@ LD = cc
 PREFIX = /usr/local
 
 CFILES  =
+CFILES += binbuf.c
 CFILES += environ.c
 CFILES += genuuid.c
 CFILES += io.c
@@ -80,6 +81,7 @@ TESTLOCKDIR = testlockdir
 OBJS  =
 OBJS += suuid.o
 
+OBJS += binbuf.o
 OBJS += environ.o
 OBJS += genuuid.o
 OBJS += io.o
@@ -120,6 +122,9 @@ version.h: Gen-version $(CFILES) $(DEPS)
 
 suuid.o: version.h suuid.c $(DEPS)
 	$(CC) $(CFLAGS) suuid.c
+
+binbuf.o: binbuf.c $(DEPS)
+	$(CC) $(CFLAGS) binbuf.c
 
 environ.o: environ.c $(DEPS)
 	$(CC) $(CFLAGS) environ.c

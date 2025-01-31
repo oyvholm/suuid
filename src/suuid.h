@@ -45,6 +45,7 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "binbuf.h"
 #include "uuid.h"
 
 #define ENV_EDITOR  "SUUID_EDITOR" /* Name of editor to use with "-c --" */
@@ -150,7 +151,7 @@ void init_opt(struct Options *dest);
 struct uuid_result create_and_log_uuids(const struct Options *opt);
 
 /* io.c */
-char *read_from_fp(FILE *fp);
+char *read_from_fp(FILE *fp, struct binbuf *dest);
 char *read_from_editor(const char *editor);
 
 /* logfile.c */

@@ -25,39 +25,43 @@
  * pointer to the allocated memory or NULL if something failed.
  */
 
-char *read_from_fp(FILE *fp)
+char *read_from_fp(FILE *fp, struct binbuf *dest)
 {
-	char *retval = NULL;
-	size_t total_bytes_read = 0;
+	struct binbuf buf;
 	size_t bufsize = BUFSIZ;
 
 	assert(fp);
 
+	binbuf_init(&buf);
+
 	do {
 		char *p = NULL;
-		char *new_mem = realloc(retval,
-		                        bufsize + total_bytes_read + 1);
+		char *new_mem = realloc(buf.buf, bufsize + buf.len);
 		size_t bytes_read;
 
 		if (!new_mem) {
 			myerror("%s(): Cannot allocate" /* gncov */
 			        " memory for stream buffer", __func__);
-			free(retval); /* gncov */
+			binbuf_free(&buf); /* gncov */
 			return NULL; /* gncov */
 		}
-		retval = new_mem;
-		p = retval + total_bytes_read;
-		bytes_read = fread(p, 1, bufsize, fp);
-		total_bytes_read += bytes_read;
+		buf.alloc = bufsize + buf.len;
+		buf.buf = new_mem;
+		p = buf.buf + buf.len;
+		bytes_read = fread(p, 1, bufsize - 1, fp);
+		buf.len += bytes_read;
 		p[bytes_read] = '\0';
 		if (ferror(fp)) {
-			myerror("%s(): Read error", __func__);
-			free(retval);
-			return NULL;
+			myerror("%s(): Read error", __func__); /* gncov */
+			binbuf_free(&buf); /* gncov */
+			return NULL; /* gncov */
 		}
 	} while (!feof(fp));
 
-	return retval;
+	if (dest)
+		*dest = buf;
+
+	return buf.buf;
 }
 
 /*
@@ -78,7 +82,7 @@ char *read_from_file(const char *fname)
 		myerror("%s(): Could not open file for read", __func__);
 		return NULL;
 	}
-	retval = read_from_fp(fp);
+	retval = read_from_fp(fp, NULL);
 	if (!retval)
 		return NULL;
 	fclose(fp);
