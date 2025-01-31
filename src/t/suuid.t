@@ -175,9 +175,8 @@ sub test_standard_options {
 	likecmd("$CMD --gurgle",
 	        '/^$/',
 	        "/\\.\\.\\/$CMDB: Option error\\n"
-	        . "\\n"
-	        . "Type \"\\.\\.\\/$CMDB --help\" for help screen\\."
-	        . " Returning with value 1\\.\\n/s",
+	        . "\\.\\.\\/$CMDB: Type \"\\.\\.\\/$CMDB --help\" for help"
+	        . " screen\\. Returning with value 1\\.\\n/s",
 	        1,
 	        'Unknown option specified');
 	return;
@@ -602,8 +601,7 @@ sub test_suuid_executable {
 	        "",
 	        "../$CMDB: Error in -n/--count argument\n"
 	        . "../$CMDB: Option error\n"
-	        . "\n"
-	        . "Type \"../$CMDB --help\" for help screen."
+	        . "../$CMDB: Type \"../$CMDB --help\" for help screen."
 	        . " Returning with value 1.\n",
 	        1,
 	        "Invalid value in --count argument");

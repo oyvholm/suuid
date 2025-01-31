@@ -185,9 +185,8 @@ static int usage(const int retval)
 	char *logdir;
 
 	if (retval != EXIT_SUCCESS) {
-		fprintf(stderr, "\nType \"%s --help\" for help screen."
-		                " Returning with value %d.\n",
-		                progname, retval);
+		myerror("Type \"%s --help\" for help screen."
+		        " Returning with value %d.", progname, retval);
 		return retval;
 	}
 
