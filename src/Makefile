@@ -2,15 +2,23 @@
 # File ID: 5cedd236-af56-11e6-92f6-279c2a0468a3
 # Author: Øyvind A. Holm <sunny@sunbase.org>
 
+CC = cc
+EXEC = suuid
+LD = cc
 PREFIX = /usr/local
 
-EXEC = suuid
-
-TESTLOCKDIR = testlockdir
-
-CC = cc
-LD = cc
-
+CFILES  =
+CFILES += environ.c
+CFILES += genuuid.c
+CFILES += io.c
+CFILES += logfile.c
+CFILES += rcfile.c
+CFILES += selftest.c
+CFILES += sessvar.c
+CFILES += string.c
+CFILES += suuid.c
+CFILES += tag.c
+CFILES += uuid.c
 CFLAGS  =
 CFLAGS += $$($(IS_DEV) && echo -O0 || echo -O2)
 CFLAGS += $$(test -n "$(GCOV)" && echo -n "-fprofile-arcs -ftest-coverage")
@@ -18,6 +26,7 @@ CFLAGS += $$(test -n "$(PROF)" && echo -n "-pg")
 CFLAGS += $(DEVFLAGS_STR)
 CFLAGS += -Wall
 CFLAGS += -c
+DEPS = $(HFILES) Makefile
 DEVFLAGS += $$(test "$$(uname -o)" = "Android" || echo -fcf-protection=full)
 DEVFLAGS += -Wbad-function-cast
 DEVFLAGS += -Wcast-align
@@ -58,27 +67,15 @@ DEVFLAGS += -fwrapv
 DEVFLAGS += -g3
 DEVFLAGS += -pedantic
 DEVFLAGS_STR = $$($(IS_DEV) && echo $(DEVFLAGS))
-
-#  Not in Clang
-# DEVFLAGS += -Wc99-c11-compat
-# DEVFLAGS += -Wduplicated-branches
-# DEVFLAGS += -Wformat-overflow=2
-# DEVFLAGS += -Wjump-misses-init
-# DEVFLAGS += -Wlogical-op
-
-#  Don't use yet
-# DEVFLAGS += -Waggregate-return
-# DEVFLAGS += -Wformat=2
-# DEVFLAGS += -Wmissing-declarations
-# DEVFLAGS += -Wpadded
-
+GNCOV_STR = $$(test -n "$(GNCOV)" && echo "-g")
+HFILES  =
+HFILES += suuid.h
+HFILES += uuid.h
 LDFLAGS  =
 LDFLAGS += $$(test -n "$(PROF)" && echo -n "-pg")
-
 LIBS  =
 LIBS += $$(test -n "$(GCOV)" && echo "-lgcov --coverage")
-
-# For regular use, it's not necessary to modify anything below this line.
+TESTLOCKDIR = testlockdir
 
 OBJS  =
 OBJS += suuid.o
@@ -94,25 +91,19 @@ OBJS += string.o
 OBJS += tag.o
 OBJS += uuid.o
 
-CFILES  =
-CFILES += environ.c
-CFILES += genuuid.c
-CFILES += io.c
-CFILES += logfile.c
-CFILES += rcfile.c
-CFILES += selftest.c
-CFILES += sessvar.c
-CFILES += string.c
-CFILES += suuid.c
-CFILES += tag.c
-CFILES += uuid.c
+#  Not in Clang
+# DEVFLAGS += -Wc99-c11-compat
+# DEVFLAGS += -Wduplicated-branches
+# DEVFLAGS += -Wformat-overflow=2
+# DEVFLAGS += -Wjump-misses-init
+# DEVFLAGS += -Wlogical-op
 
-HFILES  =
-HFILES += suuid.h
-HFILES += uuid.h
+#  Don't use yet
+# DEVFLAGS += -Waggregate-return
+# DEVFLAGS += -Wformat=2
+# DEVFLAGS += -Wmissing-declarations
+# DEVFLAGS += -Wpadded
 
-DEPS = $(HFILES) Makefile
-GNCOV_STR = $$(test -n "$(GNCOV)" && echo "-g")
 IS_DEV = [ -z "$(NODEVEL)" \
            -a \( -e .devel -o -e ../.git/.devel -o -n "$(DEVEL)" \) ]
 TESTABLE_LINES = $$(grep -E '^ +\#\#\#\#\#:' *.c.gcov \
