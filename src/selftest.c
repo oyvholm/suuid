@@ -517,69 +517,6 @@ static int test_valid_uuid(void)
 }
 
 /*
- * selftest() - Run internal testing to check that it works on the current 
- * system. Executed if --selftest is used.
- */
-
-int selftest(void)
-{
-	char buf1[] = "ABCÅÆØ";
-	char buf2[DATE_LENGTH + 1];
-
-	errno = EACCES;
-	puts("# myerror(\"errno is EACCES\")");
-	myerror("errno is EACCES");
-	errno = 0;
-
-	printf("string_to_lower(NULL) = %s\n", string_to_lower(NULL));
-	printf("string_to_lower(\"%s\") = ", buf1);
-	printf("%s\n", string_to_lower(buf1));
-
-	printf("is_valid_date(\"2017-12-23T02:33:57Z\", 1) = %d\n",
-	       is_valid_date("2017-12-23T02:33:57Z", 1));
-	printf("is_valid_date(\"2017-12-23T02:33:57Z\", 0) = %d\n",
-	       is_valid_date("2017-12-23T02:33:57Z", 0));
-	printf("is_valid_date(\"2017-12-23T02:33:57.1234567Z\", 1) = %d\n",
-	       is_valid_date("2017-12-23T02:33:57.1234567Z", 1));
-	printf("is_valid_date(\"2017-12-23T02:33:57.1234567Z\", 0) = %d\n",
-	       is_valid_date("2017-12-23T02:33:57.1234567Z", 0));
-	printf("is_valid_date(\"2017-12-23T02:33:57.1234567Zabcd\", 0) = %d\n",
-	       is_valid_date("2017-12-23T02:33:57.1234567Zabcd", 0));
-
-	printf("uuid_date(buf2, \""
-	       "00000000-0000-11e7-87d5-f74d993421b0\") =\n  \"%s\"\n",
-	       uuid_date(buf2, "00000000-0000-11e7-87d5-f74d993421b0"));
-	printf("uuid_date(buf2, \""
-	       "acdaf974-e78e-11e7-87d5-f74d993421b0\") =\n  \"%s\"\n",
-	       uuid_date(buf2, "acdaf974-e78e-11e7-87d5-f74d993421b0"));
-
-	printf("uuid_date(buf2, \"notvalid\") = %s\n",
-	       uuid_date(buf2, "notvalid"));
-	printf("uuid_date(buf2, \"\") = %s\n", uuid_date(buf2, ""));
-	printf("uuid_date(buf2, \""
-	       "c9ffa9cb-708d-454b-b1f2-f18f609cb825\") = %s\n",
-	       uuid_date(buf2, "c9ffa9cb-708d-454b-b1f2-f18f609cb825"));
-	printf("uuid_date(buf2, \""
-	       "acdaf974-e78e-11e7-87d5-g74d993421b0\") = %s\n",
-	       uuid_date(buf2, "acdaf974-e78e-11e7-87d5-g74d993421b0"));
-
-	printf("valid_uuid(\"acdaf974-e78e-11e7-87d5-f74d993421b0\", 1)"
-	       " = %d\n",
-	       valid_uuid("acdaf974-e78e-11e7-87d5-f74d993421b0", 1));
-	printf("valid_uuid(\"acdaf974-e78e-11e7-87d5-f74d993421b0123\", 0)"
-	       " = %d\n",
-	       valid_uuid("acdaf974-e78e-11e7-87d5-f74d993421b0123", 0));
-	printf("valid_uuid(\"acdaf974-e78e-11e7-87d5-f74d993421b0123\", 1)"
-	       " = %d\n",
-	       valid_uuid("acdaf974-e78e-11e7-87d5-f74d993421b0123", 1));
-	printf("valid_uuid(\"c9ffa9cb-708d-454b-b1f2-f18f609cb825\", 1)"
-	       " = %d\n",
-	       valid_uuid("c9ffa9cb-708d-454b-b1f2-f18f609cb825", 1));
-
-	return EXIT_SUCCESS;
-}
-
-/*
  * test_functions() - Tests various functions directly. Returns the number of 
  * failed tests.
  */
