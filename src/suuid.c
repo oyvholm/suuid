@@ -350,7 +350,8 @@ static int choose_opt_action(struct Options *dest,
 		dest->whereto = optarg;
 		break;
 	default:
-		msg(3, "getopt_long() returned character code %d", c);
+		myerror("%s(): getopt_long() returned character code %d",
+		        __func__, c);
 		retval = 1;
 		break;
 	}
@@ -431,7 +432,7 @@ int main(int argc, char *argv[])
 		return usage(EXIT_FAILURE);
 	}
 
-	msg(3, "Using verbose level %d", opt.verbose);
+	msg(4, "%s(): Using verbose level %d", __func__, opt.verbose);
 
 	if (opt.help)
 		return usage(EXIT_SUCCESS);
@@ -469,7 +470,7 @@ int main(int argc, char *argv[])
 	if (!result.success)
 		retval = EXIT_FAILURE;
 
-	msg(3, "Returning from main() with value %d", retval);
+	msg(4, "Returning from %s() with value %d", __func__, retval);
 	return retval;
 }
 

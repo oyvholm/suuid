@@ -323,11 +323,7 @@ sub test_suuid_executable {
 	diag("Read the SUUID_LOGDIR environment variable...");
 	likecmd("SUUID_LOGDIR=$Outdir $CMD -vvv",
 	        "/^$v1_templ\n\$/s",
-	        '/Using verbose level 3\n'
-	        . '.+'
-	        . 'Returning from main'
-	        . '.+'
-	        . 'with value 0\n/',
+	        '/^$/',
 	        0,
 	        "Read SUUID_LOGDIR environment variable, use -vvv");
 	like(file_data($Outfile),
