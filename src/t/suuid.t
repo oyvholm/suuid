@@ -136,13 +136,6 @@ sub main {
 }
 
 sub test_standard_options {
-	diag('Testing -h (--help) option...');
-	likecmd("$CMD -h",
-	        '/  Show this help/i',
-	        '/^$/',
-	        0,
-	        'Option -h prints help screen');
-
 	diag('Testing -v (--verbose) option...');
 	likecmd("$CMD -hv",
 	        '/^\n\S+ \d+\.\d+\.\d+/s',
