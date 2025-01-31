@@ -216,6 +216,8 @@ static int usage(const int retval)
 	       "    the value from EDITOR is used. If none of these variables"
 	       " are \n"
 	       "    defined, the program aborts.\n", ENV_EDITOR, ENV_EDITOR);
+	printf("  -n x, --count x\n"
+	       "    Print and store x UUIDs.\n");
 	printf("  -h, --help\n"
 	       "    Show this help.\n");
 	printf("  --license\n"
@@ -226,13 +228,11 @@ static int usage(const int retval)
 	       " that value is \n"
 	       "    used. Otherwise the value \"$HOME/uuids\" is used.\n"
 	       "    Current default: %s\n", ENV_LOGDIR, logdir);
+	printf("  -q, --quiet\n"
+	       "    Be more quiet. Can be repeated to increase silence.\n");
 	printf("  -m, --random-mac\n"
 	       "    Don't use the hardware MAC address, generate a random"
 	       " address field.\n");
-	printf("  -n x, --count x\n"
-	       "    Print and store x UUIDs.\n");
-	printf("  -q, --quiet\n"
-	       "    Be more quiet. Can be repeated to increase silence.\n");
 	printf("  --raw\n"
 	       "    Don't convert <txt> element to XML. When using this"
 	       " option, it is \n"
