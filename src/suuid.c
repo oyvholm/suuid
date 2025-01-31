@@ -114,7 +114,7 @@ int myerror(const char *format, ...)
  * print_license() - Display the program license. Returns `EXIT_SUCCESS`.
  */
 
-int print_license(void)
+static int print_license(void)
 {
 	puts("(C)opyleft 2016- Øyvind A. Holm <sunny@sunbase.org>");
 	puts("");
@@ -145,7 +145,7 @@ int print_license(void)
  * the version number is printed. Returns `EXIT_SUCCESS`.
  */
 
-int print_version(void)
+static int print_version(void)
 {
 	if (opt.verbose < 0) {
 		puts(EXEC_VERSION);
@@ -181,7 +181,7 @@ int print_version(void)
  * usage() - Prints a help screen. Returns `retval`.
  */
 
-int usage(const int retval)
+static int usage(const int retval)
 {
 	char *logdir;
 
@@ -293,8 +293,8 @@ int usage(const int retval)
  * Returns 0 if ok, or 1 if `c` is unknown or anything fails.
  */
 
-int choose_opt_action(struct Options *dest,
-                      const int c, const struct option *opts)
+static int choose_opt_action(struct Options *dest,
+                             const int c, const struct option *opts)
 {
 	int retval = 0;
 	static unsigned int tag_count = 0;
@@ -364,7 +364,8 @@ int choose_opt_action(struct Options *dest,
  * Returns 0 if succesful, or 1 if an error occurs.
  */
 
-int parse_options(struct Options *dest, const int argc, char * const argv[])
+static int parse_options(struct Options *dest,
+                         const int argc, char * const argv[])
 {
 	int retval = 0;
 
