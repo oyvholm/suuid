@@ -22,18 +22,18 @@
 
 /*
  * get_rcfilename() - Return pointer to an allocated string with name of 
- * rcfile. If neither opt->rcfile or HOME is defined, return NULL.
+ * rcfile. If neither opts->rcfile or HOME is defined, return NULL.
  */
 
-char *get_rcfilename(const struct Options *opt)
+char *get_rcfilename(const struct Options *opts)
 {
 	char *retval = NULL, *env;
 	size_t size;
 
-	assert(opt);
+	assert(opts);
 
-	if (opt && opt->rcfile)
-		return mystrdup(opt->rcfile);
+	if (opts && opts->rcfile)
+		return mystrdup(opts->rcfile);
 	env = getenv("HOME");
 	if (!env) {
 		fprintf(stderr, "%s: HOME environment variable not defined,"

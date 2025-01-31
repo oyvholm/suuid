@@ -134,19 +134,20 @@ char *process_comment_option(const char *cmt)
 }
 
 /*
- * fill_entry_struct() - Fill the entry struct with information from the opt 
- * struct and the environment, like current directory, hostname, comment, etc.
+ * fill_entry_struct() - Fill the `entry` struct with information from the 
+ * `opts` struct and the environment, like current directory, hostname, 
+ * comment, etc.
  * Returns 0 if no errors, 1 if errors.
  */
 
 int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
-                      const struct Options *opt)
+                      const struct Options *opts)
 {
 	unsigned int i;
 
 	assert(entry);
 	assert(rc);
-	assert(opt);
+	assert(opts);
 
 	/*
 	 * Get information about the environment; hostname, current directory, 
@@ -167,13 +168,13 @@ int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
 	 * Store tags and comment in entry.
 	 */
 
-	for (i = 0; i < MAX_TAGS && opt->tag[i]; i++) {
-		if (store_tag(entry, opt->tag[i]))
+	for (i = 0; i < MAX_TAGS && opts->tag[i]; i++) {
+		if (store_tag(entry, opts->tag[i]))
 			return 1;
 	}
 
-	if (opt->comment) {
-		entry->txt = process_comment_option(opt->comment);
+	if (opts->comment) {
+		entry->txt = process_comment_option(opts->comment);
 		if (!entry->txt)
 			return 1;
 	}
@@ -197,27 +198,27 @@ int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
  */
 
 char *process_uuid(struct Logs *logs,
-                   const struct Rc *rc, const struct Options *opt,
+                   const struct Rc *rc, const struct Options *opts,
                    struct Entry *entry)
 {
 	assert(logs);
 	assert(logs->logfp);
 	assert(rc);
-	assert(opt);
+	assert(opts);
 	assert(entry);
 
 	/*
 	 * Generate the UUID or use an already generated UUID stored in 
-	 * opt->uuid.
+	 * opts->uuid.
 	 */
 
-	if (opt->uuid) {
-		if (!valid_uuid(opt->uuid, true)) {
+	if (opts->uuid) {
+		if (!valid_uuid(opts->uuid, true)) {
 			fprintf(stderr, "%s(): UUID \"%s\" is not valid.\n",
-			                __func__, opt->uuid);
+			                __func__, opts->uuid);
 			return NULL;
 		}
-		memcpy(entry->uuid, opt->uuid, UUID_LENGTH + 1);
+		memcpy(entry->uuid, opts->uuid, UUID_LENGTH + 1);
 	} else {
 		if (!generate_uuid(entry->uuid))
 			return NULL; /* gncov */
@@ -225,7 +226,7 @@ char *process_uuid(struct Logs *logs,
 			memcpy(entry->uuid + 24, rc->macaddr,
 			       MACADDR_LENGTH * 2);
 		}
-		if (opt->random_mac)
+		if (opts->random_mac)
 			scramble_mac_address(entry->uuid + 24);
 	}
 	if (!valid_uuid(entry->uuid, true)) {
@@ -241,7 +242,7 @@ char *process_uuid(struct Logs *logs,
 	if (!uuid_date(entry->date, entry->uuid))
 		return NULL;
 
-	if (add_to_logfile(logs->logfp, entry, opt->raw))
+	if (add_to_logfile(logs->logfp, entry, opts->raw))
 		return NULL;
 
 	/*
@@ -249,12 +250,12 @@ char *process_uuid(struct Logs *logs,
 	 * -w/--whereto argument.
 	 */
 
-	if (!opt->whereto) {
+	if (!opts->whereto) {
 		puts(entry->uuid);
 	} else {
-		if (strchr(opt->whereto, 'a') || strchr(opt->whereto, 'o'))
+		if (strchr(opts->whereto, 'a') || strchr(opts->whereto, 'o'))
 			fprintf(stdout, "%s\n", entry->uuid);
-		if (strchr(opt->whereto, 'a') || strchr(opt->whereto, 'e'))
+		if (strchr(opts->whereto, 'a') || strchr(opts->whereto, 'e'))
 			fprintf(stderr, "%s\n", entry->uuid);
 	}
 
@@ -286,11 +287,11 @@ void sighandler(const int sig)
  * line, generate the UUID(s) and write it to the log file.
  *
  * Returns a struct uuid_result with the number of UUIDs generated and a value 
- * indicating success or not. If opt->uuid contains an UUID, set count to 1 to 
+ * indicating success or not. If opts->uuid contains an UUID, set count to 1 to 
  * avoid duplicates in the log file.
  */
 
-struct uuid_result create_and_log_uuids(const struct Options *opt)
+struct uuid_result create_and_log_uuids(const struct Options *opts)
 {
 	struct uuid_result retval;
 	char *rcfile = NULL;
@@ -300,11 +301,11 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	struct Entry entry;
 	struct Logs logs;
 
-	assert(opt);
+	assert(opts);
 
 	memset(&rc, 0, sizeof(rc));
 	logs.logfp = NULL;
-	count = opt->count;
+	count = opts->count;
 	retval.count = 0UL;
 	memset(retval.lastuuid, 0, UUID_LENGTH + 1);
 	retval.success = true;
@@ -320,18 +321,18 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 		goto cleanup; /* gncov */
 	}
 
-	rcfile = get_rcfilename(opt);
+	rcfile = get_rcfilename(opts);
 	if (read_rcfile(rcfile, &rc)) {
 		retval.success = false;
 		goto cleanup;
 	}
 
-	if (fill_entry_struct(&entry, &rc, opt)) {
+	if (fill_entry_struct(&entry, &rc, opts)) {
 		retval.success = false;
 		goto cleanup;
 	}
 
-	logfile = get_log_prefix(&rc, opt, ".xml");
+	logfile = get_log_prefix(&rc, opts, ".xml");
 	if (!logfile) {
 		retval.success = false;
 		goto cleanup;
@@ -357,10 +358,10 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	 * Generate the UUIDs and write them to the log file.
 	 */
 
-	if (opt->uuid)
+	if (opts->uuid)
 		count = 1UL;
 	for (l = 0UL; l < count; l++) {
-		if (!process_uuid(&logs, &rc, opt, &entry)) {
+		if (!process_uuid(&logs, &rc, opts, &entry)) {
 			retval.success = false;
 			goto cleanup;
 		}
@@ -375,9 +376,9 @@ struct uuid_result create_and_log_uuids(const struct Options *opt)
 	 * Check that the correct amount of UUIDs were created.
 	 */
 
-	if (retval.count < opt->count) {
+	if (retval.count < opts->count) {
 		fprintf(stderr, "%s: Generated only %lu of %lu UUIDs\n",
-		                progname, retval.count, opt->count);
+		                progname, retval.count, opts->count);
 	}
 
 	/*

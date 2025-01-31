@@ -349,7 +349,7 @@ int run_session(const struct Options *orig_opt,
                 const int argc, char * const argv[])
 {
 	int retval = 0;
-	struct Options opt = *orig_opt;
+	struct Options opts = *orig_opt;
 	char *cmd = NULL;
 	char *start_uuid = NULL;
 	char *cmd_desc = NULL;
@@ -364,9 +364,9 @@ int run_session(const struct Options *orig_opt,
 	cmd_desc = get_desc_from_command(cmd);
 	msg(2, "cmd_desc = \"%s\"", cmd_desc);
 
-	opt.count = 1;
-	opt.whereto = "e";
-	result = create_and_log_uuids(&opt);
+	opts.count = 1;
+	opts.whereto = "e";
+	result = create_and_log_uuids(&opts);
 	if (!result.success) {
 		myerror("Error generating UUID, session not started");
 		retval = -1;

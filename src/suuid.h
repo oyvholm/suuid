@@ -187,6 +187,7 @@ const char *utf8_check(const char *text);
 
 /* suuid.c */
 extern char *progname;
+extern struct Options opt;
 int msg(const int verbose, const char *format, ...);
 const char *std_strerror(const int errnum);
 int myerror(const char *format, ...);

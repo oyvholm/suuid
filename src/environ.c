@@ -111,18 +111,18 @@ char *get_hostname(const struct Rc *rc)
 
 /*
  * get_logdir() - Return pointer to allocated string with location of the log 
- * directory. Use the value of opt->logdir if it's defined, otherwise use the 
+ * directory. Use the value of opts->logdir if it's defined, otherwise use the 
  * environment variable defined in ENV_LOGDIR, otherwise use "$HOME/uuids". If 
- * that also fails, return NULL. opt is allowed to be NULL, it's called by 
+ * that also fails, return NULL. `opts` is allowed to be NULL, it's called by 
  * usage().
  */
 
-char *get_logdir(const struct Options *opt)
+char *get_logdir(const struct Options *opts)
 {
 	char *p = NULL, *retval = NULL;
 
-	if (opt && opt->logdir) {
-		p = opt->logdir;
+	if (opts && opts->logdir) {
+		p = opts->logdir;
 	} else if (getenv(ENV_LOGDIR)) {
 		p = getenv(ENV_LOGDIR);
 	} else if (getenv("HOME")) {
@@ -156,7 +156,7 @@ char *get_logdir(const struct Options *opt)
  * added to the returned string, it can be "", NULL or a string.
  */
 
-char *get_log_prefix(const struct Rc *rc, const struct Options *opt,
+char *get_log_prefix(const struct Rc *rc, const struct Options *opts,
                      const char *ext)
 {
 	char *logdir, *hostname;
@@ -164,13 +164,13 @@ char *get_log_prefix(const struct Rc *rc, const struct Options *opt,
 	char *prefix = NULL;
 
 	assert(rc);
-	assert(opt);
+	assert(opts);
 
 	/*
 	 * Get full path to the log directory.
 	 */
 
-	logdir = get_logdir(opt);
+	logdir = get_logdir(opts);
 	if (!logdir)
 		return NULL;
 
