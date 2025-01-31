@@ -81,10 +81,13 @@ const char *std_strerror(const int errnum)
 
 /*
  * myerror() - Print an error message to stderr using this format:
- *   a: b: c
- * where a is the name of the program (progname), b is the output from the 
- * printf-like string and optional arguments, and c is the error message from 
- * errno. Returns the number of characters written.
+ *
+ *     a: b: c
+ *
+ * where `a` is the name of the program (the value of `progname`), `b` is the 
+ * output from the printf-like string and optional arguments, and `c` is the 
+ * error message from `errno`. If `errno` indicates no error, the ": c" part is 
+ * not printed. Returns the number of characters written.
  */
 
 int myerror(const char *format, ...)
@@ -108,7 +111,7 @@ int myerror(const char *format, ...)
 }
 
 /*
- * print_license() - Display the program license. Returns EXIT_SUCCESS.
+ * print_license() - Display the program license. Returns `EXIT_SUCCESS`.
  */
 
 int print_license(void)
@@ -138,7 +141,8 @@ int print_license(void)
 }
 
 /*
- * print_version() - Print version information on stdout. Returns EXIT_SUCCESS.
+ * print_version() - Print version information on stdout. If `-q` is used, only 
+ * the version number is printed. Returns `EXIT_SUCCESS`.
  */
 
 int print_version(void)
@@ -174,7 +178,7 @@ int print_version(void)
 }
 
 /*
- * usage() - Prints a help screen. Returns retval.
+ * usage() - Prints a help screen. Returns `retval`.
  */
 
 int usage(const int retval)
@@ -284,10 +288,9 @@ int usage(const int retval)
 }
 
 /*
- * choose_opt_action() - Decide what to do when option c is found. Store 
- * changes in dest. opts is the struct with the definitions for the long 
- * options.
- * Return 0 if ok, 1 if c is unknown or anything fails.
+ * choose_opt_action() - Decide what to do when option `c` is found. Store 
+ * changes in `dest`. Read definitions for long options from `opts`.
+ * Returns 0 if ok, or 1 if `c` is unknown or anything fails.
  */
 
 int choose_opt_action(struct Options *dest,
@@ -358,7 +361,7 @@ int choose_opt_action(struct Options *dest,
 
 /*
  * parse_options() - Parse command line options.
- * Returns 0 if ok, 1 if error.
+ * Returns 0 if succesful, or 1 if an error occurs.
  */
 
 int parse_options(struct Options *dest, const int argc, char * const argv[])
