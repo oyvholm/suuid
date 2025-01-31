@@ -94,7 +94,7 @@ int myerror(const char *format, ...)
 {
 	va_list ap;
 	int retval = 0;
-	int orig_errno = errno;
+	const int orig_errno = errno;
 
 	assert(format);
 	assert(strlen(format));
@@ -376,7 +376,7 @@ int parse_options(struct Options *dest, const int argc, char * const argv[])
 	while (!retval) {
 		int c;
 		int option_index = 0;
-		static struct option long_options[] = {
+		static const struct option long_options[] = {
 			{"comment", required_argument, 0, 'c'},
 			{"count", required_argument, 0, 'n'},
 			{"help", no_argument, 0, 'h'},
