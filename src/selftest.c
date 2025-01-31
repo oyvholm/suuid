@@ -549,6 +549,11 @@ static int test_functions(void)
 	return r;
 }
 
+/*
+ * print_version_info() - Display output from the --version command. Returns 0 
+ * if ok, or 1 if streams_exec() failed.
+ */
+
 static int print_version_info(char *execname)
 {
 	struct streams ss;
