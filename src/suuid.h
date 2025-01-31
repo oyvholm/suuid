@@ -186,6 +186,7 @@ char *trim_str_end(char *dest);
 const char *utf8_check(const char *text);
 
 /* suuid.c */
+extern char *progname;
 int msg(const int verbose, const char *format, ...);
 const char *std_strerror(const int errnum);
 int myerror(const char *format, ...);
@@ -195,12 +196,6 @@ void rewind_tag(void);
 char *get_next_tag(const struct Entry *entry);
 int store_tag(struct Entry *entry, const char *arg);
 void free_tags(struct Entry *entry);
-
-/*
- * Global variables
- */
-
-extern char *progname;
 
 #endif /* ifndef _SUUID_H */
 
