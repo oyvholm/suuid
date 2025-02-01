@@ -49,6 +49,9 @@ END
 # the Perl version.
 test -n "$FAKE_HOST" && newdef FAKE_HOST
 
+# FAKE_MEMLEAK: Insert memleak in print_version(), used for Valgrind testing.
+test -n "$FAKE_MEMLEAK" && newdef FAKE_MEMLEAK
+
 # GCOV: Compile with coverage code for gcov(1)
 test -n "$GCOV" && newdef GCOV
 
