@@ -246,6 +246,9 @@ static int usage(const int retval)
 	       "    Run various internal self tests and exit.\n");
 	printf("  -t x, --tag x\n"
 	       "    Use x as tag (category).\n");
+	printf("  --valgrind\n"
+	       "    Run the built-in test suite with Valgrind memory"
+	       " checking.\n");
 	printf("  -v, --verbose\n"
 	       "    Increase level of verbosity. Can be repeated.\n");
 	printf("  --version\n"
@@ -310,6 +313,8 @@ static int choose_opt_action(struct Options *dest,
 			dest->rcfile = optarg;
 		} else if (!strcmp(opts->name, "selftest")) {
 			dest->selftest = true;
+		} else if (!strcmp(opts->name, "valgrind")) {
+			dest->valgrind = dest->selftest = true;
 		} else if (!strcmp(opts->name, "version")) {
 			dest->version = true;
 		}
@@ -389,6 +394,7 @@ static int parse_options(struct Options *dest,
 			{"rcfile", required_argument, NULL, 0},
 			{"selftest", no_argument, NULL, 0},
 			{"tag", required_argument, NULL, 't'},
+			{"valgrind", no_argument, NULL, 0},
 			{"verbose", no_argument, NULL, 'v'},
 			{"version", no_argument, NULL, 0},
 			{"whereto", required_argument, NULL, 'w'},

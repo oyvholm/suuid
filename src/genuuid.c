@@ -63,6 +63,7 @@ void init_opt(struct Options *dest)
 	dest->rcfile = NULL;
 	dest->selftest = false;
 	dest->uuid = NULL;
+	dest->valgrind = false;
 	dest->verbose = 0;
 	dest->version = false;
 	dest->whereto = NULL;

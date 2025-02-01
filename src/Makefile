@@ -106,6 +106,11 @@ OBJS += uuid.o
 # DEVFLAGS += -Wmissing-declarations
 # DEVFLAGS += -Wpadded
 
+CMD_VALGRIND  = valgrind
+CMD_VALGRIND += -q
+CMD_VALGRIND += --leak-check=full
+CMD_VALGRIND += --show-leak-kinds=all
+CMD_VALGRIND += --
 IS_DEV = [ -z "$(NODEVEL)" \
            -a \( -e .devel -o -e ../.git/.devel -o -n "$(DEVEL)" \) ]
 TESTABLE_LINES = $$(grep -E '^ +\#\#\#\#\#:' *.c.gcov \
@@ -280,7 +285,9 @@ uninstall:
 	rm -f $(PREFIX)/bin/$(EXEC)
 
 .PHONY: valgrind
-valgrind:
+valgrind: $(EXEC)
+	./$(EXEC) --valgrind
+	$(CMD_VALGRIND) ./$(EXEC) --selftest | grep -v ^ok
 	cd t && $(MAKE) valgrind
 
 .PHONY: valgrindall

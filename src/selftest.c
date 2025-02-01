@@ -473,6 +473,42 @@ free_p:
 }
 
 /*
+ * test_valgrind_option() - Tests the --valgrind command line option. Returns 
+ * the number of failed tests.
+ */
+
+static int test_valgrind_option(char *execname)
+{
+	int r = 0;
+	struct streams ss;
+
+	diag("Test --valgrind");
+
+	if (opt.valgrind) {
+		opt.valgrind = false; /* gncov */
+		streams_init(&ss); /* gncov */
+		streams_exec(&ss, chp{"valgrind", "--version", /* gncov */
+		                      NULL});
+		if (!strstr(ss.out.buf, "valgrind-")) { /* gncov */
+			r += ok(1, "Valgrind is not installed," /* gncov */
+			           " disabling Valgrind checks.");
+		} else {
+			ok(0, "Valgrind is installed"); /* gncov */
+			opt.valgrind = true; /* gncov */
+		}
+		streams_free(&ss); /* gncov */
+	}
+
+	r += sc(chp{execname, "--valgrind", "-h", NULL},
+	        "Show this",
+	        "",
+	        EXIT_SUCCESS,
+	        "--valgrind -h");
+
+	return r;
+}
+
+/*
  * test_string_to_lower() - Tests the string_to_lower() function. Returns the 
  * number of failed tests.
  */
@@ -710,6 +746,7 @@ static int test_executable(char *execname)
 
 	diag("Test the executable");
 	print_version_info(execname);
+	r += test_valgrind_option(execname);
 
 	r += test_standard_options(execname);
 

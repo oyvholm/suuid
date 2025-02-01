@@ -123,6 +123,7 @@ struct Options {
 	bool selftest;
 	char *tag[MAX_TAGS];
 	char *uuid;
+	bool valgrind;
 	int verbose;
 	bool version;
 	char *whereto;
