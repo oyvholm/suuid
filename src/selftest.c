@@ -119,7 +119,8 @@ static char *diag_output_va(const char *format, va_list ap)
 
 /*
  * diag_output() - Frontend against diag_output_va(), used by the tests. 
- * Returns number of failed tests.
+ * Returns the value from diag_output_va(); a pointer to the allocated string, 
+ * or NULL if anything failed.
  */
 
 static char *diag_output(const char *format, ...)
@@ -274,19 +275,20 @@ static int valgrind_lines(const char *s)
 /*
  * test_command() - Run the executable with arguments in `cmd` and verify 
  * stdout, stderr and the return value against `exp_stdout`, `exp_stderr` and 
- * `exp_retval`. Returns the number of failed tests, or 1 if `cmd` is NULL.
+ * `exp_retval`. Returns nothing.
  */
 
-static int test_command(const char identical, char *cmd[],
-                        const char *exp_stdout, const char *exp_stderr,
-                        const int exp_retval, const char *desc)
+static void test_command(const char identical, char *cmd[],
+                         const char *exp_stdout, const char *exp_stderr,
+                         const int exp_retval, const char *desc)
 {
-	int r = 0;
 	struct streams ss;
 
 	assert(cmd);
-	if (!cmd)
-		return 1; /* gncov */
+	if (!cmd) {
+		ok(1, "%s(): cmd is NULL", __func__); /* gncov */
+		return; /* gncov */
+	}
 
 	if (opt.verbose >= 4) {
 		int i = -1; /* gncov */
@@ -300,47 +302,43 @@ static int test_command(const char identical, char *cmd[],
 	streams_init(&ss);
 	streams_exec(&ss, cmd);
 	if (exp_stdout) {
-		r += ok(tc_cmp(identical, ss.out.buf, exp_stdout),
-		        "%s (stdout)", desc);
+		ok(tc_cmp(identical, ss.out.buf, exp_stdout),
+		   "%s (stdout)", desc);
 		if (tc_cmp(identical, ss.out.buf, exp_stdout))
 			print_gotexp(ss.out.buf, exp_stdout); /* gncov */
 	}
 	if (exp_stderr) {
-		r += ok(tc_cmp(identical, ss.err.buf, exp_stderr),
-		        "%s (stderr)", desc);
+		ok(tc_cmp(identical, ss.err.buf, exp_stderr),
+		   "%s (stderr)", desc);
 		if (tc_cmp(identical, ss.err.buf, exp_stderr))
 			print_gotexp(ss.err.buf, exp_stderr); /* gncov */
 	}
-	r += ok(!(ss.ret == exp_retval), "%s (retval)", desc);
+	ok(!(ss.ret == exp_retval), "%s (retval)", desc);
 	if (ss.ret != exp_retval) {
 		char *g = allocstr("%d", ss.ret), /* gncov */
 		     *e = allocstr("%d", exp_retval); /* gncov */
 		if (!g || !e) /* gncov */
-			r += ok(1, "%s(): allocstr() failed", /* gncov */
-			           __func__); /* gncov */
+			ok(1, "%s(): allocstr() failed", __func__); /* gncov */
 		else
 			print_gotexp(g, e); /* gncov */
 		free(e); /* gncov */
 		free(g); /* gncov */
 	}
 	if (valgrind_lines(ss.err.buf))
-		r += ok(1, "Found valgrind output"); /* gncov */
+		ok(1, "Found valgrind output"); /* gncov */
 	streams_free(&ss);
-
-	return r;
 }
 
 /*
  * sc() - Execute command `cmd` and verify that stdout, stderr and the return 
  * value corresponds to the expected values. The `exp_*` variables are 
- * substrings that must occur in the actual output. Returns the number of 
- * failed tests.
+ * substrings that must occur in the actual output. Returns nothing.
  */
 
-static int sc(char *cmd[], const char *exp_stdout, const char *exp_stderr,
-              const int exp_retval, const char *desc)
+static void sc(char *cmd[], const char *exp_stdout, const char *exp_stderr,
+               const int exp_retval, const char *desc)
 {
-	return test_command(0, cmd, exp_stdout, exp_stderr, exp_retval, desc);
+	test_command(0, cmd, exp_stdout, exp_stderr, exp_retval, desc);
 }
 
 /*
@@ -355,20 +353,20 @@ static int sc(char *cmd[], const char *exp_stdout, const char *exp_stderr,
 
 /*
  * test_diag_big() - Tests diag_output() with a string larger than BUFSIZ. 
- * Returns the number of failed tests.
+ * Returns nothing.
  */
 
-static int test_diag_big(void)
+static void test_diag_big(void)
 {
-	int r = 0;
 	size_t size;
 	char *p, *outp;
 
 	size = BUFSIZ * 2;
 	p = malloc(size + 1);
 	if (!p) {
-		return ok(1, "%s(): malloc(%zu) failed", /* gncov */
-		             __func__, size + 1);
+		ok(1, "%s(): malloc(%zu) failed", /* gncov */
+		       __func__, size + 1);
+		return; /* gncov */
 	}
 
 	memset(p, 'a', size);
@@ -377,102 +375,89 @@ static int test_diag_big(void)
 	p[size] = '\0';
 
 	outp = diag_output("%s", p);
-	r += ok(!outp, "diag_big: diag_output() returns ok");
-	r += ok(!(strlen(outp) == size + 2),
-	        "diag_big: String length is correct");
-	r += ok(!!strncmp(outp, "# aaabcaaa", 10),
-	        "diag_big: Beginning is ok");
+	ok(!outp, "diag_big: diag_output() returns ok");
+	ok(!(strlen(outp) == size + 2), "diag_big: String length is correct");
+	ok(!!strncmp(outp, "# aaabcaaa", 10), "diag_big: Beginning is ok");
 	free(outp);
 	free(p);
-
-	return r;
 }
 
 /*
  * test_diag() - Tests the diag_output() function. diag() can't be tested 
- * directly because it would pollute the the test output. Returns the number of 
- * failed tests.
+ * directly because it would pollute the the test output. Returns nothing.
  */
 
-static int test_diag(void) {
-	int r = 0;
+static void test_diag(void) {
 	char *p, *s;
 
 	diag("Test diag()");
 
-	r += ok(!diag(NULL), "diag(NULL)");
-	r += ok(!(diag_output(NULL) == NULL), "diag_output() receives NULL");
+	ok(!diag(NULL), "diag(NULL)");
+	ok(!(diag_output(NULL) == NULL), "diag_output() receives NULL");
 
 	p = diag_output("Text with\nnewline");
-	r += ok(!p, "diag_output() with newline didn't return NULL");
+	ok(!p, "diag_output() with newline didn't return NULL");
 	s = "# Text with\n# newline";
-	r += ok(p ? !!strcmp(p, s) : 1,
-	        "diag_output() with newline, output is ok");
+	ok(p ? !!strcmp(p, s) : 1, "diag_output() with newline, output is ok");
 	print_gotexp(p, s);
 	free(p);
 
 	p = diag_output("%d = %s, %d = %s, %d = %s",
 	                1, "one", 2, "two", 3, "three");
-	r += ok(!p, "diag_output() with %%d and %%s didn't return NULL");
+	ok(!p, "diag_output() with %%d and %%s didn't return NULL");
 	s = "# 1 = one, 2 = two, 3 = three";
-	r += ok(p ? !!strcmp(p, s) : 1, "diag_output() with %%d and %%s");
+	ok(p ? !!strcmp(p, s) : 1, "diag_output() with %%d and %%s");
 	print_gotexp(p, s);
 	free(p);
 
-	r += test_diag_big();
-
-	return r;
+	test_diag_big();
 }
 
 /*
  * test_gotexp_output() - Tests the gotexp_output() function. print_gotexp() 
- * can't be tested directly because it would pollute stderr. Returns the number 
- * of failed tests.
+ * can't be tested directly because it would pollute stderr. Returns nothing.
  */
 
-static int test_gotexp_output(void)
+static void test_gotexp_output(void)
 {
-	int r = 0;
 	char *p, *s;
 
 	diag("Test gotexp_output()");
 
-	r += ok(!!gotexp_output(NULL, "a"), "gotexp_output(NULL, \"a\")");
+	ok(!!gotexp_output(NULL, "a"), "gotexp_output(NULL, \"a\")");
 
-	r += ok(!!strcmp((p = gotexp_output("got this", "expected this")),
-	                 "         got: 'got this'\n"
-	                 "    expected: 'expected this'"),
-	        "gotexp_output(\"got this\", \"expected this\")");
+	ok(!!strcmp((p = gotexp_output("got this", "expected this")),
+	            "         got: 'got this'\n"
+	            "    expected: 'expected this'"),
+	   "gotexp_output(\"got this\", \"expected this\")");
 	free(p);
 
-	r += ok(!print_gotexp(NULL, "expected this"),
-	        "print_gotexp(): Arg is NULL");
+	ok(!print_gotexp(NULL, "expected this"),
+	   "print_gotexp(): Arg is NULL");
 
 	s = "gotexp_output(\"a\", \"a\")";
-	r += ok(!(p = gotexp_output("a", "a")), "%s doesn't return NULL", s);
-	r += ok(!!strcmp(p, "         got: 'a'\n    expected: 'a'"),
-	        "%s: Contents is ok", s);
+	ok(!(p = gotexp_output("a", "a")), "%s doesn't return NULL", s);
+	ok(!!strcmp(p, "         got: 'a'\n    expected: 'a'"),
+	   "%s: Contents is ok", s);
 	free(p);
 
 	s = "gotexp_output() with newline";
-	r += ok(!(p = gotexp_output("with\nnewline", "also with\nnewline")),
-	        "%s: Doesn't return NULL", s);
-	r += ok(!!strcmp(p, "         got: 'with\nnewline'\n"
-	                    "    expected: 'also with\nnewline'"),
-	        "%s: Contents is ok", s);
+	ok(!(p = gotexp_output("with\nnewline", "also with\nnewline")),
+	   "%s: Doesn't return NULL", s);
+	ok(!!strcmp(p, "         got: 'with\nnewline'\n"
+	               "    expected: 'also with\nnewline'"),
+	   "%s: Contents is ok", s);
 	free(p);
-
-	return r;
 }
 
 /*
- * test_valgrind_lines() - Test the behavior of valgrind_lines(). Returns the 
- * number of failed tests.
+ * test_valgrind_lines() - Test the behavior of valgrind_lines(). Returns 
+ * nothing.
  */
 
-static int test_valgrind_lines(void)
+static void test_valgrind_lines(void)
 {
-	int r = 0, i;
+	int i;
 	const char
 	*has[] = {
 		"\n==123==",
@@ -503,50 +488,45 @@ static int test_valgrind_lines(void)
 
 	i = 0;
 	while (has[i]) {
-		r += ok(!valgrind_lines(has[i]),
-		        "valgrind_lines(): Has valgrind marker, string %d", i);
+		ok(!valgrind_lines(has[i]),
+		   "valgrind_lines(): Has valgrind marker, string %d", i);
 		i++;
 	}
 
 	i = 0;
 	while (hasnot[i]) {
-		r += ok(valgrind_lines(hasnot[i]),
-		        "valgrind_lines(): No valgrind marker, string %d", i);
+		ok(valgrind_lines(hasnot[i]),
+		   "valgrind_lines(): No valgrind marker, string %d", i);
 		i++;
 	}
-
-	return r;
 }
 
 /*
- * test_allocstr() - Tests the allocstr() function. Returns the number of 
- * failed tests.
+ * test_allocstr() - Tests the allocstr() function. Returns nothing.
  */
 
-static int test_allocstr(void)
+static void test_allocstr(void)
 {
 	const size_t bufsize = BUFSIZ * 2 + 1;
 	char *p, *p2, *p3;
-	int r = 0;
 	size_t alen;
 
 	diag("Test allocstr()");
 	p = malloc(bufsize);
 	if (!p) {
-		r += ok(1, "%s(): malloc() failed", __func__); /* gncov */
-		return r; /* gncov */
+		ok(1, "%s(): malloc() failed", __func__); /* gncov */
+		return; /* gncov */
 	}
 	memset(p, 'a', bufsize - 1);
 	p[bufsize - 1] = '\0';
 	p2 = allocstr("%s", p);
 	if (!p2) {
-		r += ok(1, "%s(): allocstr() failed" /* gncov */
-		           " with BUFSIZ * 2",
-		           __func__);
+		ok(1, "%s(): allocstr() failed with BUFSIZ * 2", /* gncov */
+		      __func__);
 		goto free_p; /* gncov */
 	}
 	alen = strlen(p2);
-	r += ok(!(alen == BUFSIZ * 2), "allocstr(): strlen is correct");
+	ok(!(alen == BUFSIZ * 2), "allocstr(): strlen is correct");
 	p3 = p2;
 	while (*p3) {
 		if (*p3 != 'a') {
@@ -555,22 +535,19 @@ static int test_allocstr(void)
 		}
 		p3++;
 	}
-	r += ok(!(p3 != NULL), "allocstr(): Content of string is correct");
+	ok(!(p3 != NULL), "allocstr(): Content of string is correct");
 	free(p2);
 free_p:
 	free(p);
-
-	return r;
 }
 
 /*
  * test_valgrind_option() - Tests the --valgrind command line option. Returns 
- * the number of failed tests.
+ * nothing.
  */
 
-static int test_valgrind_option(char *execname)
+static void test_valgrind_option(char *execname)
 {
-	int r = 0;
 	struct streams ss;
 
 	diag("Test --valgrind");
@@ -581,8 +558,8 @@ static int test_valgrind_option(char *execname)
 		streams_exec(&ss, chp{"valgrind", "--version", /* gncov */
 		                      NULL});
 		if (!strstr(ss.out.buf, "valgrind-")) { /* gncov */
-			r += ok(1, "Valgrind is not installed," /* gncov */
-			           " disabling Valgrind checks.");
+			ok(1, "Valgrind is not installed," /* gncov */
+			      " disabling Valgrind checks.");
 		} else {
 			ok(0, "Valgrind is installed"); /* gncov */
 			opt.valgrind = true; /* gncov */
@@ -590,67 +567,54 @@ static int test_valgrind_option(char *execname)
 		streams_free(&ss); /* gncov */
 	}
 
-	r += sc(chp{execname, "--valgrind", "-h", NULL},
-	        "Show this",
-	        "",
-	        EXIT_SUCCESS,
-	        "--valgrind -h");
-
-	return r;
+	sc(chp{execname, "--valgrind", "-h", NULL},
+	   "Show this",
+	   "",
+	   EXIT_SUCCESS,
+	   "--valgrind -h");
 }
 
 /*
- * test_string_to_lower() - Tests the string_to_lower() function. Returns the 
- * number of failed tests.
+ * test_string_to_lower() - Tests the string_to_lower() function. Returns 
+ * nothing.
  */
 
-static int test_string_to_lower(void)
+static void test_string_to_lower(void)
 {
-	int r = 0;
 	char s1[] = "ABCÅÆØ";
 
 	diag("Test string_to_lower()");
-	r += ok(!(string_to_lower(NULL) == NULL), "string_to_lower(NULL)");
-	r += ok(!!strcmp(string_to_lower(s1), "abcÅÆØ"),
-	        "string_to_lower(\"ABCÅÆØ\")");
-
-	return r;
+	ok(!(string_to_lower(NULL) == NULL), "string_to_lower(NULL)");
+	ok(!!strcmp(string_to_lower(s1), "abcÅÆØ"),
+	   "string_to_lower(\"ABCÅÆØ\")");
 }
 
 /*
  * chk_ivd() - Used by test_is_valid_date(). Checks that `is_valid_date(date, 
- * check_len)` returns the value in `exp`. Returns the number of failed tests.
+ * check_len)` returns the value in `exp`. Returns nothing.
  */
 
-static int chk_ivd(const char *date, const bool check_len, const int exp)
+static void chk_ivd(const char *date, const bool check_len, const int exp)
 {
-	int r = 0, res;
+	int res;
 
 	res = is_valid_date(date, check_len);
-	r += ok(!(res == exp),
-	        "is_valid_date(\"%s\", %s), expecting %d",
-	        date, check_len ? "true" : "false", res);
-
-	return r;
+	ok(!(res == exp), "is_valid_date(\"%s\", %s), expecting %d",
+	                  date, check_len ? "true" : "false", res);
 }
 
 /*
- * test_is_valid_date() - Tests the is_valid_date() function. Returns the 
- * number of failed tests.
+ * test_is_valid_date() - Tests the is_valid_date() function. Returns nothing.
  */
 
-static int test_is_valid_date(void)
+static void test_is_valid_date(void)
 {
-	int r = 0;
-
 	diag("Test is_valid_date()");
-	r += chk_ivd("2017-12-23T02:33:57Z", true, 0);
-	r += chk_ivd("2017-12-23T02:33:57Z", false, 0);
-	r += chk_ivd("2017-12-23T02:33:57.1234567Z", true, 1);
-	r += chk_ivd("2017-12-23T02:33:57.1234567Z", false, 1);
-	r += chk_ivd("2017-12-23T02:33:57.1234567Zabcd", false, 1);
-
-	return r;
+	chk_ivd("2017-12-23T02:33:57Z", true, 0);
+	chk_ivd("2017-12-23T02:33:57Z", false, 0);
+	chk_ivd("2017-12-23T02:33:57.1234567Z", true, 1);
+	chk_ivd("2017-12-23T02:33:57.1234567Z", false, 1);
+	chk_ivd("2017-12-23T02:33:57.1234567Zabcd", false, 1);
 }
 
 /*
@@ -660,143 +624,117 @@ static int test_is_valid_date(void)
  * NULL, otherwise 1. It then checks that the generated timestamp is as 
  * expected.
  *
- * Returns the number of failed tests.
+ * Returns nothing.
  */
 
-static int chk_ud(const char *uuid, const int exp_ret, const char *exp_date)
+static void chk_ud(const char *uuid, const int exp_ret, const char *exp_date)
 {
-	int r = 0, ret;
+	int ret;
 	char buf[DATE_LENGTH + 1];
 
 	assert(uuid);
 	assert(exp_date);
 
 	ret = !!uuid_date(buf, uuid);
-	r += ok(!(ret == exp_ret),
-	        "uuid_date(): \"%s\" is%s a valid v1 UUID",
-	        uuid, exp_ret ? "" : " not");
+	ok(!(ret == exp_ret), "uuid_date(): \"%s\" is%s a valid v1 UUID",
+	                      uuid, exp_ret ? "" : " not");
 	if (!ret)
-		return r;
-	r += ok(!!strcmp(buf, exp_date), "uuid_date(\"%s\")", uuid);
+		return;
+	ok(!!strcmp(buf, exp_date), "uuid_date(\"%s\")", uuid);
 	print_gotexp(buf, exp_date);
-
-	return r;
 }
 
 /*
- * test_uuid_date() - Tests the uuid_date() function. Returns the number of 
- * failed tests.
+ * test_uuid_date() - Tests the uuid_date() function. Returns nothing.
  */
 
-static int test_uuid_date(void)
+static void test_uuid_date(void)
 {
-	int r = 0;
-
 	diag("Test uuid_date()");
-	r += chk_ud("00000000-0000-11e7-87d5-f74d993421b0", 1,
-	            "2017-03-03T10:56:05.8089472Z");
-	r += chk_ud("acdaf974-e78e-11e7-87d5-f74d993421b0", 1,
-	            "2017-12-23T03:09:22.9493620Z");
-	r += chk_ud("notvalid", 0, "");
-	r += chk_ud("", 0, "");
-	r += chk_ud("c9ffa9cb-708d-454b-b1f2-f18f609cb825", 0, "");
-	r += chk_ud("acdaf974-e78e-11e7-87d5-g74d993421b0", 0, "");
-
-	return r;
+	chk_ud("00000000-0000-11e7-87d5-f74d993421b0", 1,
+	       "2017-03-03T10:56:05.8089472Z");
+	chk_ud("acdaf974-e78e-11e7-87d5-f74d993421b0", 1,
+	       "2017-12-23T03:09:22.9493620Z");
+	chk_ud("notvalid", 0, "");
+	chk_ud("", 0, "");
+	chk_ud("c9ffa9cb-708d-454b-b1f2-f18f609cb825", 0, "");
+	chk_ud("acdaf974-e78e-11e7-87d5-g74d993421b0", 0, "");
 }
 
 /*
  * chk_vu() - Used by test_valid_uuid(). Checks that `valid_uuid(uuid, 
- * check_len)` returns `exp_valid`. Returns the number of failed tests.
+ * check_len)` returns `exp_valid`. Returns nothing.
  */
 
-static int chk_vu(const char *uuid, const bool check_len, const bool exp_valid)
+static void chk_vu(const char *uuid, const bool check_len,
+                   const bool exp_valid)
 {
-	int r = 0;
 	bool res;
 
 	res = valid_uuid(uuid, check_len);
-	r += ok(!(res == exp_valid), "valid_uuid(\"%s\", %s) should return %s",
-	        uuid, check_len ? "true" : "false",
-	        exp_valid ? "true" : "false");
-
-	return r;
+	ok(!(res == exp_valid), "valid_uuid(\"%s\", %s) should return %s",
+	   uuid, check_len ? "true" : "false", exp_valid ? "true" : "false");
 }
 
 /*
- * test_valid_uuid() - Tests the valid_uuid() function. Returns the number of 
- * failed tests.
+ * test_valid_uuid() - Tests the valid_uuid() function. Returns nothing.
  */
 
-static int test_valid_uuid(void)
+static void test_valid_uuid(void)
 {
-	int r = 0;
-
 	diag("Test valid_uuid()");
 	chk_vu("acdaf974-e78e-11e7-87d5-f74d993421b0", true, true);
 	chk_vu("acdaf974-e78e-11e7-87d5-f74d993421b0123", false, true);
 	chk_vu("acdaf974-e78e-11e7-87d5-f74d993421b0123", true, false);
 	chk_vu("c9ffa9cb-708d-454b-b1f2-f18f609cb825", true, false);
-
-	return r;
 }
 
 /*
  * test_standard_options() - Tests the various generic options available in 
- * most programs. Returns the number of failed tests.
+ * most programs. Returns nothing.
  */
 
-static int test_standard_options(char *execname)
+static void test_standard_options(char *execname)
 {
-	int r = 0;
-
 	diag("Test standard options");
 
 	diag("Test -h/--help");
-	r += sc(chp{ execname, "-h", NULL },
-	        "  Show this help",
-	        "",
-	        EXIT_SUCCESS,
-	        "-h");
-	r += sc(chp{ execname, "--help", NULL },
-	        "  Show this help",
-	        "",
-	        EXIT_SUCCESS,
-	        "--help");
-
-	return r;
+	sc(chp{ execname, "-h", NULL },
+	   "  Show this help",
+	   "",
+	   EXIT_SUCCESS,
+	   "-h");
+	sc(chp{ execname, "--help", NULL },
+	   "  Show this help",
+	   "",
+	   EXIT_SUCCESS,
+	   "--help");
 }
 
 /*
- * test_functions() - Tests various functions directly. Returns the number of 
- * failed tests.
+ * test_functions() - Tests various functions directly. Returns nothing.
  */
 
-static int test_functions(void)
+static void test_functions(void)
 {
-	int r = 0;
-
 	diag("Test selftest routines");
-	r += ok(!ok(0, NULL), "ok(0, NULL)");
-	r += test_diag();
-	r += test_gotexp_output();
-	r += test_valgrind_lines();
+	ok(!ok(0, NULL), "ok(0, NULL)");
+	test_diag();
+	test_gotexp_output();
+	test_valgrind_lines();
 
 	diag("Test various routines");
 	diag("Test myerror()");
 	errno = EACCES;
-	r += ok(!(myerror("errno is EACCES") > 37),
-	        "myerror(): errno is EACCES");
+	ok(!(myerror("errno is EACCES") > 37), "myerror(): errno is EACCES");
 	errno = 0;
 	diag("Test std_strerror()");
-	r += ok(!(std_strerror(0) != NULL), "std_strerror(0)");
-	r += test_allocstr();
-	r += test_string_to_lower();
-	r += test_is_valid_date();
-	r += test_uuid_date();
-	r += test_valid_uuid();
-
-	return r;
+	ok(!(std_strerror(0) != NULL), "std_strerror(0)");
+	test_allocstr();
+	test_string_to_lower();
+	test_is_valid_date();
+	test_uuid_date();
+	test_valid_uuid();
 }
 
 /*
@@ -828,21 +766,16 @@ static int print_version_info(char *execname)
 
 /*
  * test_executable() - Run various tests with the executable and verify that 
- * stdout, stderr and the return value are as expected. Returns the number of 
- * failed tests.
+ * stdout, stderr and the return value are as expected. Returns nothing.
  */
 
-static int test_executable(char *execname)
+static void test_executable(char *execname)
 {
-	int r = 0;
-
 	diag("Test the executable");
 	print_version_info(execname);
-	r += test_valgrind_option(execname);
+	test_valgrind_option(execname);
 
-	r += test_standard_options(execname);
-
-	return r;
+	test_standard_options(execname);
 }
 
 /*
