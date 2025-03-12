@@ -203,6 +203,13 @@ gdb: $(EXEC)
 .PHONY: install
 install: $(PREFIX)/bin/$(EXEC)
 
+.PHONY: longlines
+longlines:
+	@for f in $(CFILES) $(HFILES) Gen-version Makefile; do \
+		[ -f "$$f" ] && expand "$$f" | sed 's/ $$//;' \
+		| grep -q -E '.{80}' && echo "$$f"; \
+	done | grep . && exit 1 || true
+
 $(PREFIX)/bin/$(EXEC): $(EXEC)
 	mkdir -p $(PREFIX)/bin
 	install $(EXEC) $(PREFIX)/bin/$(EXEC)
@@ -259,11 +266,8 @@ testlock: $(EXEC)
 
 .PHONY: testsrc
 testsrc:
-	@echo Check files for long lines >&2
-	@for f in $(CFILES) $(HFILES) Gen-version Makefile; do \
-		[ -f "$$f" ] && expand "$$f" | sed 's/ $$//;' \
-		| grep -q -E '.{80}' && echo "$$f"; \
-	done | grep . && exit 1 || true
+	@echo Check files for long lines
+	@$(MAKE) -s longlines
 
 .PHONY: tlok
 tlok:
