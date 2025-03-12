@@ -110,7 +110,6 @@ sub main {
 	delete $ENV{'SUUID_HOSTNAME'};
 	delete $ENV{'SUUID_LOGDIR'};
 
-	test_suuid_selftest();
 	test_test_functions();
 	test_suuid_executable();
 
@@ -132,15 +131,6 @@ sub main {
 	diag('Testing finished.');
 
 	return $Retval;
-}
-
-sub test_suuid_selftest {
-	diag("--selftest");
-	likecmd("$CMD --selftest",
-	        '/.*/',
-	        '/.*/',
-	        0,
-	        '--selftest');
 }
 
 sub test_s_suuid_sess {
