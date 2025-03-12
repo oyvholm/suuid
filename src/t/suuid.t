@@ -110,7 +110,6 @@ sub main {
 	delete $ENV{'SUUID_HOSTNAME'};
 	delete $ENV{'SUUID_LOGDIR'};
 
-	test_standard_options();
 	test_suuid_selftest();
 	test_test_functions();
 	test_suuid_executable();
@@ -133,34 +132,6 @@ sub main {
 	diag('Testing finished.');
 
 	return $Retval;
-}
-
-sub test_standard_options {
-	diag('Testing -v (--verbose) option...');
-	likecmd("$CMD -hv",
-	        '/^\n\S+ \d+\.\d+\.\d+/s',
-	        '/^$/',
-	        0,
-	        'Option -v with -h returns version number and help screen');
-
-	diag('--license option');
-	likecmd("$CMD --license",
-	        '/GNU General Public License'
-	        . '.*'
-	        . 'either version 2 of the License/s',
-	        '/^$/',
-	        0,
-	        'Option --license displays the program license');
-
-	diag('Unknown option');
-	likecmd("$CMD --gurgle",
-	        '/^$/',
-	        "/\\.\\.\\/$CMDB: Option error\\n"
-	        . "\\.\\.\\/$CMDB: Type \"\\.\\.\\/$CMDB --help\" for help"
-	        . " screen\\. Returning with value 1\\.\\n/s",
-	        1,
-	        'Unknown option specified');
-	return;
 }
 
 sub test_suuid_selftest {

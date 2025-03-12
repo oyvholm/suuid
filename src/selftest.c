@@ -342,6 +342,18 @@ static void sc(char *cmd[], const char *exp_stdout, const char *exp_stderr,
 }
 
 /*
+ * tc() - Execute command `cmd` and verify that stdout, stderr and the return 
+ * value are identical to the expected values. The `exp_*` variables are 
+ * strings that must be identical to the actual output. Returns nothing.
+ */
+
+static void tc(char *cmd[], const char *exp_stdout, const char *exp_stderr,
+               const int exp_retval, const char *desc)
+{
+	test_command(1, cmd, exp_stdout, exp_stderr, exp_retval, desc);
+}
+
+/*
  ******************
  * Function tests *
  ******************
@@ -696,6 +708,8 @@ static void test_valid_uuid(void)
 
 static void test_standard_options(char *execname)
 {
+	char *s;
+
 	diag("Test standard options");
 
 	diag("Test -h/--help");
@@ -731,6 +745,49 @@ static void test_standard_options(char *execname)
 	   ": main(): Using verbose level 5\n",
 	   EXIT_SUCCESS,
 	   "--verbose: One -q reduces the verbosity level");
+
+	diag("Test --version");
+	s = allocstr("%s %s (%s)\n", execname, EXEC_VERSION, EXEC_DATE);
+	if (s) {
+		sc(chp{ execname, "--version", NULL },
+		   s,
+		   "",
+		   EXIT_SUCCESS,
+		   "--version");
+		free(s);
+	} else {
+		ok(1, "%s(): allocstr() 1 failed", __func__); /* gncov */
+	}
+	s = EXEC_VERSION "\n";
+	tc(chp{ execname, "--version", "-q", NULL },
+	   s,
+	   "",
+	   EXIT_SUCCESS,
+	   "--version with -q shows only the version number");
+
+	diag("Test --license");
+	sc(chp{ execname, "--license", NULL },
+	   "GNU General Public License",
+	   "",
+	   EXIT_SUCCESS,
+	   "--license: It's GPL");
+	sc(chp{ execname, "--license", NULL },
+	   "either version 2 of the License",
+	   "",
+	   EXIT_SUCCESS,
+	   "--license: It's version 2 of the GPL");
+
+	diag("Unknown option");
+	sc(chp{ execname, "--gurgle", NULL },
+	   "",
+	   ": Option error\n",
+	   EXIT_FAILURE,
+	   "Unknown option: \"Option error\" message is printed");
+	sc(chp{ execname, "--gurgle", NULL },
+	   "",
+	   " --help\" for help screen. Returning with value 1.\n",
+	   EXIT_FAILURE,
+	   "Unknown option mentions --help");
 }
 
 /*
