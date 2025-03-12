@@ -174,6 +174,13 @@ clean:
 	rm -fr $(TESTLOCKDIR)
 	cd t && $(MAKE) clean
 
+.PHONY: dupdesc
+dupdesc:
+	@$(MAKE) -s clean all \
+	&& ./$(EXEC) --selftest 2>/dev/null | cut -f 4- -d ' ' | sort \
+	   | uniq -c | sed 's/^[[:space:]]*//g;' | grep -v '^1 ' \
+	   | grep . && exit 1 || true
+
 .PHONY: edit
 edit: tags
 	$(EDITOR) $$(git ls-files | grep -v -e ^COPYING)
@@ -268,6 +275,8 @@ testlock: $(EXEC)
 testsrc:
 	@echo Check files for long lines
 	@$(MAKE) -s longlines
+	@echo Check for duplicated test descriptions
+	@$(MAKE) -s dupdesc
 
 .PHONY: tlok
 tlok:
