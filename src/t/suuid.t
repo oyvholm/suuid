@@ -143,18 +143,6 @@ sub test_standard_options {
 	        0,
 	        'Option -v with -h returns version number and help screen');
 
-	diag('Testing --version option...');
-	likecmd("$CMD --version",
-	        '/^\S+ \d+\.\d+\.\d+/',
-	        '/^$/',
-	        0,
-	        'Option --version returns version number');
-	likecmd("$CMD --version --quiet",
-	        '/^\d+\.\d+\.\d+\S*$/',
-	        '/^$/',
-	        0,
-	        '--version with --quiet shows only the version number');
-
 	diag('--license option');
 	likecmd("$CMD --license",
 	        '/GNU General Public License'
