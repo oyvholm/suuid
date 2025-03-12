@@ -772,8 +772,8 @@ static int print_version_info(char *execname)
 static void test_executable(char *execname)
 {
 	diag("Test the executable");
-	print_version_info(execname);
 	test_valgrind_option(execname);
+	print_version_info(execname);
 
 	test_standard_options(execname);
 }
