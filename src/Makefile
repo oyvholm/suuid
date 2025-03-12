@@ -218,6 +218,7 @@ test: $(EXEC)
 testall:
 	$(MAKE) -s testcomb WHAT=testold
 	$(MAKE) -s testcomb WHAT=test
+	$(MAKE) -s testsrc
 
 .PHONY: testold
 testold: $(EXEC)
