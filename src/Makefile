@@ -172,7 +172,7 @@ clean:
 	rm -f gmon.out gmon.sum
 	rm -f version.h
 	rm -fr $(TESTLOCKDIR)
-	cd t && $(MAKE) clean
+	cd t && $(MAKE) $@
 
 .PHONY: dupdesc
 dupdesc:
@@ -302,7 +302,7 @@ uninstall:
 valgrind: $(EXEC)
 	./$(EXEC) --valgrind
 	$(CMD_VALGRIND) ./$(EXEC) --selftest | grep -v ^ok
-	cd t && $(MAKE) valgrind
+	cd t && $(MAKE) $@
 
 .PHONY: valgrindall
 valgrindall:

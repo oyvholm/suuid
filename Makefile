@@ -19,8 +19,8 @@ EXECS += wi
 
 .PHONY: all
 all:
-	cd doc && $(MAKE)
-	cd src && $(MAKE)
+	cd doc && $(MAKE) $@
+	cd src && $(MAKE) $@
 
 tags: src/*.[ch]
 	ctags src/*.[ch]
@@ -32,9 +32,9 @@ cflags:
 .PHONY: clean
 clean:
 	find . -name .testadd.tmp -type d -print0 | xargs -0r rm -rf
-	cd doc && $(MAKE) clean
-	cd src && $(MAKE) clean
-	cd tests && $(MAKE) clean
+	cd doc && $(MAKE) $@
+	cd src && $(MAKE) $@
+	cd tests && $(MAKE) $@
 
 .PHONY: distclean
 distclean: clean
@@ -43,38 +43,38 @@ distclean: clean
 install:
 	mkdir -p $(PREFIX)/bin
 	install $(EXECS) $(PREFIX)/bin
-	cd src && $(MAKE) install
+	cd src && $(MAKE) $@
 
 .PHONY: testlock
 testlock:
-	cd src && $(MAKE) testlock
+	cd src && $(MAKE) $@
 
 .PHONY: test
 test:
-	cd doc && $(MAKE) test
-	cd src && $(MAKE) test
-	cd tests && $(MAKE) test
+	cd doc && $(MAKE) $@
+	cd src && $(MAKE) $@
+	cd tests && $(MAKE) $@
 
 .PHONY: testall
 testall:
-	cd src && $(MAKE) testall
-	cd tests && $(MAKE) testall
+	cd src && $(MAKE) $@
+	cd tests && $(MAKE) $@
 
 .PHONY: tlok
 tlok:
-	@cd src && $(MAKE) -s tlok
+	@cd src && $(MAKE) -s $@
 
 .PHONY: uninstall
 uninstall:
 	cd $(PREFIX)/bin && rm -f $(EXECS)
-	cd src && $(MAKE) uninstall
+	cd src && $(MAKE) $@
 
 .PHONY: valgrind
 valgrind:
-	cd src && $(MAKE) valgrind
+	cd src && $(MAKE) $@
 	cd tests && $(MAKE) test
 
 .PHONY: valgrindall
 valgrindall:
-	cd src && $(MAKE) valgrindall
+	cd src && $(MAKE) $@
 	cd tests && $(MAKE) testall
