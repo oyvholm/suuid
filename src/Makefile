@@ -16,7 +16,7 @@ CFILES += logfile.c
 CFILES += rcfile.c
 CFILES += selftest.c
 CFILES += sessvar.c
-CFILES += string.c
+CFILES += strings.c
 CFILES += suuid.c
 CFILES += tag.c
 CFILES += uuid.c
@@ -89,7 +89,7 @@ OBJS += logfile.o
 OBJS += rcfile.o
 OBJS += selftest.o
 OBJS += sessvar.o
-OBJS += string.o
+OBJS += strings.o
 OBJS += tag.o
 OBJS += uuid.o
 
@@ -152,8 +152,8 @@ selftest.o: selftest.c $(DEPS)
 sessvar.o: sessvar.c $(DEPS)
 	$(CC) $(CFLAGS) sessvar.c
 
-string.o: string.c $(DEPS)
-	$(CC) $(CFLAGS) string.c
+strings.o: strings.c $(DEPS)
+	$(CC) $(CFLAGS) strings.c
 
 tag.o: tag.c $(DEPS)
 	$(CC) $(CFLAGS) tag.c
