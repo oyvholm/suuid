@@ -1,8 +1,10 @@
-*.o
 /*.gcda
 /*.gcno
 /*.gcov
+/*.o
 /.devel
+/.make-tlok.tmp
+/gdbopts
 /gmon.out
 /gmon.sum
 /logdir/

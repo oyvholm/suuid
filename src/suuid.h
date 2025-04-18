@@ -50,6 +50,13 @@
 #include "binbuf.h"
 #include "uuid.h"
 
+#if 1
+#  define DEBL  msg(2, "DEBL: %s, line %u in %s()", \
+                       __FILE__, __LINE__, __func__)
+#else
+#  define DEBL  ;
+#endif
+
 #define ENV_EDITOR  "SUUID_EDITOR" /* Name of editor to use with "-c --" */
 #define ENV_HOSTNAME  "SUUID_HOSTNAME" /* Optional environment variable */
 #define ENV_LOGDIR  "SUUID_LOGDIR" /* Optional environment variable with path 
@@ -85,9 +92,6 @@
                     "_"                          \
                     "abcdefghijklmnopqrstuvwxyz" \
                     LEGAL_UTF8_CHARS /* Legal chars in sess descriptions */
-
-#define DEBL  msg(2, "%s, line %u in %s()", __FILE__, __LINE__, __func__)
-#define in_range(a,b,c)  ((a) >= (b) && (a) <= (c) ? true : false)
 
 struct Rc {
 	char *hostname;
@@ -144,6 +148,13 @@ struct uuid_result {
  * Public function prototypes
  */
 
+/* suuid.c */
+extern char *progname;
+extern struct Options opt;
+int msg(const int verbose, const char *format, ...);
+const char *std_strerror(const int errnum);
+int myerror(const char *format, ...);
+
 /* environ.c */
 char *get_editor(void);
 bool valid_hostname(const char *s);
@@ -197,13 +208,6 @@ char *string_to_lower(char *str);
 char *trim_str_front(char *dest);
 char *trim_str_end(char *dest);
 const char *utf8_check(const char *text);
-
-/* suuid.c */
-extern char *progname;
-extern struct Options opt;
-int msg(const int verbose, const char *format, ...);
-const char *std_strerror(const int errnum);
-int myerror(const char *format, ...);
 
 /* tag.c */
 void rewind_tag(void);

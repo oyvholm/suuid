@@ -554,6 +554,12 @@ free_p:
 }
 
 /*
+ ****************
+ * Option tests *
+ ****************
+ */
+
+/*
  * test_valgrind_option() - Tests the --valgrind command line option. Returns 
  * nothing.
  */
@@ -571,7 +577,7 @@ static void test_valgrind_option(char *execname)
 		                      NULL});
 		if (!strstr(ss.out.buf, "valgrind-")) { /* gncov */
 			ok(1, "Valgrind is not installed," /* gncov */
-			      " disabling Valgrind checks.");
+			      " disabling Valgrind checks");
 		} else {
 			ok(0, "Valgrind is installed"); /* gncov */
 			opt.valgrind = true; /* gncov */
@@ -829,9 +835,9 @@ static int print_version_info(char *execname)
 	streams_init(&ss);
 	res = streams_exec(&ss, chp{ execname, "--version", NULL });
 	if (res) {
-		diag("%s(): streams_exec() failed:\n%s",
-		     __func__, ss.err.buf ? ss.err.buf : "(null)");
-		return 1;
+		diag("%s(): streams_exec() failed:\n%s", /* gncov */
+		     __func__, ss.err.buf ? ss.err.buf : "(null)"); /* gncov */
+		return 1; /* gncov */
 	}
 	diag("========== BEGIN version info ==========\n"
 	     "%s"

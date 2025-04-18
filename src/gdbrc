@@ -41,3 +41,4 @@ tui enable
 b main
 
 r
+set pagination on

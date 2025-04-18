@@ -1,4 +1,4 @@
-# Top Makefile in <sunny256/suuid.git>
+# Top Makefile in <oyvholm/suuid.git>
 # File ID: c9f9bc1a-28d8-11e5-b53c-fefdb24f8e10
 # Author: Øyvind A. Holm <sunny@sunbase.org>
 
@@ -57,7 +57,7 @@ test:
 
 .PHONY: testall
 testall:
-	cd src && $(MAKE) $@
+	cd src && $(MAKE) -s $@
 	cd tests && $(MAKE) $@
 
 .PHONY: tlok

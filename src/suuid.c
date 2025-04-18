@@ -244,9 +244,9 @@ static int usage(const int retval)
 	       "    Don't use the hardware MAC address, generate a random"
 	       " address field.\n");
 	printf("  --raw\n"
-	       "    Don't convert <txt> element to XML. When using this"
-	       " option, it is \n"
-	       "    expected that the value of the -c/--comment option is"
+	       "    Don't convert the <txt> element to XML. When using this"
+	       " option, it \n"
+	       "    is expected that the value of the -c/--comment option is"
 	       " valid XML, \n"
 	       "    otherwise it will create corrupted log files.\n");
 	printf("  --rcfile X\n"
@@ -437,7 +437,7 @@ static int parse_options(struct Options *dest,
 
 int main(int argc, char *argv[])
 {
-	int retval = 0;
+	int retval = EXIT_SUCCESS;
 	struct uuid_result result;
 
 	progname = argv[0];
