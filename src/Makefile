@@ -122,6 +122,10 @@ all: $(EXEC)
 $(EXEC): $(OBJS)
 	$(LD) -o $(EXEC) $(LDFLAGS) $(OBJS) $(LIBS)
 
+$(PREFIX)/bin/$(EXEC): $(EXEC)
+	mkdir -p $(PREFIX)/bin
+	install $(EXEC) $(PREFIX)/bin/$(EXEC)
+
 version.h: Gen-version $(CFILES) $(DEPS)
 	./Gen-version
 
@@ -157,6 +161,9 @@ strings.o: strings.c $(DEPS)
 
 tag.o: tag.c $(DEPS)
 	$(CC) $(CFLAGS) tag.c
+
+tags: $(CFILES) $(HFILES)
+	ctags $(CFILES) $(HFILES)
 
 uuid.o: uuid.c $(DEPS)
 	$(CC) $(CFLAGS) uuid.c
@@ -216,13 +223,6 @@ longlines:
 		[ -f "$$f" ] && expand "$$f" | sed 's/ $$//;' \
 		| grep -q -E '.{80}' && echo "$$f"; \
 	done | grep . && exit 1 || true
-
-$(PREFIX)/bin/$(EXEC): $(EXEC)
-	mkdir -p $(PREFIX)/bin
-	install $(EXEC) $(PREFIX)/bin/$(EXEC)
-
-tags: $(CFILES) $(HFILES)
-	ctags $(CFILES) $(HFILES)
 
 .PHONY: test
 test: $(EXEC)
