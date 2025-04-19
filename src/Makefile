@@ -28,6 +28,8 @@ CFLAGS += $(DEVFLAGS_STR)
 CFLAGS += -Wall
 CFLAGS += -c
 DEPS = $(HFILES) Makefile
+DEVEL =
+DEVFLAGS  =
 DEVFLAGS += $$(test "$$(uname -o)" = "Android" || echo -fcf-protection=full)
 DEVFLAGS += -Wbad-function-cast
 DEVFLAGS += -Wcast-align
@@ -70,6 +72,7 @@ DEVFLAGS += -pedantic
 DEVFLAGS_STR = $$($(IS_DEV) && echo $(DEVFLAGS))
 GNCOV_STR = $$(test -n "$(GNCOV)" && echo "-g")
 HFILES  =
+HFILES += binbuf.h
 HFILES += suuid.h
 HFILES += uuid.h
 LDFLAGS  =
