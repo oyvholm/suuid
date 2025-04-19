@@ -3,6 +3,9 @@
 
 image: gcc
 
+variables:
+  LC_ALL: "C.UTF-8"
+
 suuid:linux:
   stage: build
   before_script:
