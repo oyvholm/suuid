@@ -27,7 +27,7 @@ CFLAGS += $$(test -n "$(PROF)" && echo -n "-pg")
 CFLAGS += $(DEVFLAGS_STR)
 CFLAGS += -Wall
 CFLAGS += -c
-DEPS = $(HFILES) Makefile
+DEPS = version.h $(HFILES) Makefile
 DEVEL =
 DEVFLAGS  =
 DEVFLAGS += $$(test "$$(uname -o)" = "Android" || echo -fcf-protection=full)
@@ -129,7 +129,7 @@ $(PREFIX)/bin/$(EXEC): $(EXEC)
 	mkdir -p $(PREFIX)/bin
 	install $(EXEC) $(PREFIX)/bin/$(EXEC)
 
-version.h: Gen-version $(CFILES) $(DEPS)
+version.h: Gen-version $(CFILES) $(HFILES) Makefile
 	./Gen-version
 
 suuid.o: version.h suuid.c $(DEPS)
