@@ -68,6 +68,9 @@ test -n "$TEST_FUNC" && newdef TEST_FUNC
 # UNUSED: Compile unused code
 test -n "$UNUSED" && newdef UNUSED
 
+# USE_NEW: Use new functionality, potentially unstable
+test -n "$USE_NEW" && newdef USE_NEW
+
 # VERIFY_UUID: Run additional checks with external programs on every generated 
 # uuid, used for development.
 test -n "$VERIFY_UUID" && newdef VERIFY_UUID

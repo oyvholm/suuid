@@ -179,6 +179,9 @@ static int print_version(void)
 #ifdef UNUSED
 	printf("has UNUSED\n");
 #endif
+#ifdef USE_NEW
+	printf("has USE_NEW\n");
+#endif
 #ifdef VERIFY_UUID
 	printf("has VERIFY_UUID\n");
 #endif
