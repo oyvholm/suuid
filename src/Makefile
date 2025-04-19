@@ -196,6 +196,10 @@ tags: $(CFILES) $(HFILES)
 uuid.o: uuid.c $(DEPS)
 	$(CC) $(CFLAGS) uuid.c
 
+.PHONY: asm
+asm: $(DEPS)
+	$(CC) $(CFLAGS) -fverbose-asm -S $(CFILES)
+
 .PHONY: cflags
 cflags:
 	@echo $(CFLAGS)
@@ -207,6 +211,7 @@ clean:
 	rm -f $(MANPAGE) $(MANPAGE).tmp
 	rm -f $(PDFFILE) $(PDFFILE).tmp
 	rm -f *.gcda *.gcno *.gcov
+	rm -f *.s
 	rm -f gmon.out gmon.sum
 	rm -f version.h
 	rm -fr $(TESTLOCKDIR)

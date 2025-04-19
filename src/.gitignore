@@ -2,6 +2,7 @@
 /*.gcno
 /*.gcov
 /*.o
+/*.s
 /.devel
 /.make-tlok.tmp
 /gdbopts
