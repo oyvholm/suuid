@@ -802,6 +802,9 @@ static void test_standard_options(char *execname)
 
 static void test_functions(void)
 {
+	if (!opt.testfunc)
+		return; /* gncov */
+
 	diag("Test selftest routines");
 	ok(!ok(0, NULL), "ok(0, NULL)");
 	test_diag();
@@ -855,6 +858,9 @@ static int print_version_info(char *execname)
 
 static void test_executable(char *execname)
 {
+	if (!opt.testexec)
+		return; /* gncov */
+
 	diag("Test the executable");
 	test_valgrind_option(execname);
 	print_version_info(execname);

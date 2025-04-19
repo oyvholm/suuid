@@ -101,6 +101,7 @@ OBJS += tag.o
 OBJS += uuid.o
 PDFFILE = $(EXEC).pdf
 TESTLOCKDIR = testlockdir
+TESTS = all
 
 #  Not in Clang
 # DEVFLAGS += -Wc99-c11-compat
@@ -268,7 +269,7 @@ pdf: $(PDFFILE)
 
 .PHONY: test
 test: $(EXEC)
-	./$(EXEC) --selftest
+	./$(EXEC) --selftest $(TESTS)
 
 .PHONY: testall
 testall:
@@ -342,8 +343,8 @@ uninstall:
 
 .PHONY: valgrind
 valgrind: $(EXEC)
-	./$(EXEC) --valgrind
-	$(CMD_VALGRIND) ./$(EXEC) --selftest | grep -v ^ok
+	./$(EXEC) --valgrind $(TESTS)
+	$(CMD_VALGRIND) ./$(EXEC) --selftest $(TESTS) | grep -v ^ok
 	cd t && $(MAKE) $@
 
 .PHONY: valgrindall

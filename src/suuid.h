@@ -126,6 +126,8 @@ struct Options {
 	char *rcfile;
 	bool selftest;
 	char *tag[MAX_TAGS];
+	bool testexec;
+	bool testfunc;
 	char *uuid;
 	bool valgrind;
 	int verbose;
