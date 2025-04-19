@@ -79,11 +79,7 @@ LDFLAGS  =
 LDFLAGS += $$(test -n "$(PROF)" && echo -n "-pg")
 LIBS  =
 LIBS += $$(test -n "$(GCOV)" && echo "-lgcov --coverage")
-TESTLOCKDIR = testlockdir
-
 OBJS  =
-OBJS += suuid.o
-
 OBJS += binbuf.o
 OBJS += environ.o
 OBJS += genuuid.o
@@ -93,8 +89,10 @@ OBJS += rcfile.o
 OBJS += selftest.o
 OBJS += sessvar.o
 OBJS += strings.o
+OBJS += suuid.o
 OBJS += tag.o
 OBJS += uuid.o
+TESTLOCKDIR = testlockdir
 
 #  Not in Clang
 # DEVFLAGS += -Wc99-c11-compat
