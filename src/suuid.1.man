@@ -1,0 +1,195 @@
+.\" suuid.1.man
+.\" File ID: 0ce51f0a-1b5a-11f0-83c9-83850402c3ce
+.TH SUUID 1 "RPL_DATE" "suuid\-RPL_VERSION"
+.SH NAME
+suuid \- Generate v1 UUIDs and document the creation in a log file
+.SH SYNOPSIS
+.B suuid
+[\fIOPTIONS\fP]
+.SH DESCRIPTION
+suuid is a program for generating v1 UUIDs with timestamp and configurable MAC 
+address. All generated UUIDs are stored as XML with various metadata for 
+logging and documentation purposes.
+.SS What is a v1 UUID?
+A v1 UUID (Universally Unique Identifier) is a 128-bit identifier designed to 
+be unique across time and space. It's generated using the current timestamp and 
+the MAC address of the machine, ensuring no two UUIDs are identical, even in 
+distributed systems. With \fBsuuid\fP, these UUIDs include added metadata 
+(e.g., timestamps, hostnames, and tags). This makes them ideal for tracking, 
+logging, and organizing tasks across various applications.
+.PP
+An example of a valid v1 UUID is 
+"\fC5a963834\-1c76\-11f0\-be7b\-83850402c3ce\fP".
+.SS Features
+.IP \[bu] 2
+Generates RFC 4122 conforming v1 UUIDs with timestamp and MAC address
+.IP \[bu] 2
+Tags, comments, and custom metadata for UUIDs are supported
+.IP \[bu] 2
+Logs UUIDs of parent processes in the current log entry
+.IP \[bu] 2
+Portable C99 code with common Makefile for Linux and various BSD variants
+.IP \[bu] 2
+Minimal dependencies, no extra C libraries needed
+.SH OPTIONS
+.TP
+\fB\-c\fP \fIx\fP, \fB\-\-comment\fP \fIx\fP
+Store comment \fIx\fP in the log file. If "\fB\-\fP" is specified as comment, 
+the program will read the comment from stdin. Two hyphens ("\fB\-\-\fP") as a 
+comment opens the editor defined in the environment variable \fBSUUID_EDITOR\fP 
+to edit the message. If \fBSUUID_EDITOR\fP is not defined, the value from 
+\fBEDITOR\fP is used. If none of these variables are defined, the program 
+aborts.
+.TP
+\fB\-n\fP \fIx\fP, \fB\-\-count\fP \fIx\fP
+Print and store \fIx\fP UUIDs.
+.TP
+\fB\-h\fP, \fB\-\-help\fP
+Show this help.
+.TP
+\fB\-\-license\fP
+Print the software license.
+.TP
+\fB\-l\fP \fIx\fP, \fB\-\-logdir\fP \fIx\fP
+Store log files in directory \fIx\fP.
+If the \fBSUUID_LOGDIR\fP environment variable is defined, that value is used. 
+Otherwise the value "\fB$HOME/uuids\fP" is used.
+.TP
+\fB\-q\fP, \fB\-\-quiet\fP
+Be more quiet. Can be repeated to increase silence.
+.TP
+\fB\-m\fP, \fB\-\-random\-mac\fP
+Don't use the hardware MAC address, generate a random address field.
+.TP
+\fB\-\-raw\fP
+Don't convert the \fB<txt>\fP element to XML. Use this option to include 
+pre-formatted XML in the \fB<txt>\fP element (e.g., for structured data). The 
+value of \fB\-c\fP/\fB\-\-comment\fP must be valid XML, or it will corrupt the 
+log file by inserting invalid XML.
+.TP
+\fB\-\-rcfile\fP \fIX\fP
+Use file \fIX\fP instead of \fB~/.suuidrc\fP.
+.TP
+\fB\-\-selftest\fP
+Run various internal self tests and exit.
+.TP
+\fB\-t\fP \fIx\fP, \fB\-\-tag\fP \fIx\fP
+Use \fIx\fP as tag (category).
+.TP
+\fB\-\-valgrind\fP
+Run the built-in test suite with Valgrind memory checking.
+.TP
+\fB\-v\fP, \fB\-\-verbose\fP
+Increase level of verbosity. Can be repeated.
+.TP
+\fB\-\-selftest\fP [\fIARG\fP]
+Run the built-in test suite. If specified, the argument can contain one or more 
+of these strings: \fBexec\fP (the tests use the executable file), \fBfunc\fP 
+(runs function tests), or \fBall\fP. Multiple strings should be separated by 
+commas. If no argument is specified, default is \fBall\fP.
+.TP
+\fB\-\-valgrind\fP [\fIARG\fP]
+Run the built-in test suite with Valgrind memory checking. Accepts the same 
+optional argument as \fB\-\-selftest\fP, with the same defaults.
+.TP
+\fB\-\-version\fP
+Print version information.
+.TP
+\fB\-w\fP \fIx\fP, \fB\-\-whereto\fP \fIx\fP
+\fIx\fP is a string which decides where the UUID will be printed:
+.RS
+.RS
+.IP "\fBo\fP"
+Print to stdout. This is the default.
+.IP "\fBe\fP"
+Print to stderr.
+.IP "\fBa\fP, \fBeo\fP"
+Print to both stdout and stderr.
+.IP "\fBn\fP"
+Don't output anything.
+.RE
+All other characters will be ignored.
+.RE
+.SH EXIT STATUS
+.TP
+0
+No error.
+.TP
+1
+Some kind of error occurred.
+.SH ENVIRONMENT VARIABLES
+.TP
+\fBSESS_UUID\fP
+Contains UUIDs and names of parent prosesses, these will be stored as 
+\fB<sess>\fP elements in the current entry.
+.TP
+\fBSUUID_HOSTNAME\fP
+Use another hostname than the one reported by the system. This will affect the 
+name of the log file and the value in the \fB<host>\fP element.
+.TP
+\fBSUUID_LOGDIR\fP
+The directory where log files are stored. Default value is \fB~/uuids\fP.
+.SH FILES
+.TP
+\fB~/.suuidrc\fP
+User configuration file, using the format "\fIkeyword\fP \fB=\fP \fIvalue\fP". 
+These keywords are recognized:
+.RS
+.IP "\fBhostname\fP"
+Use another hostname than the one reported by the system. This will affect the 
+name of the log file and the value in the \fB<host>\fP element.
+.IP "\fBmacaddr\fP"
+Specify the MAC address to use in the generated UUIDs. Must be a valid MAC 
+address and contain 12 hexadecimal digits.
+.RE
+.SH EXAMPLES
+.TP
+\fCsuuid\fP
+.br
+This command generates a single v1 UUID and prints it to stdout. Behind the 
+scenes, it logs metadata such as the timestamp embedded in the UUID, the 
+hostname, the current working directory, and any parent process UUIDs. It's a 
+quick way to get a unique identifier for scripts, logs, or any task requiring a 
+distinct marker.
+.TP
+\fCsuuid \-t backup \-c "Backup before system upgrade"\fP
+Creates a UUID with custom metadata: a tag ("backup") and a comment. This is 
+useful for categorizing UUIDs or adding context, making them easier to search 
+or reference later.
+.SH METADATA
+This is an example of a log entry with the default metadata:
+.PP
+.EX
+<suuid t="2025\-04\-18T17:17:40.1978380Z"
+       u="0828820c\-1c79\-11f0\-a1d1\-83850402c3ce">
+  <txt>Example for the man page.</txt>
+  <host>hpelite2</host>
+  <cwd>/home/sunny/src/git/suuid</cwd>
+  <user>sunny</user>
+  <tty>/dev/pts/14</tty>
+  <sess desc="xterm">4abc48bc\-13e9\-11f0\-954b\-83850402c3ce</sess>
+  <sess desc="screen">556aad62\-13e9\-11f0\-b18d\-83850402c3ce</sess>
+</suuid>
+.EE
+.PP
+The example is formatted for readability; all entries are stored using 1 line 
+to make grepping and sorting easier. Additional metadata can be added with the 
+\fB--raw\fP option.
+.SH AUTHOR
+Written by \[/O]yvind A.\& Holm <sunny@sunbase.org>
+.SH COPYRIGHT
+(C)opyleft 2008\- \[/O]yvind A.\& Holm <sunny@sunbase.org>
+.PP
+This program is free software; you can redistribute it and/or modify it under 
+the terms of the GNU General Public License as published by the Free Software 
+Foundation; either version 2 of the License, or (at your option) any later 
+version.
+.PP
+This program is distributed in the hope that it will be useful, but WITHOUT ANY 
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A 
+PARTICULAR PURPOSE.
+.PP
+See the GNU General Public License for more details.
+.PP
+You should have received a copy of the GNU General Public License along with 
+this program. If not, see <http://www.gnu.org/licenses/>.

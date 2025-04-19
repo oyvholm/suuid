@@ -9,6 +9,12 @@
 /gmon.sum
 /logdir/
 /suuid
+/suuid.1
+/suuid.1.tmp
+/suuid.html
+/suuid.html.tmp
+/suuid.pdf
+/suuid.pdf.tmp
 /tags
 /testlockdir/
 /version.h

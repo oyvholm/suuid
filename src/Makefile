@@ -75,12 +75,17 @@ HFILES  =
 HFILES += binbuf.h
 HFILES += suuid.h
 HFILES += uuid.h
+HTMLFILE = $(EXEC).html
 INSTALL_TARGETS  =
 INSTALL_TARGETS += $(PREFIX)/bin/$(EXEC)
+INSTALL_TARGETS += $(PREFIX)/share/man/man1/$(MANPAGE)
 LDFLAGS  =
 LDFLAGS += $$(test -n "$(PROF)" && echo -n "-pg")
 LIBS  =
 LIBS += $$(test -n "$(GCOV)" && echo "-lgcov --coverage")
+MANPAGE = $(EXEC).1
+MANSRC = $(MANPAGE).man
+MAN_DATE = $$(grep EXEC_DATE version.h | cut -d '"' -f 2 | sed 's/-/\\\\-/g;')
 OBJS  =
 OBJS += binbuf.o
 OBJS += environ.o
@@ -94,6 +99,7 @@ OBJS += strings.o
 OBJS += suuid.o
 OBJS += tag.o
 OBJS += uuid.o
+PDFFILE = $(EXEC).pdf
 TESTLOCKDIR = testlockdir
 
 #  Not in Clang
@@ -116,18 +122,37 @@ CMD_VALGRIND += --show-leak-kinds=all
 CMD_VALGRIND += --
 IS_DEV = [ -z "$(NODEVEL)" \
            -a \( -e .devel -o -e ../.git/.devel -o -n "$(DEVEL)" \) ]
+MAN_VERSION = $$(grep EXEC_VERSION version.h | cut -d '"' -f 2 \
+                 | sed 's/-/\\\\-/g;')
 TESTABLE_LINES = $$(grep -E '^ +\#\#\#\#\#:' *.c.gcov \
                     | grep -vF '/* gncov */' | wc -l)
 
 .PHONY: all
-all: $(EXEC)
+all: $(EXEC) $(MANPAGE)
 
 $(EXEC): $(OBJS)
 	$(LD) -o $(EXEC) $(LDFLAGS) $(OBJS) $(LIBS)
 
+$(HTMLFILE): $(MANPAGE)
+	man -Thtml ./$(MANPAGE) >$@.tmp
+	mv $@.tmp $@
+
+$(MANPAGE): $(MANSRC) version.h
+	sed "s/RPL_DATE/$(MAN_DATE)/g; s/RPL_VERSION/$(MAN_VERSION)/g;" \
+	<$(MANSRC) >$@.tmp
+	mv $@.tmp $@
+
+$(PDFFILE): $(MANPAGE)
+	man -Tpdf ./$(MANPAGE) >$@.tmp
+	mv $@.tmp $@
+
 $(PREFIX)/bin/$(EXEC): $(EXEC)
 	mkdir -p $(PREFIX)/bin
 	install $(EXEC) $(PREFIX)/bin/$(EXEC)
+
+$(PREFIX)/share/man/man1/$(MANPAGE): $(MANPAGE)
+	mkdir -p $(PREFIX)/share/man/man1
+	install $(MANPAGE) $(PREFIX)/share/man/man1/$(MANPAGE)
 
 version.h: Gen-version $(CFILES) $(HFILES) Makefile
 	./Gen-version
@@ -178,6 +203,9 @@ cflags:
 .PHONY: clean
 clean:
 	rm -f $(EXEC) $(OBJS)
+	rm -f $(HTMLFILE) $(HTMLFILE).tmp
+	rm -f $(MANPAGE) $(MANPAGE).tmp
+	rm -f $(PDFFILE) $(PDFFILE).tmp
 	rm -f *.gcda *.gcno *.gcov
 	rm -f gmon.out gmon.sum
 	rm -f version.h
@@ -217,15 +245,21 @@ gcov-cmt-clean:
 gdb: $(EXEC)
 	gdb -x gdbrc $$(cat gdbopts 2>/dev/null) $(EXEC)
 
+.PHONY: html
+html: $(HTMLFILE)
+
 .PHONY: install
 install: $(INSTALL_TARGETS)
 
 .PHONY: longlines
 longlines:
-	@for f in $(CFILES) $(HFILES) Gen-version Makefile; do \
+	@for f in $(CFILES) $(HFILES) $(MANSRC) Gen-version Makefile; do \
 		[ -f "$$f" ] && expand "$$f" | sed 's/ $$//;' \
 		| grep -q -E '.{80}' && echo "$$f"; \
 	done | grep . && exit 1 || true
+
+.PHONY: pdf
+pdf: $(PDFFILE)
 
 .PHONY: test
 test: $(EXEC)
