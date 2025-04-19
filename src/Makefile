@@ -75,6 +75,8 @@ HFILES  =
 HFILES += binbuf.h
 HFILES += suuid.h
 HFILES += uuid.h
+INSTALL_TARGETS  =
+INSTALL_TARGETS += $(PREFIX)/bin/$(EXEC)
 LDFLAGS  =
 LDFLAGS += $$(test -n "$(PROF)" && echo -n "-pg")
 LIBS  =
@@ -216,7 +218,7 @@ gdb: $(EXEC)
 	gdb -x gdbrc $$(cat gdbopts 2>/dev/null) $(EXEC)
 
 .PHONY: install
-install: $(PREFIX)/bin/$(EXEC)
+install: $(INSTALL_TARGETS)
 
 .PHONY: longlines
 longlines:
@@ -297,7 +299,7 @@ tlok:
 
 .PHONY: uninstall
 uninstall:
-	rm -f $(PREFIX)/bin/$(EXEC)
+	rm -f $(INSTALL_TARGETS)
 
 .PHONY: valgrind
 valgrind: $(EXEC)
