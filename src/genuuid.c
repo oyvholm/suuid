@@ -273,6 +273,7 @@ char *process_uuid(struct Logs *logs,
 			errno = 0;
 		}
 #endif
+		check_errno;
 	} else {
 		size_t len = strlen(entry->uuid) + 1;
 

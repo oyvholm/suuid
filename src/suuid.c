@@ -541,6 +541,8 @@ int main(int argc, char *argv[])
 	if (!result.success)
 		retval = EXIT_FAILURE;
 
+	check_errno;
+
 	msg(4, "Returning from %s() with value %d", __func__, retval);
 	return retval;
 }

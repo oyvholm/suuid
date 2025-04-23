@@ -696,6 +696,7 @@ FILE *open_logfile(const char *fname)
 		/* File doesn't exist */
 		if (errno == ENOENT)
 			errno = 0; /* Set by access() */
+		check_errno;
 		fp = fopen(fname, "a");
 		if (!fp) {
 			myerror("%s: Could not create log file", fname);

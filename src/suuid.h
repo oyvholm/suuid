@@ -57,6 +57,14 @@
 #  define DEBL  ;
 #endif
 
+#define check_errno  do { \
+	if (errno) { \
+		myerror("%s():%s:%d: errno = %d (\"%s\")", \
+		        __func__, __FILE__, __LINE__, \
+		        errno, strerror(errno)); \
+	} \
+} while (0)
+
 #define ENV_EDITOR  "SUUID_EDITOR" /* Name of editor to use with "-c --" */
 #define ENV_HOSTNAME  "SUUID_HOSTNAME" /* Optional environment variable */
 #define ENV_LOGDIR  "SUUID_LOGDIR" /* Optional environment variable with path 

@@ -274,6 +274,7 @@ char *get_tty(void)
 
 	if (errno == ENOTTY)
 		errno = 0; /* Happens when the program reads from stdin */
+	check_errno;
 
 	return retval;
 }
