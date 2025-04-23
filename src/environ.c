@@ -270,7 +270,12 @@ char *get_username(void)
 
 char *get_tty(void)
 {
-	return ttyname(STDIN_FILENO);
+	char *retval = ttyname(STDIN_FILENO);
+
+	if (errno == ENOTTY)
+		errno = 0; /* Happens when the program reads from stdin */
+
+	return retval;
 }
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */

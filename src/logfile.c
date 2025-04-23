@@ -689,10 +689,13 @@ FILE *open_logfile(const char *fname)
 		if (!fp) {
 			myerror("%s: Could not open file for read+write",
 			        fname);
+			errno = 0;
 			return NULL;
 		}
 	} else {
 		/* File doesn't exist */
+		if (errno == ENOENT)
+			errno = 0; /* Set by access() */
 		fp = fopen(fname, "a");
 		if (!fp) {
 			myerror("%s: Could not create log file", fname);

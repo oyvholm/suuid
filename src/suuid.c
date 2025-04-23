@@ -66,6 +66,10 @@ const char *std_strerror(const int errnum)
 		return "Permission denied";
 	case EISDIR:
 		return "Is a directory";
+	case ENOENT:
+		return "No such file or directory";
+	case ENOTTY:
+		return "Inappropriate ioctl for device";
 	case EPIPE:
 		return "Broken pipe";
 	default:
