@@ -66,6 +66,8 @@ const char *std_strerror(const int errnum)
 		return "Permission denied";
 	case EISDIR:
 		return "Is a directory";
+	case EPIPE:
+		return "Broken pipe";
 	default:
 		/*
 		 * Should never happen. If this line is executed, an `errno` 

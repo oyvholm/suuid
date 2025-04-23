@@ -1186,6 +1186,7 @@ sub test_suuid_signal {
 	        '/^$/s',
 	        '/^\.\.\/suuid: Termination signal \(Broken pipe\) received,'
 	        . ' aborting\n'
+	        . '\.\./suuid: Cannot print UUID to stdout: Broken pipe\n'
 	        . '\.\.\/suuid: Generated only \d+ of 1000 UUIDs\n$/s',
 	        0,
 	        "Receive SIGPIPE");

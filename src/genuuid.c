@@ -204,6 +204,8 @@ char *process_uuid(struct Logs *logs,
                    const struct Rc *rc, const struct Options *opts,
                    struct Entry *entry)
 {
+	int result;
+
 	assert(logs);
 	assert(logs->logfp);
 	assert(rc);
@@ -254,12 +256,32 @@ char *process_uuid(struct Logs *logs,
 	 */
 
 	if (!opts->whereto) {
-		puts(entry->uuid);
+		result = puts(entry->uuid);
+		if (result == EOF) {
+			myerror("Cannot print UUID to stdout");
+			errno = 0;
+			return NULL;
+		}
 	} else {
-		if (strchr(opts->whereto, 'a') || strchr(opts->whereto, 'o'))
-			fprintf(stdout, "%s\n", entry->uuid);
-		if (strchr(opts->whereto, 'a') || strchr(opts->whereto, 'e'))
-			fprintf(stderr, "%s\n", entry->uuid);
+		size_t len = strlen(entry->uuid) + 1;
+
+		if (strchr(opts->whereto, 'a') || strchr(opts->whereto, 'o')) {
+			result = fprintf(stdout, "%s\n", entry->uuid);
+			if (result < 0 || (size_t)result != len) {
+				myerror("Cannot print UUID to stdout");
+				errno = 0;
+				return NULL;
+			}
+
+		}
+		if (strchr(opts->whereto, 'a') || strchr(opts->whereto, 'e')) {
+			result = fprintf(stderr, "%s\n", entry->uuid);
+			if (result < 0 || (size_t)result != len) {
+				myerror("Cannot print UUID to stderr");
+				errno = 0;
+				return NULL;
+			}
+		}
 	}
 
 	return entry->uuid;
@@ -366,6 +388,16 @@ struct uuid_result create_and_log_uuids(const struct Options *opts)
 	for (l = 0UL; l < count; l++) {
 		if (!process_uuid(&logs, &rc, opts, &entry)) {
 			retval.success = false;
+			/*
+			 * Check that the correct amount of UUIDs were created.
+			 */
+			if (retval.count < opts->count) {
+				fprintf(stderr, "%s: Generated only %lu of %lu"
+				                " UUIDs\n",
+				                progname, retval.count,
+				                opts->count);
+			}
+
 			goto cleanup;
 		}
 		retval.count++;
@@ -374,15 +406,6 @@ struct uuid_result create_and_log_uuids(const struct Options *opts)
 	}
 	if (valid_uuid(entry.uuid, true))
 		memcpy(retval.lastuuid, entry.uuid, UUID_LENGTH + 1);
-
-	/*
-	 * Check that the correct amount of UUIDs were created.
-	 */
-
-	if (retval.count < opts->count) {
-		fprintf(stderr, "%s: Generated only %lu of %lu UUIDs\n",
-		                progname, retval.count, opts->count);
-	}
 
 	/*
 	 * Close up the shop and go home.
