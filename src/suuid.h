@@ -210,6 +210,7 @@ int run_session(const struct Options *orig_opt,
 /* string.c */
 void *mymalloc(const size_t size);
 char *mystrdup(const char *s);
+char *allocstr_va(const char *format, va_list ap);
 char *allocstr(const char *format, ...);
 #if defined(UNUSED) || defined(TEST_FUNC)
 char *squeeze_chars(char *s, const char *chars);
