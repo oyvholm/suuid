@@ -27,8 +27,8 @@
 
 #define chp  (char *[])
 
-static int testnum = 0;
 static int failcount = 0;
+static int testnum = 0;
 
 /*
  * ok() - Print a log line to stdout. If `i` is 0, an "ok" line is printed, 
@@ -872,8 +872,8 @@ static void test_executable(char *execname)
 	diag("Test the executable");
 	test_valgrind_option(execname);
 	print_version_info(execname);
-
 	test_standard_options(execname);
+
 	print_version_info(execname);
 }
 

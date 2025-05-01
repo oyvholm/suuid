@@ -207,7 +207,7 @@ void free_sess(struct Entry *entry);
 int run_session(const struct Options *orig_opt,
                 const int argc, char * const argv[]);
 
-/* string.c */
+/* strings.c */
 void *mymalloc(const size_t size);
 char *mystrdup(const char *s);
 char *allocstr_va(const char *format, va_list ap);
