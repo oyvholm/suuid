@@ -289,7 +289,7 @@ testold: $(EXEC)
 
 .PHONY: testoldall
 testoldall:
-	$(MAKE) testcomb WHAT=testold
+	$(MAKE) -s testcomb WHAT=testold
 
 .PHONY: testcomb
 testcomb:
