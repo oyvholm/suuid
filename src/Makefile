@@ -364,8 +364,13 @@ uninstall:
 valgrind: $(EXEC)
 	./$(EXEC) --valgrind $(TESTS)
 	$(CMD_VALGRIND) ./$(EXEC) --selftest $(TESTS) | grep -v ^ok
-	cd t && $(MAKE) $@
+	$(MAKE) valgrindold
 
 .PHONY: valgrindall
 valgrindall:
 	$(MAKE) testcomb WHAT=valgrind
+	$(MAKE) testcomb WHAT=valgrindold
+
+.PHONY: valgrindold
+valgrindold:
+	cd t && $(MAKE) -s valgrind
