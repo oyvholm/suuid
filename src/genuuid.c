@@ -369,7 +369,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opts)
 		goto cleanup;
 	}
 
-	logfile = get_log_prefix(&rc, opts, ".xml");
+	logfile = get_log_prefix(&rc, opts, LOGFILE_EXTENSION);
 	if (!logfile) {
 		retval.success = false;
 		goto cleanup;
