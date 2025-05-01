@@ -45,7 +45,7 @@ aborts.
 Print and store \fIx\fP UUIDs.
 .TP
 \fB\-h\fP, \fB\-\-help\fP
-Show this help.
+Show a help summary.
 .TP
 \fB\-\-license\fP
 Print the software license.
