@@ -259,7 +259,6 @@ char *process_uuid(struct Logs *logs,
 		result = puts(entry->uuid);
 		if (result == EOF) {
 			myerror("Cannot print UUID to stdout");
-			errno = 0;
 			return NULL;
 		}
 #ifdef __BIONIC__
@@ -281,7 +280,6 @@ char *process_uuid(struct Logs *logs,
 			result = fprintf(stdout, "%s\n", entry->uuid);
 			if (result < 0 || (size_t)result != len) {
 				myerror("Cannot print UUID to stdout");
-				errno = 0;
 				return NULL;
 			}
 
@@ -290,7 +288,6 @@ char *process_uuid(struct Logs *logs,
 			result = fprintf(stderr, "%s\n", entry->uuid);
 			if (result < 0 || (size_t)result != len) {
 				myerror("Cannot print UUID to stderr");
-				errno = 0;
 				return NULL;
 			}
 		}

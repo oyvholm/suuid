@@ -689,7 +689,6 @@ FILE *open_logfile(const char *fname)
 		if (!fp) {
 			myerror("%s: Could not open file for read+write",
 			        fname);
-			errno = 0;
 			return NULL;
 		}
 	} else {
