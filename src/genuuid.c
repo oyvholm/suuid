@@ -113,9 +113,11 @@ char *process_comment_option(const char *cmt)
 		 * The comment was stored as a plain string in the -c/--comment 
 		 * argument.
 		 */
-		retval = mystrdup(cmt);
-		if (!retval)
+		retval = strdup(cmt);
+		if (!retval) {
+			failed("strdup()"); /* gncov */
 			return NULL; /* gncov */
+		}
 	}
 	if (!valid_xml_chars(retval)) {
 		fprintf(stderr, "%s: Comment contains illegal characters or"

@@ -83,9 +83,11 @@ int store_tag(struct Entry *entry, const char *arg)
 	assert(entry);
 	assert(arg);
 
-	tag = mystrdup(arg); /* Don't modify the source */
-	if (!tag)
+	tag = strdup(arg); /* Don't modify the source */
+	if (!tag) {
+		failed("strdup()"); /* gncov */
 		return 1; /* gncov */
+	}
 
 	while ((p = strchr(tag, ','))) {
 		*p++ = '\0';
@@ -103,8 +105,9 @@ int store_tag(struct Entry *entry, const char *arg)
 			 */
 			char *tag2;
 
-			tag2 = mymalloc(strlen(p) + 1);
+			tag2 = malloc(strlen(p) + 1);
 			if (!tag2) {
+				failed("malloc()"); /* gncov */
 				retval = 1; /* gncov */
 				goto cleanup; /* gncov */
 			}
@@ -130,8 +133,10 @@ int store_tag(struct Entry *entry, const char *arg)
 		goto cleanup;
 	}
 
-	if (!(entry->tag[tag_count++] = mystrdup(tag)))
+	if (!(entry->tag[tag_count++] = strdup(tag))) {
+		failed("strdup()"); /* gncov */
 		retval = 1; /* gncov */
+	}
 
 cleanup:
 	free(tag);

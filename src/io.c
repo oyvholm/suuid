@@ -138,9 +138,11 @@ char *read_from_editor(const char *editor)
 	}
 
 	size = strlen(editor) + strlen(tmpfile) + 5;
-	cmdbuf = mymalloc(size);
-	if (!cmdbuf)
+	cmdbuf = malloc(size);
+	if (!cmdbuf) {
+		failed("malloc()"); /* gncov */
 		return NULL; /* gncov */
+	}
 	snprintf(cmdbuf, size, "%s %s", editor, tmpfile);
 
 	r = system(cmdbuf);

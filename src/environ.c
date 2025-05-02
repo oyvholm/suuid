@@ -32,8 +32,12 @@ char *get_editor(void)
 	e = getenv(ENV_EDITOR);
 	if (!e || !strlen(e))
 		e = getenv("EDITOR");
-	if (e && strlen(e))
-		return mystrdup(e);
+	if (e && strlen(e)) {
+		char *p = strdup(e);
+		if (!p)
+			failed("strdup()"); /* gncov */
+		return p;
+	}
 	myerror("Environment variables %s and EDITOR aren't defined,"
 	        " cannot start editor", ENV_EDITOR);
 
@@ -132,9 +136,11 @@ char *get_logdir(const struct Options *opts)
 		size_t size = strlen(getenv("HOME"))
 		              + strlen("/uuids") + 1; /* FIXME: slash */
 
-		retval = mymalloc(size + 1);
-		if (!retval)
+		retval = malloc(size + 1);
+		if (!retval) {
+			failed("malloc()"); /* gncov */
 			return NULL; /* gncov */
+		}
 		snprintf(retval, size, "%s/uuids", /* FIXME: slash */
 		                       getenv("HOME"));
 	} else {
@@ -143,8 +149,11 @@ char *get_logdir(const struct Options *opts)
 		                " create logdir path\n", progname, ENV_LOGDIR);
 		return NULL;
 	}
-	if (p)
-		retval = mystrdup(p);
+	if (p) {
+		retval = strdup(p);
+		if (!retval)
+			failed("strdup()"); /* gncov */
+	}
 
 	return retval;
 }
@@ -194,9 +203,11 @@ char *get_log_prefix(const struct Rc *rc, const struct Options *opts,
 
 	prefix_length = strlen(logdir) + strlen("/") /* FIXME: slash */
 	                + strlen(hostname) + strlen(ext) + 1;
-	prefix = mymalloc(prefix_length + 1);
-	if (!prefix)
+	prefix = malloc(prefix_length + 1);
+	if (!prefix) {
+		failed("malloc()"); /* gncov */
 		goto cleanup; /* gncov */
+	}
 	/* FIXME: Remove slash hardcoding, use some portable solution */
 	snprintf(prefix, prefix_length, "%s/%s%s", logdir, hostname, ext);
 
@@ -218,9 +229,11 @@ char *getpath(void)
 	char *p;
 	size_t size = BUFSIZ;
 
-	retval = mymalloc(size);
-	if (!retval)
+	retval = malloc(size);
+	if (!retval) {
+		failed("malloc()"); /* gncov */
 		return NULL; /* gncov */
+	}
 	for (p = getcwd(retval, size); !p;) {
 		size += BUFSIZ; /* gncov */
 		retval = realloc(retval, size); /* gncov */

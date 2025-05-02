@@ -66,9 +66,11 @@ char *suuid_xml(const char *text)
 	assert(text);
 
 	size = strlen(text);
-	retval = mymalloc(size * MAX_GROWTH + 1);
-	if (!retval)
+	retval = malloc(size * MAX_GROWTH + 1);
+	if (!retval) {
+		failed("malloc()"); /* gncov */
 		return NULL; /* gncov */
+	}
 
 	destp = retval;
 	for (p = text; *p; p++) {
@@ -147,17 +149,23 @@ char *allocate_elem(const char *elem, const char *src)
 	assert(elem);
 	assert(strlen(elem));
 
-	if (!src)
-		return mystrdup("");
+	if (!src) {
+		retval = strdup("");
+		if (!retval)
+			failed("strdup()"); /* gncov */
+		return retval;
+	}
 
 	size += strlen("<") + strlen(elem) + strlen(">")
 	        + strlen(src) * MAX_GROWTH
 	        + strlen("<") + strlen(elem) + strlen("/> ")
 	        + 1;
 
-	retval = mymalloc(size + 1);
-	if (!retval)
+	retval = malloc(size + 1);
+	if (!retval) {
+		failed("malloc()"); /* gncov */
 		return NULL; /* gncov */
+	}
 
 	ap = suuid_xml(src);
 	if (!ap)
@@ -189,9 +197,11 @@ char *alloc_attr(const char *attr, const char *data)
 	size = strlen(" ") + strlen(attr) + strlen("=\"") + strlen(data)
 	       + strlen("\"") + 1;
 
-	retval = mymalloc(size + 1);
-	if (!retval)
+	retval = malloc(size + 1);
+	if (!retval) {
+		failed("malloc()"); /* gncov */
 		return NULL; /* gncov */
+	}
 
 	snprintf(retval, size, " %s=\"%s\"", attr, data);
 
@@ -235,17 +245,23 @@ char *get_xml_tags(const struct Entry *entry)
 		/*
 		 * No tags found, return empty string,
 		 */
-		return mystrdup("");
+		buf = strdup("");
+		if (!buf)
+			failed("strdup()"); /* gncov */
+		return buf;
 	}
 
-	buf = mymalloc(size);
-	if (!buf)
+	buf = malloc(size);
+	if (!buf) {
+		failed("malloc()"); /* gncov */
 		return NULL; /* gncov */
+	}
 	buf[0] = '\0';
 
 	tmpsize = tmpsize * MAX_GROWTH + 16;
-	tmpbuf = mymalloc(tmpsize);
+	tmpbuf = malloc(tmpsize);
 	if (!tmpbuf) {
+		failed("malloc()"); /* gncov */
 		free(buf); /* gncov */
 		return NULL; /* gncov */
 	}
@@ -316,19 +332,25 @@ char *create_sess_xml(const struct Entry *entry)
 		/*
 		 * No elements in the sess array, return empty string.
 		 */
-		return mystrdup("");
+		buf = strdup("");
+		if (!buf)
+			failed("strdup()"); /* gncov */
+		return buf;
 	}
 
 	/*
 	 * Allocate space for the final string and a temporary work buffer.
 	 */
 
-	buf = mymalloc(size);
-	if (!buf)
+	buf = malloc(size);
+	if (!buf) {
+		failed("malloc()"); /* gncov */
 		return NULL; /* gncov */
+	}
 
-	tmpbuf = mymalloc(tmpsize);
+	tmpbuf = malloc(tmpsize);
 	if (!tmpbuf) {
+		failed("malloc()"); /* gncov */
 		free(buf); /* gncov */
 		return NULL; /* gncov */
 	}
@@ -429,8 +451,9 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 
 		txt_size = strlen("<txt> ") + strlen(entry->txt)
 		           + strlen(" </txt> ") + 1;
-		e.txt = mymalloc(txt_size);
+		e.txt = malloc(txt_size);
 		if (!e.txt) {
+			failed("malloc()"); /* gncov */
 			retval = NULL; /* gncov */
 			goto cleanup; /* gncov */
 		}
@@ -456,8 +479,9 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 	size = DATE_LENGTH + UUID_LENGTH + strlen(tag_xml) + strlen(e.txt)
 	       + strlen(e.host) + strlen(e.cwd) + strlen(e.user)
 	       + strlen(e.tty) + strlen(sess_xml) + 128;
-	retval = mymalloc(size);
+	retval = malloc(size);
 	if (!retval) {
+		failed("malloc()"); /* gncov */
 		retval = NULL; /* gncov */
 		goto cleanup; /* gncov */
 	}

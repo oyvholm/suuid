@@ -64,6 +64,8 @@
 	} \
 } while (0)
 
+#define failed(a)  myerror("%s():%d: %s failed", __func__, __LINE__, (a))
+
 #define ENV_EDITOR  "SUUID_EDITOR" /* Name of editor to use with "-c --" */
 #define ENV_HOSTNAME  "SUUID_HOSTNAME" /* Optional environment variable */
 #define ENV_LOGDIR  "SUUID_LOGDIR" /* Optional environment variable with path 
@@ -208,8 +210,6 @@ int run_session(const struct Options *orig_opt,
                 const int argc, char * const argv[]);
 
 /* strings.c */
-void *mymalloc(const size_t size);
-char *mystrdup(const char *s);
 char *allocstr_va(const char *format, va_list ap);
 char *allocstr(const char *format, ...);
 #if defined(UNUSED) || defined(TEST_FUNC)

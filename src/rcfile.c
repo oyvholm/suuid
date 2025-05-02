@@ -32,8 +32,12 @@ char *get_rcfilename(const struct Options *opts)
 
 	assert(opts);
 
-	if (opts && opts->rcfile)
-		return mystrdup(opts->rcfile);
+	if (opts && opts->rcfile) {
+		retval = strdup(opts->rcfile);
+		if (!retval)
+			failed("strdup()"); /* gncov */
+		return retval;
+	}
 	env = getenv("HOME");
 	if (!env) {
 		fprintf(stderr, "%s: HOME environment variable not defined,"
@@ -42,9 +46,11 @@ char *get_rcfilename(const struct Options *opts)
 		return NULL;
 	}
 	size = strlen(env) + strlen(STD_RCFILE) + 32;
-	retval = mymalloc(size);
-	if (!retval)
+	retval = malloc(size);
+	if (!retval) {
+		failed("malloc()"); /* gncov */
 		return NULL; /* gncov */
+	}
 	snprintf(retval, size, "%s/%s", env, STD_RCFILE); /* FIXME: slash */
 
 	return retval;
@@ -95,14 +101,18 @@ int parse_rc_line(const char *line, struct Rc *rc)
 	assert(rc);
 
 	if (has_key(line, "hostname")) {
-		rc->hostname = mystrdup(has_key(line, "hostname"));
-		if (!rc->hostname)
+		rc->hostname = strdup(has_key(line, "hostname"));
+		if (!rc->hostname) {
+			failed("strdup()"); /* gncov */
 			return 1; /* gncov */
+		}
 	}
 	if (has_key(line, "macaddr")) {
-		rc->macaddr = mystrdup(has_key(line, "macaddr"));
-		if (!rc->macaddr)
+		rc->macaddr = strdup(has_key(line, "macaddr"));
+		if (!rc->macaddr) {
+			failed("strdup()"); /* gncov */
 			return 1; /* gncov */
+		}
 		string_to_lower(rc->macaddr);
 	}
 

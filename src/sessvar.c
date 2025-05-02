@@ -68,9 +68,11 @@ char *get_desc_from_command(const char *cmd)
 
 	if (!cmd || !strlen(cmd))
 		return NULL;
-	ap = mystrdup(cmd);
-	if (!ap)
-		return NULL;
+	ap = strdup(cmd);
+	if (!ap) {
+		failed("strdup()"); /* gncov */
+		return NULL; /* gncov */
+	}
 	p = ap;
 	while (strchr("./", *p))
 		p++;
@@ -144,9 +146,11 @@ int get_sess_info(struct Entry *entry)
 	if (!getenv(ENV_SESS))
 		return 0;
 
-	s = mystrdup(getenv(ENV_SESS));
-	if (!s)
+	s = strdup(getenv(ENV_SESS));
+	if (!s) {
+		failed("strdup()"); /* gncov */
 		return 1; /* gncov */
+	}
 
 	if (!scan_for_uuid(s)) {
 		/*
@@ -233,9 +237,11 @@ char *concat_cmd_string(const int argc, char * const argv[])
 		cmdsize += strlen(argv[t]) + 1; /* Add one for space */
 	}
 	cmdsize += 1; /* Terminating '\0' */
-	cmd = mymalloc(cmdsize);
-	if (!cmd)
-		return NULL;
+	cmd = malloc(cmdsize);
+	if (!cmd) {
+		failed("malloc()"); /* gncov */
+		return NULL; /* gncov */
+	}
 	memset(cmd, 0, cmdsize);
 
 	for (t = optind; t < argc; t++) {
@@ -299,22 +305,31 @@ const char *add_to_sessvar(const char *desc, const char *uuid)
 	if (getenv(ENV_SESS)) {
 		char *ap;
 
-		ap = mystrdup(getenv(ENV_SESS));
+		ap = strdup(getenv(ENV_SESS));
+		if (!ap) {
+			failed("strdup()"); /* gncov */
+			return NULL; /* gncov */
+		}
 		clean_up_sessvar(ap);
-		sessvar = mystrdup(ap);
+		sessvar = strdup(ap);
+		if (!sessvar)
+			failed("strdup()"); /* gncov */
 		free(ap);
 	} else {
-		sessvar = mystrdup("");
+		sessvar = strdup("");
+		if (!sessvar)
+			failed("strdup()"); /* gncov */
 	}
 	if (!sessvar)
 		return NULL;
 
 	envlen = strlen(ENV_SESS) + 1 + strlen(sessvar) + 1
 	         + strlen(desc) + 1 + UUID_LENGTH + 1 + 1;
-	envbuf = mymalloc(envlen);
+	envbuf = malloc(envlen);
 	if (!envbuf) {
-		free(sessvar);
-		return NULL;
+		failed("malloc()"); /* gncov */
+		free(sessvar); /* gncov */
+		return NULL; /* gncov */
 	}
 
 	snprintf(envbuf, envlen,
@@ -372,10 +387,11 @@ int run_session(const struct Options *orig_opt,
 		retval = -1;
 		goto cleanup;
 	}
-	start_uuid = mystrdup(result.lastuuid);
+	start_uuid = strdup(result.lastuuid);
 	if (!start_uuid) {
-		retval = -1;
-		goto cleanup;
+		failed("strdup()"); /* gncov */
+		retval = -1; /* gncov */
+		goto cleanup; /* gncov */
 	}
 	assert(valid_uuid(start_uuid, true));
 	msg(3, "old %s: \"%s\"", ENV_SESS, getenv(ENV_SESS));
