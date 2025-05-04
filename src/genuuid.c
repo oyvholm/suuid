@@ -44,36 +44,6 @@ int init_randomness(void)
 }
 
 /*
- * init_opt() - Initialise dest with default start values.
- */
-
-void init_opt(struct Options *dest)
-{
-	unsigned int i;
-
-	assert(dest);
-
-	dest->comment = NULL;
-	dest->count = 1;
-	dest->help = false;
-	dest->license = false;
-	dest->logdir = NULL;
-	dest->random_mac = false;
-	dest->raw = false;
-	dest->rcfile = NULL;
-	dest->selftest = false;
-	dest->testexec = false;
-	dest->testfunc = false;
-	dest->uuid = NULL;
-	dest->valgrind = false;
-	dest->verbose = 0;
-	dest->version = false;
-	dest->whereto = NULL;
-	for (i = 0; i < MAX_TAGS; i++)
-		dest->tag[i] = NULL;
-}
-
-/*
  * process_comment_option() - Receive the argument used with -c/--comment and 
  * decide what to do with it. Return pointer to allocated string with the 
  * comment, or NULL if anything failed.

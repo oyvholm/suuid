@@ -400,6 +400,37 @@ static int choose_opt_action(struct Options *dest,
 }
 
 /*
+ * init_opt() - Initializes a `struct Options` with default values. Returns 
+ * nothing.
+ */
+
+void init_opt(struct Options *dest)
+{
+	unsigned int i;
+
+	assert(dest);
+
+	dest->comment = NULL;
+	dest->count = 1;
+	dest->help = false;
+	dest->license = false;
+	dest->logdir = NULL;
+	dest->random_mac = false;
+	dest->raw = false;
+	dest->rcfile = NULL;
+	dest->selftest = false;
+	dest->testexec = false;
+	dest->testfunc = false;
+	dest->uuid = NULL;
+	dest->valgrind = false;
+	dest->verbose = 0;
+	dest->version = false;
+	dest->whereto = NULL;
+	for (i = 0; i < MAX_TAGS; i++)
+		dest->tag[i] = NULL;
+}
+
+/*
  * parse_options() - Parse command line options.
  * Returns 0 if succesful, or 1 if an error occurs.
  */

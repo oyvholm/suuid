@@ -166,6 +166,7 @@ extern struct Options opt;
 int msg(const int verbose, const char *format, ...);
 const char *std_strerror(const int errnum);
 int myerror(const char *format, ...);
+void init_opt(struct Options *dest);
 
 /* environ.c */
 char *get_editor(void);
@@ -179,7 +180,6 @@ char *get_username(void);
 char *get_tty(void);
 
 /* genuuid.c */
-void init_opt(struct Options *dest);
 struct uuid_result create_and_log_uuids(const struct Options *opt);
 
 /* io.c */
