@@ -32,8 +32,8 @@ int init_randomness(void)
 	struct timeval tv;
 
 	if (gettimeofday(&tv, NULL) == -1) {
-		myerror("Could not initialise randomness" /* gncov */
-		        " generator, gettimeofday() failed");
+		failed("Could not initialise randomness" /* gncov */
+		       " generator, gettimeofday()");
 		return 1; /* gncov */
 	}
 
