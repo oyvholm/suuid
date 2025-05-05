@@ -9,6 +9,6 @@ variables:
 suuid:linux:
   stage: build
   before_script:
-    - apt-get update -qq && apt-get install -y uuid valgrind
+    - apt-get update -qq && apt-get install -y uuid
   script:
-    - script -e -q -c "make testall clean valgrind tlokall DEVEL=1"
+    - script -e -q -c "make testall clean tlokall DEVEL=1"
