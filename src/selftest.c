@@ -530,6 +530,27 @@ static void test_valgrind_lines(void)
 }
 
 /*
+ * test_mystrdup() - Tests the mystrdup() function. Returns nothing.
+ */
+
+static void test_mystrdup(void)
+{
+	const char *txt = "Test string";
+	char *s;
+
+	diag("Test mystrdup()");
+	ok(!(mystrdup(NULL) == NULL), "mystrdup(NULL) == NULL");
+
+	s = mystrdup(txt);
+	if (!s) {
+		failed("mystrdup()"); /* gncov */
+		return; /* gncov */
+	}
+	ok(!!strcmp(s, txt), "mystrdup(): Strings are identical");
+	free(s);
+}
+
+/*
  * test_allocstr() - Tests the allocstr() function. Returns nothing.
  */
 
@@ -832,6 +853,7 @@ static void test_functions(void)
 	ok(!!errno, "errno is set to 0 by myerror()");
 	diag("Test std_strerror()");
 	ok(!(std_strerror(0) != NULL), "std_strerror(0)");
+	test_mystrdup();
 	test_allocstr();
 	test_string_to_lower();
 	test_is_valid_date();

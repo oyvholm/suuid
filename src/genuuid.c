@@ -83,9 +83,9 @@ char *process_comment_option(const char *cmt)
 		 * The comment was stored as a plain string in the -c/--comment 
 		 * argument.
 		 */
-		retval = strdup(cmt);
+		retval = mystrdup(cmt);
 		if (!retval) {
-			failed("strdup()"); /* gncov */
+			failed("mystrdup()"); /* gncov */
 			return NULL; /* gncov */
 		}
 	}

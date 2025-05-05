@@ -83,9 +83,9 @@ int store_tag(struct Entry *entry, const char *arg)
 	assert(entry);
 	assert(arg);
 
-	tag = strdup(arg); /* Don't modify the source */
+	tag = mystrdup(arg); /* Don't modify the source */
 	if (!tag) {
-		failed("strdup()"); /* gncov */
+		failed("mystrdup()"); /* gncov */
 		return 1; /* gncov */
 	}
 
@@ -133,8 +133,8 @@ int store_tag(struct Entry *entry, const char *arg)
 		goto cleanup;
 	}
 
-	if (!(entry->tag[tag_count++] = strdup(tag))) {
-		failed("strdup()"); /* gncov */
+	if (!(entry->tag[tag_count++] = mystrdup(tag))) {
+		failed("mystrdup()"); /* gncov */
 		retval = 1; /* gncov */
 	}
 

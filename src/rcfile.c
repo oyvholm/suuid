@@ -33,9 +33,9 @@ char *get_rcfilename(const struct Options *opts)
 	assert(opts);
 
 	if (opts && opts->rcfile) {
-		retval = strdup(opts->rcfile);
+		retval = mystrdup(opts->rcfile);
 		if (!retval)
-			failed("strdup()"); /* gncov */
+			failed("mystrdup()"); /* gncov */
 		return retval;
 	}
 	env = getenv("HOME");
@@ -92,7 +92,7 @@ char *has_key(const char *line, const char *keyword)
 /*
  * parse_rc_line() - Receive a line from the rcfile and check for each keyword 
  * by sending it to check_rc() which will set the struct variable accordingly. 
- * If ok, return 0. If strdup() failed, return 1.
+ * If ok, return 0. If mystrdup() failed, return 1.
  */
 
 int parse_rc_line(const char *line, struct Rc *rc)
@@ -101,16 +101,16 @@ int parse_rc_line(const char *line, struct Rc *rc)
 	assert(rc);
 
 	if (has_key(line, "hostname")) {
-		rc->hostname = strdup(has_key(line, "hostname"));
+		rc->hostname = mystrdup(has_key(line, "hostname"));
 		if (!rc->hostname) {
-			failed("strdup()"); /* gncov */
+			failed("mystrdup()"); /* gncov */
 			return 1; /* gncov */
 		}
 	}
 	if (has_key(line, "macaddr")) {
-		rc->macaddr = strdup(has_key(line, "macaddr"));
+		rc->macaddr = mystrdup(has_key(line, "macaddr"));
 		if (!rc->macaddr) {
-			failed("strdup()"); /* gncov */
+			failed("mystrdup()"); /* gncov */
 			return 1; /* gncov */
 		}
 		string_to_lower(rc->macaddr);

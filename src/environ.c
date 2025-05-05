@@ -33,9 +33,9 @@ char *get_editor(void)
 	if (!e || !strlen(e))
 		e = getenv("EDITOR");
 	if (e && strlen(e)) {
-		char *p = strdup(e);
+		char *p = mystrdup(e);
 		if (!p)
-			failed("strdup()"); /* gncov */
+			failed("mystrdup()"); /* gncov */
 		return p;
 	}
 	myerror("Environment variables %s and EDITOR aren't defined,"
@@ -150,9 +150,9 @@ char *get_logdir(const struct Options *opts)
 		return NULL;
 	}
 	if (p) {
-		retval = strdup(p);
+		retval = mystrdup(p);
 		if (!retval)
-			failed("strdup()"); /* gncov */
+			failed("mystrdup()"); /* gncov */
 	}
 
 	return retval;

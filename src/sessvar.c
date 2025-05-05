@@ -68,9 +68,9 @@ char *get_desc_from_command(const char *cmd)
 
 	if (!cmd || !strlen(cmd))
 		return NULL;
-	ap = strdup(cmd);
+	ap = mystrdup(cmd);
 	if (!ap) {
-		failed("strdup()"); /* gncov */
+		failed("mystrdup()"); /* gncov */
 		return NULL; /* gncov */
 	}
 	p = ap;
@@ -146,9 +146,9 @@ int get_sess_info(struct Entry *entry)
 	if (!getenv(ENV_SESS))
 		return 0;
 
-	s = strdup(getenv(ENV_SESS));
+	s = mystrdup(getenv(ENV_SESS));
 	if (!s) {
-		failed("strdup()"); /* gncov */
+		failed("mystrdup()"); /* gncov */
 		return 1; /* gncov */
 	}
 
@@ -305,20 +305,20 @@ const char *add_to_sessvar(const char *desc, const char *uuid)
 	if (getenv(ENV_SESS)) {
 		char *ap;
 
-		ap = strdup(getenv(ENV_SESS));
+		ap = mystrdup(getenv(ENV_SESS));
 		if (!ap) {
-			failed("strdup()"); /* gncov */
+			failed("mystrdup()"); /* gncov */
 			return NULL; /* gncov */
 		}
 		clean_up_sessvar(ap);
-		sessvar = strdup(ap);
+		sessvar = mystrdup(ap);
 		if (!sessvar)
-			failed("strdup()"); /* gncov */
+			failed("mystrdup()"); /* gncov */
 		free(ap);
 	} else {
-		sessvar = strdup("");
+		sessvar = mystrdup("");
 		if (!sessvar)
-			failed("strdup()"); /* gncov */
+			failed("mystrdup()"); /* gncov */
 	}
 	if (!sessvar)
 		return NULL;
@@ -387,9 +387,9 @@ int run_session(const struct Options *orig_opt,
 		retval = -1;
 		goto cleanup;
 	}
-	start_uuid = strdup(result.lastuuid);
+	start_uuid = mystrdup(result.lastuuid);
 	if (!start_uuid) {
-		failed("strdup()"); /* gncov */
+		failed("mystrdup()"); /* gncov */
 		retval = -1; /* gncov */
 		goto cleanup; /* gncov */
 	}

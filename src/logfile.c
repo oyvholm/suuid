@@ -150,9 +150,9 @@ char *allocate_elem(const char *elem, const char *src)
 	assert(strlen(elem));
 
 	if (!src) {
-		retval = strdup("");
+		retval = mystrdup("");
 		if (!retval)
-			failed("strdup()"); /* gncov */
+			failed("mystrdup()"); /* gncov */
 		return retval;
 	}
 
@@ -245,9 +245,9 @@ char *get_xml_tags(const struct Entry *entry)
 		/*
 		 * No tags found, return empty string,
 		 */
-		buf = strdup("");
+		buf = mystrdup("");
 		if (!buf)
-			failed("strdup()"); /* gncov */
+			failed("mystrdup()"); /* gncov */
 		return buf;
 	}
 
@@ -332,9 +332,9 @@ char *create_sess_xml(const struct Entry *entry)
 		/*
 		 * No elements in the sess array, return empty string.
 		 */
-		buf = strdup("");
+		buf = mystrdup("");
 		if (!buf)
-			failed("strdup()"); /* gncov */
+			failed("mystrdup()"); /* gncov */
 		return buf;
 	}
 
