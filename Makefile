@@ -4,6 +4,8 @@
 
 PREFIX = /usr/local
 
+# LONGLINES_FILES += conv-old-suuid
+# LONGLINES_FILES += conv-suuid
 EXECS  =
 EXECS += conv-suuid
 EXECS += fileid
@@ -16,6 +18,21 @@ EXECS += tjah
 EXECS += uuiddate
 EXECS += v
 EXECS += wi
+LONGLINES_FILES  =
+LONGLINES_FILES += .gitlab-ci.yml
+LONGLINES_FILES += Makefile
+LONGLINES_FILES += README.md
+LONGLINES_FILES += add-missing-dates
+LONGLINES_FILES += fileid
+LONGLINES_FILES += finduuid
+LONGLINES_FILES += needuuid
+LONGLINES_FILES += sess
+LONGLINES_FILES += sortuuid
+LONGLINES_FILES += ti
+LONGLINES_FILES += tjah
+LONGLINES_FILES += uuiddate
+LONGLINES_FILES += v
+LONGLINES_FILES += wi
 
 .PHONY: all
 all:
@@ -80,9 +97,13 @@ install:
 
 .PHONY: longlines
 longlines:
-	@for f in .gitlab-ci.yml Makefile NEWS.md README.md; do \
-		[ -f "$$f" ] && expand "$$f" | sed 's/ $$//;' \
-		| grep -q -E '.{80}' && echo "$$f"; \
+	@for f in $(LONGLINES_FILES); do \
+		if [ -f "$$f" ]; then \
+			d="$$(expand "$$f" | sed 's/ $$//;' \
+			  | grep -E -n '.{80}')"; \
+			echo "$$d" | grep -q . \
+			&& (echo "$$f"; echo "$$d"; echo " "); \
+		fi; \
 	done | grep . && exit 1 || true
 	cd src && $(MAKE) -s $@
 
