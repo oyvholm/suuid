@@ -23,9 +23,9 @@
 
 #include "version.h"
 
-#define T_RESET  "\x1b[m\x0f"
-#define T_RED    "\x1b[31m"
 #define T_GREEN  "\x1b[32m"
+#define T_RED    "\x1b[31m"
+#define T_RESET  "\x1b[m\x0f"
 
 #include <assert.h>
 #include <ctype.h>
@@ -107,10 +107,12 @@ struct Rc {
 	char *hostname;
 	char *macaddr;
 };
+
 struct Sess {
 	char *uuid;
 	char *desc;
 };
+
 struct Entry {
 	char date[DATE_LENGTH + 1];
 	char uuid[UUID_LENGTH + 1];
@@ -122,15 +124,18 @@ struct Entry {
 	char *tty;
 	struct Sess sess[MAX_SESS];
 };
+
 struct Logs {
 	FILE *logfp;
 };
+
 struct Options {
+	/* sort -d -k2 */
 	char *comment;
-	unsigned long count;
 	bool help;
 	bool license;
 	char *logdir;
+	unsigned long count;
 	bool random_mac;
 	bool raw;
 	char *rcfile;
@@ -144,12 +149,14 @@ struct Options {
 	bool version;
 	char *whereto;
 };
+
 struct streams {
 	struct binbuf in;
 	struct binbuf out;
 	struct binbuf err;
 	int ret;
 };
+
 struct uuid_result {
 	unsigned long count;
 	char lastuuid[UUID_LENGTH + 1];

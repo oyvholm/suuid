@@ -79,7 +79,7 @@ const char *std_strerror(const int errnum)
 		 * on other platforms.
 		 */
 		fprintf(stderr,
-		        "\n%s: %s(): Unknown errnum received: %d, \"%s\"\n",
+		        "\n%s: %s(): Unknown errno received: %d, \"%s\"\n",
 		        progname, __func__, errnum, strerror(errnum));
 		return strerror(errnum);
 	}
@@ -431,8 +431,8 @@ void init_opt(struct Options *dest)
 }
 
 /*
- * parse_options() - Parse command line options.
- * Returns 0 if succesful, or 1 if an error occurs.
+ * parse_options() - Parse command line options and store the result in `dest`. 
+ * Returns 0 if successful, or 1 if an error occurs.
  */
 
 static int parse_options(struct Options *dest,

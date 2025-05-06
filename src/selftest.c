@@ -902,7 +902,6 @@ static void test_executable(char *execname)
 	test_valgrind_option(execname);
 	print_version_info(execname);
 	test_standard_options(execname);
-
 	print_version_info(execname);
 }
 
