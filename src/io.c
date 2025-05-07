@@ -99,7 +99,7 @@ char *read_from_file(const char *fname)
 	char *retval;
 
 	assert(fname);
-	assert(strlen(fname));
+	assert(*fname);
 
 	fp = fopen(fname, "rb");
 	if (!fp) {
@@ -128,7 +128,7 @@ char *read_from_editor(const char *editor)
 	int r;
 
 	assert(editor);
-	assert(strlen(editor));
+	assert(*editor);
 
 	if (mkstemp(tmpfile) == -1) {
 		myerror("%s(): Could not create" /* gncov */

@@ -30,9 +30,9 @@ char *get_editor(void)
 	char *e;
 
 	e = getenv(ENV_EDITOR);
-	if (!e || !strlen(e))
+	if (!e || !*e)
 		e = getenv("EDITOR");
-	if (e && strlen(e)) {
+	if (e && *e) {
 		char *p = mystrdup(e);
 		if (!p)
 			failed("mystrdup()"); /* gncov */
@@ -55,7 +55,7 @@ bool valid_hostname(const char *s)
 
 	assert(s);
 
-	if (!strlen(s) || strlen(s) > MAX_HOSTNAME_LENGTH
+	if (!*s || strlen(s) > MAX_HOSTNAME_LENGTH
 	    || strstr(s, "..") || utf8_check(s))
 		return false;
 

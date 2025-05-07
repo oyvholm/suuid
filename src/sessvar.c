@@ -66,7 +66,7 @@ char *get_desc_from_command(const char *cmd)
 {
 	char *ap, *p, *p2;
 
-	if (!cmd || !strlen(cmd))
+	if (!cmd || !*cmd)
 		return NULL;
 	ap = mystrdup(cmd);
 	if (!ap) {
@@ -248,9 +248,9 @@ char *concat_cmd_string(const int argc, char * const argv[])
 		strcat(cmd, argv[t]);
 		strcat(cmd, " ");
 	}
-	if (strlen(cmd) && cmd[strlen(cmd) - 1] == ' ')
+	if (*cmd && cmd[strlen(cmd) - 1] == ' ')
 		cmd[strlen(cmd) - 1] = '\0'; /* Remove added space */
-	if (!strlen(cmd)) {
+	if (!*cmd) {
 		fprintf(stderr, "%s: Command is empty\n", progname);
 		free(cmd);
 		return NULL;

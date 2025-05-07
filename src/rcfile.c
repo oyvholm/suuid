@@ -68,7 +68,7 @@ char *has_key(const char *line, const char *keyword)
 
 	assert(line);
 	assert(keyword);
-	assert(strlen(keyword));
+	assert(*keyword);
 
 	if (strlen(keyword) >= strlen(line))
 		return NULL;
@@ -166,7 +166,7 @@ int read_rcfile(const char *rcfile, struct Rc *rc)
 
 	fclose(fp);
 
-	if (rc->macaddr && !strlen(rc->macaddr)) {
+	if (rc->macaddr && !*rc->macaddr) {
 		/* Keyword with no value, that's ok */
 		free(rc->macaddr);
 		rc->macaddr = NULL;

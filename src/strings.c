@@ -129,9 +129,9 @@ char *squeeze_chars(char *s, const char *chars)
 	char *p = s, *p2, *buf;
 
 	assert(chars);
-	assert(strlen(chars));
+	assert(*chars);
 
-	if (!s || !strlen(s))
+	if (!s || !*s)
 		return s;
 
 	buf = mystrdup(s);

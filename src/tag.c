@@ -95,7 +95,7 @@ int store_tag(struct Entry *entry, const char *arg)
 			retval = 1;
 			goto cleanup;
 		}
-		if (p && strlen(p)) {
+		if (p && *p) {
 			/*
 			 * This whole thing could be replaced by a single 
 			 * strcpy(tag, p), but Valgrind complains about source 
@@ -118,7 +118,7 @@ int store_tag(struct Entry *entry, const char *arg)
 	}
 	trim_str_front(tag);
 	trim_str_end(tag);
-	if (tag_exists(entry, tag) || !strlen(tag))
+	if (tag_exists(entry, tag) || !*tag)
 		goto cleanup;
 	if (utf8_check(tag)) {
 		fprintf(stderr, "%s: Tags have to be in UTF-8\n", progname);

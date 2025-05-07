@@ -147,7 +147,7 @@ char *allocate_elem(const char *elem, const char *src)
 	size_t size = 0;
 
 	assert(elem);
-	assert(strlen(elem));
+	assert(*elem);
 
 	if (!src) {
 		retval = mystrdup("");
@@ -171,7 +171,7 @@ char *allocate_elem(const char *elem, const char *src)
 	if (!ap)
 		return NULL; /* gncov */
 
-	if (strlen(ap))
+	if (*ap)
 		snprintf(retval, size, "<%s>%s</%s> ", elem, ap, elem);
 	else
 		retval[0] = '\0';
@@ -192,7 +192,7 @@ char *alloc_attr(const char *attr, const char *data)
 	size_t size;
 
 	assert(attr);
-	assert(strlen(attr));
+	assert(*attr);
 
 	size = strlen(" ") + strlen(attr) + strlen("=\"") + strlen(data)
 	       + strlen("\"") + 1;
@@ -532,7 +532,7 @@ FILE *lock_file(FILE *fp, const char *fname)
 {
 	assert(fp);
 	assert(fname);
-	assert(strlen(fname));
+	assert(*fname);
 
 	if (flock(fileno(fp), LOCK_EX) == -1) {
 		myerror("Could not lock file \"%s\"", fname); /* gncov */
@@ -689,7 +689,7 @@ FILE *open_logfile(const char *fname)
 	FILE *fp;
 
 	assert(fname);
-	assert(strlen(fname));
+	assert(*fname);
 
 	/*
 	 * FIXME: Make the existence check/file creation atomic. See the log 
