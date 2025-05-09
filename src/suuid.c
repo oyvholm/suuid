@@ -72,16 +72,16 @@ const char *std_strerror(const int errnum)
 		return "Inappropriate ioctl for device";
 	case EPIPE:
 		return "Broken pipe";
-	default:
+	default: /* gncov */
 		/*
 		 * Should never happen. If this line is executed, an `errno` 
 		 * value is missing from `std_strerror()`, and tests may fail 
 		 * on other platforms.
 		 */
-		fprintf(stderr,
+		fprintf(stderr, /* gncov */
 		        "\n%s: %s(): Unknown errno received: %d, \"%s\"\n",
 		        progname, __func__, errnum, strerror(errnum));
-		return strerror(errnum);
+		return strerror(errnum); /* gncov */
 	}
 }
 
@@ -114,8 +114,9 @@ int myerror(const char *format, ...)
 	retval += vfprintf(stderr, format, ap);
 	va_end(ap);
 	if (orig_errno) {
-		retval += fprintf(stderr, ": %s", std_strerror(orig_errno));
-		errno = 0;
+		retval += fprintf(stderr, ": %s", /* gncov */
+		                          std_strerror(orig_errno));
+		errno = 0; /* gncov */
 	}
 	retval += fprintf(stderr, "\n");
 
