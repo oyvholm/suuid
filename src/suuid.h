@@ -168,11 +168,12 @@ struct uuid_result {
  */
 
 /* suuid.c */
-extern struct Options opt;
+struct Options opt_struct(void);
 int msg(const int verbose, const char *format, ...);
 const char *std_strerror(const int errnum);
 int myerror(const char *format, ...);
 void init_opt(struct Options *dest);
+void set_opt_valgrind(bool b);
 
 /* environ.c */
 char *get_editor(void);
@@ -193,7 +194,7 @@ void streams_init(struct streams *dest);
 void streams_free(struct streams *dest);
 char *read_from_fp(FILE *fp, struct binbuf *dest);
 char *read_from_editor(const char *editor);
-int streams_exec(struct streams *dest, char *cmd[]);
+int streams_exec(const struct Options *o, struct streams *dest, char *cmd[]);
 
 /* logfile.c */
 bool valid_xml_chars(const char *s);
@@ -207,7 +208,7 @@ char *get_rcfilename(const struct Options *opt);
 int read_rcfile(const char *rcfile, struct Rc *rc);
 
 /* selftest.c */
-int opt_selftest(char *execname);
+int opt_selftest(char *execname, const struct Options *o);
 
 /* sessvar.c */
 int get_sess_info(struct Entry *entry);

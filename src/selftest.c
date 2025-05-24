@@ -278,6 +278,7 @@ static void test_command(const char identical, char *cmd[],
                          const char *exp_stdout, const char *exp_stderr,
                          const int exp_retval, const char *desc, va_list ap)
 {
+	const struct Options o = opt_struct();
 	struct streams ss;
 	char *descbuf;
 
@@ -288,7 +289,7 @@ static void test_command(const char identical, char *cmd[],
 		return; /* gncov */
 	}
 
-	if (opt.verbose >= 4) {
+	if (o.verbose >= 4) {
 		int i = -1; /* gncov */
 		fprintf(stderr, "# %s(", __func__); /* gncov */
 		while (cmd[++i]) /* gncov */
@@ -303,7 +304,7 @@ static void test_command(const char identical, char *cmd[],
 		return; /* gncov */
 	}
 	streams_init(&ss);
-	streams_exec(&ss, cmd);
+	streams_exec(&o, &ss, cmd);
 	if (exp_stdout) {
 		ok(tc_cmp(identical, ss.out.buf, exp_stdout),
 		   "%s (stdout)", descbuf);
@@ -619,24 +620,27 @@ free_p:
  * nothing.
  */
 
-static void test_valgrind_option(char *execname)
+static void test_valgrind_option(char *execname, const struct Options *o)
 {
 	struct streams ss;
 
 	assert(execname);
+	assert(o);
 	diag("Test --valgrind");
 
-	if (opt.valgrind) {
-		opt.valgrind = false; /* gncov */
+	if (o->valgrind) {
+		struct Options mod_opt = *o; /* gncov */
+
+		mod_opt.valgrind = false; /* gncov */
 		streams_init(&ss); /* gncov */
-		streams_exec(&ss, chp{"valgrind", "--version", /* gncov */
-		                      NULL});
+		streams_exec(&mod_opt, &ss, chp{"valgrind", /* gncov */
+		                                "--version", NULL});
 		if (!strstr(ss.out.buf, "valgrind-")) { /* gncov */
 			ok(1, "Valgrind is not installed," /* gncov */
 			      " disabling Valgrind checks");
+			set_opt_valgrind(false); /* gncov */
 		} else {
 			ok(0, "Valgrind is installed"); /* gncov */
-			opt.valgrind = true; /* gncov */
 		}
 		streams_free(&ss); /* gncov */
 	}
@@ -858,9 +862,11 @@ static void test_standard_options(char *execname)
  * test_functions() - Tests various functions directly. Returns nothing.
  */
 
-static void test_functions(void)
+static void test_functions(const struct Options *o)
 {
-	if (!opt.testfunc)
+	assert(o);
+
+	if (!o->testfunc)
 		return; /* gncov */
 
 	diag("Test selftest routines");
@@ -884,14 +890,15 @@ static void test_functions(void)
  * if ok, or 1 if streams_exec() failed.
  */
 
-static int print_version_info(char *execname)
+static int print_version_info(char *execname, const struct Options *o)
 {
 	struct streams ss;
 	int res;
 
 	assert(execname);
+	assert(o);
 	streams_init(&ss);
-	res = streams_exec(&ss, chp{ execname, "--version", NULL });
+	res = streams_exec(o, &ss, chp{ execname, "--version", NULL });
 	if (res) {
 		failed_ok("streams_exec()"); /* gncov */
 		if (ss.err.buf) /* gncov */
@@ -912,17 +919,18 @@ static int print_version_info(char *execname)
  * stdout, stderr and the return value are as expected. Returns nothing.
  */
 
-static void test_executable(char *execname)
+static void test_executable(char *execname, const struct Options *o)
 {
 	assert(execname);
-	if (!opt.testexec)
+	assert(o);
+	if (!o->testexec)
 		return; /* gncov */
 
 	diag("Test the executable");
-	test_valgrind_option(execname);
-	print_version_info(execname);
+	test_valgrind_option(execname, o);
+	print_version_info(execname, o);
 	test_standard_options(execname);
-	print_version_info(execname);
+	print_version_info(execname, o);
 }
 
 /*
@@ -931,14 +939,15 @@ static void test_executable(char *execname)
  * fail; otherwise, it returns `EXIT_SUCCESS`.
  */
 
-int opt_selftest(char *execname)
+int opt_selftest(char *execname, const struct Options *o)
 {
 	assert(execname);
+	assert(o);
 	diag("Running tests for %s %s (%s)",
 	     execname, EXEC_VERSION, EXEC_DATE);
 
-	test_functions();
-	test_executable(execname);
+	test_functions(o);
+	test_executable(execname, o);
 
 	printf("1..%d\n", testnum);
 	if (failcount) {
