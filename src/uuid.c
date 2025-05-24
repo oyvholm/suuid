@@ -219,6 +219,8 @@ bool valid_macaddr(const char *macaddr)
 {
 	unsigned int first;
 
+	assert(macaddr);
+
 	if (check_hex(macaddr, 12)) {
 		fprintf(stderr, "%s: MAC address contains illegal characters,"
 		                " can only contain hex digits\n", progname);

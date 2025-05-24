@@ -193,6 +193,7 @@ char *alloc_attr(const char *attr, const char *data)
 
 	assert(attr);
 	assert(*attr);
+	assert(data);
 
 	size = strlen(" ") + strlen(attr) + strlen("=\"") + strlen(data)
 	       + strlen("\"") + 1;

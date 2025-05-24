@@ -26,6 +26,8 @@
 
 void streams_init(struct streams *dest)
 {
+	assert(dest);
+
 	binbuf_init(&dest->in);
 	binbuf_init(&dest->out);
 	binbuf_init(&dest->err);
@@ -39,6 +41,8 @@ void streams_init(struct streams *dest)
 
 void streams_free(struct streams *dest)
 {
+	assert(dest);
+
 	binbuf_free(&dest->in);
 	binbuf_free(&dest->out);
 	binbuf_free(&dest->err);
@@ -194,6 +198,7 @@ static char **prepare_valgrind_cmd(char *cmd[]) /* gncov */
 	size_t cmd_len = 0; /* gncov */
 	char **valgrind_cmd;
 
+	assert(cmd); /* gncov */
 	while (cmd[cmd_len]) /* gncov */
 		cmd_len++; /* gncov */
 	valgrind_cmd = malloc((cmd_len + argnum + 1) /* gncov */
@@ -227,6 +232,7 @@ int streams_exec(struct streams *dest, char *cmd[])
 	FILE *infp = NULL, *outfp = NULL, *errfp = NULL;
 	struct sigaction old_action, new_action;
 
+	assert(dest);
 	assert(cmd);
 	if (opt.verbose >= 10) {
 		int i = -1; /* gncov */

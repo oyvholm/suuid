@@ -152,6 +152,8 @@ void free_tags(struct Entry *entry)
 {
 	unsigned int i;
 
+	assert(entry);
+
 	for (i = 0; entry->tag[i]; i++)
 		free(entry->tag[i]);
 }
