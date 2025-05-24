@@ -152,9 +152,8 @@ char *read_from_editor(const char *editor)
 	if (r == -1 || r >> 8 == 127) {
 		myerror("%s(): Cannot execute \"%s\"", __func__, cmdbuf);
 		if (access(tmpfile, F_OK) != -1) {
-			fprintf(stderr, "%s: File contents is stored in"
-			                " temporary file %s\n",
-			                progname, tmpfile);
+			myerror("File contents is stored in temporary file %s",
+			        tmpfile);
 		}
 		retval = NULL;
 		goto cleanup;

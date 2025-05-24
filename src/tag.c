@@ -121,14 +121,13 @@ int store_tag(struct Entry *entry, const char *arg)
 	if (tag_exists(entry, tag) || !*tag)
 		goto cleanup;
 	if (utf8_check(tag)) {
-		fprintf(stderr, "%s: Tags have to be in UTF-8\n", progname);
+		myerror("Tags have to be in UTF-8");
 		retval = 1;
 		goto cleanup;
 	}
 
 	if (tag_count >= MAX_TAGS) {
-		fprintf(stderr, "%s: Maximum number of tags (%d) exceeded\n",
-		                progname, MAX_TAGS);
+		myerror("Maximum number of tags (%d) exceeded", MAX_TAGS);
 		retval = 1;
 		goto cleanup;
 	}

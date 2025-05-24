@@ -104,8 +104,8 @@ int fill_sess(struct Entry *dest, const char *uuid,
 	assert(valid_uuid(uuid, false));
 
 	if (sessind >= MAX_SESS) {
-		fprintf(stderr, "%s: Maximum number of sess entries (%d)"
-		                " exceeded\n", progname, MAX_SESS);
+		myerror("Maximum number of sess entries (%d) exceeded",
+		        MAX_SESS);
 		return 1;
 	}
 
@@ -251,7 +251,7 @@ char *concat_cmd_string(const int argc, char * const argv[])
 	if (*cmd && cmd[strlen(cmd) - 1] == ' ')
 		cmd[strlen(cmd) - 1] = '\0'; /* Remove added space */
 	if (!*cmd) {
-		fprintf(stderr, "%s: Command is empty\n", progname);
+		myerror("Command is empty");
 		free(cmd);
 		return NULL;
 	}

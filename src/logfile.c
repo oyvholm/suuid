@@ -599,8 +599,7 @@ FILE *unknown_end_line(FILE *fp, const char *fname)
 	assert(fp);
 	assert(fname);
 
-	fprintf(stderr, "%s: %s: Unknown end line, adding to end of file\n",
-	                progname, fname);
+	myerror("%s: Unknown end line, adding to end of file", fname);
 
 	return seek_to_eof(fp, fname);
 }

@@ -40,9 +40,8 @@ char *get_rcfilename(const struct Options *opts)
 	}
 	env = getenv("HOME");
 	if (!env) {
-		fprintf(stderr, "%s: HOME environment variable not defined,"
-		                " cannot determine name of rcfile\n",
-		                progname);
+		myerror("HOME environment variable not defined, cannot"
+		        " determine name of rcfile");
 		return NULL;
 	}
 	size = strlen(env) + strlen(STD_RCFILE) + 32;

@@ -90,8 +90,8 @@ char *process_comment_option(const char *cmt)
 		}
 	}
 	if (!valid_xml_chars(retval)) {
-		fprintf(stderr, "%s: Comment contains illegal characters or"
-		                " is not valid UTF-8\n", progname);
+		myerror("Comment contains illegal characters or is not valid"
+		        " UTF-8");
 		free(retval);
 		return NULL;
 	}
@@ -207,7 +207,7 @@ char *process_uuid(struct Logs *logs,
 			scramble_mac_address(entry->uuid + 24);
 	}
 	if (!valid_uuid(entry->uuid, true)) {
-		fprintf(stderr, "%s: UUID generation failed\n", progname);
+		myerror("UUID generation failed");
 		return NULL;
 	}
 
@@ -278,8 +278,8 @@ void sighandler(const int sig)
 {
 	if (sig == SIGHUP || sig == SIGINT || sig == SIGQUIT
 	    || sig == SIGPIPE || sig == SIGTERM) {
-		fprintf(stderr, "%s: Termination signal (%s) received,"
-		                " aborting\n", progname, strsignal(sig));
+		myerror("Termination signal (%s) received, aborting",
+		        strsignal(sig));
 	} else {
 		myerror("%s(): Unknown signal %d (%s) received,"
 		        " should not happen\n", __func__, sig, strsignal(sig));
@@ -373,10 +373,8 @@ struct uuid_result create_and_log_uuids(const struct Options *opts)
 			 * Check that the correct amount of UUIDs were created.
 			 */
 			if (retval.count < opts->count) {
-				fprintf(stderr, "%s: Generated only %lu of %lu"
-				                " UUIDs\n",
-				                progname, retval.count,
-				                opts->count);
+				myerror("Generated only %lu of %lu UUIDs",
+				        retval.count, opts->count);
 			}
 
 			goto cleanup;

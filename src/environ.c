@@ -144,9 +144,8 @@ char *get_logdir(const struct Options *opts)
 		snprintf(retval, size, "%s/uuids", /* FIXME: slash */
 		                       getenv("HOME"));
 	} else {
-		fprintf(stderr, "%s: $%s and $HOME environment"
-		                " variables are not defined, cannot"
-		                " create logdir path\n", progname, ENV_LOGDIR);
+		myerror("$%s and $HOME environment variables are not defined,"
+		        " cannot create logdir path", ENV_LOGDIR);
 		return NULL;
 	}
 	if (p) {
