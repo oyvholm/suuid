@@ -44,7 +44,7 @@ all:
 	echo '<html>' >$@.tmp
 	echo '<head>' >>$@.tmp
 	echo '<meta charset="UTF-8" />' >>$@.tmp
-	echo '<title>$* - STDexecDTS</title>' >>$@.tmp
+	echo '<title>$* - suuid</title>' >>$@.tmp
 	echo '</head>' >>$@.tmp
 	echo '<body>' >>$@.tmp
 	cmark $*.md >>$@.tmp

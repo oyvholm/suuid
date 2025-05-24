@@ -282,7 +282,7 @@ void sighandler(const int sig)
 		        strsignal(sig));
 	} else {
 		myerror("%s(): Unknown signal %d (%s) received,"
-		        " should not happen\n", __func__, sig, strsignal(sig));
+		        " should not happen", __func__, sig, strsignal(sig));
 	}
 	should_terminate = true;
 }
