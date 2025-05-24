@@ -165,7 +165,7 @@ $(PREFIX)/share/man/man1/$(MANPAGE): $(MANPAGE)
 version.h: Gen-version $(CFILES) $(HFILES) Makefile
 	./Gen-version
 
-suuid.o: version.h suuid.c $(DEPS)
+suuid.o: suuid.c $(DEPS)
 	$(CC) $(CFLAGS) suuid.c
 
 binbuf.o: binbuf.c $(DEPS)
