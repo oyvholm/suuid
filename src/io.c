@@ -184,6 +184,7 @@ static char **prepare_valgrind_cmd(char *cmd[]) /* gncov */
 	static const char *valgrind_args[] = {
 		"valgrind",
 		"-q",
+		"--error-exitcode=1",
 		"--leak-check=full",
 		"--show-leak-kinds=all",
 		"--"
