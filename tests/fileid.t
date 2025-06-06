@@ -102,25 +102,25 @@ sub main {
     ok(mkdir($logdir), 'mkdir $logdir');
     diag("Testing -t/--type option...");
     likecmd("SUUID_LOGDIR=$logdir $CMD -t erlang kadusei",
-            "/^% File ID: $Templ\\n\$/",
+            "/^% kadusei\\n% File ID: $Templ\\n\$/",
             '/^$/',
             0,
             "--type erlang returns Erlang comment");
 
     likecmd("SUUID_LOGDIR=$logdir $CMD -t latex jawohl",
-            "/^% File ID: $Templ\\n\$/",
+            "/^% jawohl\\n% File ID: $Templ\\n\$/",
             '/^$/',
             0,
             "--type latex returns LaTeX comment");
 
     likecmd("SUUID_LOGDIR=$logdir $CMD -t perl ohyes",
-            "/^# File ID: $Templ\\n\$/",
+            "/^# ohyes\\n# File ID: $Templ\\n\$/",
             '/^$/',
             0,
             "--type perl returns Perl comment");
 
     likecmd("SUUID_LOGDIR=$logdir $CMD -t tex indeed",
-            "/^% File ID: $Templ\\n\$/",
+            "/^% indeed\\n% File ID: $Templ\\n\$/",
             '/^$/',
             0,
             "--type tex returns TeX comment");

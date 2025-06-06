@@ -70,7 +70,7 @@ sub main {
     defined($ARGV[0])
     || die("$progname: Filename not specified. Use -h for help.\n");
 
-    my $Comment = "_%uuid%_\n";
+    my $Comment = "$file_name\n_%uuid%_\n";
     if ($Opt{'new'}) {
         while (<STDIN>) {
             s/($Templ)/new_uuid($1)/ge;
@@ -79,17 +79,17 @@ sub main {
         exit(0);
     } elsif (length($Opt{'type'})) {
         if ($Opt{'type'} =~ /^(txt)$/) {
-            $Comment = ("File ID: _%uuid%_\n");
+            $Comment = ("$file_name\nFile ID: _%uuid%_\n");
         } elsif ($Opt{'type'} =~ /^(perl|bash|sh|htaccess)$/) {
-            $Comment = ("# File ID: _%uuid%_\n");
+            $Comment = ("# $file_name\n# File ID: _%uuid%_\n");
         } elsif ($Opt{'type'} =~ /^(html|xml)$/) {
-            $Comment = ("  <!-- File ID: _%uuid%_ -->\n");
+            $Comment = ("<!-- $file_name -->\n<!-- File ID: _%uuid%_ -->\n");
         } elsif ($Opt{'type'} =~ /^(sql)$/) {
-            $Comment = ("-- File ID: _%uuid%_\n");
+            $Comment = ("-- $file_name\n-- File ID: _%uuid%_\n");
         } elsif ($Opt{'type'} =~ /^(c|css)$/) {
-            $Comment = ("/* File ID: _%uuid%_ */\n");
+            $Comment = ("/*\n * $file_name\n * File ID: _%uuid%_\n */\n");
         } elsif ($Opt{'type'} =~ /^(erlang|latex|tex)$/) {
-            $Comment = ("% File ID: _%uuid%_\n");
+            $Comment = ("% $file_name\n% File ID: _%uuid%_\n");
         } else {
             die("$progname: $Opt{'type'}: Unkown comment type."
                 . " Use -h for help.\n");
