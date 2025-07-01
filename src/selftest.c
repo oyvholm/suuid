@@ -637,8 +637,8 @@ static void test_valgrind_option(char *execname, const struct Options *o)
 
 		mod_opt.valgrind = false; /* gncov */
 		streams_init(&ss); /* gncov */
-		streams_exec(&mod_opt, &ss, chp{"valgrind", /* gncov */
-		                                "--version", NULL});
+		streams_exec(&mod_opt, &ss, chp{ "valgrind", /* gncov */
+		                                 "--version", NULL });
 		if (!strstr(ss.out.buf, "valgrind-")) { /* gncov */
 			ok(1, "Valgrind is not installed," /* gncov */
 			      " disabling Valgrind checks");
@@ -649,7 +649,7 @@ static void test_valgrind_option(char *execname, const struct Options *o)
 		streams_free(&ss); /* gncov */
 	}
 
-	sc(chp{execname, "--valgrind", "-h", NULL},
+	sc(chp{ execname, "--valgrind", "-h", NULL },
 	   "Show this",
 	   "",
 	   EXIT_SUCCESS,
