@@ -62,6 +62,7 @@ DEVFLAGS += -Wshadow
 DEVFLAGS += -Wstrict-aliasing
 DEVFLAGS += -Wstrict-overflow=5
 DEVFLAGS += -Wstrict-prototypes
+DEVFLAGS += -Wuninitialized
 DEVFLAGS += -Wunused-const-variable
 DEVFLAGS += -Wunused-function
 DEVFLAGS += -fno-common
@@ -115,6 +116,7 @@ TESTS = all
 # DEVFLAGS += -Wformat-overflow=2
 # DEVFLAGS += -Wjump-misses-init
 # DEVFLAGS += -Wlogical-op
+# DEVFLAGS += -Wmaybe-uninitialized
 
 #  Don't use yet
 # DEVFLAGS += -Waggregate-return
