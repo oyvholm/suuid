@@ -35,6 +35,7 @@
 	errno = 0; \
 } while (0)
 
+static char *execname;
 static int failcount = 0;
 static int testnum = 0;
 
@@ -624,11 +625,10 @@ free_p:
  * nothing.
  */
 
-static void test_valgrind_option(char *execname, const struct Options *o)
+static void test_valgrind_option(const struct Options *o)
 {
 	struct streams ss;
 
-	assert(execname);
 	assert(o);
 	diag("Test --valgrind");
 
@@ -778,11 +778,10 @@ static void test_valid_uuid(void)
  * most programs. Returns nothing.
  */
 
-static void test_standard_options(char *execname)
+static void test_standard_options(void)
 {
 	char *s;
 
-	assert(execname);
 	diag("Test standard options");
 
 	diag("Test -h/--help");
@@ -894,12 +893,11 @@ static void test_functions(const struct Options *o)
  * if ok, or 1 if streams_exec() failed.
  */
 
-static int print_version_info(char *execname, const struct Options *o)
+static int print_version_info(const struct Options *o)
 {
 	struct streams ss;
 	int res;
 
-	assert(execname);
 	assert(o);
 	streams_init(&ss);
 	res = streams_exec(o, &ss, chp{ execname, "--version", NULL });
@@ -923,18 +921,17 @@ static int print_version_info(char *execname, const struct Options *o)
  * stdout, stderr and the return value are as expected. Returns nothing.
  */
 
-static void test_executable(char *execname, const struct Options *o)
+static void test_executable(const struct Options *o)
 {
-	assert(execname);
 	assert(o);
 	if (!o->testexec)
 		return; /* gncov */
 
 	diag("Test the executable");
-	test_valgrind_option(execname, o);
-	print_version_info(execname, o);
-	test_standard_options(execname);
-	print_version_info(execname, o);
+	test_valgrind_option(o);
+	print_version_info(o);
+	test_standard_options();
+	print_version_info(o);
 }
 
 /*
@@ -943,15 +940,17 @@ static void test_executable(char *execname, const struct Options *o)
  * fail; otherwise, it returns `EXIT_SUCCESS`.
  */
 
-int opt_selftest(char *execname, const struct Options *o)
+int opt_selftest(char *main_execname, const struct Options *o)
 {
-	assert(execname);
+	assert(main_execname);
 	assert(o);
+
+	execname = main_execname;
 	diag("Running tests for %s %s (%s)",
 	     execname, EXEC_VERSION, EXEC_DATE);
 
 	test_functions(o);
-	test_executable(execname, o);
+	test_executable(o);
 
 	printf("1..%d\n", testnum);
 	if (failcount) {
