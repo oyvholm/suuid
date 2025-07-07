@@ -184,6 +184,9 @@ static int print_version(const struct Options *o)
 		return EXIT_SUCCESS;
 	}
 	printf("%s %s (%s)\n", progname, EXEC_VERSION, EXEC_DATE);
+#ifdef CHECK_ERRNO
+	printf("has CHECK_ERRNO\n");
+#endif
 #ifdef FAKE_HOST
 	printf("has FAKE_HOST\n");
 #endif
