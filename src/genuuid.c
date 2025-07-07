@@ -233,18 +233,6 @@ char *process_uuid(struct Logs *logs,
 			myerror("Cannot print UUID to stdout");
 			return NULL;
 		}
-#ifdef __BIONIC__
-		if (result >= 0 && errno == ENOTTY) {
-			/*
-			 * Get around a problem in Termux 0.118.1 (and possibly 
-			 * other versions) on Android where a redirect of 
-			 * stdout to /dev/null results in errno being set to 
-			 * ENOTTY (Inappropriate ioctl for device).
-			 */
-			errno = 0;
-		}
-#endif
-		check_errno;
 	} else {
 		size_t len = strlen(entry->uuid) + 1;
 
