@@ -90,9 +90,11 @@ const char *std_strerror(const int errnum)
 		 * value is missing from `std_strerror()`, and tests may fail 
 		 * on other platforms.
 		 */
+#ifdef CHECK_ERRNO
 		fprintf(stderr, /* gncov */
 		        "\n%s: %s(): Unknown errno received: %d, \"%s\"\n",
 		        progname, __func__, errnum, strerror(errnum));
+#endif
 		return strerror(errnum); /* gncov */
 	}
 }
