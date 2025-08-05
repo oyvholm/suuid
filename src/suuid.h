@@ -69,6 +69,7 @@
 #endif
 
 #define failed(a)  myerror("%s():%d: %s failed", __func__, __LINE__, (a))
+#define no_null(a)  ((a) ? (a) : "(null)")
 
 #define ENV_EDITOR  "SUUID_EDITOR" /* Name of editor to use with "-c --" */
 #define ENV_HOSTNAME  "SUUID_HOSTNAME" /* Optional environment variable */
