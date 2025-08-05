@@ -43,6 +43,10 @@ static char *execname;
 static int failcount = 0;
 static int testnum = 0;
 
+/******************************************************************************
+                             --selftest functions
+******************************************************************************/
+
 /*
  * ok() - Print a log line to stdout. If `i` is 0, an "ok" line is printed, 
  * otherwise a "not ok" line is printed. `desc` is the test description and can 
@@ -379,15 +383,11 @@ static void tc(char *cmd[], const char *exp_stdout, const char *exp_stderr,
 	va_end(ap);
 }
 
-/*
- ******************
- * Function tests *
- ******************
- */
+/******************************************************************************
+                 Function tests, no temporary directory needed
+******************************************************************************/
 
-/*
- * selftest functions
- */
+                             /*** selftest.c ***/
 
 /*
  * test_diag_big() - Tests diag_output() with a string larger than BUFSIZ. 
@@ -568,9 +568,7 @@ static void test_valgrind_lines(void)
 	}
 }
 
-/*
- * Various functions
- */
+                               /*** suuid.c ***/
 
 /*
  * test_std_strerror() - Tests the std_strerror() function. Returns nothing.
@@ -582,6 +580,8 @@ static void test_std_strerror(void)
 	ok(!!strcmp(std_strerror(EACCES), "Permission denied"),
 	   "std_strerror(EACCES) is as expected");
 }
+
+                              /*** strings.c ***/
 
 /*
  * test_mystrdup() - Tests the mystrdup() function. Returns nothing.
@@ -793,12 +793,6 @@ static void test_str_replace(void)
 }
 
 /*
- ****************
- * Option tests *
- ****************
- */
-
-/*
  * test_string_to_lower() - Tests the string_to_lower() function. Returns 
  * nothing.
  */
@@ -812,6 +806,8 @@ static void test_string_to_lower(void)
 	ok(!!strcmp(string_to_lower(s1), "abcÅÆØ"),
 	   "string_to_lower(\"ABCÅÆØ\")");
 }
+
+                               /*** uuid.c ***/
 
 /*
  * chk_vu() - Used by test_valid_uuid(). Checks that `valid_uuid(uuid, 
@@ -914,6 +910,10 @@ static void test_uuid_date(void)
 	chk_ud("c9ffa9cb-708d-454b-b1f2-f18f609cb825", 0, "");
 	chk_ud("acdaf974-e78e-11e7-87d5-g74d993421b0", 0, "");
 }
+
+/******************************************************************************
+            Test the executable file, no temporary directory needed
+******************************************************************************/
 
 /*
  * test_valgrind_option() - Tests the --valgrind command line option. Returns 
@@ -1062,6 +1062,10 @@ static void test_standard_options(void)
 	   "Unknown option: \"Option error\" message is printed");
 }
 
+/******************************************************************************
+                        Top-level --selftest functions
+******************************************************************************/
+
 /*
  * test_functions() - Tests various functions directly. Returns nothing.
  */
@@ -1074,18 +1078,26 @@ static void test_functions(const struct Options *o)
 		return; /* gncov */
 
 	diag("Test selftest routines");
+
+	/* selftest.c */
 	ok(!ok(0, NULL), "ok(0, NULL)");
 	test_diag();
 	test_gotexp_output();
 	test_valgrind_lines();
 
 	diag("Test various routines");
+
+	/* suuid.c */
 	test_std_strerror();
+
+	/* strings.c */
 	test_mystrdup();
 	test_allocstr();
 	test_count_substr();
 	test_str_replace();
 	test_string_to_lower();
+
+	/* uuid.c */
 	test_valid_uuid();
 	test_is_valid_date();
 	test_uuid_date();
