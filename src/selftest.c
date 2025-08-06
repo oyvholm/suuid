@@ -784,7 +784,7 @@ static void test_mystrdup(void)
 
 	s = mystrdup(txt);
 	if (!s) {
-		failed("mystrdup()"); /* gncov */
+		failed_ok("mystrdup()"); /* gncov */
 		return; /* gncov */
 	}
 	ok(!!strcmp(s, txt), "mystrdup(): Strings are identical");
