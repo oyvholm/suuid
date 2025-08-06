@@ -718,6 +718,76 @@ static void test_std_strerror(void)
 	   "std_strerror(EACCES) is as expected");
 }
 
+                              /*** logfile.c ***/
+
+/*
+ * chk_csx() - Used by test_create_sess_xml(). Verifies that the values in 
+ * `sess` results in the string `exp`. `desc` is a short test description. 
+ * Returns nothing.
+ */
+
+static void chk_csx(const struct Sess *sess, const char *exp,
+                    const char *desc)
+{
+	struct Entry entry;
+	char *result;
+	int i;
+
+	assert(sess);
+	assert(exp);
+	assert(desc);
+
+	init_xml_entry(&entry);
+	for (i = 0; i < MAX_SESS; i++) {
+		entry.sess[i].uuid = sess[i].uuid;
+		entry.sess[i].desc = sess[i].desc;
+	}
+	result = create_sess_xml(&entry);
+	if (!result) {
+		failed_ok("create_sess_xml()"); /* gncov */
+		return; /* gncov */
+	}
+	ok(!!strcmp(result, exp), "create_sess_xml(): %s", desc);
+	print_gotexp(result, exp);
+	free(result);
+}
+
+/*
+ * test_create_sess_xml() - Tests the create_sess_xml() function. Returns 
+ * nothing.
+ */
+
+static void test_create_sess_xml(void)
+{
+	struct Sess sess[MAX_SESS];
+
+	diag("Test create_sess_xml()");
+
+	init_sess_array(sess);
+	chk_csx(sess, "", "No sess elements");
+
+	sess[0].uuid = "5175c9c8-5f82-11f0-a282-83850402c3ce";
+	chk_csx(sess, "<sess>5175c9c8-5f82-11f0-a282-83850402c3ce</sess> ",
+	        "1 sess element, uuid only");
+
+	sess[1].uuid = "cd2c846c-5f82-11f0-903a-83850402c3ce";
+	chk_csx(sess, "<sess>5175c9c8-5f82-11f0-a282-83850402c3ce</sess> "
+	              "<sess>cd2c846c-5f82-11f0-903a-83850402c3ce</sess> ",
+	        "2 sess elements, uuid only");
+
+	sess[0].desc = "desc_1";
+	chk_csx(sess,
+	        "<sess desc=\"desc_1\">5175c9c8-5f82-11f0-a282-83850402c3ce</sess> "
+	        "<sess>cd2c846c-5f82-11f0-903a-83850402c3ce</sess> ",
+	        "2 sess elements, 1 desc");
+
+	sess[1].desc = "desc_2";
+	chk_csx(sess,
+	        "<sess desc=\"desc_1\">5175c9c8-5f82-11f0-a282-83850402c3ce</sess> "
+	        "<sess desc=\"desc_2\">cd2c846c-5f82-11f0-903a-83850402c3ce</sess> ",
+	        "2 sess elements, 2 descs");
+}
+
                               /*** rcfile.c ***/
 
 /*
@@ -1276,6 +1346,9 @@ static void test_functions(const struct Options *o)
 
 	/* suuid.c */
 	test_std_strerror();
+
+	/* logfile.c */
+	test_create_sess_xml();
 
 	/* rcfile.c */
 	test_has_key();

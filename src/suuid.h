@@ -203,7 +203,9 @@ int streams_exec(const struct Options *o, struct streams *dest, char *cmd[]);
 
 /* logfile.c */
 bool valid_xml_chars(const char *s);
+void init_sess_array(struct Sess *sess);
 void init_xml_entry(struct Entry *e);
+char *create_sess_xml(const struct Entry *entry);
 FILE *open_logfile(const char *fname);
 int add_to_logfile(FILE *fp, const struct Entry *entry, const bool raw);
 int close_logfile(FILE *fp);
