@@ -441,6 +441,45 @@ static void tc(char *cmd[], const char *exp_stdout, const char *exp_stderr,
 }
 
 /******************************************************************************
+                       suuid-specific selftest functions
+******************************************************************************/
+
+/*
+ * count_uuids() - Returns the number of UUIDs followed by separator `sep` in 
+ * the string `buf`. If an invalid UUID or separator is found, it returns the 
+ * number of valid UUIDs and separators up until then.
+ */
+
+static unsigned long count_uuids(const char *buf, const char *sep)
+{
+	const char *p = buf, *endbuf;
+	unsigned long count = 0L;
+	size_t sep_len, both_len;
+
+	assert(buf);
+	assert(sep);
+
+	sep_len = strlen(sep);
+	both_len = UUID_LENGTH + sep_len;
+	endbuf = p + strlen(buf);
+	if ((size_t)(endbuf - p) < both_len)
+		goto out;
+
+	while ((size_t)(endbuf - p) >= both_len) {
+		if (!valid_uuid(p, false))
+			goto out;
+		p += UUID_LENGTH;
+		if (strncmp(p, sep, sep_len))
+			goto out;
+		p += sep_len;
+		count++;
+	}
+
+out:
+	return count;
+}
+
+/******************************************************************************
                  Function tests, no temporary directory needed
 ******************************************************************************/
 
@@ -623,6 +662,47 @@ static void test_valgrind_lines(void)
 		   "valgrind_lines(): No valgrind marker, string %d", i);
 		i++;
 	}
+}
+
+/*
+ * chk_cu() - Used by test_count_uuids(). Verifies that count_uuids() returns 
+ * `count` number of UUIDs in `s` with the separator `sep`. `desc` is a short 
+ * test description. Returns nothing.
+ */
+
+static void chk_cu(const char *s, const char *sep, unsigned long count,
+                   const char *desc)
+{
+	assert(s);
+	assert(sep);
+	assert(desc);
+
+	ok(!(count_uuids(s, sep) == count), "%s", desc);
+}
+
+/*
+ * test_count_uuids() - Tests the count_uuids() function. Returns nothing.
+ */
+
+static void test_count_uuids(void)
+{
+#define U  "da99fa2c-69bd-11f0-8ac5-83850402c3ce"
+	diag("Test count_uuids()");
+
+	chk_cu(U "\n", "\n", 1, "1 UUID with \\n");
+	chk_cu(U "\n" U "\n", "\n", 2, "2 UUIDs with \\n");
+	chk_cu(U, "\n", 0, "1 UUID, missing \\n");
+	chk_cu(U "  ", " ", 1, "1 UUID, extra space");
+	chk_cu(U " ", "  ", 0, "1 UUID, missing 1 space from separator");
+	chk_cu("a" U " ", " ", 0, "1 UUID, 'a' in front");
+	chk_cu(U "a", "b", 0, "1 UUID, separator doesn't match");
+	chk_cu(U "a" U "a" U "b" U "a" U "a", "a", 2,
+	       "5 UUIDs, separator 3 doesn't match");
+	chk_cu(U, "", 1, "1 UUID, empty separator");
+	chk_cu(U U U U U U U U U U, "", 10, "10 UUIDs, empty separator");
+	chk_cu("da99fa2c-69bd-11f0-8ac5-83850402c3c", "a", 0,
+	       "1 UUID which is 1 char too short, separator is 'a'");
+#undef U
 }
 
                                /*** suuid.c ***/
@@ -1190,6 +1270,7 @@ static void test_functions(const struct Options *o)
 	test_diag();
 	test_gotexp_output();
 	test_valgrind_lines();
+	test_count_uuids();
 
 	diag("Test various routines");
 
