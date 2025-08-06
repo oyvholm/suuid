@@ -72,15 +72,25 @@ char *has_key(const char *line, const char *keyword)
 	if (strlen(keyword) >= strlen(line))
 		return NULL;
 	if (!strncmp(line, keyword, strlen(keyword))) {
+		/*
+		 * Verify that the first character after what looks like a 
+		 * complete keyword is either a space or '='. This avoids 
+		 * misinterpreting a longer keyword that starts with the 
+		 * shorter one. E.g., "hostname_extra = value" shouldn't match 
+		 * "hostname".
+		 */
 		if (!strchr(" =", line[strlen(keyword)]))
 			return NULL;
 		/*
-		 * Move retval to the first character that is not a space 
-		 * (ASCII 32) after the first equal sign.
+		 * Find the first '=', then skip spaces (but not '=') after it 
+		 * to preserve leading '=' in the value.
 		 */
 		retval = strchr(line, '=');
-		while (retval && (*retval == '=' || *retval == ' '))
-			retval++;
+		if (retval) {
+			retval++; /* Skip the single '=' */
+			while (*retval == ' ') /* Skip only spaces after '=' */
+				retval++;
+		}
 	} else {
 		retval = NULL;
 	}

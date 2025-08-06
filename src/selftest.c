@@ -684,6 +684,8 @@ static void test_has_key(void)
 	chk_hk("hostname:abc", "hostname", NULL);
 	chk_hk("macaddr = abc", "hostname", NULL);
 	chk_hk("unknown = abc", "unknown", "abc");
+	chk_hk("abc==def", "abc", "=def");
+	chk_hk("abc = = def ", "abc", "= def ");
 }
 
                               /*** strings.c ***/
