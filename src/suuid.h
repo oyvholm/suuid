@@ -210,6 +210,7 @@ int close_logfile(FILE *fp);
 
 /* rcfile.c */
 char *get_rcfilename(const struct Options *opt);
+char *has_key(const char *line, const char *keyword);
 int read_rcfile(const char *rcfile, struct Rc *rc);
 
 /* selftest.c */

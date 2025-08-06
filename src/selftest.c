@@ -638,6 +638,54 @@ static void test_std_strerror(void)
 	   "std_strerror(EACCES) is as expected");
 }
 
+                              /*** rcfile.c ***/
+
+/*
+ * chk_hk() - Used by test_has_key(). Verifies that `has_key(line, keyword)` 
+ * returns `exp`. Returns nothing.
+ */
+
+static void chk_hk(const char *line, const char *keyword, const char *exp)
+{
+	const char *result;
+
+	assert(line);
+	assert(keyword);
+
+	result = has_key(line, keyword);
+	if (!result || !exp) {
+		ok(!(result == exp), "has_key(\"%s\", \"%s\") (NULL check)",
+		   line, keyword);
+		print_gotexp(result, exp);
+		return;
+	}
+	ok(!!strcmp(result, exp), "has_key(\"%s\", \"%s\")", line, keyword);
+	print_gotexp(result, exp);
+}
+
+/*
+ * test_has_key() - Tests the has_key() function. Returns nothing.
+ */
+
+static void test_has_key(void)
+{
+	diag("Test has_key()");
+
+	chk_hk("hostname = abc", "hostname", "abc");
+	chk_hk("hostname=abc", "hostname", "abc");
+	chk_hk("hostname= abc", "hostname", "abc");
+	chk_hk("hostname =abc", "hostname", "abc");
+	chk_hk("hostname     =    abc", "hostname", "abc");
+	chk_hk("hostname=    abc", "hostname", "abc");
+	chk_hk("hostname =", "hostname", "");
+	chk_hk("hostname=", "hostname", "");
+	chk_hk("# hostname = abc", "hostname", NULL);
+	chk_hk("hostname: abc", "hostname", NULL);
+	chk_hk("hostname:abc", "hostname", NULL);
+	chk_hk("macaddr = abc", "hostname", NULL);
+	chk_hk("unknown = abc", "unknown", "abc");
+}
+
                               /*** strings.c ***/
 
 /*
@@ -1145,6 +1193,9 @@ static void test_functions(const struct Options *o)
 
 	/* suuid.c */
 	test_std_strerror();
+
+	/* rcfile.c */
+	test_has_key();
 
 	/* strings.c */
 	test_mystrdup();
