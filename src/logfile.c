@@ -110,6 +110,21 @@ char *suuid_xml(const char *text)
 }
 
 /*
+ * init_sess_array() - Initializes a `struct Sess` array. The array must 
+ * contain `MAX_SESS` elements. Returns nothing.
+ */
+
+void init_sess_array(struct Sess *sess)
+{
+	int i;
+
+	assert(sess);
+
+	for (i = 0; i < MAX_SESS; i++)
+		sess[i].uuid = sess[i].desc = NULL;
+}
+
+/*
  * init_xml_entry() - Initialise Entry struct at memory position e with initial 
  * values.
  */
@@ -130,8 +145,7 @@ void init_xml_entry(struct Entry *e)
 
 	for (i = 0; i < MAX_TAGS; i++)
 		e->tag[i] = NULL;
-	for (i = 0; i < MAX_SESS; i++)
-		e->sess[i].uuid = e->sess[i].desc = NULL;
+	init_sess_array(e->sess);
 }
 
 /*
