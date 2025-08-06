@@ -882,7 +882,7 @@ static void test_allocstr(void)
 	p2 = allocstr("%s", p);
 	if (!p2) {
 		failed_ok("allocstr() with BUFSIZ * 2"); /* gncov */
-		goto free_p; /* gncov */
+		goto cleanup; /* gncov */
 	}
 	alen = strlen(p2);
 	ok(!(alen == BUFSIZ * 2), "allocstr(): strlen is correct");
@@ -895,8 +895,9 @@ static void test_allocstr(void)
 		p3++;
 	}
 	ok(!(p3 != NULL), "allocstr(): Content of string is correct");
+
+cleanup:
 	free(p2);
-free_p:
 	free(p);
 }
 
