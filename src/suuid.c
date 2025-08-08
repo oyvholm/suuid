@@ -353,7 +353,6 @@ static int usage(const struct Options *o, const int retval)
 static int choose_opt_action(struct Options *dest,
                              const int c, const struct option *opts)
 {
-	int retval = 0;
 	static unsigned int tag_count = 0;
 
 	assert(dest);
@@ -390,7 +389,7 @@ static int choose_opt_action(struct Options *dest,
 	case 'n':
 		if (!sscanf(optarg, "%lu", &dest->count)) {
 			myerror("Error in -n/--count argument");
-			retval = 1;
+			return 1;
 		}
 		break;
 	case 'q':
@@ -400,7 +399,7 @@ static int choose_opt_action(struct Options *dest,
 		if (tag_count >= MAX_TAGS) {
 			fprintf(stderr, "%s: Maximum number of tags (%d)"
 			                " exceeded\n", progname, MAX_TAGS);
-			retval = 1;
+			return 1;
 		}
 		dest->tag[tag_count++] = optarg;
 		break;
@@ -413,11 +412,11 @@ static int choose_opt_action(struct Options *dest,
 	default:
 		myerror("%s(): getopt_long() returned character code %d",
 		        __func__, c);
-		retval = 1;
+		return 1;
 		break;
 	}
 
-	return retval;
+	return 0;
 }
 
 /*
