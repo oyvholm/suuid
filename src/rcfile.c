@@ -21,6 +21,31 @@
 #include "suuid.h"
 
 /*
+ * init_rc() - Initialize a `struct Rc`. Returns nothing.
+ */
+
+void init_rc(struct Rc *rc)
+{
+	assert(rc);
+
+	rc->hostname = NULL;
+	rc->macaddr = NULL;
+}
+
+/*
+ * free_rc() - Deallocate all members of a `struct Rc`. Returns nothing.
+ */
+
+void free_rc(struct Rc *rc)
+{
+	assert(rc);
+
+	free(rc->hostname);
+	free(rc->macaddr);
+	init_rc(rc);
+}
+
+/*
  * get_rcfilename() - Return pointer to an allocated string with name of 
  * rcfile. If neither opts->rcfile or HOME is defined, return NULL.
  */
@@ -141,8 +166,7 @@ int read_rcfile(const char *rcfile, struct Rc *rc)
 
 	assert(rc);
 
-	rc->hostname = NULL;
-	rc->macaddr = NULL;
+	free_rc(rc);
 
 	if (!rcfile)
 		return 0;

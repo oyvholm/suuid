@@ -211,6 +211,8 @@ int add_to_logfile(FILE *fp, const struct Entry *entry, const bool raw);
 int close_logfile(FILE *fp);
 
 /* rcfile.c */
+void init_rc(struct Rc *rc);
+void free_rc(struct Rc *rc);
 char *get_rcfilename(const struct Options *opt);
 char *has_key(const char *line, const char *keyword);
 int read_rcfile(const char *rcfile, struct Rc *rc);

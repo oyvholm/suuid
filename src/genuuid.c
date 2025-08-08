@@ -297,7 +297,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opts)
 
 	assert(opts);
 
-	memset(&rc, 0, sizeof(rc));
+	init_rc(&rc);
 	logs.logfp = NULL;
 	count = opts->count;
 	retval.count = 0UL;
@@ -385,8 +385,7 @@ cleanup:
 	free(logfile);
 	free_sess(&entry);
 	free_tags(&entry);
-	free(rc.macaddr);
-	free(rc.hostname);
+	free_rc(&rc);
 	free(entry.txt);
 	free(entry.cwd);
 	free(rcfile);
