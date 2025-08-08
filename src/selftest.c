@@ -853,6 +853,31 @@ static void test_std_strerror(void)
 	          "std_strerror(EACCES) is as expected");
 }
 
+                                /*** io.c ***/
+
+/*
+ * test_read_from_file() - Tests the read_from_file() function. Returns 
+ * nothing.
+ */
+
+static void test_read_from_file(void)
+{
+	char *p = NULL;
+	int orig_errno;
+
+	diag("Test read_from_file()");
+
+	p = read_from_file(TMPDIR "/non-existing");
+	orig_errno = errno;
+	errno = 0;
+	OK_NULL(p, "read_from_file(): Non-existing file, NULL is returned");
+	OK_EQUAL(orig_errno, ENOENT, "read_from_file(): errno is ENOENT");
+	if (orig_errno != ENOENT) {
+		diag("errno was %d (%s)", /* gncov */
+		     orig_errno, strerror(orig_errno));
+	}
+}
+
                               /*** logfile.c ***/
 
 /*
@@ -1558,6 +1583,9 @@ static void test_functions(const struct Options *o)
 
 	/* suuid.c */
 	test_std_strerror();
+
+	/* io.c */
+	test_read_from_file();
 
 	/* logfile.c */
 	test_create_sess_xml();
