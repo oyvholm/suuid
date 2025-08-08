@@ -5,6 +5,7 @@
 /*.s
 /.devel
 /.make-tlok.tmp
+/.suuid-test.tmp/
 /gdbopts
 /gmon.out
 /gmon.sum
@@ -12,6 +13,7 @@
 /suuid
 /suuid.1
 /suuid.1.tmp
+/suuid.core
 /suuid.html
 /suuid.html.tmp
 /suuid.pdf
