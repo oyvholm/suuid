@@ -78,6 +78,11 @@ HFILES += binbuf.h
 HFILES += suuid.h
 HFILES += uuid.h
 HTMLFILE = $(EXEC).html
+IGNFILES  =
+IGNFILES += -e ^COPYING
+IGNFILES += -e ^conv-suuid
+IGNFILES += -e ^t/fake-editor
+IGNFILES += -e ^t/rcfile1
 INSTALL_TARGETS  =
 INSTALL_TARGETS += $(PREFIX)/bin/$(EXEC)
 INSTALL_TARGETS += $(PREFIX)/share/man/man1/$(MANPAGE)
@@ -238,7 +243,7 @@ dupdesc:
 
 .PHONY: edit
 edit: tags
-	$(EDITOR) $$(git ls-files | grep -v -e ^COPYING)
+	$(EDITOR) $$(git ls-files | grep -v $(IGNFILES))
 	rm tags
 
 .PHONY: gcov
