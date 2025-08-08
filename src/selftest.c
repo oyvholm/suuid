@@ -130,6 +130,8 @@
 	errno = 0; \
 } while (0)
 
+#define TMPDIR  ".suuid-test.tmp"
+
 static char *execname;
 static int failcount = 0;
 static int testnum = 0;
@@ -1450,6 +1452,35 @@ static void test_standard_options(void)
 ******************************************************************************/
 
 /*
+ * functests_with_tempdir() - Tests functions that need a temporary directory 
+ * to store the output from stderr and stdout. Returns nothing.
+ */
+
+static void functests_with_tempdir(void)
+{
+	int result;
+
+	diag("Test functions that need a temporary directory for stdout and"
+	     " stderr");
+	result = mkdir(TMPDIR, 0755);
+	OK_SUCCESS(result, "mkdir " TMPDIR " for function tests");
+	if (result) {
+		diag("test %d: %s, skipping tests", /* gncov */
+		     testnum, strerror(errno)); /* gncov */
+		errno = 0; /* gncov */
+		return; /* gncov */
+	}
+
+	result = rmdir(TMPDIR);
+	OK_SUCCESS(result, "rmdir " TMPDIR " after function tests");
+	if (result) {
+		diag("test %d: %s", testnum, strerror(errno)); /* gncov */
+		errno = 0; /* gncov */
+		return; /* gncov */
+	}
+}
+
+/*
  * test_functions() - Tests various functions directly. Returns nothing.
  */
 
@@ -1490,6 +1521,8 @@ static void test_functions(const struct Options *o)
 	test_valid_uuid();
 	test_is_valid_date();
 	test_uuid_date();
+
+	functests_with_tempdir();
 }
 
 /*
@@ -1552,6 +1585,7 @@ int opt_selftest(char *main_execname, const struct Options *o)
 #undef OK_SUCCESS
 #undef OK_TRUE
 #undef OPTION_ERROR_STR
+#undef TMPDIR
 #undef chp
 #undef failed_ok
 
