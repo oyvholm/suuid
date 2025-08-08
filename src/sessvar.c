@@ -211,7 +211,7 @@ void free_sess(struct Entry *entry)
 
 	assert(entry);
 
-	for (i = 0; entry->sess[i].uuid && i < MAX_SESS; i++) {
+	for (i = 0; i < MAX_SESS && entry->sess[i].uuid; i++) {
 		free(entry->sess[i].uuid);
 		free(entry->sess[i].desc);
 	}
