@@ -406,9 +406,9 @@ int streams_exec(const struct Options *o, struct streams *dest, char *cmd[])
 	read_from_fp(errfp, &dest->err);
 	read_from_fp(outfp, &dest->out);
 	msg(10, "%s():%d: dest->out.buf = \"%s\"",
-	        __func__, __LINE__, dest->out.buf);
+	        __func__, __LINE__, no_null(dest->out.buf));
 	msg(10, "%s():%d: dest->err.buf = \"%s\"",
-	        __func__, __LINE__, dest->err.buf);
+	        __func__, __LINE__, no_null(dest->err.buf));
 
 	wait(&dest->ret);
 	dest->ret = dest->ret >> 8;
