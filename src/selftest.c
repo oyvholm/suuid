@@ -30,6 +30,14 @@
                           EXECSTR ": Type \"" EXECSTR " --help\" for help screen." \
                           " Returning with value 1.\n"
 #define chp  (char *[])
+#define DIAG_DEBL  diag("DEBL: %s:%s():%d", __FILE__, __func__, __LINE__)
+#define DIAG_VARS  do { \
+	diag("%s = \"%s\"", "HOME", no_null(getenv("HOME"))); \
+	diag("%s = \"%s\"", ENV_EDITOR, no_null(getenv(ENV_EDITOR))); \
+	diag("%s = \"%s\"", ENV_HOSTNAME, no_null(getenv(ENV_HOSTNAME))); \
+	diag("%s = \"%s\"", ENV_LOGDIR, no_null(getenv(ENV_LOGDIR))); \
+	diag("%s = \"%s\"", ENV_SESS, no_null(getenv(ENV_SESS))); \
+} while (0)
 
 /*
  * Main test macros, meant to be a human-friendly frontend against ok(). Unlike 
@@ -1619,6 +1627,8 @@ int opt_selftest(char *main_execname, const struct Options *o)
 	return failcount ? EXIT_FAILURE : EXIT_SUCCESS;
 }
 
+#undef DIAG_DEBL
+#undef DIAG_VARS
 #undef EXECSTR
 #undef OK_EQUAL
 #undef OK_ERROR
