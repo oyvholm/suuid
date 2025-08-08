@@ -163,6 +163,12 @@ struct timeval *get_current_time(struct timeval *tv)
 	assert(tv);
 
 	while (1) {
+		if (++count > maxcount) {
+			myerror("%s(): Got the same timestamp" /* gncov */
+			        " after %lu tries. System clock broken?",
+			        __func__, maxcount);
+			return NULL; /* gncov */
+		}
 		if (gettimeofday(&tvbuf, NULL)) {
 			myerror("%s(): gettimeofday() failed", /* gncov */
 			        __func__);
@@ -171,12 +177,6 @@ struct timeval *get_current_time(struct timeval *tv)
 		create_uuid_time(&utime, &tvbuf);
 		if (utime != prevtime)
 			break;
-		if (++count > maxcount) { /* gncov */
-			myerror("%s(): Got the same timestamp" /* gncov */
-			        " after %lu tries. System clock broken?",
-			        __func__, maxcount);
-			return NULL; /* gncov */
-		}
 	}
 	prevtime = utime;
 	memcpy(tv, &tvbuf, sizeof(tvbuf));
