@@ -124,7 +124,7 @@
 #define failed_ok(a)  do { \
 	if (errno) \
 		OK_ERROR("%s():%d: %s failed: %s", \
-		         __func__, __LINE__, (a), std_strerror(errno)); \
+		         __func__, __LINE__, (a), strerror(errno)); \
 	else \
 		OK_ERROR("%s():%d: %s failed", __func__, __LINE__, (a)); \
 	errno = 0; \
