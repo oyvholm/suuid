@@ -30,12 +30,103 @@
                           EXECSTR ": Type \"" EXECSTR " --help\" for help screen." \
                           " Returning with value 1.\n"
 #define chp  (char *[])
+
+/*
+ * Main test macros, meant to be a human-friendly frontend against ok(). Unlike 
+ * most other testing frameworks that return 1 for success and 0 for error, 
+ * these functions and macros return 0 for success and 1 if the test fails. The 
+ * reasoning behind this is:
+ *
+ * We don't look for successful tests, but tests that fail. By returning 1 when 
+ * the test fails, the return value can be used to increase a fail counter to 
+ * find the total number of failed tests, or take special action based on the 
+ * outcome of a single test or a series of previous tests. If the macros or 
+ * ok() had returned 0 for failure and non-zero for success, we would need an 
+ * additional counter to keep track of the number of executed tests and then 
+ * use subtraction to see if any tests failed. Besides, C typically returns 0 
+ * for success and non-zero for failure, so this convention should feel natural 
+ * to C programmers. The `ok(expr, desc, ...)` function is a frontend to 
+ * `ok_va()`, which evaluates `expr`, printing an "ok" line to stdout if `expr` 
+ * is 0 (success, returning 0) or "not ok" if `expr` is non-zero (failure, 
+ * returning 1), using `desc` with any additional arguments for the test 
+ * description.
+ *
+ * All macros have a description parameter at the end which supports printf() 
+ * sequences and additional optional arguments.
+ *
+ * This is a list of the various macros, with a description of which types of 
+ * tests they're intended for, and the criteria for success:
+ *
+ * OK_EQUAL(a, b, desc, ...) - Verifies that the values `a` and `b` are 
+ * identical. It uses `==` for comparison and is intended for variables of any 
+ * type that supports the `==` operator.
+ * Example: OK_EQUAL(num_found, expected, "Found %u elements", expected);
+ *
+ * OK_ERROR(msg, ...) - Generates a test failure with `msg` as the description. 
+ * Used for unexpected errors that can't be ignored, incrementing the failure 
+ * counter and failing the test run. Typically used in conditional checks.
+ * Example: if (valgrind_lines(stderr_output))
+ *                  OK_ERROR("Found Valgrind output in stderr");
+ *
+ * OK_FAILURE(func, desc, ...) - Used for functions that return 0 for success 
+ * and non-zero for failure. Expects the function to fail (return non-zero). 
+ * Example: OK_FAILURE(stat(file), "File is unreadable or doesn't exist");
+ *
+ * OK_FALSE(val, desc, ...) - Used for boolean values or expressions expected 
+ * to be false. Negated expressions can be confusing, so `OK_TRUE` is usually a 
+ * clearer choice for complex checks.
+ * Examples: OK_FALSE(user_exists(user), "User %s doesn't exist", user);
+ *           OK_FALSE(result == 5, "Result is not 5");
+ *
+ * OK_NOTEQUAL(a, b, desc, ...) - Expects the values `a` and `b` to be 
+ * different. The `!=` operator is used for the comparison.
+ * Example: OK_NOTEQUAL(userid1, userid2, "The users have different IDs");
+ *
+ * OK_NOTNULL(p, desc, ...) - Succeeds if the pointer `p` is non-NULL.
+ * Examples: OK_NOTNULL(strstr(txt, substr), "Substring was found in text");
+ *           OK_NOTNULL(fp, "File pointer is not NULL");
+ *
+ * OK_NULL(p, desc, ...) - Expects the pointer `p` to be NULL.
+ * Examples: OK_NULL(getenv(var), "Environment variable %s is undefined", var);
+ *           OK_NULL(strchr(file, '/'), "No slash in file name \"%s\"", file);
+ *
+ * OK_STRCMP(a, b, desc, ...) - Compares the strings `a` and `b` and succeeds 
+ * if they're identical.
+ * Example: OK_STRCMP(file, "index.html", "File name is correct");
+ *
+ * OK_STRNCMP(a, b, len, desc, ...) - Compares the first `len` characters of 
+ * the strings `a` and `b` and succeeds if the substrings are identical.
+ * Example: OK_STRNCMP(file, "tmp", 3, "File name has \"tmp\" prefix");
+ *
+ * OK_SUCCESS(func, desc, ...) - Used for functions that return 0 for success 
+ * and non-zero for failure. Expects the function to succeed (return zero).
+ * Example: OK_SUCCESS(rmdir(tempdir), "Delete temporary directory");
+ *
+ * OK_TRUE(val, desc, ...) - Expects the boolean value `val` to be true. This 
+ * macro can also be used for comparisons or expressions not covered by other 
+ * macros, like checking if a value is larger or smaller than another.
+ * Examples: OK_TRUE(file_exists(file), "File %s was created", file);
+ *           OK_TRUE(errcount < 10, "Error count %d is below 10", errcount);
+ */
+
+#define OK_EQUAL(a, b, desc, ...)  ok(!((a) == (b)), (desc), ##__VA_ARGS__)
+#define OK_ERROR(msg, ...)  ok(1, (msg), ##__VA_ARGS__)
+#define OK_FAILURE(func, desc, ...)  ok(!(func), (desc), ##__VA_ARGS__)
+#define OK_FALSE(val, desc, ...)  ok(!!(val), (desc), ##__VA_ARGS__)
+#define OK_NOTEQUAL(a, b, desc, ...)  ok(!((a) != (b)), (desc), ##__VA_ARGS__)
+#define OK_NOTNULL(p, desc, ...)  ok(!(p), (desc), ##__VA_ARGS__)
+#define OK_NULL(p, desc, ...)  ok(!!(p), (desc), ##__VA_ARGS__)
+#define OK_STRCMP(a, b, desc, ...)  ok(!!strcmp((a), (b)), (desc), ##__VA_ARGS__)
+#define OK_STRNCMP(a, b, len, desc, ...)  ok(!!strncmp((a), (b), (len)), (desc), ##__VA_ARGS__)
+#define OK_SUCCESS(func, desc, ...)  ok(!!(func), (desc), ##__VA_ARGS__)
+#define OK_TRUE(val, desc, ...)  ok(!(val), (desc), ##__VA_ARGS__)
+
 #define failed_ok(a)  do { \
 	if (errno) \
-		ok(1, "%s():%d: %s failed: %s", \
-		      __func__, __LINE__, (a), std_strerror(errno)); \
+		OK_ERROR("%s():%d: %s failed: %s", \
+		         __func__, __LINE__, (a), std_strerror(errno)); \
 	else \
-		ok(1, "%s():%d: %s failed", __func__, __LINE__, (a)); \
+		OK_ERROR("%s():%d: %s failed", __func__, __LINE__, (a)); \
 	errno = 0; \
 } while (0)
 
@@ -283,7 +374,7 @@ static int valgrind_lines(const char *s)
 	const char *p = s;
 
 	if (!s)
-		return ok(1, "%s(): s == NULL", __func__); /* gncov */
+		return OK_ERROR("%s(): s == NULL", __func__); /* gncov */
 
 	while (*p) {
 		p = strstr(p, "\n==");
@@ -349,7 +440,7 @@ static void test_command(const char identical, char *cmd[],
 	assert(cmd);
 	assert(desc);
 	if (!cmd) {
-		ok(1, "%s(): cmd is NULL", __func__); /* gncov */
+		OK_ERROR("%s(): cmd is NULL", __func__); /* gncov */
 		return; /* gncov */
 	}
 
@@ -372,18 +463,18 @@ static void test_command(const char identical, char *cmd[],
 	streams_init(&ss);
 	streams_exec(&o, &ss, cmd);
 	if (e_stdout) {
-		ok(tc_cmp(identical, ss.out.buf, e_stdout),
-		   "%s (stdout)", descbuf);
+		OK_FALSE(tc_cmp(identical, ss.out.buf, e_stdout),
+		         "%s (stdout)", descbuf);
 		if (tc_cmp(identical, ss.out.buf, e_stdout))
 			print_gotexp(ss.out.buf, e_stdout); /* gncov */
 	}
 	if (e_stderr) {
-		ok(tc_cmp(identical, ss.err.buf, e_stderr),
-		   "%s (stderr)", descbuf);
+		OK_FALSE(tc_cmp(identical, ss.err.buf, e_stderr),
+		         "%s (stderr)", descbuf);
 		if (tc_cmp(identical, ss.err.buf, e_stderr))
 			print_gotexp(ss.err.buf, e_stderr); /* gncov */
 	}
-	ok(!(ss.ret == exp_retval), "%s (retval)", descbuf);
+	OK_EQUAL(ss.ret, exp_retval, "%s (retval)", descbuf);
 	free(descbuf);
 	free(e_stderr);
 	free(e_stdout);
@@ -398,7 +489,7 @@ static void test_command(const char identical, char *cmd[],
 		free(g); /* gncov */
 	}
 	if (valgrind_lines(ss.err.buf))
-		ok(1, "Found valgrind output"); /* gncov */
+		OK_ERROR("Found valgrind output"); /* gncov */
 	streams_free(&ss);
 }
 
@@ -486,6 +577,27 @@ out:
                              /*** selftest.c ***/
 
 /*
+ * test_ok_macros() - Tests the OK_*() macros. Returns nothing.
+ */
+
+static void test_ok_macros(void)
+{
+	diag("Test the OK_*() macros");
+
+	OK_EQUAL(3.14, 3.14, "OK_EQUAL(%.2f, %.2f, ...)", 3.14, 3.14);
+	/* OK_ERROR("OK_ERROR(...), can't be tested"); */
+	OK_FAILURE(1, "OK_FAILURE(1, ...)");
+	OK_FALSE(5 == 9, "OK_FALSE(5 == 9, ...)");
+	OK_NOTEQUAL(19716, 1916, "OK_NOTEQUAL(%u, %u, ...)", 19716, 1916);
+	OK_NOTNULL(strstr("abcdef", "cde"), "OK_NOTNULL(strstr(\"abcdef\", \"cde\"), ...)");
+	OK_NULL(strstr("abcdef", "notfound"), "OK_NULL(strstr(\"abcdef\", \"notfound\"), ...)");
+	OK_STRCMP("str", "str", "OK_STRCMP(\"%s\", \"%s\", ...)", "str", "str");
+	OK_STRNCMP("abcde", "abcyz", 3, "OK_STRNCMP(\"abcde\", \"abcyz\", 3, ...)");
+	OK_SUCCESS(0, "OK_SUCCESS(0, ...)");
+	OK_TRUE(9 > -4, "OK_TRUE(%d > %d, ...)", 9, -4);
+}
+
+/*
  * test_diag_big() - Tests diag_output() with a string larger than BUFSIZ. 
  * Returns nothing.
  */
@@ -508,9 +620,9 @@ static void test_diag_big(void)
 	p[size] = '\0';
 
 	outp = diag_output("%s", p);
-	ok(!outp, "diag_big: diag_output() returns ok");
-	ok(!(strlen(outp) == size + 2), "diag_big: String length is correct");
-	ok(!!strncmp(outp, "# aaabcaaa", 10), "diag_big: Beginning is ok");
+	OK_NOTNULL(outp, "diag_big: diag_output() returns ok");
+	OK_EQUAL(strlen(outp), size + 2, "diag_big: String length is correct");
+	OK_STRNCMP(outp, "# aaabcaaa", 10, "diag_big: Beginning is ok");
 	free(outp);
 	free(p);
 }
@@ -522,31 +634,44 @@ static void test_diag_big(void)
 
 static void test_diag(void) {
 	char *p, *s;
+	const char *desc;
 
 	diag("Test diag()");
 
-	ok(!diag(NULL), "diag(NULL)");
-	ok(!(diag_output(NULL) == NULL), "diag_output() receives NULL");
+	OK_EQUAL(diag(NULL), 1, "diag(NULL)");
+	OK_NULL(diag_output(NULL), "diag_output() receives NULL");
 
 	p = diag_output("Text with\nnewline");
-	ok(!p, "diag_output() with newline didn't return NULL");
+	OK_NOTNULL(p, "diag_output() with newline didn't return NULL");
 	s = "# Text with\n# newline";
-	ok(p ? !!strcmp(p, s) : 1, "diag_output() with newline, output is ok");
+	desc = "diag_output() with newline, output is ok";
+	if (p)
+		OK_STRCMP(p, s, desc);
+	else
+		OK_ERROR(desc); /* gncov */
 	print_gotexp(p, s);
 	free(p);
 
 	p = diag_output("\n\n\n\n\n\n\n\n\n\n");
-	ok(!p, "diag_output() with only newlines didn't return NULL");
+	OK_NOTNULL(p, "diag_output() with only newlines didn't return NULL");
 	s = "# \n# \n# \n# \n# \n# \n# \n# \n# \n# \n# ";
-	ok(p ? !!strcmp(p, s) : 1, "diag_output() with only newlines");
+	desc = "diag_output() with only newlines";
+	if (p)
+		OK_STRCMP(p, s, desc);
+	else
+		OK_ERROR(desc); /* gncov */
 	print_gotexp(p, s);
 	free(p);
 
 	p = diag_output("%d = %s, %d = %s, %d = %s",
 	                1, "one", 2, "two", 3, "three");
-	ok(!p, "diag_output() with %%d and %%s didn't return NULL");
+	OK_NOTNULL(p, "diag_output() with %%d and %%s didn't return NULL");
 	s = "# 1 = one, 2 = two, 3 = three";
-	ok(p ? !!strcmp(p, s) : 1, "diag_output() with %%d and %%s");
+	desc = "diag_output() with %%d and %%s";
+	if (p)
+		OK_STRCMP(p, s, desc);
+	else
+		OK_ERROR(desc); /* gncov */
 	print_gotexp(p, s);
 	free(p);
 
@@ -584,8 +709,8 @@ static void chk_go(const char *got, const char *exp,
 		free(s); /* gncov */
 		return; /* gncov */
 	}
-	ok(!!strcmp(s, exp_str), "gotexp_output(\"%s\", \"%s\")",
-	                         no_null(got), no_null(exp));
+	OK_STRCMP(s, exp_str, "gotexp_output(\"%s\", \"%s\")",
+	                      no_null(got), no_null(exp));
 	if (strcmp(s, exp_str))
 		diag("Got:\n%s\nExpected:\n%s", s, exp_str); /* gncov */
 	free(exp_str);
@@ -651,15 +776,15 @@ static void test_valgrind_lines(void)
 
 	i = 0;
 	while (has[i]) {
-		ok(!valgrind_lines(has[i]),
-		   "valgrind_lines(): Has valgrind marker, string %d", i);
+		OK_TRUE(valgrind_lines(has[i]),
+		        "valgrind_lines(): Has valgrind marker, string %d", i);
 		i++;
 	}
 
 	i = 0;
 	while (hasnot[i]) {
-		ok(valgrind_lines(hasnot[i]),
-		   "valgrind_lines(): No valgrind marker, string %d", i);
+		OK_FALSE(valgrind_lines(hasnot[i]),
+		         "valgrind_lines(): No valgrind marker, string %d", i);
 		i++;
 	}
 }
@@ -677,7 +802,7 @@ static void chk_cu(const char *s, const char *sep, unsigned long count,
 	assert(sep);
 	assert(desc);
 
-	ok(!(count_uuids(s, sep) == count), "%s", desc);
+	OK_EQUAL(count_uuids(s, sep), count, "%s", desc);
 }
 
 /*
@@ -714,8 +839,8 @@ static void test_count_uuids(void)
 static void test_std_strerror(void)
 {
 	diag("Test std_strerror()");
-	ok(!!strcmp(std_strerror(EACCES), "Permission denied"),
-	   "std_strerror(EACCES) is as expected");
+	OK_STRCMP(std_strerror(EACCES), "Permission denied",
+	          "std_strerror(EACCES) is as expected");
 }
 
                               /*** logfile.c ***/
@@ -747,7 +872,7 @@ static void chk_csx(const struct Sess *sess, const char *exp,
 		failed_ok("create_sess_xml()"); /* gncov */
 		return; /* gncov */
 	}
-	ok(!!strcmp(result, exp), "create_sess_xml(): %s", desc);
+	OK_STRCMP(result, exp, "create_sess_xml(): %s", desc);
 	print_gotexp(result, exp);
 	free(result);
 }
@@ -804,12 +929,12 @@ static void chk_hk(const char *line, const char *keyword, const char *exp)
 
 	result = has_key(line, keyword);
 	if (!result || !exp) {
-		ok(!(result == exp), "has_key(\"%s\", \"%s\") (NULL check)",
-		   line, keyword);
+		OK_EQUAL(result, exp, "has_key(\"%s\", \"%s\") (NULL check)",
+		                      line, keyword);
 		print_gotexp(result, exp);
 		return;
 	}
-	ok(!!strcmp(result, exp), "has_key(\"%s\", \"%s\")", line, keyword);
+	OK_STRCMP(result, exp, "has_key(\"%s\", \"%s\")", line, keyword);
 	print_gotexp(result, exp);
 }
 
@@ -850,14 +975,14 @@ static void test_mystrdup(void)
 	char *s;
 
 	diag("Test mystrdup()");
-	ok(!(mystrdup(NULL) == NULL), "mystrdup(NULL) == NULL");
+	OK_NULL(mystrdup(NULL), "mystrdup(NULL) == NULL");
 
 	s = mystrdup(txt);
 	if (!s) {
 		failed_ok("mystrdup()"); /* gncov */
 		return; /* gncov */
 	}
-	ok(!!strcmp(s, txt), "mystrdup(): Strings are identical");
+	OK_STRCMP(s, txt, "mystrdup(): Strings are identical");
 	free(s);
 }
 
@@ -885,7 +1010,7 @@ static void test_allocstr(void)
 		goto cleanup; /* gncov */
 	}
 	alen = strlen(p2);
-	ok(!(alen == BUFSIZ * 2), "allocstr(): strlen is correct");
+	OK_EQUAL(alen, BUFSIZ * 2, "allocstr(): strlen is correct");
 	p3 = p2;
 	while (*p3) {
 		if (*p3 != 'a') {
@@ -894,7 +1019,7 @@ static void test_allocstr(void)
 		}
 		p3++;
 	}
-	ok(!(p3 != NULL), "allocstr(): Content of string is correct");
+	OK_NOTNULL(p3, "allocstr(): Content of string is correct");
 
 cleanup:
 	free(p2);
@@ -913,7 +1038,7 @@ static void chk_cs(const char *s, const char *substr, const size_t count,
 	size_t result;
 
 	result = count_substr(s, substr);
-	ok(!(result == count), "count_substr(): %s", desc);
+	OK_EQUAL(result, count, "count_substr(): %s", desc);
 	if (result != count) {
 		char *s_result = allocstr("%zu", result), /* gncov */
 		     *s_count = allocstr("%zu", count); /* gncov */
@@ -985,9 +1110,9 @@ static void chk_sr(const char *s, const char *s1, const char *s2,
 
 	result = str_replace(s, s1, s2);
 	if (!result || !exp) {
-		ok(!(result == exp), "str_replace(): %s", desc);
+		OK_EQUAL(result, exp, "str_replace(): %s", desc);
 	} else {
-		ok(!!strcmp(result, exp), "str_replace(): %s", desc);
+		OK_STRCMP(result, exp, "str_replace(): %s", desc);
 		print_gotexp(result, exp);
 	}
 	free(result);
@@ -1060,9 +1185,9 @@ static void test_string_to_lower(void)
 	char s1[] = "ABCÅÆØ";
 
 	diag("Test string_to_lower()");
-	ok(!(string_to_lower(NULL) == NULL), "string_to_lower(NULL)");
-	ok(!!strcmp(string_to_lower(s1), "abcÅÆØ"),
-	   "string_to_lower(\"ABCÅÆØ\")");
+	OK_NULL(string_to_lower(NULL), "string_to_lower(NULL)");
+	OK_STRCMP(string_to_lower(s1), "abcÅÆØ",
+	          "string_to_lower(\"ABCÅÆØ\")");
 }
 
                                /*** uuid.c ***/
@@ -1079,8 +1204,9 @@ static void chk_vu(const char *uuid, const bool check_len,
 
 	assert(uuid);
 	res = valid_uuid(uuid, check_len);
-	ok(!(res == exp_valid), "valid_uuid(\"%s\", %s) should return %s",
-	   uuid, check_len ? "true" : "false", exp_valid ? "true" : "false");
+	OK_EQUAL(res, exp_valid, "valid_uuid(\"%s\", %s) should return %s",
+	                         uuid, check_len ? "true" : "false",
+	                         exp_valid ? "true" : "false");
 }
 
 /*
@@ -1107,8 +1233,8 @@ static void chk_ivd(const char *date, const bool check_len, const int exp)
 
 	assert(date);
 	res = is_valid_date(date, check_len);
-	ok(!(res == exp), "is_valid_date(\"%s\", %s), expecting %d",
-	                  date, check_len ? "true" : "false", res);
+	OK_EQUAL(res, exp, "is_valid_date(\"%s\", %s), expecting %d",
+	                   date, check_len ? "true" : "false", res);
 }
 
 /*
@@ -1144,11 +1270,11 @@ static void chk_ud(const char *uuid, const int exp_ret, const char *exp_date)
 	assert(exp_date);
 
 	ret = !!uuid_date(buf, uuid);
-	ok(!(ret == exp_ret), "uuid_date(): \"%s\" is%s a valid v1 UUID",
-	                      uuid, exp_ret ? "" : " not");
+	OK_EQUAL(ret, exp_ret, "uuid_date(): \"%s\" is%s a valid v1 UUID",
+	                       uuid, exp_ret ? "" : " not");
 	if (!ret)
 		return;
-	ok(!!strcmp(buf, exp_date), "uuid_date(\"%s\")", uuid);
+	OK_STRCMP(buf, exp_date, "uuid_date(\"%s\")", uuid);
 	print_gotexp(buf, exp_date);
 }
 
@@ -1193,11 +1319,11 @@ static void test_valgrind_option(const struct Options *o)
 		streams_exec(&mod_opt, &ss, chp{ "valgrind", /* gncov */
 		                                 "--version", NULL });
 		if (!strstr(ss.out.buf, "valgrind-")) { /* gncov */
-			ok(1, "Valgrind is not installed," /* gncov */
-			      " disabling Valgrind checks");
+			OK_ERROR("Valgrind is not installed," /* gncov */
+			         " disabling Valgrind checks");
 			set_opt_valgrind(false); /* gncov */
 		} else {
-			ok(0, "Valgrind is installed"); /* gncov */
+			OK_SUCCESS(0, "Valgrind is installed"); /* gncov */
 		}
 		streams_free(&ss); /* gncov */
 	}
@@ -1400,6 +1526,7 @@ int opt_selftest(char *main_execname, const struct Options *o)
 	diag("Running tests for %s %s (%s)",
 	     execname, EXEC_VERSION, EXEC_DATE);
 
+	test_ok_macros();
 	test_functions(o);
 	test_executable(o);
 
@@ -1414,6 +1541,17 @@ int opt_selftest(char *main_execname, const struct Options *o)
 }
 
 #undef EXECSTR
+#undef OK_EQUAL
+#undef OK_ERROR
+#undef OK_FAILURE
+#undef OK_FALSE
+#undef OK_NOTEQUAL
+#undef OK_NOTNULL
+#undef OK_NULL
+#undef OK_STRCMP
+#undef OK_STRNCMP
+#undef OK_SUCCESS
+#undef OK_TRUE
 #undef OPTION_ERROR_STR
 #undef chp
 #undef failed_ok
