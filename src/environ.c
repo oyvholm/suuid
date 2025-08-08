@@ -55,8 +55,13 @@ bool valid_hostname(const char *s)
 
 	assert(s);
 
-	if (!*s || strlen(s) > MAX_HOSTNAME_LENGTH
-	    || strstr(s, "..") || utf8_check(s))
+	if (!*s)
+		return false;
+	if (strlen(s) > MAX_HOSTNAME_LENGTH)
+		return false;
+	if (strstr(s, ".."))
+		return false;
+	if (utf8_check(s))
 		return false;
 
 	p = (const unsigned char *)s;
@@ -70,8 +75,11 @@ bool valid_hostname(const char *s)
 		 * it be allowed here? In the end it ends up as a file name 
 		 * anyway.
 		 */
-		if (strchr("!\"#$%&'()*+,/:;<=>?@[\\]^`{|}~", *p)
-		    || *p < '!' || *p >= '\x7f')
+		if (strchr("!\"#$%&'()*+,/:;<=>?@[\\]^`{|}~", *p))
+			return false;
+		if (*p < '!')
+			return false;
+		if (*p >= '\x7f')
 			return false;
 		p++;
 	}
