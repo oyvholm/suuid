@@ -418,7 +418,7 @@ char *xml_entry(const struct Entry *entry, const bool raw)
 	init_xml_entry(&e);
 
 	if (!valid_uuid(entry->uuid, true))
-		return NULL;
+		return NULL; /* gncov */
 
 	/*
 	 * Allocate space for the UUID and timestamp attributes.
@@ -762,7 +762,7 @@ int add_to_logfile(FILE *fp, const struct Entry *entry, const bool raw)
 
 	ap = xml_entry(entry, raw);
 	if (!ap)
-		return 1;
+		return 1; /* gncov */
 	if (fputs(ap, fp) < 0)
 		retval = 1; /* gncov */
 	if (fputc('\n', fp) == EOF)

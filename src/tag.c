@@ -67,7 +67,7 @@ char *get_next_tag(const struct Entry *entry)
 	if (tag_list_ind < MAX_TAGS)
 		return entry->tag[tag_list_ind++];
 	else
-		return NULL;
+		return NULL; /* gncov */
 }
 
 /*

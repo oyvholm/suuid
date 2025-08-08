@@ -189,8 +189,8 @@ char *squeeze_chars(char *s, const char *chars)
 
 	buf = mystrdup(s);
 	if (!buf) {
-		failed("mystrdup()"); /* gncov */
-		return NULL; /* gncov */
+		failed("mystrdup()");
+		return NULL;
 	}
 	memset(buf, 0, strlen(s));
 

@@ -70,8 +70,8 @@ char *get_desc_from_command(const char *cmd)
 		return NULL;
 	ap = mystrdup(cmd);
 	if (!ap) {
-		failed("mystrdup()"); /* gncov */
-		return NULL; /* gncov */
+		failed("mystrdup()");
+		return NULL;
 	}
 	p = ap;
 	while (strchr("./", *p))
@@ -239,8 +239,8 @@ char *concat_cmd_string(const int argc, char * const argv[])
 	cmdsize += 1; /* Terminating '\0' */
 	cmd = malloc(cmdsize);
 	if (!cmd) {
-		failed("malloc()"); /* gncov */
-		return NULL; /* gncov */
+		failed("malloc()");
+		return NULL;
 	}
 	memset(cmd, 0, cmdsize);
 
@@ -307,18 +307,18 @@ const char *add_to_sessvar(const char *desc, const char *uuid)
 
 		ap = mystrdup(getenv(ENV_SESS));
 		if (!ap) {
-			failed("mystrdup()"); /* gncov */
-			return NULL; /* gncov */
+			failed("mystrdup()");
+			return NULL;
 		}
 		clean_up_sessvar(ap);
 		sessvar = mystrdup(ap);
 		if (!sessvar)
-			failed("mystrdup()"); /* gncov */
+			failed("mystrdup()");
 		free(ap);
 	} else {
 		sessvar = mystrdup("");
 		if (!sessvar)
-			failed("mystrdup()"); /* gncov */
+			failed("mystrdup()");
 	}
 	if (!sessvar)
 		return NULL;
@@ -327,9 +327,9 @@ const char *add_to_sessvar(const char *desc, const char *uuid)
 	         + strlen(desc) + 1 + UUID_LENGTH + 1 + 1;
 	envbuf = malloc(envlen);
 	if (!envbuf) {
-		failed("malloc()"); /* gncov */
-		free(sessvar); /* gncov */
-		return NULL; /* gncov */
+		failed("malloc()");
+		free(sessvar);
+		return NULL;
 	}
 
 	snprintf(envbuf, envlen,
@@ -389,9 +389,9 @@ int run_session(const struct Options *orig_opt,
 	}
 	start_uuid = mystrdup(result.lastuuid);
 	if (!start_uuid) {
-		failed("mystrdup()"); /* gncov */
-		retval = -1; /* gncov */
-		goto cleanup; /* gncov */
+		failed("mystrdup()");
+		retval = -1;
+		goto cleanup;
 	}
 	assert(valid_uuid(start_uuid, true));
 	msg(3, "old %s: \"%s\"", ENV_SESS, getenv(ENV_SESS));

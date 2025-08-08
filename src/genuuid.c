@@ -207,8 +207,8 @@ char *process_uuid(struct Logs *logs,
 			scramble_mac_address(entry->uuid + 24);
 	}
 	if (!valid_uuid(entry->uuid, true)) {
-		myerror("UUID generation failed");
-		return NULL;
+		myerror("UUID generation failed"); /* gncov */
+		return NULL; /* gncov */
 	}
 
 	/*
@@ -217,10 +217,10 @@ char *process_uuid(struct Logs *logs,
 	 */
 
 	if (!uuid_date(entry->date, entry->uuid))
-		return NULL;
+		return NULL; /* gncov */
 
 	if (add_to_logfile(logs->logfp, entry, opts->raw))
-		return NULL;
+		return NULL; /* gncov */
 
 	/*
 	 * Write the UUID to stdout and/or stderr, or not, depending on the 
@@ -247,8 +247,9 @@ char *process_uuid(struct Logs *logs,
 		if (strchr(opts->whereto, 'a') || strchr(opts->whereto, 'e')) {
 			result = fprintf(stderr, "%s\n", entry->uuid);
 			if (result < 0 || (size_t)result != len) {
-				myerror("Cannot print UUID to stderr");
-				return NULL;
+				myerror("Cannot print UUID to" /* gncov */
+				        " stderr");
+				return NULL; /* gncov */
 			}
 		}
 	}
@@ -369,7 +370,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opts)
 		}
 		retval.count++;
 		if (should_terminate)
-			break;
+			break; /* gncov */
 	}
 	if (valid_uuid(entry.uuid, true))
 		memcpy(retval.lastuuid, entry.uuid, UUID_LENGTH + 1);
@@ -378,7 +379,7 @@ struct uuid_result create_and_log_uuids(const struct Options *opts)
 	 * Close up the shop and go home.
 	 */
 
-cleanup:
+cleanup: /* gncov */
 	if (logs.logfp && close_logfile(logs.logfp))
 		retval.success = false; /* gncov */
 

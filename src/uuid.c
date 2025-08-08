@@ -230,9 +230,9 @@ bool valid_macaddr(const char *macaddr)
 		return false;
 	}
 	if (sscanf(macaddr, "%2x", &first) != 1) {
-		myerror("%s(): sscanf() failed when scanning \"%s\"",
-		        __func__, macaddr);
-		return false;
+		myerror("%s(): sscanf() failed when scanning" /* gncov */
+		        " \"%s\"", __func__, macaddr);
+		return false; /* gncov */
 	}
 	if (!(first & 0x01)) {
 		myerror("MAC address doesn't follow RFC 4122, multicast bit"
@@ -381,7 +381,7 @@ char *uuid_date(char *dest, const char *uuid)
 	if (!valid_uuid(uuid, false))
 		return NULL;
 	if (uuid[14] != '1')
-		return NULL; /* Not a v1 UUID, has no timestamp */
+		return NULL; /* Not a v1 UUID, has no timestamp */ /* gncov */
 
 	memset(hexbuf, 0, 16);
 	strncat(hexbuf, uuid + 15, 3);
@@ -398,7 +398,7 @@ char *uuid_date(char *dest, const char *uuid)
 	p = dest + strlen(dest);
 	if (p - dest != 19) {
 		myerror("%td: Invalid date length, should be 19", /* gncov */
-		        (ptrdiff_t)(p - dest)); /* gncov */
+		        (ptrdiff_t)(p - dest));
 		return NULL; /* gncov */
 	}
 	snprintf(p, DATE_LENGTH - 19 + 1, ".%07lluZ", nano);
