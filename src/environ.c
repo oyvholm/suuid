@@ -173,6 +173,7 @@ char *get_log_prefix(const struct Rc *rc, const struct Options *opts,
 
 	assert(rc);
 	assert(opts);
+	assert(ext);
 
 	/*
 	 * Get full path to the log directory.
@@ -191,9 +192,6 @@ char *get_log_prefix(const struct Rc *rc, const struct Options *opts,
 	hostname = get_hostname(rc);
 	if (!hostname)
 		goto cleanup;
-
-	if (!ext)
-		ext = "";
 
 	/*
 	 * Build the full log file path with extension if provided and return 
