@@ -92,7 +92,6 @@ char *read_from_fp(FILE *fp, struct binbuf *dest)
 		size_t bytes_read;
 
 		if (!new_mem) {
-			failed("Stream buffer memory allocation"); /* gncov */
 			binbuf_free(&buf); /* gncov */
 			return NULL; /* gncov */
 		}
@@ -103,7 +102,6 @@ char *read_from_fp(FILE *fp, struct binbuf *dest)
 		buf.len += bytes_read;
 		p[bytes_read] = '\0';
 		if (ferror(fp)) {
-			failed("Read error, fread()"); /* gncov */
 			binbuf_free(&buf); /* gncov */
 			return NULL; /* gncov */
 		}
@@ -129,13 +127,11 @@ char *read_from_file(const char *fname)
 	assert(*fname);
 
 	fp = fopen(fname, "rb");
-	if (!fp) {
-		myerror("%s(): Could not open file for read", __func__);
+	if (!fp)
 		return NULL;
-	}
 	retval = read_from_fp(fp, NULL);
 	if (!retval)
-		return NULL;
+		retval = NULL; /* gncov */
 	fclose(fp);
 
 	return retval;
@@ -218,6 +214,7 @@ char *read_from_editor(const char *editor)
 
 	retval = read_from_file(tmpfile);
 	if (!retval) {
+		myerror("%s: Cannot read comment from file", tmpfile);
 		retval = NULL;
 		goto cleanup;
 	}
