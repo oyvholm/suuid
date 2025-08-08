@@ -21,6 +21,29 @@
 #include "suuid.h"
 
 /*
+ * file_exists() - Returns `true` if a filesystem entry (file, directory, 
+ * symlink, etc.) exists at path `s`, or `false` if it does not. Symlinks are 
+ * treated as ordinary entries, so if the symlink exists but is broken, the 
+ * function still returns `true`.
+ */
+
+bool file_exists(const char *s)
+{
+	struct stat st;
+
+	assert(s);
+	assert(*s);
+
+	if (lstat(s, &st)) {
+		if (errno == ENOENT)
+			errno = 0;
+		return false;
+	}
+
+	return true;
+}
+
+/*
  * streams_init() - Initialize a `struct streams` struct. Returns nothing.
  */
 
@@ -113,6 +136,40 @@ char *read_from_file(const char *fname)
 	retval = read_from_fp(fp, NULL);
 	if (!retval)
 		return NULL;
+	fclose(fp);
+
+	return retval;
+}
+
+/*
+ * create_file() - Create file `file` and write the string `txt` to it. If any 
+ * error occurred, NULL is returned. Otherwise, it returns `txt`. If `txt` is 
+ * NULL, an empty file is created and an empty string is returned.
+ */
+
+const char *create_file(const char *file, const char *txt)
+{
+	const char *retval = NULL;
+	FILE *fp = NULL;
+
+	assert(file);
+	assert(*file);
+
+	fp = fopen(file, "w");
+	if (!fp)
+		return NULL;
+	if (txt) {
+		int i;
+
+		i = fputs(txt, fp);
+		if (i == EOF)
+			goto out; /* gncov */
+		retval = txt;
+	} else {
+		retval = "";
+	}
+
+out:
 	fclose(fp);
 
 	return retval;

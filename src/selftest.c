@@ -1298,6 +1298,50 @@ static void test_uuid_date(void)
 }
 
 /******************************************************************************
+                   Function tests, use a temporary directory
+******************************************************************************/
+
+                                /*** io.c ***/
+
+/*
+ * test_create_file() - Tests the create_file() function. Returns nothing.
+ */
+
+static void test_create_file(void)
+{
+	const char *desc, *file, *res;
+	struct stat sb;
+
+	diag("Test create_file()");
+
+	OK_TRUE(file_exists(TMPDIR), "%s exists", TMPDIR);
+	OK_NULL(create_file(TMPDIR, NULL),
+	        "create_file(%s), but it's already a directory", TMPDIR);
+	OK_EQUAL(errno, EISDIR, "errno is EISDIR");
+	if (errno != EISDIR)  {
+		diag("test %d: errno = %d (%s)", /* gncov */
+		     testnum, errno, strerror(errno)); /* gncov */
+	}
+	errno = 0;
+
+	desc = "create_file() with NULL creates empty file";
+	file = TMPDIR "/emptyfile";
+	OK_NOTNULL(res = create_file(file, NULL), "%s (exec)", desc);
+	if (!res) {
+		diag("test %d: errno = %d (%s)", /* gncov */
+		     testnum, errno, strerror(errno)); /* gncov */
+		errno = 0; /* gncov */
+	}
+	OK_STRCMP(res, "", "%s (retval)", desc);
+	if (stat(file, &sb)) {
+		failed_ok("stat()"); /* gncov */
+		return; /* gncov */
+	}
+	OK_EQUAL(sb.st_size, 0, "%s is empty", file);
+	OK_SUCCESS(remove(file), "Delete %s", file);
+}
+
+/******************************************************************************
             Test the executable file, no temporary directory needed
 ******************************************************************************/
 
@@ -1470,6 +1514,9 @@ static void functests_with_tempdir(void)
 		errno = 0; /* gncov */
 		return; /* gncov */
 	}
+
+	/* io.c */
+	test_create_file();
 
 	result = rmdir(TMPDIR);
 	OK_SUCCESS(result, "rmdir " TMPDIR " after function tests");

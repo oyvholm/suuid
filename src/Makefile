@@ -226,6 +226,7 @@ clean:
 	rm -f gmon.out gmon.sum
 	rm -f version.h
 	rm -fr $(TESTLOCKDIR)
+	rm -fr .suuid-test.tmp
 	cd t && $(MAKE) $@
 
 .PHONY: dupdesc
