@@ -190,6 +190,12 @@
 #define verify_output_files(desc, exp_stdout, exp_stderr)  \
         verify_output_files_func(__LINE__, desc, exp_stdout, exp_stderr)
 
+/* Used in chk_unique_macs() */
+enum cum_mode {
+	CHECK_UNIQUE,
+	CHECK_EQUAL
+};
+
 /* Used in chk_rr_im() to specify which stderr output is expected. */
 enum rr_msgs {
 	RR_ILLEGAL_CHARS,
@@ -3999,6 +4005,184 @@ cleanup:
 	cleanup_tempdir(__LINE__);
 }
 
+                           /*** -m/--random-mac ***/
+
+/*
+ * chk_unique_macs() - Check that all `num` newline-separated UUID strings in 
+ * the string `s` have unique or identical MAC addresses.
+ *
+ * `mode`:
+ * - CHECK_UNIQUE: Check that all MAC addresses are unique.
+ * - CHECK_EQUAL: Check that all MAC addresses are identical.
+ *
+ * Returns:
+ * - 0 if the condition is met
+ * - 1 if the condition is not met
+ * - -1 on error (`s` is NULL)
+ */
+
+int chk_unique_macs(const char *s, unsigned int num, enum cum_mode mode)
+{
+	char macs[num][13];
+	unsigned int count = 0;
+	const char *line_start = s;
+
+	assert(s);
+
+	if (!s)
+		return -1; /* gncov */
+
+	if (!num)
+		return 0; /* gncov */
+
+	while (*line_start && count < num) {
+		const char *line_end = strchr(line_start, '\n');
+		size_t line_len = line_end ? (size_t)(line_end - line_start)
+		                           : strlen(line_start);
+
+		/* Extract last 12 characters as MAC string */
+		const char *mac_start = line_start + line_len - 12;
+
+		/* Copy MAC substring */
+		memcpy(macs[count], mac_start, 12);
+		macs[count][12] = '\0';
+
+		if (mode == CHECK_UNIQUE) {
+			unsigned int i;
+
+			/* Check for duplicates among previous MACs */
+			for (i = 0; i < count; i++) {
+				if (strcmp(macs[count], macs[i]) == 0) {
+					/* Duplicate found */
+					return 1; /* gncov */
+				}
+			}
+		} else {
+			/* Check if current MAC differs from first MAC */
+			if (count > 0 /* gncov */
+			    && strcmp(macs[count], macs[0]) != 0) { /* gncov */
+				/* Difference found */
+				return 1; /* gncov */
+			}
+		}
+
+		count++;
+		if (!line_end)
+			break; /* gncov */
+		line_start = line_end + 1;
+	}
+
+	return 0;
+}
+
+/*
+ * test_unique_macs() - Verifies that -m/--random-mac creates unique MAC 
+ * addresses. Returns nothing.
+ */
+
+static void test_unique_macs(void)
+{
+	struct streams ss;
+	struct Options opt = opt_struct();
+	unsigned int num = 100;
+	char *num_s;
+
+	num_s = allocstr("%u", num);
+	if (!num_s) {
+		failed_ok("allocstr()"); /* gncov */
+		return; /* gncov */
+	}
+
+	streams_init(&ss);
+	streams_exec(&opt, &ss, chp{ execname, "-m", "-n", num_s, NULL });
+
+	if (opt.verbose >= 1) {
+		diag("ss.out.buf = \"%s\"", no_null(ss.out.buf)); /* gncov */
+		diag("ss.err.buf = \"%s\"", no_null(ss.err.buf)); /* gncov */
+		diag("ss.ret = \"%d\"", ss.ret); /* gncov */
+	}
+
+	OK_SUCCESS(chk_unique_macs(ss.out.buf, num, CHECK_UNIQUE),
+	           "-m -n %u, all MAC addresses are unique", num);
+
+	streams_free(&ss);
+	free(num_s);
+}
+
+/*
+ * test_random_mac_option() - Tests the -m/--random-mac option. Returns 
+ * nothing.
+ */
+
+static void test_random_mac_option(void)
+{
+	struct Entry entry;
+	int result;
+	struct Rc rc;
+	char *s = NULL;
+
+	diag("Test -m/--random-mac");
+
+	if (init_tempdir())
+		return; /* gncov */
+	init_xml_entry(&entry);
+
+	init_rc(&rc);
+	rc.hostname = HNAME;
+	rc.macaddr = "897feb323faa";
+
+	OK_SUCCESS(result = create_rcfile(rcfile, &rc),
+	           "%s():%d: Create rcfile", __func__, __LINE__);
+	if (result) {
+		diag("%s(): Cannot create rcfile \"%s\", skipping" /* gncov */
+		     " tests: %s",
+		     __func__, rcfile, strerror(errno)); /* gncov */
+		errno = 0; /* gncov */
+		return; /* gncov */
+	}
+
+	uc((chp{ execname, NULL }), 1, 0, "Use macaddr from the rc file");
+	s = read_from_file(logfile);
+	if (!s) {
+		failed_ok("read_from_file()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	OK_NOTNULL(strstr(s, rc.macaddr), "rc.macaddr exists in the log file");
+	free(s);
+	s = NULL;
+	delete_logfile();
+
+	uc((chp{ execname, "-m", NULL }), 1, 0, "Use \"-m\"");
+	s = read_from_file(logfile);
+	if (!s) {
+		failed_ok("read_from_file()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	OK_NULL(strstr(s, rc.macaddr),
+	        "rc.macaddr doesn't exist in the log file after -m");
+	free(s);
+	s = NULL;
+	delete_logfile();
+
+	uc((chp{ execname, "--random-mac", NULL }), 1, 0,
+	   "Use \"--random-mac\"");
+	s = read_from_file(logfile);
+	if (!s) {
+		failed_ok("read_from_file()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	OK_NULL(strstr(s, rc.macaddr),
+	        "rc.macaddr doesn't exist in the log file after --random-mac");
+	free(s);
+	s = NULL;
+
+	test_unique_macs();
+
+cleanup:
+	free(s);
+	cleanup_tempdir(__LINE__);
+}
+
 /******************************************************************************
                         Top-level --selftest functions
 ******************************************************************************/
@@ -4076,6 +4260,7 @@ static void tests_with_tempdir(void)
 	test_nonexisting_editor();
 	test_count_option();
 	test_logdir_option();
+	test_random_mac_option();
 
 	OK_SUCCESS(rmdir(TMPDIR), "Delete temporary directory %s", TMPDIR);
 }
