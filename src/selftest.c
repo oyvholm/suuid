@@ -3899,6 +3899,13 @@ static void test_count_option(void)
 	   EXIT_FAILURE,
 	   "-n with invalid argument");
 
+	tc((chp{ execname, "--count", "", NULL }),
+	   "",
+	   EXECSTR ": Error in -n/--count argument\n"
+	   OPTION_ERROR_STR,
+	   EXIT_FAILURE,
+	   "--count with empty argument");
+
 	cleanup_tempdir(__LINE__);
 }
 

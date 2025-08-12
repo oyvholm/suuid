@@ -385,7 +385,7 @@ static int choose_opt_action(struct Options *dest,
 		dest->random_mac = true;
 		break;
 	case 'n':
-		if (!sscanf(optarg, "%lu", &dest->count)) {
+		if (!*optarg || !sscanf(optarg, "%lu", &dest->count)) {
 			myerror("Error in -n/--count argument");
 			return 1;
 		}
