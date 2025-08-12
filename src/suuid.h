@@ -33,6 +33,7 @@
 #include <getopt.h>
 #include <limits.h>
 #include <pwd.h>
+#include <regex.h>
 #include <signal.h>
 #include <stdarg.h>
 #include <stdbool.h>

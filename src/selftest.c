@@ -159,6 +159,15 @@
 	errno = 0; \
 } while (0)
 
+/* 2025-04-26T21:02:32.1107790Z */
+#define R_TIMESTAMP  "2[0-9]{3}-[01][0-9]-[0-3][0-9]" \
+                     "T" \
+                     "[0-2][0-9]:[0-5][0-9]:[0-6][0-9]\\.[0-9]{7}" \
+                     "Z"
+
+/* c5450b4e-22e1-11f0-bffd-83850402c3ce */
+#define R_UUID  "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+
 #define HNAME  "hname"
 #define TMPDIR  ".suuid-test.tmp"
 
@@ -172,6 +181,9 @@
         tc_func(__LINE__, (cmd), (num_stdout), (num_stderr), \
                 (desc), ##__VA_ARGS__);
 #define unset_env(a)  unset_env_func(__LINE__, (a))
+#define verify_logfile(entry, uuid_count, desc, ...)  \
+        verify_logfile_func(__LINE__, (entry), (uuid_count), \
+                            (desc), ##__VA_ARGS__);
 #define verify_output_files(desc, exp_stdout, exp_stderr)  \
         verify_output_files_func(__LINE__, desc, exp_stdout, exp_stderr)
 
@@ -908,6 +920,227 @@ static int delete_logfile_func(const int linenum)
 	}
 
 	return !!result;
+}
+
+/*
+ * generate_tags_regexp() - Used by generate_line_regexp(). Returns an 
+ * allocated string with all non-NULL `tag` elements in `entry` up to the first 
+ * NULL element. Each element is surrounded with "<tag>" and "</tag>", and all 
+ * "<tag>...</tag>" are surrounded by 1 space (" ") except the last one. 
+ * Returns NULL if any error occurs.
+ */
+
+static char *generate_tags_regexp(const struct Entry *entry)
+{
+	unsigned int ui, tag_count = 0;
+	size_t tag_lengths = 0, elem_len = strlen(" <tag></tag>"), bufsize;
+	char *buf;
+
+	assert(entry);
+
+	if (!entry->tag[0])
+		return mystrdup("");
+
+	for (ui = 0; entry->tag[ui]; ui++) {
+		tag_count++;
+		tag_lengths += strlen(entry->tag[ui]);
+	}
+	bufsize = tag_count * elem_len + tag_lengths + 1;
+	buf = malloc(bufsize);
+	if (!buf)
+		return NULL; /* gncov */
+	memset(buf, 0, bufsize);
+
+	for (ui = 0; ui < tag_count; ui++) {
+		strcat(buf, " <tag>");
+		strcat(buf, entry->tag[ui]);
+		strcat(buf, "</tag>");
+	}
+
+	return buf;
+}
+
+/*
+ * generate_line_regexp() - Returns a pointer to an allocated string with a 
+ * `<suuid>...</suuid>` regexp generated from the data in `entry`. `count` is 
+ * the expected number of lines and is used as a repetition count at the end of 
+ * the regexp. Returns NULL if anything fails.
+ */
+
+static char *generate_line_regexp(const struct Entry *entry,
+                                  const unsigned int count)
+{
+	char *tag_str = NULL, *txt_str = NULL, *sess_elems = NULL,
+	     *r_entry = NULL;
+
+	assert(entry);
+
+	if (!count)
+		return mystrdup("\n");
+
+	tag_str = generate_tags_regexp(entry);
+	if (!tag_str) {
+		failed_ok("generate_tags_regexp()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	txt_str = entry->txt && *entry->txt
+		? allocstr(" <txt>%s</txt>", entry->txt)
+		: mystrdup("");
+	if (!txt_str)
+		goto cleanup; /* gncov */
+
+	sess_elems = create_sess_xml(entry);
+
+	r_entry = allocstr("(<suuid"
+	                   " t=\"%s\""
+	                   " u=\"%s\">"
+	                   "%s"
+	                   "%s"
+	                   " <host>%s</host>"
+	                   " <cwd>%s</cwd>"
+	                   " <user>%s</user> "
+	                   "%s"
+	                   "</suuid>\n){%u}",
+	                   *entry->date ? entry->date : R_TIMESTAMP,
+	                   *entry->uuid ? entry->uuid : R_UUID,
+	                   tag_str,
+	                   txt_str,
+	                   entry->host ? entry->host : "[^<]+",
+	                   entry->cwd ? entry->cwd : "[^<]+",
+	                   entry->user ? entry->user : "[^<]+",
+	                   sess_elems,
+	                   count);
+	if (!r_entry) {
+		failed_ok("allocstr()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+
+cleanup:
+	free(sess_elems);
+	free(txt_str);
+	free(tag_str);
+
+	return r_entry;
+}
+
+/*
+ * diag_sess_array/() - Print all non-NULL values of a `Struct sess` array. 
+ * Returns nothing.
+ */
+
+static void diag_sess_array(const struct Sess *sess) /* gncov */
+{
+	size_t i;
+
+	assert(sess); /* gncov */
+
+	for (i = 0; i < MAX_SESS; i++) { /* gncov */
+		if (sess[i].desc) /* gncov */
+			diag("sess[%zu].desc: \"%s\"", /* gncov */
+			     i, sess[i].desc); /* gncov */
+		if (sess[i].uuid) /* gncov */
+			diag("sess[%zu].uuid: \"%s\"", /* gncov */
+			     i, sess[i].uuid); /* gncov */
+	}
+} /* gncov */
+
+/*
+ * verify_logfile_func() - Verify that the contents in the log file defined in 
+ * the file-static variable `logfile` corresponds to the data in `entry` and 
+ * that the number of entries is `uuid_count` is correct. `desc` is a test 
+ * description, and can use printf escapes.
+ *
+ * Not meant to be called directly, but via the verify_logfile() macro that 
+ * logs the line number automatically.
+ *
+ * Returns 0 if ok, or 1 if anything fails.
+ */
+
+static int verify_logfile_func(const int linenum, const struct Entry *entry,
+                               const unsigned int uuid_count,
+                               const char *desc, ...)
+{
+	char *r_entry = NULL, *r_file = NULL, *pattern = NULL,
+	     *contents = NULL, *log_file = NULL;
+	int retval = 1, result;
+	regex_t regexp;
+	va_list ap;
+
+	assert(entry);
+	assert(desc);
+
+	r_entry = generate_line_regexp(entry, uuid_count);
+	if (!r_entry) {
+		failed_ok("generate_line_regexp()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	r_file = allocstr("<\\?xml version=\"1\\.0\" encoding=\"UTF-8\"\\?>\n"
+	                  "<!DOCTYPE suuids SYSTEM \"dtd/suuids\\.dtd\">\n"
+	                  "<suuids>\n"
+	                  "%s"
+	                  "</suuids>\n", uuid_count ? r_entry : "");
+	if (!r_file) {
+		failed_ok("allocstr()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+
+	pattern = allocstr(r_file, uuid_count);
+	if (!pattern) {
+		failed_ok("allocstr()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	result = regcomp(&regexp, pattern, REG_EXTENDED);
+	if (result) {
+		char errbuf[1024];
+
+		regerror(result, &regexp, errbuf, sizeof(errbuf)); /* gncov */
+		OK_ERROR_L(linenum, "%s():%d: regcomp() failed: %s", /* gncov */
+		           __func__, __LINE__, errbuf);
+		regfree(&regexp); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	if (entry->host) {
+		log_file = allocstr("%s/uuids/%s%s",
+		                    TMPDIR, entry->host, LOGFILE_EXTENSION);
+	} else {
+		log_file = mystrdup(logfile);
+	}
+	if (!log_file) {
+		failed_ok("allocstr() or mystrdup()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	contents = read_from_file(log_file);
+	if (!contents) {
+		failed_ok("read_from_file()"); /* gncov */
+		diag("test %d: log_file = \"%s\"", /* gncov */
+		     testnum, log_file);
+	} else {
+		result = regexec(&regexp, contents, 0, NULL, 0);
+		va_start(ap, desc);
+		if (ok_va(!!result, linenum, desc, ap)) {
+			diag("Expected sess values:"); /* gncov */
+			diag_sess_array(entry->sess); /* gncov */
+			diag(""); /* gncov */
+		}
+		va_end(ap);
+		if (result) {
+			diag("Contents of \"%s\":\n\n%s", /* gncov */
+			     log_file, contents);
+			diag("regexp = \"%s\"", pattern); /* gncov */
+		}
+	}
+	regfree(&regexp);
+
+	retval = 0;
+
+cleanup:
+	free(contents);
+	free(log_file);
+	free(pattern);
+	free(r_file);
+	free(r_entry);
+
+	return retval;
 }
 
 /*
@@ -2217,6 +2450,7 @@ static void test_create_and_log_uuids(void)
 	free(s2);
 
 	init_xml_entry(&entry);
+	verify_logfile(&entry, 0, "%s (log file)", desc);
 	delete_logfile();
 
 	diag("o.uuid contains a v4 UUID");
@@ -2245,6 +2479,7 @@ static void test_create_and_log_uuids(void)
 		goto cleanup; /* gncov */
 	}
 	verify_output_files(desc, "", s2);
+	verify_logfile(&entry, 0, "%s (log file)", desc);
 
 cleanup:
 	free(s);
@@ -2868,6 +3103,8 @@ int opt_selftest(char *main_execname, const struct Options *o)
 #undef OK_TRUE
 #undef OK_TRUE_L
 #undef OPTION_ERROR_STR
+#undef R_TIMESTAMP
+#undef R_UUID
 #undef TMPDIR
 #undef chp
 #undef delete_logfile
@@ -2877,6 +3114,7 @@ int opt_selftest(char *main_execname, const struct Options *o)
 #undef set_env
 #undef tc
 #undef unset_env
+#undef verify_logfile
 #undef verify_output_files
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */
