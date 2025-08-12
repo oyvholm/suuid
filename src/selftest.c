@@ -813,6 +813,15 @@ static int unset_env_func(const int linenum, const char *name)
 	return 1; /* gncov */
 }
 
+/*
+ * is_root() - Returns 1 if the current user is root, otherwise it returns 0.
+ */
+
+static int is_root(void)
+{
+	return !getuid();
+}
+
 /******************************************************************************
                        suuid-specific selftest functions
 ******************************************************************************/
@@ -3520,6 +3529,347 @@ cleanup:
 	cleanup_tempdir(__LINE__);
 }
 
+/*
+ * external_editor_with_vars() - Runs the external editor with the 2 
+ * environment variables it checks for. `ENV_EDITOR` is set to the string in 
+ * `suuid_editor`, and "EDITOR" is set to the string in `editor`. `fake` is the 
+ * value of the `fake_editor` script in test_external_editor(). Returns 
+ * nothing.
+ */
+
+static void external_editor_with_vars(const int linenum,
+                                      const char *suuid_editor,
+                                      const char *editor, const char *fake)
+{
+	char *vars, *desc = NULL, *exp_stderr = NULL;
+	struct Entry entry;
+
+	assert(suuid_editor);
+	assert(editor);
+	assert(fake);
+
+#define e_var(v)  (strlen(v) ? (!strcmp((v), fake) ? "fake" : "non-existing") \
+                             : "empty")
+	vars = allocstr("%s=%s, EDITOR=%s",
+	                ENV_EDITOR, e_var(suuid_editor), e_var(editor));
+	if (!vars) {
+		failed_ok("allocstr()"); /* gncov */
+		return; /* gncov */
+	}
+
+	desc = allocstr("External editor, %s", vars);
+	if (!desc) {
+		failed_ok("allocstr()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	diag("%s", desc);
+
+	if (suuid_editor && set_env_func(linenum, ENV_EDITOR, suuid_editor))
+		goto cleanup; /* gncov */
+	if (editor && set_env_func(linenum, "EDITOR", editor))
+		goto cleanup; /* gncov */
+
+	uc_func(linenum, (chp{ execname, "-c", "--", NULL }), 1, 0, "%s",
+	        desc);
+	init_xml_entry(&entry);
+	entry.txt = "Text from editor";
+	verify_logfile_func(linenum, &entry, 1, "%s (Log file)", desc);
+
+cleanup:
+	if (suuid_editor)
+		unset_env_func(linenum, ENV_EDITOR);
+	if (editor)
+		unset_env_func(linenum, "EDITOR");
+	delete_logfile_func(linenum);
+	free(exp_stderr);
+	free(desc);
+	free(vars);
+#undef e_var
+}
+
+/*
+ * external_editor_missing_vars() - Emulate a situation when the external 
+ * editor can't be executed because both the `ENV_EDITOR` or "EDITOR" variables 
+ * are undefined or empty. Returns nothing.
+ */
+
+static void external_editor_missing_vars(const int linenum,
+                                         const char *suuid_editor,
+                                         const char *editor)
+{
+	char *vars, *desc = NULL, *exp_stderr = NULL;
+
+	vars = allocstr("%s=\"%s\", EDITOR=\"%s\"",
+	                ENV_EDITOR, no_null(suuid_editor), no_null(editor));
+	if (!vars) {
+		failed_ok("allocstr()"); /* gncov */
+		return; /* gncov */
+	}
+
+	diag("External editor missing variables, %s", vars);
+	desc = allocstr("External editor fails, %s", vars);
+	if (!desc) {
+		failed_ok("allocstr()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+
+	if (suuid_editor && set_env_func(linenum, ENV_EDITOR, suuid_editor))
+		goto cleanup; /* gncov */
+	if (editor && set_env_func(linenum, "EDITOR", editor))
+		goto cleanup; /* gncov */
+
+	exp_stderr = allocstr("%s: Environment variables %s and EDITOR aren't"
+	                      " defined, cannot start editor\n",
+	                      EXECSTR, ENV_EDITOR);
+	if (!exp_stderr) {
+		failed_ok("allocstr()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+
+	tc_func(linenum, (chp{ execname, "-c", "--", NULL }),
+	        "",
+	        exp_stderr,
+	        EXIT_FAILURE,
+	        "%s", desc);
+
+cleanup:
+	if (suuid_editor)
+		unset_env_func(linenum, ENV_EDITOR);
+	if (editor)
+		unset_env_func(linenum, "EDITOR");
+	free(exp_stderr);
+	free(desc);
+	free(vars);
+}
+
+/*
+ * test_external_editor() - Tests the use of an external editor when the 
+ * argument to -c/--comment is "--". Returns nothing.
+ */
+
+static void test_external_editor(void)
+{
+	const char *p, *fake_editor = TMPDIR "/fake-editor",
+	           *nonexisting = TMPDIR "/non-existing";
+	int i;
+
+	diag("Test external editor");
+
+	if (init_tempdir())
+		return; /* gncov */
+
+	OK_NOTNULL(p = create_file(fake_editor,
+	                           "#!/bin/sh\n"
+	                           "\n"
+	                           "echo Text from editor >\"$1\"\n"),
+	           "Create %s", fake_editor);
+	if (!p) {
+		diag("%s: Cannot create file: %s", /* gncov */
+		     fake_editor, strerror(errno)); /* gncov */
+		errno = 0; /* gncov */
+		goto cleanup; /* gncov */
+	}
+	OK_SUCCESS(i = chmod(fake_editor, 0755),
+	           "Make %s executable", fake_editor);
+	if (i) {
+		diag("%s: Cannot make file executable: %s", /* gncov */
+		     fake_editor, strerror(errno)); /* gncov */
+		errno = 0; /* gncov */
+		goto cleanup; /* gncov */
+	}
+
+	if (unset_env(ENV_EDITOR))
+		goto cleanup; /* gncov */
+	if (unset_env("EDITOR"))
+		goto cleanup; /* gncov */
+
+#define external_editor_with_vars(suuid_editor, editor, fake)  \
+        external_editor_with_vars(__LINE__, (suuid_editor), (editor), (fake))
+
+	external_editor_with_vars("", fake_editor, fake_editor);
+	external_editor_with_vars(fake_editor, "", fake_editor);
+	external_editor_with_vars(fake_editor, fake_editor, fake_editor);
+	external_editor_with_vars(fake_editor, nonexisting, fake_editor);
+#undef external_editor_with_vars
+
+#define external_editor_missing_vars(suuid_editor, editor)  \
+        external_editor_missing_vars(__LINE__, (suuid_editor), (editor))
+
+	external_editor_missing_vars("", "");
+	external_editor_missing_vars("", NULL);
+	external_editor_missing_vars(NULL, "");
+	external_editor_missing_vars(NULL, NULL);
+#undef external_editor_missing_vars
+
+cleanup:
+	if (file_exists(fake_editor)) {
+		i = remove(fake_editor);
+		OK_SUCCESS(i, "Delete fake editor script");
+		if (i) {
+			diag("test %d: errno = %d (%s)", /* gncov */
+			     testnum, errno, strerror(errno)); /* gncov */
+			errno = 0; /* gncov */
+		}
+	}
+	unset_env(ENV_EDITOR);
+	unset_env("EDITOR");
+	cleanup_tempdir(__LINE__);
+}
+
+/*
+ * test_unreadable_editor_file() - Simulate a situation when the external 
+ * editor saves a file with wrong permissions, making it unreadable. Returns 
+ * nothing.
+ */
+
+static void test_unreadable_editor_file(void)
+{
+	const char *p, *fake_editor = TMPDIR "/fake-editor", *desc;
+	char *errdup = NULL, *tempfile = NULL, *colon;
+	int i;
+	struct streams ss;
+	struct Options opt = opt_struct();
+	size_t err_offs;
+
+	desc = "The editor saves an unreadable file";
+
+	if (is_root()) {
+		diag("%s # SKIP Running as root", desc); /* gncov */
+		return; /* gncov */
+	}
+
+	diag("%s", desc);
+
+	if (init_tempdir())
+		return; /* gncov */
+
+	streams_init(&ss);
+	OK_NOTNULL(p = create_file(fake_editor,
+	                           "#!/bin/sh\n"
+	                           "\n"
+	                           "echo Text from editor >\"$1\"\n"
+	                           "chmod 000 \"$1\""),
+	           "Create %s, makes the saved file unreadable", fake_editor);
+	if (!p) {
+		failed_ok("create_file()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	OK_SUCCESS(i = chmod(fake_editor, 0755),
+	           "%s(): Make %s executable", __func__, fake_editor);
+	if (i) {
+		diag("%s(): %s: Cannot make file executable: %s", /* gncov */
+		     __func__, fake_editor, strerror(errno)); /* gncov */
+		errno = 0; /* gncov */
+		goto cleanup; /* gncov */
+	}
+	if (set_env(ENV_EDITOR, fake_editor))
+		goto cleanup; /* gncov */
+
+	desc = "\"--comment --\" with unreadable file";
+	streams_exec(&opt, &ss, chp{ execname, "--comment", "--", NULL });
+	OK_STRCMP(ss.out.buf, "", "%s (stdout)", desc);
+	print_gotexp(ss.out.buf, "");
+	OK_NOTNULL(strstr(ss.err.buf,
+	           ": Cannot read comment from file: Permission denied\n"),
+	           "%s (stderr)", desc);
+	OK_EQUAL(ss.ret, EXIT_FAILURE, "%s (retval)", desc);
+	OK_FALSE(file_exists(logfile),
+	         "Log file doesn't exist after unreadable file");
+	errdup = mystrdup(ss.err.buf);
+	if (!errdup) {
+		failed_ok("mystrdup()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	err_offs = strlen(execname) + strlen(": ");
+	if (strlen(errdup) <= err_offs) {
+		OK_ERROR("%s(): stderr is too short to contain" /* gncov */
+		         " tempfile name", __func__);
+		goto cleanup; /* gncov */
+	}
+	tempfile = errdup + err_offs;
+	colon = strstr(tempfile, ": ");
+	if (!colon) {
+		OK_ERROR("Didn't find colon after tempfile name" /* gncov */
+		         " in stderr");
+		goto cleanup; /* gncov */
+	}
+	*colon = '\0';
+	OK_TRUE(file_exists(tempfile), "%s(): Tempfile exists", __func__);
+
+cleanup:
+	streams_free(&ss);
+	if (file_exists(fake_editor)) {
+		i = remove(fake_editor);
+		OK_SUCCESS(i, "%s(): Delete fake editor script", __func__);
+		if (i) {
+			diag("test %d: errno = %d (%s)", /* gncov */
+			     testnum, errno, strerror(errno)); /* gncov */
+			errno = 0; /* gncov */
+		}
+	}
+	if (tempfile && file_exists(tempfile)) {
+		OK_SUCCESS(i = chmod(tempfile, 0555),
+		           "Make tempfile writable");
+		if (i)
+			failed_ok("chmod()"); /* gncov */
+		if (OK_SUCCESS(remove(tempfile),
+		               "%s(): Delete tempfile", __func__)) {
+			diag("%s: Cannot remove file: %s", /* gncov */
+			     tempfile, strerror(errno)); /* gncov */
+		}
+	}
+	free(errdup);
+	unset_env(ENV_EDITOR);
+	cleanup_tempdir(__LINE__);
+}
+
+/*
+ * test_nonexisting_editor() - Tests the behavior when the external editor 
+ * doesn't exist. Returns nothing.
+ */
+
+static void test_nonexisting_editor(void)
+{
+	struct streams ss;
+	struct Options o = opt_struct();
+	const char *desc = "External editor not found",
+	           *searchstr = "File contents is stored in temporary file ";
+	char *tempfile, *p;
+
+	diag("Non-existing editor");
+	if (init_tempdir())
+		return; /* gncov */
+
+	streams_init(&ss);
+	if (unset_env(ENV_EDITOR))
+		goto cleanup; /* gncov */
+	if (set_env("EDITOR", TMPDIR "/doesnt-exist"))
+		goto cleanup; /* gncov */
+
+	streams_exec(&o, &ss, chp{ execname, "-c", "--", NULL });
+	OK_STRCMP(ss.out.buf, "", "%s (stdout)", desc);
+	print_gotexp(ss.out.buf, "");
+	OK_NOTNULL(tempfile = strstr(ss.err.buf, searchstr),
+	           "%s (stderr)", desc);
+	OK_EQUAL(ss.ret, EXIT_FAILURE, "%s (retval)", desc);
+	if (!tempfile)
+		goto cleanup; /* gncov */
+	tempfile += strlen(searchstr);
+	p = strstr(tempfile, "\n");
+	if (!p) {
+		OK_ERROR("%s(): Newline not found in tempfile" /* gncov */
+		         " string", __func__);
+		goto cleanup; /* gncov */
+	}
+	*p = '\0';
+	OK_TRUE(file_exists(tempfile), "Tempfile from editor exists");
+	OK_SUCCESS(remove(tempfile), "Delete tempfile from editor");
+
+cleanup:
+	streams_free(&ss);
+	cleanup_tempdir(__LINE__);
+}
+
 /******************************************************************************
                         Top-level --selftest functions
 ******************************************************************************/
@@ -3592,6 +3942,9 @@ static void tests_with_tempdir(void)
 	test_truncated_logfile();
 	test_comment_option();
 	read_long_text_from_stdin();
+	test_external_editor();
+	test_unreadable_editor_file();
+	test_nonexisting_editor();
 
 	OK_SUCCESS(rmdir(TMPDIR), "Delete temporary directory %s", TMPDIR);
 }
