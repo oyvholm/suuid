@@ -4576,6 +4576,120 @@ static void test_whereto_option(void)
 	cleanup_tempdir(__LINE__);
 }
 
+                             /*** Other tests ***/
+
+/*
+ * test_sigpipe_signal() - Tests the signal handler, i.e., what happens when it 
+ * receives SIGPIPE. Returns nothing.
+ */
+
+static void test_sigpipe_signal(const int linenum, const char *args)
+{
+	struct Entry entry;
+	char *s = NULL, *s2, *script = TMPDIR "/pipefail.sh", *pattern = NULL,
+	     *contents = NULL;
+	struct streams ss;
+	struct Options o = opt_struct();
+	bool orig_valgrind = o.valgrind;
+	regex_t regexp;
+	int result;
+	unsigned int count;
+
+	diag("Receive SIGPIPE signal, args = \"%s\"", args);
+
+	if (init_tempdir_func(linenum))
+		return; /* gncov */
+	init_xml_entry(&entry);
+	s = allocstr("#!/bin/sh\n"
+	             "\n"
+	             "%s -n 1000 -vvvv %s | true\n", execname, args);
+	if (!s) {
+		failed_ok("allocstr()"); /* gncov */
+		return; /* gncov */
+	}
+	OK_NOTNULL_L(create_file(script, s), linenum, "Create %s", script);
+	OK_SUCCESS_L(chmod(script, 0755), linenum, "Make %s executable",
+	                                           script);
+	free(s);
+
+	streams_init(&ss);
+	o.valgrind = false; /* Suppress Valgrind errors from /bin/sh */
+	streams_exec(&o, &ss, chp{ script, NULL });
+	o.valgrind = orig_valgrind;
+
+	pattern = allocstr(
+	          "^"
+	          "%s: main\\(\\): Using verbose level 4\n"
+	          "%s: Termination signal \\(Broken pipe\\) received, aborting"
+#ifdef __NetBSD__
+	          ": No such file or directory" /* FIXME */
+#endif
+	          "\n"
+	          "%s: Cannot print UUID to stdout: Broken pipe\n"
+	          "%s: Generated only [0-9]+ of 1000 UUIDs\n"
+	          "%s: Returning from main\\(\\) with value 1\n"
+	          "$",
+	          execname, execname, execname, execname, execname);
+	result = regcomp(&regexp, pattern, REG_EXTENDED);
+	if (result) {
+		char errbuf[1024];
+
+		regerror(result, &regexp, errbuf, sizeof(errbuf)); /* gncov */
+		OK_ERROR_L(linenum, "%s():%d: regcomp() failed: %s", /* gncov */
+		           __func__, __LINE__, errbuf);
+		regfree(&regexp); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	result = regexec(&regexp, ss.err.buf, 0, NULL, 0);
+	OK_SUCCESS_L(result, linenum, "Pipe output to true(1) (stderr)");
+	if (result) {
+		diag("test %d: stderr = \"%s\"", /* gncov */
+		     testnum, ss.err.buf);
+		diag("test %d: pattern = \"%s\"", /* gncov */
+		     testnum, pattern);
+	}
+	regfree(&regexp);
+
+	s = strstr(ss.err.buf, "Generated only ");
+	if (!s) {
+		OK_ERROR_L(linenum, /* gncov */
+		           "Didn't find \"Generated only \" string");
+		diag("ss.err.buf = \"%s\"", ss.err.buf); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	s += strlen("Generated only ");
+	s2 = strchr(s, ' ');
+	if (!s2) {
+		OK_ERROR_L(linenum, /* gncov */
+		           "%s(): Didn't find any space characters after the"
+		           " string");
+		goto cleanup; /* gncov */
+	}
+	*s2 = '\0';
+	count = (unsigned int)atoi(s) + 1; /* FIXME, 1 off */
+	OK_NOTNULL_L(contents = read_from_file(logfile), linenum,
+	             "Read contents from log file");
+	if (!contents) {
+		diag("test %d: %s", testnum, strerror(errno)); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	OK_EQUAL_L(count_substr(contents, "<suuid t="), count, linenum,
+	           "The log file has the correct number of entries");
+	OK_EQUAL_L(count_substr(contents, "</suuids>"), 1, linenum,
+	           "The log file has only 1 end element");
+	s = "</suuid>\n</suuids>\n";
+	s2 = contents + strlen(contents) - strlen(s);
+	OK_STRCMP_L(s2, s, linenum,
+	            "The end of the log file is ok after SIGPIPE");
+
+cleanup:
+	free(contents);
+	free(pattern);
+	streams_free(&ss);
+	OK_SUCCESS_L(remove(script), linenum, "Delete %s", script);
+	cleanup_tempdir(linenum);
+}
+
 /******************************************************************************
                         Top-level --selftest functions
 ******************************************************************************/
@@ -4660,6 +4774,8 @@ static void tests_with_tempdir(void)
 	test_too_many_tags();
 	test_too_many_comma_tags();
 	test_whereto_option();
+	test_sigpipe_signal(__LINE__, "");
+	test_sigpipe_signal(__LINE__, "-w o");
 
 	OK_SUCCESS(rmdir(TMPDIR), "Delete temporary directory %s", TMPDIR);
 }

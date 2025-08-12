@@ -269,9 +269,6 @@ void sighandler(const int sig)
 	    || sig == SIGPIPE || sig == SIGTERM) {
 		myerror("Termination signal (%s) received, aborting",
 		        strsignal(sig));
-	} else {
-		myerror("%s(): Unknown signal %d (%s) received,"
-		        " should not happen", __func__, sig, strsignal(sig));
 	}
 	should_terminate = true;
 }
