@@ -30,6 +30,27 @@
                           EXECSTR ": Type \"" EXECSTR " --help\" for help screen." \
                           " Returning with value 1.\n"
 #define chp  (char *[])
+#define print_gotexp_nostr(seq, got, exp)  do { \
+	char *g = allocstr((seq), (got)), *e = allocstr((seq), (exp)); \
+	if (!g || !e) \
+		failed_ok("allocstr()"); \
+	else \
+		print_gotexp(g, e); \
+	free(e); \
+	free(g); \
+} while (0)
+#define print_gotexp_int(got, exp)  do { \
+	if ((got) != (exp)) \
+		print_gotexp_nostr("%d", (got), (exp)); \
+} while (0)
+#define print_gotexp_size_t(got, exp)  do { \
+	if ((got) != (exp)) \
+		print_gotexp_nostr("%zu", (got), (exp)); \
+} while (0)
+#define print_gotexp_ulong(got, exp)  do { \
+	if ((got) != (exp)) \
+		print_gotexp_nostr("%lu", (got), (exp)); \
+} while (0)
 #define DIAG_DEBL  diag("DEBL: %s:%s():%d", __FILE__, __func__, __LINE__)
 #define DIAG_VARS  do { \
 	diag("%s = \"%s\"", "HOME", no_null(getenv("HOME"))); \
@@ -555,19 +576,11 @@ static void test_command(const int linenum, const char identical, char *cmd[],
 			print_gotexp(ss.err.buf, e_stderr); /* gncov */
 	}
 	OK_EQUAL_L(ss.ret, exp_retval, linenum, "%s (retval)", descbuf);
+	print_gotexp_int(ss.ret, exp_retval);
 	free(descbuf);
 	free(e_stderr);
 	free(e_stdout);
-	if (ss.ret != exp_retval) {
-		char *g = allocstr("%d", ss.ret), /* gncov */
-		     *e = allocstr("%d", exp_retval); /* gncov */
-		if (!g || !e) /* gncov */
-			failed_ok("allocstr()"); /* gncov */
-		else
-			print_gotexp(g, e); /* gncov */
-		free(e); /* gncov */
-		free(g); /* gncov */
-	}
+	print_gotexp_int(ss.ret, exp_retval);
 	if (valgrind_lines(ss.err.buf))
 		OK_ERROR_L(linenum, "Found valgrind output"); /* gncov */
 	streams_free(&ss);
@@ -960,10 +973,12 @@ static void uc_func(const int linenum, char *cmd[],
 	uc_check_va(linenum, "out", ss.out.buf, num_stdout, desc, ap);
 	uc_check_va(linenum, "err", ss.err.buf, num_stderr, desc, ap);
 	s = allocstr_va(desc, ap);
-	if (s)
+	if (s) {
 		OK_EQUAL_L(ss.ret, EXIT_SUCCESS, linenum, "%s (retval)", s);
-	else
+		print_gotexp_int(ss.ret, EXIT_SUCCESS);
+	} else {
 		failed_ok("allocstr_va()"); /* gncov */
+	}
 	free(s);
 	va_end(ap);
 
@@ -1607,11 +1622,15 @@ static void test_valgrind_lines(void)
 static void chk_cu(const int linenum, const char *s, const char *sep,
                    unsigned long count, const char *desc)
 {
+	unsigned long res;
+
 	assert(s);
 	assert(sep);
 	assert(desc);
 
-	OK_EQUAL_L(count_uuids(s, sep), count, linenum, "%s", desc);
+	res = count_uuids(s, sep);
+	OK_EQUAL_L(res, count, linenum, "%s", desc);
+	print_gotexp_ulong(res, count);
 }
 
 /*
@@ -2041,16 +2060,7 @@ static void chk_cs(const int linenum, const char *s, const char *substr,
 
 	result = count_substr(s, substr);
 	OK_EQUAL_L(result, count, linenum, "count_substr(): %s", desc);
-	if (result != count) {
-		char *s_result = allocstr("%zu", result), /* gncov */
-		     *s_count = allocstr("%zu", count); /* gncov */
-		if (s_result && s_count) /* gncov */
-			print_gotexp(s_result, s_count); /* gncov */
-		else
-			failed_ok("allocstr()"); /* gncov */
-		free(s_count); /* gncov */
-		free(s_result); /* gncov */
-	}
+	print_gotexp_size_t(result, count);
 }
 
 /*
@@ -2114,12 +2124,11 @@ static void chk_sr(const int linenum, const char *s, const char *s1,
 	assert(desc);
 
 	result = str_replace(s, s1, s2);
-	if (!result || !exp) {
+	if (!result || !exp)
 		OK_EQUAL_L(result, exp, linenum, "str_replace(): %s", desc);
-	} else {
+	else
 		OK_STRCMP_L(result, exp, linenum, "str_replace(): %s", desc);
-		print_gotexp(result, exp);
-	}
+	print_gotexp(result, exp);
 	free(result);
 }
 
@@ -2195,6 +2204,7 @@ static void test_string_to_lower(void)
 	OK_NULL(string_to_lower(NULL), "string_to_lower(NULL)");
 	OK_STRCMP(string_to_lower(s1), "abcÅÆØ",
 	          "string_to_lower(\"ABCÅÆØ\")");
+	print_gotexp(s1, "abcÅÆØ");
 }
 
                                /*** uuid.c ***/
@@ -5036,6 +5046,10 @@ int opt_selftest(char *main_execname, const struct Options *o)
 #undef delete_logfile
 #undef failed_ok
 #undef init_tempdir
+#undef print_gotexp_int
+#undef print_gotexp_nostr
+#undef print_gotexp_size_t
+#undef print_gotexp_ulong
 #undef sc
 #undef set_env
 #undef tc
