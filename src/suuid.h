@@ -193,6 +193,8 @@ char *get_username(void);
 char *get_tty(void);
 
 /* genuuid.c */
+int fill_entry_struct(struct Entry *entry, const struct Rc *rc,
+                      const struct Options *opts);
 struct uuid_result create_and_log_uuids(const struct Options *opt);
 
 /* io.c */

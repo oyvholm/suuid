@@ -170,10 +170,17 @@
         tc_func(__LINE__, (cmd), (num_stdout), (num_stderr), \
                 (desc), ##__VA_ARGS__);
 #define unset_env(a)  unset_env_func(__LINE__, (a))
+#define verify_output_files(desc, exp_stdout, exp_stderr)  \
+        verify_output_files_func(__LINE__, desc, exp_stdout, exp_stderr)
 static char *execname;
 static char *logfile;
 static int failcount = 0;
 static int testnum = 0;
+
+static const char *stderr_file = TMPDIR "/stderr.txt";
+static const char *stdout_file = TMPDIR "/stdout.txt";
+static int orig_stderr_fd = -1;
+static int orig_stdout_fd = -1;
 
 /******************************************************************************
                              --selftest functions
@@ -581,6 +588,156 @@ static void tc_func(const int linenum, char *cmd[], const char *exp_stdout,
 }
 
 /*
+ * init_output_files() - Redirects stdout and stderr to files in TMPDIR. Used 
+ * for testing functions that prints to stderr or stdout. Returns 0 on success, 
+ * or 1 on failure.
+ */
+
+static int init_output_files(void)
+{
+	int stdout_fd, stderr_fd;
+
+	assert(file_exists(TMPDIR));
+
+	if (orig_stdout_fd != -1 || orig_stderr_fd != -1) {
+		/*
+		 * Already initialized, perhaps a previous test didn't restore 
+		 * properly.
+		 */
+		OK_ERROR("%s(): Already initialized", __func__); /* gncov */
+		return 1; /* gncov */
+	}
+
+	stdout_fd = open(stdout_file, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+	if (stdout_fd == -1) {
+		failed_ok("open() for stdout"); /* gncov */
+		diag("stdout_file = \"%s\"", stdout_file); /* gncov */
+		return 1; /* gncov */
+	}
+
+	stderr_fd = open(stderr_file, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+	if (stderr_fd == -1) {
+		failed_ok("open() for stderr"); /* gncov */
+		diag("stderr_file = \"%s\"", stderr_file); /* gncov */
+		close(stdout_fd); /* gncov */
+		return 1; /* gncov */
+	}
+
+	orig_stdout_fd = dup(1);
+	if (orig_stdout_fd == -1) {
+		failed_ok("dup() for stdout"); /* gncov */
+		close(stdout_fd); /* gncov */
+		close(stderr_fd); /* gncov */
+		return 1; /* gncov */
+	}
+
+	orig_stderr_fd = dup(2);
+	if (orig_stderr_fd == -1) {
+		failed_ok("dup() for stderr"); /* gncov */
+		close(stdout_fd); /* gncov */
+		close(stderr_fd); /* gncov */
+		close(orig_stdout_fd); /* gncov */
+		return 1; /* gncov */
+	}
+
+	fflush(stdout);
+	fflush(stderr);
+
+	if (dup2(stdout_fd, 1) == -1) {
+		failed_ok("dup2() for stdout"); /* gncov */
+		close(stdout_fd); /* gncov */
+		close(stderr_fd); /* gncov */
+		close(orig_stdout_fd); /* gncov */
+		close(orig_stderr_fd); /* gncov */
+		orig_stdout_fd = -1; /* gncov */
+		orig_stderr_fd = -1; /* gncov */
+		return 1; /* gncov */
+	}
+	close(stdout_fd);
+
+	if (dup2(stderr_fd, 2) == -1) {
+		failed_ok("dup2() for stderr"); /* gncov */
+		close(stderr_fd); /* gncov */
+		close(orig_stdout_fd); /* gncov */
+		close(orig_stderr_fd); /* gncov */
+		/* Restore stdout partially if possible */
+		dup2(orig_stdout_fd, 1); /* gncov */
+		orig_stdout_fd = -1; /* gncov */
+		orig_stderr_fd = -1; /* gncov */
+		return 1; /* gncov */
+	}
+	close(stderr_fd);
+
+	return 0;
+}
+
+/*
+ * restore_output_files() - Restores stdout and stderr to their original file 
+ * descriptors. Returns nothing, but logs failures.
+ */
+
+static void restore_output_files(void)
+{
+	if (orig_stdout_fd == -1 && orig_stderr_fd == -1) {
+		/* Not initialized, nothing to restore */
+		return; /* gncov */
+	}
+
+	fflush(stdout);
+	fflush(stderr);
+
+	if (orig_stdout_fd != -1) {
+		if (dup2(orig_stdout_fd, 1) == -1) {
+			failed_ok("dup2() (restore stdout)"); /* gncov */
+		}
+		close(orig_stdout_fd);
+		orig_stdout_fd = -1;
+	}
+
+	if (orig_stderr_fd != -1) {
+		if (dup2(orig_stderr_fd, 2) == -1) {
+			failed_ok("dup2() (restore stderr)"); /* gncov */
+		}
+		close(orig_stderr_fd);
+		orig_stderr_fd = -1;
+	}
+}
+
+/*
+ * verify_output_files_func() - Verify that the contents of stdout_file and 
+ * stderr_file is equal to `exp_stdout` and `exp_stderr`, respectively. Returns 
+ * nothing.
+ */
+
+static void verify_output_files_func(const int linenum, const char *desc,
+                                     const char *exp_stdout,
+                                     const char *exp_stderr)
+{
+	char *result;
+
+	assert(exp_stdout);
+	assert(exp_stderr);
+
+	result = read_from_file(stdout_file);
+	if (result) {
+		OK_STRCMP_L(result, exp_stdout, linenum, "%s (stdout)", desc);
+		print_gotexp(result, exp_stdout);
+		free(result);
+	} else {
+		failed_ok("read_from_file(stdout_file)"); /* gncov */
+	}
+
+	result = read_from_file(stderr_file);
+	if (result) {
+		OK_STRCMP_L(result, exp_stderr, linenum, "%s (stderr)", desc);
+		print_gotexp(result, exp_stderr);
+		free(result);
+	} else {
+		failed_ok("read_from_file(stderr_file)"); /* gncov */
+	}
+}
+
+/*
  * set_env_func() - Sets the environment variable `name` to `val`. It's 
  * normally not meant to be called directly, but via the set_env() macro that 
  * takes care of specifying `__LINE__` automatically.
@@ -667,6 +824,22 @@ static unsigned long count_uuids(const char *buf, const char *sep)
 
 out:
 	return count;
+}
+
+/*
+ * cleanup_tempdir() - Delete the files and the `uuids` directory in the 
+ * temporary work directory defined in TMPDIR. Expects `linenum` to be 
+ * `__LINE__` or the `linenum` value from a parent function. Returns nothing.
+ */
+
+static void cleanup_tempdir(const int linenum)
+{
+	if (file_exists(stderr_file))
+		OK_SUCCESS_L(remove(stderr_file), linenum,
+		             "Delete %s", stderr_file);
+	if (file_exists(stdout_file))
+		OK_SUCCESS_L(remove(stdout_file), linenum,
+		             "Delete %s", stdout_file);
 }
 
 /******************************************************************************
@@ -1668,6 +1841,89 @@ static void test_uuid_date(void)
                    Function tests, use a temporary directory
 ******************************************************************************/
 
+                              /*** genuuid.c ***/
+
+/*
+ * test_fill_entry_struct() - Tests the fill_entry_struct() function. Returns 
+ * nothing.
+ */
+
+static void test_fill_entry_struct(void)
+{
+	size_t bufsize = 1 + (UUID_LENGTH + 1) * (MAX_SESS + 1) + 1,
+	       t, buf_len;
+	char *buf, *p, *bufchk, *desc = NULL, *exp_stderr = NULL;
+	int res;
+	struct Entry entry;
+	struct Rc rc;
+	struct Options opt = opt_struct();
+
+	diag("Test fill_entry_struct()");
+
+	buf = malloc(bufsize);
+	if (!buf) {
+		failed_ok("malloc()"); /* gncov */
+		return; /* gncov */
+	}
+
+	p = buf;
+	*p++ = ',';
+	for (t = 0; t < MAX_SESS + 1; t++) {
+		generate_uuid(p);
+		p += UUID_LENGTH;
+		*p++ = ',';
+	}
+	*p = '\0';
+	OK_SUCCESS(res = setenv(ENV_SESS, buf, 1),
+	           "Init %s variable with MAX_SESS + 1 UUIDs", ENV_SESS);
+	if (res) {
+		diag("Cannot set %s variable: %s", /* gncov */
+		     ENV_SESS, strerror(errno)); /* gncov */
+		errno = 0; /* gncov */
+		goto cleanup; /* gncov */
+	}
+	bufchk = getenv(ENV_SESS);
+	if (!bufchk) {
+		failed_ok("getenv()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	buf_len = strlen(bufchk);
+	OK_EQUAL(buf_len, bufsize - 1,
+	         "Length of the %s variable is %zu bytes",
+	         ENV_SESS, bufsize - 1);
+
+	init_xml_entry(&entry);
+	init_rc(&rc);
+	rc.hostname = HNAME;
+
+	if (init_output_files()) {
+		restore_output_files(); /* gncov */
+		failed_ok("init_output_files()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	res = fill_entry_struct(&entry, &rc, &opt);
+	restore_output_files();
+
+	desc = allocstr("%s contains more than %u UUIDs", ENV_SESS, MAX_SESS);
+	if (!desc) {
+		failed_ok("allocstr()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	OK_EQUAL(res, 1, "%s (retval)", desc);
+	exp_stderr = allocstr("%s: Maximum number of sess entries (%u)"
+	                      " exceeded\n", execname, MAX_SESS);
+	verify_output_files(desc, "", exp_stderr);
+	unset_env(ENV_SESS);
+
+cleanup:
+	free(exp_stderr);
+	free(desc);
+	free(buf);
+	free(entry.cwd);
+	free_sess(&entry);
+	cleanup_tempdir(__LINE__);
+}
+
                                 /*** io.c ***/
 
 /*
@@ -1947,6 +2203,9 @@ static void functests_with_tempdir(void)
 		return; /* gncov */
 	}
 
+	/* genuuid.c */
+	test_fill_entry_struct();
+
 	/* io.c */
 	test_create_file();
 
@@ -2095,5 +2354,6 @@ int opt_selftest(char *main_execname, const struct Options *o)
 #undef set_env
 #undef tc
 #undef unset_env
+#undef verify_output_files
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */
