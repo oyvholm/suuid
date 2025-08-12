@@ -159,16 +159,19 @@
 	errno = 0; \
 } while (0)
 
+#define HNAME  "hname"
 #define TMPDIR  ".suuid-test.tmp"
 
 #define sc(cmd, num_stdout, num_stderr, desc, ...)  \
         sc_func(__LINE__, (cmd), (num_stdout), (num_stderr), \
                 (desc), ##__VA_ARGS__);
+#define set_env(name, val)  set_env_func(__LINE__, (name), (val))
 #define tc(cmd, num_stdout, num_stderr, desc, ...)  \
         tc_func(__LINE__, (cmd), (num_stdout), (num_stderr), \
                 (desc), ##__VA_ARGS__);
 #define unset_env(a)  unset_env_func(__LINE__, (a))
 static char *execname;
+static char *logfile;
 static int failcount = 0;
 static int testnum = 0;
 
@@ -578,6 +581,32 @@ static void tc_func(const int linenum, char *cmd[], const char *exp_stdout,
 }
 
 /*
+ * set_env_func() - Sets the environment variable `name` to `val`. It's 
+ * normally not meant to be called directly, but via the set_env() macro that 
+ * takes care of specifying `__LINE__` automatically.
+ *
+ * Returns 1 if unsetenv() failed, otherwise it returns 0.
+ */
+
+static int set_env_func(const int linenum, const char *name, const char *val)
+{
+	assert(name);
+	assert(*name);
+	assert(val);
+
+	if (OK_SUCCESS_L(setenv(name, val, 1), linenum,
+	                 "Set %s=\"%s\"", name, val)) {
+		diag("Cannot set %s environment" /* gncov */
+		     " variable to \"%s\": %s",
+		     name, val, strerror(errno)); /* gncov */
+		errno = 0; /* gncov */
+		return 1; /* gncov */
+	}
+
+	return 0;
+}
+
+/*
  * unset_env_func() - Unsets the environment variable `name` and prefixes the 
  * test description with `funcname` and `linenum` to avoid duplicated test 
  * descriptions. It's normally not meant to be called directly, but via the 
@@ -665,6 +694,60 @@ static void test_ok_macros(void)
 	OK_STRNCMP("abcde", "abcyz", 3, "OK_STRNCMP(\"abcde\", \"abcyz\", 3, ...)");
 	OK_SUCCESS(0, "OK_SUCCESS(0, ...)");
 	OK_TRUE(9 > -4, "OK_TRUE(%d > %d, ...)", 9, -4);
+}
+
+/*
+ * init_testvars() - Initialize file-static variables and environment variables 
+ * to use the temporary directory defined in TMPDIR. Returns 1 if anything 
+ * fails, or 0 if OK.
+ */
+
+static int init_testvars(void)
+{
+	char *cwd = NULL, *p = NULL;
+	int retval = 1;
+	struct Rc rc;
+
+	diag("Initialize variables and the environment");
+	cwd = getpath();
+	if (!cwd) {
+		failed_ok("getpath()"); /* gncov */
+		return 1; /* gncov */
+	}
+
+	p = allocstr("%s/%s", cwd, TMPDIR);
+	if (!p) {
+		failed_ok("allocstr()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	if (set_env("HOME", p))
+		goto cleanup; /* gncov */
+	free(p);
+	p = NULL;
+
+	if (unset_env(ENV_EDITOR))
+		goto cleanup; /* gncov */
+	if (unset_env(ENV_HOSTNAME))
+		goto cleanup; /* gncov */
+	if (unset_env(ENV_LOGDIR))
+		goto cleanup; /* gncov */
+	if (unset_env(ENV_SESS))
+		goto cleanup; /* gncov */
+
+	init_rc(&rc);
+	rc.hostname = HNAME;
+	logfile = allocstr("%s/%s/uuids/%s%s",
+	                   cwd, TMPDIR, get_hostname(&rc), LOGFILE_EXTENSION);
+	if (!logfile) {
+		failed_ok("allocstr()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	retval = 0;
+
+cleanup:
+	free(p);
+	free(cwd);
+	return retval;
 }
 
 /*
@@ -1962,6 +2045,8 @@ int opt_selftest(char *main_execname, const struct Options *o)
 	     execname, EXEC_VERSION, EXEC_DATE);
 
 	test_ok_macros();
+	if (init_testvars())
+		return EXIT_FAILURE; /* gncov */
 	test_functions(o);
 	test_executable(o);
 
@@ -1972,12 +2057,14 @@ int opt_selftest(char *main_execname, const struct Options *o)
 		     testnum);
 	}
 
+	free(logfile); /* Allocated in init_testvars() */
 	return failcount ? EXIT_FAILURE : EXIT_SUCCESS;
 }
 
 #undef DIAG_DEBL
 #undef DIAG_VARS
 #undef EXECSTR
+#undef HNAME
 #undef OK_EQUAL
 #undef OK_EQUAL_L
 #undef OK_ERROR
@@ -2005,6 +2092,7 @@ int opt_selftest(char *main_execname, const struct Options *o)
 #undef chp
 #undef failed_ok
 #undef sc
+#undef set_env
 #undef tc
 #undef unset_env
 
