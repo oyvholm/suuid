@@ -3870,6 +3870,38 @@ cleanup:
 	cleanup_tempdir(__LINE__);
 }
 
+                             /*** -n/--count ***/
+
+/*
+ * test_count_option() - Tests the -n/--count option. Returns nothing.
+ */
+
+static void test_count_option(void)
+{
+	struct Entry entry;
+
+	diag("Test -n/--count");
+
+	if (init_tempdir())
+		return; /* gncov */
+	init_xml_entry(&entry);
+
+	uc((chp{ execname, "-n", "10", NULL }), 10, 0, "-n 10");
+	verify_logfile(&entry, 10, "-n created 10 entries");
+
+	uc((chp{ execname, "--count", "20", NULL }), 20, 0, "--count 20");
+	verify_logfile(&entry, 30, "--count created 20 entries");
+
+	tc((chp{ execname, "-n", "y", NULL }),
+	   "",
+	   EXECSTR ": Error in -n/--count argument\n"
+	   OPTION_ERROR_STR,
+	   EXIT_FAILURE,
+	   "-n with invalid argument");
+
+	cleanup_tempdir(__LINE__);
+}
+
 /******************************************************************************
                         Top-level --selftest functions
 ******************************************************************************/
@@ -3945,6 +3977,7 @@ static void tests_with_tempdir(void)
 	test_external_editor();
 	test_unreadable_editor_file();
 	test_nonexisting_editor();
+	test_count_option();
 
 	OK_SUCCESS(rmdir(TMPDIR), "Delete temporary directory %s", TMPDIR);
 }
