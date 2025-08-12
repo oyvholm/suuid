@@ -20,6 +20,8 @@
 
 #include "suuid.h"
 
+static unsigned int sessind = 0;
+
 /*
  * is_legal_desc_char() - Return true if the character c is a valid char for 
  * use in the desc attribute in <sess> elements, false if not.
@@ -98,7 +100,6 @@ int fill_sess(struct Entry *dest, const char *uuid,
               const char *desc, const size_t desclen)
 {
 	char *auuid = NULL, *adesc = NULL;
-	static unsigned int sessind = 0;
 
 	assert(dest);
 	assert(valid_uuid(uuid, false));
@@ -202,7 +203,7 @@ int get_sess_info(struct Entry *entry)
 
 /*
  * free_sess() - Deallocate all sess entries in the entry->sess[].{desc,uuid} 
- * arrays.
+ * arrays and reset `sessind`.
  */
 
 void free_sess(struct Entry *entry)
@@ -215,6 +216,7 @@ void free_sess(struct Entry *entry)
 		free(entry->sess[i].uuid);
 		free(entry->sess[i].desc);
 	}
+	sessind = 0;
 }
 
 #ifdef UNUSED

@@ -1071,6 +1071,164 @@ static void test_has_key(void)
 #undef chk_hk
 }
 
+                              /*** sessvar.c ***/
+
+/*
+ * chk_gsi() - Used by test_get_sess_info(). Verifies that the value `env` in 
+ * the environment variable defined by ENV_SESS results in the XML in `exp`. 
+ * Returns nothing.
+ */
+
+static void chk_gsi(const int linenum, const char *env, const char *exp,
+                    const char *desc)
+{
+	struct Entry entry;
+	char *chk_env, *result = NULL;
+
+	assert(env);
+	assert(exp);
+	assert(desc);
+	assert(*desc);
+
+	diag(desc);
+
+	if (OK_SUCCESS_L(setenv(ENV_SESS, env, 1), linenum,
+	                 "Set the %s environment variable", ENV_SESS)) {
+		diag("Cannot set the %s envvar: %s", /* gncov */
+		     ENV_SESS, strerror(errno)); /* gncov */
+		errno = 0; /* gncov */
+		return; /* gncov */
+	}
+	chk_env = getenv(ENV_SESS);
+	OK_NOTNULL_L(chk_env, linenum, "getenv(\"%s\") is not NULL", ENV_SESS);
+	if (!chk_env)
+		return; /* gncov */
+	OK_STRCMP_L(chk_env, env, linenum, "%s is correct", ENV_SESS);
+
+	init_xml_entry(&entry);
+	if (get_sess_info(&entry)) {
+		failed_ok("get_sess_info()"); /* gncov */
+		return; /* gncov */
+	}
+
+	OK_NOTNULL_L(result = create_sess_xml(&entry), linenum,
+	                                      "Extract info from %s",
+	                                      ENV_SESS);
+	if (!result) {
+		failed_ok("create_sess_xml()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	trim_str_end(result);
+	OK_STRCMP_L(result, exp, linenum, "Generated XML is correct");
+	print_gotexp(result, exp);
+
+cleanup:
+	free(result);
+	free_sess(&entry);
+}
+
+/*
+ * test_get_sess_info() - Tests the get_sess_info() function. Returns nothing.
+ */
+
+static void test_get_sess_info(void)
+{
+	diag("Test get_sess_info()");
+
+#define chk_gsi(env, exp, desc)  chk_gsi(__LINE__, (env), (exp), (desc))
+	chk_gsi("", "", "Empty string");
+	chk_gsi("27538da4-fc68-11dd-996d-000475e441b9",
+	        "<sess>27538da4-fc68-11dd-996d-000475e441b9</sess>",
+	        "1 single UUID");
+	chk_gsi("ssh-agent/da700fd8-43eb-11e2-889a-0016d364066c,",
+	        "<sess desc=\"ssh-agent\">da700fd8-43eb-11e2-889a-0016d364066c</sess>",
+	        "\"ssh-agent/\" prefix and comma at the end");
+	chk_gsi("ssh-agent/da700fd8-43eb-11e2-889a-0016d364066c,"
+	        "dingle©/4c66b03a-43f4-11e2-b70d-0016d364066c,",
+	        "<sess desc=\"ssh-agent\">da700fd8-43eb-11e2-889a-0016d364066c</sess> "
+	        "<sess desc=\"dingle©\">4c66b03a-43f4-11e2-b70d-0016d364066c</sess>",
+	        "\"ssh-agent\" and \"dingle©\"");
+	chk_gsi("abc", "", "Variable doesn't contain any UUIDs");
+	chk_gsi("abcdef;b/4c66b03a-43f4-11e2-b70d-0016d364066c",
+	        "<sess desc=\"b\">4c66b03a-43f4-11e2-b70d-0016d364066c</sess>",
+	        "Everything before the semicolon is gone");
+	chk_gsi("ssh-agent/da700fd8-43eb-11e2-889a-0016d364066c",
+	        "<sess desc=\"ssh-agent\">da700fd8-43eb-11e2-889a-0016d364066c</sess>",
+	        "With \"ssh-agent\", missing comma");
+	chk_gsi("/da700fd8-43eb-11e2-889a-0016d364066c",
+	        "<sess>da700fd8-43eb-11e2-889a-0016d364066c</sess>",
+	        "Missing name and comma, but has slash");
+	chk_gsi("ee5db39a-43f7-11e2-a975-0016d364066c,"
+	        "/da700fd8-43eb-11e2-889a-0016d364066c",
+	        "<sess>ee5db39a-43f7-11e2-a975-0016d364066c</sess> "
+	        "<sess>da700fd8-43eb-11e2-889a-0016d364066c</sess>",
+	        "Contains 2 UUIDs; latter missing name and comma, but has slash");
+	chk_gsi("ee5db39a-43f7-11e2-a975-0016d364066c"
+	        "da700fd8-43eb-11e2-889a-0016d364066c",
+	        "<sess>ee5db39a-43f7-11e2-a975-0016d364066c</sess> "
+	        "<sess>da700fd8-43eb-11e2-889a-0016d364066c</sess>",
+	        "2 UUIDs smashed together");
+	chk_gsi("da700fd8-43eb-11e2-889a-0016d364066c"
+	        "abc"
+	        "ee5db39a-43f7-11e2-a975-0016d364066c",
+	        "<sess>da700fd8-43eb-11e2-889a-0016d364066c</sess> "
+	        "<sess desc=\"abc\">ee5db39a-43f7-11e2-a975-0016d364066c</sess>",
+	        "2 UUIDs, only separated by \"abc\"");
+	chk_gsi("da700fd8-43eb-11e2-889a-0016d364066c"
+	        "abc/ee5db39a-43f7-11e2-a975-0016d364066c",
+	        "<sess>da700fd8-43eb-11e2-889a-0016d364066c</sess> "
+	        "<sess desc=\"abc\">ee5db39a-43f7-11e2-a975-0016d364066c</sess>",
+	        "2 UUIDs, separated by \"abc/\"");
+	chk_gsi("da700fd8-43eb-11e2-889a-0016d364066c"
+	        "ee5db39a-43f7-11e2-a975-0016d364066c"
+	        "abc",
+	        "<sess>da700fd8-43eb-11e2-889a-0016d364066c</sess> "
+	        "<sess>ee5db39a-43f7-11e2-a975-0016d364066c</sess>",
+	        "2 UUIDs together, 'abc' at EOS");
+	chk_gsi("da700fd8-43eb-11e2-889a-0016d364066c"
+	        ",,ee5db39a-43f7-11e2-a975-0016d364066c",
+	        "<sess>da700fd8-43eb-11e2-889a-0016d364066c</sess> "
+	        "<sess>ee5db39a-43f7-11e2-a975-0016d364066c</sess>",
+	        "2 UUIDs separated by 2 commas");
+	chk_gsi(",,,,,"
+	        "abc/da700fd8-43eb-11e2-889a-0016d364066c"
+	        ",,,,,,,,,,"
+	        "def/ee5db39a-43f7-11e2-a975-0016d364066c"
+	        ",,%..¤¤¤%¤,,,",
+	        "<sess desc=\"abc\">da700fd8-43eb-11e2-889a-0016d364066c</sess> "
+	        "<sess desc=\"def\">ee5db39a-43f7-11e2-a975-0016d364066c</sess>",
+	        "Lots of commas+punctuation and 2 UUIDs with descs");
+	chk_gsi("5f650dac-4404-11e2-8e0e-0016d364066c"
+	        "5f660e28-4404-11e2-808e-0016d364066c"
+	        "5f66ef14-4404-11e2-8b45-0016d364066c"
+	        "5f67e266-4404-11e2-a6f8-0016d364066c",
+	        "<sess>5f650dac-4404-11e2-8e0e-0016d364066c</sess> "
+	        "<sess>5f660e28-4404-11e2-808e-0016d364066c</sess> "
+	        "<sess>5f66ef14-4404-11e2-8b45-0016d364066c</sess> "
+	        "<sess>5f67e266-4404-11e2-a6f8-0016d364066c</sess>",
+	        "4 UUIDs, no separators");
+	chk_gsi("5f650dac-4404-11e2-8e0e-0016d364066c"
+	        "abc"
+	        "5f660e28-4404-11e2-808e-0016d364066c"
+	        "5f66ef14-4404-11e2-8b45-0016d364066c,"
+	        "nmap/5f67e266-4404-11e2-a6f8-0016d364066c",
+	        "<sess>5f650dac-4404-11e2-8e0e-0016d364066c</sess> "
+	        "<sess desc=\"abc\">5f660e28-4404-11e2-808e-0016d364066c</sess> "
+	        "<sess>5f66ef14-4404-11e2-8b45-0016d364066c</sess> "
+	        "<sess desc=\"nmap\">5f67e266-4404-11e2-a6f8-0016d364066c</sess>",
+	        "4 UUIDs, \"abc\" separates the first 2, last one has desc");
+	chk_gsi("ssh-agent/fea9315a-43d6-11e2-8294-0016d364066c,"
+	        "logging/febfd0f4-43d6-11e2-9117-0016d364066c,"
+	        "screen/0e144c10-43d7-11e2-9833-0016d364066c,"
+	        "ti/152d8f16-4409-11e2-be17-0016d364066c,",
+	        "<sess desc=\"ssh-agent\">fea9315a-43d6-11e2-8294-0016d364066c</sess> "
+	        "<sess desc=\"logging\">febfd0f4-43d6-11e2-9117-0016d364066c</sess> "
+	        "<sess desc=\"screen\">0e144c10-43d7-11e2-9833-0016d364066c</sess> "
+	        "<sess desc=\"ti\">152d8f16-4409-11e2-be17-0016d364066c</sess>",
+	        "4 UUIDs, all with desc");
+#undef chk_gsi
+}
+
                               /*** strings.c ***/
 
 /*
@@ -1750,6 +1908,9 @@ static void test_functions(const struct Options *o)
 
 	/* rcfile.c */
 	test_has_key();
+
+	/* sessvar.c */
+	test_get_sess_info();
 
 	/* strings.c */
 	test_mystrdup();
