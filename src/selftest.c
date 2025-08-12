@@ -4183,6 +4183,46 @@ cleanup:
 	cleanup_tempdir(__LINE__);
 }
 
+                                /*** --raw ***/
+
+/*
+ * test_raw_option() - Tests the --raw option. Returns nothing.
+ */
+
+static void test_raw_option(void)
+{
+	struct Entry entry;
+
+	diag("Test --raw");
+
+	if (init_tempdir())
+		return; /* gncov */
+	init_xml_entry(&entry);
+
+	entry.txt = "Raw data";
+	uc((chp{ execname, "--raw", "-c", "Raw data", NULL }), 1, 0,
+	   "--raw -c \"Raw data\"");
+	verify_logfile(&entry, 1, "--raw with plain text has no surrounding"
+	                          " spaces");
+	delete_logfile();
+
+	entry.txt = " <dingle><dangle>bær</dangle></dingle> ";
+	uc((chp{ execname, "--raw", "-c",
+	         "<dingle><dangle>bær</dangle></dingle>", NULL }),
+	   1, 0, "--raw -c \"<dingle><dangle>bær</dangle></dingle>\"");
+	verify_logfile(&entry, 1, "XML with --raw gets surrounding spaces");
+	delete_logfile();
+
+	entry.txt = "abc<raw>Raw data</raw>def";
+	uc((chp{ execname, "--raw", "-c", "abc<raw>Raw data</raw>def", NULL }),
+	   1, 0, "--raw -c \"abc<raw>Raw data</raw>def\"");
+	verify_logfile(&entry, 1, "--raw: XML with surrounding plain text gets"
+	                          " no surrounding spaces");
+	delete_logfile();
+
+	cleanup_tempdir(__LINE__);
+}
+
 /******************************************************************************
                         Top-level --selftest functions
 ******************************************************************************/
@@ -4261,6 +4301,7 @@ static void tests_with_tempdir(void)
 	test_count_option();
 	test_logdir_option();
 	test_random_mac_option();
+	test_raw_option();
 
 	OK_SUCCESS(rmdir(TMPDIR), "Delete temporary directory %s", TMPDIR);
 }
