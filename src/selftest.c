@@ -4547,6 +4547,35 @@ cleanup:
 	cleanup_tempdir(__LINE__);
 }
 
+                            /*** -w/--whereto ***/
+
+/*
+ * test_whereto_option() - Tests the -w/--whereto option. Returns nothing.
+ */
+
+static void test_whereto_option(void)
+{
+	struct Entry entry;
+
+	diag("Test -w/--whereto");
+
+	if (init_tempdir())
+		return; /* gncov */
+	init_xml_entry(&entry);
+
+	uc((chp{ execname, "-w", "o", NULL }), 1, 0, "\"-w o\" prints to stdout");
+	uc((chp{ execname, "-w", "e", NULL }), 0, 1, "\"-w e\" prints to stderr");
+	uc((chp{ execname, "-w", "a", NULL }), 1, 1, "\"-w a\" prints to stdout and stderr");
+	uc((chp{ execname, "-w", "oe", NULL }), 1, 1, "\"-w oe\" prints to stdout and stderr");
+	uc((chp{ execname, "-w", "n", NULL }), 0, 0, "\"-w n\" prints nothing");
+	uc((chp{ execname, "-w", "y", NULL }), 0, 0, "\"-w y\" prints nothing");
+	uc((chp{ execname, "-w", "", NULL }), 0, 0, "\"-w\" with empty argument prints nothing");
+
+	verify_logfile(&entry, 7, "Log file contains the correct number of"
+	                          " entries after -w/--whereto");
+	cleanup_tempdir(__LINE__);
+}
+
 /******************************************************************************
                         Top-level --selftest functions
 ******************************************************************************/
@@ -4630,6 +4659,7 @@ static void tests_with_tempdir(void)
 	test_tag_option();
 	test_too_many_tags();
 	test_too_many_comma_tags();
+	test_whereto_option();
 
 	OK_SUCCESS(rmdir(TMPDIR), "Delete temporary directory %s", TMPDIR);
 }
