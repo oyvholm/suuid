@@ -1841,6 +1841,84 @@ static void test_uuid_date(void)
                    Function tests, use a temporary directory
 ******************************************************************************/
 
+                              /*** environ.c ***/
+
+/*
+ * test_get_log_prefix() - Tests the get_log_prefix() function. Returns 
+ * nothing.
+ */
+
+static void test_get_log_prefix(void)
+{
+	struct Rc rc;
+	struct Options o = opt_struct();
+	char *hostname, *result = NULL, *exp = NULL, *dir = NULL;
+	const char *desc;
+
+	diag("Test get_log_prefix()");
+
+	init_rc(&rc);
+	rc.hostname = HNAME;
+	hostname = get_hostname(&rc);
+
+	desc = "get_log_prefix() with default values";
+
+	if (init_output_files()) {
+		restore_output_files(); /* gncov */
+		failed_ok("init_output_files()"); /* gncov */
+		return; /* gncov */
+	}
+	result = get_log_prefix(&rc, &o, LOGFILE_EXTENSION);
+	restore_output_files();
+
+	if (!result) {
+		failed_ok("get_log_prefix()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+
+	dir = getpath();
+	if (!dir) {
+		failed_ok("getpath()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	exp = allocstr("%s/%s/uuids/%s%s",
+	               dir, TMPDIR, hostname, LOGFILE_EXTENSION);
+	if (!exp) {
+		failed_ok("allocstr()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	OK_STRCMP(result, exp, "%s (retval)", desc);
+	print_gotexp(result, exp);
+	free(exp);
+	free(result);
+	verify_output_files(desc, "", "");
+
+	desc = "get_log_prefix() with slash in rc.hostname";
+
+	rc.hostname = "with/slash";
+	if (init_output_files()) {
+		restore_output_files(); /* gncov */
+		failed_ok("init_output_files()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	result = get_log_prefix(&rc, &o, LOGFILE_EXTENSION);
+	restore_output_files();
+	OK_NULL(result, "%s (retval)", desc);
+
+	exp = str_replace(EXECSTR ": Got invalid hostname: \"with/slash\"\n",
+	                  EXECSTR, execname);
+	if (!exp) {
+		failed_ok("str_replace()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	verify_output_files(desc, "", exp);
+
+cleanup:
+	free(exp);
+	free(result);
+	free(dir);
+}
+
                               /*** genuuid.c ***/
 
 /*
@@ -2202,6 +2280,9 @@ static void functests_with_tempdir(void)
 		errno = 0; /* gncov */
 		return; /* gncov */
 	}
+
+	/* environ.c */
+	test_get_log_prefix();
 
 	/* genuuid.c */
 	test_fill_entry_struct();
