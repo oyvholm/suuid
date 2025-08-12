@@ -457,6 +457,8 @@ char *uuid_date_from_uuid(char *dest, const char *uuid)
 	}
 	ap = read_from_fp(fp, NULL);
 	pclose(fp);
+	if (!ap)
+		return NULL;
 
 	p = strstr(ap, "content: time:");
 	if (!p) {
