@@ -896,6 +896,26 @@ static void uc_check_va(const int linenum, const char *name,
 }
 
 /*
+ * uc_check() - Frontend against uc_check_va(). Read the description of that 
+ * function for more info.
+ */
+
+static void uc_check(const int linenum, const char *name, const char *output,
+                     const unsigned long num_exp, const char *desc, ...)
+{
+	va_list ap;
+
+	assert(name);
+	assert(strlen(name) == 3);
+	assert(output);
+	assert(desc);
+
+	va_start(ap, desc);
+	uc_check_va(linenum, name, output, num_exp, desc, ap);
+	va_end(ap);
+}
+
+/*
  * uc_func() - Execute command `cmd` and verify that stdout and stderr contains 
  * the correct number of uuids. `desc` is a description of the test. Not meant 
  * to be called directly, but via the uc() macro that logs the line number 
@@ -3278,6 +3298,228 @@ static void test_truncated_logfile(void)
 	cleanup_tempdir(__LINE__);
 }
 
+                            /*** -c/--comment ***/
+
+/*
+ * chk_comment() - Used by test_comment_option(). Verifies that the comment 
+ * `cmt` is stored in the log file as something that matches the regexp 
+ * `regexp`. `desc` is a short test description. Returns nothing.
+ */
+
+static void chk_comment(const int linenum, char *cmt, char *regexp,
+                        const char *desc)
+{
+	struct streams ss;
+	struct Options opt = opt_struct();
+	char *s;
+	struct Entry entry;
+
+	assert(cmt);
+	assert(regexp);
+	assert(desc);
+
+	uc_func(linenum, (chp{ execname, "-c", cmt, NULL }), 1, 0,
+	        "%s, -c option", desc);
+
+	streams_init(&ss);
+	s = allocstr("%s from stdin", desc);
+	if (!s) {
+		failed_ok("allocstr()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	binbuf_allocstr(&ss.in, "%s", cmt);
+	streams_exec(&opt, &ss, chp{ execname, "--comment", "-", NULL });
+	if (!ss.out.buf || !ss.err.buf) {
+		failed_ok("ss.out.buf or ss.err.buf is NULL," /* gncov */
+		          " streams_exec()");
+		goto cleanup; /* gncov */
+	}
+	uc_check(linenum, "out", ss.out.buf, 1, "%s from stdin", desc);
+	OK_STRCMP(ss.err.buf, "", "%s (stderr)", s);
+	print_gotexp(ss.err.buf, "");
+	OK_EQUAL(ss.ret, EXIT_SUCCESS, "%s (retval)", s);
+	init_xml_entry(&entry);
+	entry.txt = regexp;
+	verify_logfile(&entry, 2, "%s (log file)", desc);
+	delete_logfile_func(linenum);
+
+cleanup:
+	streams_free(&ss);
+	free(s);
+}
+
+/*
+ * chk_inv_comment() - Used by test_comment_option(). `cmt` is a comment with 
+ * invalid characters (for example text that's not in UTF-8), and `desc` is a 
+ * short test description. Returns nothing.
+ */
+
+static void chk_inv_comment(const int linenum, char *cmt, const char *desc)
+{
+	struct streams ss;
+	struct Options opt = opt_struct();
+	char *s;
+
+	assert(cmt);
+	assert(desc);
+
+	s = str_replace(EXECSTR ": Comment contains illegal characters or is"
+	                " not valid UTF-8\n", EXECSTR, execname);
+	if (!s) {
+		failed_ok("str_replace()"); /* gncov */
+		return; /* gncov */
+	}
+
+	tc_func(linenum, (chp{ execname, "-c", cmt, NULL }),
+	        "",
+	        s,
+	        EXIT_FAILURE,
+	        "%s, -c option", desc);
+
+	streams_init(&ss);
+	binbuf_allocstr(&ss.in, "%s", cmt);
+	streams_exec(&opt, &ss, chp{ execname, "--comment", "-", NULL });
+	if (!ss.out.buf || !ss.err.buf) {
+		failed_ok("ss.out.buf or ss.err.buf is NULL," /* gncov */
+		          " streams_exec()");
+		goto cleanup; /* gncov */
+	}
+	OK_STRCMP_L(ss.out.buf, "", linenum, "%s from stdin (stdout)", desc);
+	print_gotexp(ss.out.buf, "");
+	OK_STRCMP_L(ss.err.buf, s, linenum, "%s from stdin (stderr)", desc);
+	print_gotexp(ss.err.buf, s);
+	OK_EQUAL_L(ss.ret, EXIT_FAILURE, linenum, "%s from stdin (retval)", desc);
+
+cleanup:
+	streams_free(&ss);
+	free(s);
+}
+
+/*
+ * test_comment_option() - Tests the -c/--comment option. Returns nothing.
+ */
+
+static void test_comment_option(void)
+{
+	struct Entry entry;
+
+	diag("Test -c/--comment");
+
+	if (init_tempdir())
+		return; /* gncov */
+	init_xml_entry(&entry);
+
+	uc((chp{ execname, "-c", "Great test", NULL }), 1, 0,
+	   "-c \"Great test\"");
+	entry.txt = "Great test";
+	verify_logfile(&entry, 1, "-c created 1 entry");
+
+	entry.txt = "(Great test|Another one)";
+	uc((chp{ execname, "--comment", "Another one", NULL }), 1, 0,
+	   "--comment");
+	verify_logfile(&entry, 2, "--comment created 1 entry");
+	delete_logfile();
+
+#define chk_comment(cmt, regexp, desc)  chk_comment(__LINE__, (cmt), \
+                                                    (regexp), (desc))
+	chk_comment("", "", "Empty comment");
+	chk_comment(" Initial space", "Initial space",
+	            "Comment with initial space");
+	chk_comment("\nInitial newline", "Initial newline",
+	            "Comment with initial newline");
+	chk_comment("Trailing space ", "Trailing space",
+	            "Comment with trailing space");
+	chk_comment("Trailing newline\n", "Trailing newline",
+	            "Comment with trailing newline");
+	chk_comment("\xe0\xad\xb2", "\xe0\xad\xb2",
+	            "Comment with 3-byte UTF-8 sequence");
+	chk_comment("\xf0\x9d\x85\x9d", "\xf0\x9d\x85\x9d",
+	            "Comment with 4-byte UTF-8 sequence");
+	chk_comment("Special chars: < & > \\ \n \t end",
+	            "Special chars: &lt; &amp; &gt; \\\\\\\\ \\\\n \\\\t end",
+	            "Special chars: < & > \\ \\n \\t");
+#undef chk_comment
+
+	diag("Invalid characters in comment");
+
+#define chk_inv_comment(cmt, desc)  chk_inv_comment(__LINE__, (cmt), (desc))
+	chk_inv_comment("F\xf8kka \xf8pp", "Comment with latin1 chars");
+	chk_inv_comment("Ctrl-d: \x04", "Reject Ctrl-d in comment");
+	chk_inv_comment("\x7f", "Reject U+007F (DELETE) in comment");
+	chk_inv_comment("\xc1\xbf", "Overlong UTF-8 char in comment, 2 bytes");
+	chk_inv_comment("\xe0\x80\xaf",
+	                "Overlong UTF-8 char in comment, 3 bytes");
+	chk_inv_comment("\xf0\x80\x80\xaf",
+	                "Overlong UTF-8 char in comment, 4 bytes");
+	chk_inv_comment("\xed\xa0\x80",
+	                "UTF-8 contains UTF-16 surrogate char U+D800");
+	chk_inv_comment("\xef\xbf\xbe", "UTF-8 contains U+FFFE");
+	chk_inv_comment("\xef\xbf\xbf", "UTF-8 contains U+FFFF");
+	chk_inv_comment("\xf4\x90\x80\x80",
+	                "UTF-8 contains U+110000, is above U+10FFFF");
+	OK_FALSE(file_exists(logfile),
+	         "The log file doesn't exist after the invalid comments");
+#undef chk_inv_comment
+
+	cleanup_tempdir(__LINE__);
+}
+
+/*
+ * read_long_text_from_stdin() - Reads a long string (120000 bytes, "00001 
+ * 00002 [...] 19999 20000") from stdin. Returns nothing.
+ */
+
+static void read_long_text_from_stdin(void)
+{
+	struct Entry entry;
+	char *buf, *p;
+	const char *desc = "Read monster string from stdin";
+	unsigned long l;
+	struct streams ss;
+	struct Options o = opt_struct();
+
+	diag("Read long text (120000 bytes) from stdin");
+
+	if (init_tempdir())
+		return; /* gncov */
+	init_xml_entry(&entry);
+
+	buf = malloc(120001);
+	if (!buf) {
+		failed_ok("malloc()"); /* gncov */
+		return; /* gncov */
+	}
+	p = buf;
+	for (l = 1; l <= 20000; l++) {
+		snprintf(p, 7, "%05lu ", l);
+		p += 6;
+	}
+	streams_init(&ss);
+	binbuf_allocstr(&ss.in, "%s", buf);
+	OK_EQUAL(streams_exec(&o, &ss, chp{ execname, "-c", "-", NULL }),
+	         EXIT_SUCCESS, "%s (retval)", desc);
+	free(buf);
+	OK_EQUAL(count_uuids(ss.out.buf, "\n"), 1, "%s (stdout)", desc);
+	OK_STRCMP(ss.err.buf, "", "%s (stderr)", desc);
+
+	buf = read_from_file(logfile);
+	if (!buf) {
+		failed_ok("read_from_file()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	OK_NOTNULL(strstr(buf, "<txt>00001 00002 00003 00004 00005 "),
+	           "Start of string is in the log file");
+	OK_NOTNULL(strstr(buf, "10001 10002 10003 10004 10005 "),
+	           "Middle of string is in the log file");
+	OK_NOTNULL(strstr(buf, "19995 19996 19997 19998 19999 20000</txt>"),
+	           "End of string is in the log file");
+
+cleanup:
+	free(buf);
+	streams_free(&ss);
+	cleanup_tempdir(__LINE__);
+}
+
 /******************************************************************************
                         Top-level --selftest functions
 ******************************************************************************/
@@ -3348,6 +3590,8 @@ static void tests_with_tempdir(void)
 	test_without_options();
 	test_sess_elements();
 	test_truncated_logfile();
+	test_comment_option();
+	read_long_text_from_stdin();
 
 	OK_SUCCESS(rmdir(TMPDIR), "Delete temporary directory %s", TMPDIR);
 }

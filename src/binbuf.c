@@ -32,6 +32,34 @@ void binbuf_init(struct binbuf *sb)
 }
 
 /*
+ * binbuf_allocstr() - binbuf version of allocstr(), i.e., store a binbuf 
+ * string in `dest` by providing printf()-like arguments. Returns `dest->buf`, 
+ * or NULL if allocation failed.
+ */
+
+char *binbuf_allocstr(struct binbuf *dest, const char *format, ...)
+{
+	va_list ap;
+	char *p;
+
+	assert(dest);
+	assert(format);
+
+	va_start(ap, format);
+	p = allocstr_va(format, ap);
+	va_end(ap);
+	if (!p) {
+		failed("allocstr_va()"); /* gncov */
+		return NULL; /* gncov */
+	}
+	dest->buf = p;
+	dest->len = strlen(dest->buf);
+	dest->alloc = dest->len + 1;
+
+	return dest->buf;
+}
+
+/*
  * binbuf_free() - Deallocate a `struct binbuf` and set struct values to 
  * initial state.
  */
