@@ -4223,6 +4223,95 @@ static void test_raw_option(void)
 	cleanup_tempdir(__LINE__);
 }
 
+                              /*** --rcfile ***/
+
+/*
+ * test_rcfile_option() - Tests the --rcfile option. Returns nothing.
+ */
+
+static void test_rcfile_option(void)
+{
+	struct Entry entry;
+	struct Rc rc;
+	char *rc2 = TMPDIR "/rc2", *s = NULL;
+
+	diag("Test --rcfile");
+
+	if (init_tempdir())
+		return; /* gncov */
+	init_xml_entry(&entry);
+
+	init_rc(&rc);
+	rc.hostname = HNAME;
+	rc.macaddr = "ed604660c349";
+
+	if (OK_SUCCESS(create_rcfile(rc2, &rc),
+	               "Create rc file \"%s\"", rc2)) {
+	        diag("%s():%d: %s: Cannot create rc file: %s", /* gncov */
+	             __func__, __LINE__, rc2, strerror(errno)); /* gncov */
+	        errno = 0; /* gncov */
+	        goto cleanup; /* gncov */
+	}
+
+	uc((chp{ execname, "--rcfile", rc2, NULL }), 1, 0, "--rcfile %s", rc2);
+	s = read_from_file(logfile);
+	if (!s) {
+		failed_ok("read_from_file(logfile)"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	OK_NOTNULL(strstr(s, rc.macaddr),
+	           "The correct MAC address is in the log file");
+
+	if (set_env(ENV_HOSTNAME, HNAME))
+		goto cleanup; /* gncov */
+	uc((chp{ execname, "--rcfile", TMPDIR "/nosuchrc", NULL }), 1, 0,
+	   "--rcfile %s/nosuchrc", TMPDIR);
+	if (unset_env(ENV_HOSTNAME))
+		goto cleanup; /* gncov */
+	verify_logfile(&entry, 2,
+	               "Log file after missing rc file has 2 entries");
+
+	rc.macaddr = "";
+	if (OK_SUCCESS(create_rcfile(rc2, &rc),
+	               "Create rc file \"%s\" with empty MAC address", rc2)) {
+		diag("%s():%d: %s: Cannot create rc file: %s", /* gncov */
+		     __func__, __LINE__, rc2, strerror(errno)); /* gncov */
+		errno = 0; /* gncov */
+		goto cleanup; /* gncov */
+	}
+	uc((chp{ execname, "--rcfile", rc2, NULL }), 1, 0,
+	   "--rcfile %s with empty MAC address", rc2);
+	verify_logfile(&entry, 3,
+	               "Log file after empty MAC address in the rc file");
+
+	if (OK_NOTNULL(create_file(rc2, "hostname = " HNAME "\nmacaddr =\n"),
+	               "Create rc file \"%s\" with empty MAC address and no"
+	               " terminating space character after \"=\"", rc2)) {
+		diag("%s():%d: %s: Cannot create rc file: %s", /* gncov */
+		     __func__, __LINE__, rc2, strerror(errno)); /* gncov */
+		errno = 0; /* gncov */
+		goto cleanup; /* gncov */
+	}
+	uc((chp{ execname, "--rcfile", rc2, NULL }), 1, 0,
+	   "--rcfile %s with empty MAC address and no terminating space", rc2);
+	verify_logfile(&entry, 4, "Log file after empty MAC address and no"
+	                          " space in the rc file");
+	delete_logfile();
+
+	if (set_env(ENV_HOSTNAME, HNAME))
+		goto cleanup; /* gncov */
+	uc((chp{ execname, "--rcfile", "", NULL }), 1, 0,
+	   "Empty argument to --rcfile");
+	verify_logfile(&entry, 1, "Log file after empty argument to --rcfile");
+
+cleanup:
+	unset_env(ENV_HOSTNAME);
+	free(s);
+	if (file_exists(rc2))
+		OK_SUCCESS(remove(rc2), "Delete rc file %s", rc2);
+	cleanup_tempdir(__LINE__);
+}
+
 /******************************************************************************
                         Top-level --selftest functions
 ******************************************************************************/
@@ -4302,6 +4391,7 @@ static void tests_with_tempdir(void)
 	test_logdir_option();
 	test_random_mac_option();
 	test_raw_option();
+	test_rcfile_option();
 
 	OK_SUCCESS(rmdir(TMPDIR), "Delete temporary directory %s", TMPDIR);
 }
