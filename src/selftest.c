@@ -4312,6 +4312,241 @@ cleanup:
 	cleanup_tempdir(__LINE__);
 }
 
+                              /*** -t/--tag ***/
+
+/*
+ * test_tag_option() - Tests the -t/--tag option. Returns nothing.
+ */
+
+static void test_tag_option(void)
+{
+	struct Entry entry;
+
+	diag("Test -t/--tag");
+
+	if (init_tempdir())
+		return; /* gncov */
+	init_xml_entry(&entry);
+
+	entry.tag[0] = "snaddertag";
+
+	uc((chp{ execname, "-t", entry.tag[0], NULL }), 1, 0, "1 single tag");
+	verify_logfile(&entry, 1, "Log file after 1 single tag");
+
+	uc((chp{ execname, "--tag", "   snaddertag   ", NULL }), 1, 0,
+	   "1 single tag with surrounding spaces");
+	verify_logfile(&entry, 2,
+	               "Log file after 1 single tag with surrounding spaces");
+
+	delete_logfile();
+
+	memcpy(entry.tag, chp{ "first", "second", "third", NULL },
+	       sizeof(char *) * 4);
+
+	uc((chp{ execname, "-t", "first,second,third", NULL }), 1, 0,
+	   "\"-t first,second,third\"");
+	verify_logfile(&entry, 1, "Log file after \"-t first,second,third\"");
+
+	uc((chp{ execname, "--tag", "first,second,third", NULL }), 1, 0,
+	   "\"--tag first,second,third\"");
+	verify_logfile(&entry, 2,
+	               "Log file after \"--tag first,second,third\"");
+
+	uc((chp{ execname, "-t", "first", "-t", "second", "--tag", "third", NULL }),
+	   1, 0, "\"-t first -t second --tag third\"");
+	verify_logfile(&entry, 3, "Log file after \"-t first -t second --tag"
+	                          " third\"");
+
+	uc((chp{ execname, "-t", "first", "--tag", "", "-t", "second", "--tag",
+	         "third", NULL }),
+	   1, 0, "Empty tag between first and second");
+	verify_logfile(&entry, 4, "Log file after empty tag");
+
+	uc((chp{ execname, "--tag", ",,first,,,second,,,third,,,", NULL }), 1, 0,
+	   "Empty comma-separated tags");
+	verify_logfile(&entry, 5, "Log file after empty comma-separated tags");
+
+	uc((chp{ execname, "-t", "first", "-t", "second", "-t", "third",
+	         "-t", "first", "-t", "second", "-t", "third", NULL }),
+	   1, 0, "Duplicated tags");
+	verify_logfile(&entry, 6, "Log file after duplicated tags");
+
+	uc((chp{ execname, "--tag", "first,second,third,first,second", NULL }),
+	   1, 0, "Duplicated comma-separated tags");
+	verify_logfile(&entry, 7,
+	               "Log file after duplicated comma-separated tags");
+
+	delete_logfile();
+	init_xml_entry(&entry);
+	entry.tag[0] = "Ḡṹṛḡḷḗ";
+
+	uc((chp{ execname, "--tag", "Ḡṹṛḡḷḗ", NULL }), 1, 0, "UTF-8 tag");
+	verify_logfile(&entry, 1, "Log file after UTF-8 tag");
+
+	tc((chp{ execname, "-t", "schn\xfc" "ffelhund", NULL }),
+	   "",
+	   EXECSTR ": Tags have to be in UTF-8\n",
+	   EXIT_FAILURE,
+	   "Invalid UTF-8 in tag");
+	verify_logfile(&entry, 1, "Log file after invalid UTF-8 in tag");
+
+	delete_logfile();
+	init_xml_entry(&entry);
+	entry.tag[0] = "tag with spaces";
+
+	uc((chp{ execname, "--tag", "tag with spaces", NULL }), 1, 0,
+	   "Tag with spaces");
+	verify_logfile(&entry, 1, "Log file, tag with spaces");
+
+	uc((chp{ execname, "--tag", "   tag with spaces   ", NULL }), 1, 0,
+	   "Tag with spaces and surrounding space");
+	verify_logfile(&entry, 2,
+	               "Log file, tag with spaces and surrounding space");
+
+	delete_logfile();
+	init_xml_entry(&entry);
+	entry.tag[0] = "tag\\\\twith\\\\ttabs";
+
+	uc((chp{ execname, "--tag", "tag\twith\ttabs", NULL }), 1, 0,
+	   "Tag with tabs");
+	verify_logfile(&entry, 1, "Log file, tag with tabs");
+
+	delete_logfile();
+	init_xml_entry(&entry);
+	entry.tag[0] = "tag\\\\nwith\\\\nnewlines";
+
+	uc((chp{ execname, "--tag", "tag\nwith\nnewlines", NULL }), 1, 0,
+	   "Tag with newlines");
+	verify_logfile(&entry, 1, "Log file, tag with newlines");
+
+	delete_logfile();
+	init_xml_entry(&entry);
+	entry.tag[0] = "&lt;&amp;&gt;";
+
+	uc((chp{ execname, "--tag", "<&>", NULL }), 1, 0,
+	   "Tag is \"<&>\"");
+	verify_logfile(&entry, 1, "Log file, tag is \"<&>\"");
+
+	cleanup_tempdir(__LINE__);
+}
+
+/*
+ * test_too_many_tags() - Tests the -t/--tag option with too many tags. Returns 
+ * nothing.
+ */
+
+static void test_too_many_tags(void)
+{
+	struct Entry entry;
+	unsigned int i;
+	size_t tag_count = MAX_TAGS + 1,
+	       arrsize = 2 * tag_count + 2;
+	char *arr[arrsize], *s = NULL;
+
+	diag("Too many -t/--tag options");
+
+	if (init_tempdir())
+		return; /* gncov */
+	init_xml_entry(&entry);
+
+	for (i = 0; i < arrsize; i++)
+		arr[i] = NULL;
+
+	arr[0] = mystrdup(execname);
+	for (i = 0; i < tag_count; i++) {
+		arr[i * 2 + 1] = mystrdup("-t");
+		if (!arr[i * 2 + 1]) {
+			failed_ok("mystrdup()"); /* gncov */
+			goto cleanup; /* gncov */
+		}
+
+		arr[i * 2 + 2] = allocstr("%u", i);
+		if (!arr[i * 2 + 2]) {
+			failed_ok("allocstr()"); /* gncov */
+			goto cleanup; /* gncov */
+		}
+	}
+
+	s = allocstr("%s: Maximum number of tags (%u) exceeded\n%s",
+	             EXECSTR, MAX_TAGS, OPTION_ERROR_STR);
+	if (!s) {
+		failed_ok("allocstr()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+
+	tc(arr, "", s, EXIT_FAILURE, "Too many tags");
+	OK_FALSE(file_exists(logfile),
+	         "Log file doesn't exist after too many tags");
+
+cleanup:
+	free(s);
+	for (i = 0; i < arrsize; i++)
+		free(arr[i]);
+	cleanup_tempdir(__LINE__);
+}
+
+/*
+ * test_too_many_comma_tags() - Tests what happens when too many 
+ * comma-separated tags (more than MAX_TAGS) are used with --tag. Returns 
+ * nothing.
+ */
+
+static void test_too_many_comma_tags(void)
+{
+	struct Entry entry;
+	size_t digits = 1, n = MAX_TAGS + 1, bufsize;
+	char *buf, *p, *exp_stderr = NULL;
+	unsigned int i;
+
+	diag("Too many comma-separated tags");
+
+	if (init_tempdir())
+		return; /* gncov */
+	init_xml_entry(&entry);
+
+	while (n >= 10) {
+		digits++;
+		n /= 10;
+	}
+	bufsize = MAX_TAGS * (strlen("t") + digits + strlen(",")) + 1;
+	if (bufsize < MAX_TAGS) {
+		OK_ERROR("Buffer size overflow for MAX_TAGS=%u", /* gncov */
+		         MAX_TAGS);
+		return; /* gncov */
+	}
+
+	buf = malloc(bufsize);
+	if (!buf) {
+		failed_ok("malloc()"); /* gncov */
+		return; /* gncov */
+	}
+	*buf = '\0';
+
+	p = buf;
+	for (i = 1; i <= MAX_TAGS + 1; i++) {
+		p = allocstr("t%u,", i);
+		if (!p) {
+			failed_ok("allocstr()"); /* gncov */
+			goto cleanup; /* gncov */
+		}
+		strcat(buf, p);
+		free(p);
+	}
+
+	exp_stderr = allocstr("%s: Maximum number of tags (%u) exceeded\n",
+	                      execname, MAX_TAGS);
+	tc((chp{ execname, "--tag", buf, NULL }),
+	   "",
+	   exp_stderr,
+	   EXIT_FAILURE,
+	   "Too many comma-separated tags");
+
+cleanup:
+	free(exp_stderr);
+	free(buf);
+	cleanup_tempdir(__LINE__);
+}
+
 /******************************************************************************
                         Top-level --selftest functions
 ******************************************************************************/
@@ -4392,6 +4627,9 @@ static void tests_with_tempdir(void)
 	test_random_mac_option();
 	test_raw_option();
 	test_rcfile_option();
+	test_tag_option();
+	test_too_many_tags();
+	test_too_many_comma_tags();
 
 	OK_SUCCESS(rmdir(TMPDIR), "Delete temporary directory %s", TMPDIR);
 }
