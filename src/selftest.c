@@ -3145,6 +3145,72 @@ cleanup:
 	cleanup_tempdir(__LINE__);
 }
 
+/*
+ * test_sess_elements() - Tests that the `<sess>` elements are generated 
+ * properly in the XML file. Returns nothing.
+ */
+
+static void test_sess_elements(void)
+{
+	struct Entry entry;
+
+	diag("Test %s environment variable", ENV_SESS);
+
+	if (init_tempdir())
+		return; /* gncov */
+	init_xml_entry(&entry);
+
+	diag("3 UUIDs with descriptions");
+
+	entry.sess[0].desc = "top";
+	entry.sess[0].uuid = "22d2a6c4-5cba-11f0-98e7-83850402c3ce";
+	entry.sess[1].desc = "middle";
+	entry.sess[1].uuid = "31353646-5cba-11f0-a4c5-83850402c3ce";
+	entry.sess[2].desc = "bottom";
+	entry.sess[2].uuid = "3db1691c-5cba-11f0-8f93-83850402c3ce";
+
+	if (setenv(ENV_SESS, ",top/22d2a6c4-5cba-11f0-98e7-83850402c3ce"
+	                     ",middle/31353646-5cba-11f0-a4c5-83850402c3ce"
+	                     ",bottom/3db1691c-5cba-11f0-8f93-83850402c3ce,",
+	           1))
+	        failed_ok("setenv()"); /* gncov */
+
+	uc((chp{ execname, NULL }), 1, 0, "%s with no options", ENV_SESS);
+	verify_logfile(&entry, 1, "Log file after %s with no options",
+	                          ENV_SESS);
+	delete_logfile();
+
+	diag("2 UUIDs separated by \"abc\"");
+
+	if (setenv(ENV_SESS, "22d2a6c4-5cba-11f0-98e7-83850402c3ce"
+	                     "abc"
+	                     "31353646-5cba-11f0-a4c5-83850402c3ce", 1))
+		failed_ok("setenv()"); /* gncov */
+
+	uc((chp{ execname, NULL }), 1, 0,
+	   "%s with 2 UUIDs, only separated by 'abc'", ENV_SESS);
+	entry.sess[0].desc = NULL;
+	entry.sess[1].desc = "abc";
+	entry.sess[2].desc = NULL;
+	entry.sess[2].uuid = NULL;
+	verify_logfile(&entry, 1, "Log file after %s with 2 UUIDs separated"
+	                          " with abc", ENV_SESS);
+
+	diag("%s contains no UUIDs", ENV_SESS);
+
+	init_xml_entry(&entry);
+	if (setenv(ENV_SESS, "no_uuids", 1))
+		failed_ok("setenv()"); /* gncov */
+	delete_logfile();
+
+	uc((chp{ execname, NULL }), 1, 0, "%s contains no UUIDs", ENV_SESS);
+	verify_logfile(&entry, 1, "Log file after %s with no UUIDs", ENV_SESS);
+
+	diag("Clean up after %s()", __func__);
+	unset_env(ENV_SESS);
+	cleanup_tempdir(__LINE__);
+}
+
 /******************************************************************************
                         Top-level --selftest functions
 ******************************************************************************/
@@ -3213,6 +3279,7 @@ static void tests_with_tempdir(void)
 	}
 
 	test_without_options();
+	test_sess_elements();
 
 	OK_SUCCESS(rmdir(TMPDIR), "Delete temporary directory %s", TMPDIR);
 }
