@@ -172,8 +172,17 @@
 #define unset_env(a)  unset_env_func(__LINE__, (a))
 #define verify_output_files(desc, exp_stdout, exp_stderr)  \
         verify_output_files_func(__LINE__, desc, exp_stdout, exp_stderr)
+
+/* Used in chk_rr_im() to specify which stderr output is expected. */
+enum rr_msgs {
+	RR_ILLEGAL_CHARS,
+	RR_MULTICAST,
+	RR_WRONG_LENGTH
+};
+
 static char *execname;
 static char *logfile;
+static const char *rcfile = TMPDIR "/" STD_RCFILE;
 static int failcount = 0;
 static int testnum = 0;
 
@@ -2042,6 +2051,105 @@ static void test_create_file(void)
 	OK_SUCCESS(remove(file), "Delete %s", file);
 }
 
+                              /*** rcfile.c ***/
+
+/*
+ * chk_rr_memb() - Used by chk_rr() and is created to avoid unnecessary 
+ * duplication and make it easy to add new rc file keywords. Verifies that 
+ * `got` (the keyword value delivered by read_rcfile()) is equal to the 
+ * expected value `exp`. `name` is the keyword, and `desc` is the short test 
+ * description specified in test_read_rcfile(). Returns nothing.
+ */
+
+static void chk_rr_memb(const int linenum, const char *got, const char *exp,
+                        const char *name, const char *desc)
+{
+	int res;
+
+	assert(name);
+	assert(desc);
+
+	if (!exp)
+		return;
+
+	res = got == exp || (got && exp && !strcmp(got, exp));
+	OK_TRUE_L(res, linenum, "%s (%s)", desc, name);
+	print_gotexp(got, exp);
+}
+
+/*
+ * chk_rr() - Used by test_read_rcfile(). Verifies that read_rcfile() parses 
+ * the contents of an rc file correctly. The contents of the rc file is stored 
+ * in `contents`, and the result must be identical to the values in `exp`. 
+ * `desc` is a short description of the test. Returns nothing.
+ */
+
+static void chk_rr(const int linenum, const char *contents, struct Rc *exp,
+                   const char *desc)
+{
+	struct Rc got;
+
+	assert(contents);
+	assert(exp);
+	assert(desc);
+
+	diag("%s", desc);
+	init_rc(&got);
+	if (OK_NOTNULL_L(create_file(rcfile, contents), linenum,
+	                 "Create rc file")) {
+		failed_ok("create_file()"); /* gncov */
+		return; /* gncov */
+	}
+	if (OK_SUCCESS_L(read_rcfile(rcfile, &got), linenum, "Read rc file")) {
+		failed_ok("read_rcfile()"); /* gncov */
+		goto remove_file; /* gncov */
+	}
+
+	chk_rr_memb(linenum, got.hostname, exp->hostname, "hostname", desc);
+	chk_rr_memb(linenum, got.macaddr, exp->macaddr, "macaddr", desc);
+
+	free_rc(&got);
+
+remove_file:
+	if (OK_SUCCESS_L(remove(rcfile), linenum, "Delete rc file"))
+		failed_ok("remove()"); /* gncov */
+}
+
+/*
+ * test_read_rcfile() - Tests the read_rcfile() function. Returns nothing.
+ */
+
+static void test_read_rcfile(void)
+{
+	diag("Test read_rcfile()");
+
+#define MAC  "a1a1e513f90b"
+#define sr  &(struct Rc)
+
+#define chk_rr(contents, exp, desc)  chk_rr(__LINE__, (contents), (exp), (desc))
+	chk_rr("hostname = abc\n", sr{ .hostname = "abc" }, "hostname = abc");
+	chk_rr("hostname=abc\n", sr{ .hostname = "abc" }, "hostname=abc");
+	chk_rr("macaddr=" MAC, sr{ .macaddr = MAC }, "hostname=" MAC
+	       ", no \\n");
+	chk_rr("hostname = abc\nmacaddr=" MAC "\n",
+	       (sr{ .hostname = "abc", .macaddr = MAC }),
+	       "hostname and macaddr, all is good");
+	chk_rr("macaddr=A1A1E513F90B\n", (sr{ .macaddr = MAC }),
+	       "MAC address is upper case");
+	chk_rr("   macaddr     =       " MAC "      \n", (sr{ .macaddr = MAC }),
+	       "macaddr with surrounding spaces");
+	chk_rr("macaddr =\n", (sr{ .macaddr = NULL }),
+	       "macaddr with no value, that's OK");
+	chk_rr("macaddr =   \n", (sr{ .macaddr = NULL }),
+	       "macaddr with no value, but with trailing spaces");
+	chk_rr("macaddr: " MAC "\n", (sr{ .macaddr = NULL }),
+	       "macaddr with colon instead of equal sign");
+#undef chk_rr
+
+#undef MAC
+#undef sr
+}
+
 /******************************************************************************
             Test the executable file, no temporary directory needed
 ******************************************************************************/
@@ -2289,6 +2397,9 @@ static void functests_with_tempdir(void)
 
 	/* io.c */
 	test_create_file();
+
+	/* rcfile.c */
+	test_read_rcfile();
 
 	result = rmdir(TMPDIR);
 	OK_SUCCESS(result, "rmdir " TMPDIR " after function tests");
