@@ -4690,6 +4690,124 @@ cleanup:
 	cleanup_tempdir(linenum);
 }
 
+/*
+ * chk_irh() - Used by test_invalid_rcfile_data(). "Check Invalid Rc Host 
+ * name". Creates a rc file with an invalid host name specified in `hostname`, 
+ * and `desc` is a short description of the host name.
+ */
+
+static void chk_irh(const int linenum, char *hostname, const char *desc)
+{
+	struct Rc rc;
+	char *s;
+
+	assert(hostname);
+	assert(desc);
+
+	init_rc(&rc);
+
+	rc.hostname = hostname;
+	OK_SUCCESS_L(create_rcfile(rcfile, &rc), linenum,
+	             "Create rc file, hostname %s", desc);
+
+	s = allocstr("%s: Got invalid hostname: \"%s\"\n", EXECSTR, hostname);
+	if (!s) {
+		failed_ok("allocstr()"); /* gncov */
+		return; /* gncov */
+	}
+	tc_func(linenum, (chp{ execname, NULL }),
+	        "",
+	        s,
+	        EXIT_FAILURE,
+	        "Host name %s", desc);
+	free(s);
+}
+
+/*
+ * test_invalid_rcfile_data() - Tests invalid values in the rc file. Returns 
+ * nothing.
+ */
+
+static void test_invalid_rcfile_data(void)
+{
+	struct Rc rc;
+	char longbuf[MAX_HOSTNAME_LENGTH + 2];
+
+	diag("Test invalid data in the rc file");
+
+	if (init_tempdir())
+		return; /* gncov */
+
+	init_rc(&rc);
+	rc.hostname = HNAME;
+
+	diag("Invalid MAC address");
+
+	// rc.macaddr = "b1049d19af79";
+
+	rc.macaddr = "b1049d19af7g";
+	OK_SUCCESS(create_rcfile(rcfile, &rc),
+	           "Create rc file, macaddr contains 'g'");
+	tc((chp{ execname, NULL }),
+	   "",
+	   EXECSTR ": MAC address contains illegal characters, can only"
+	   " contain hex digits\n",
+	   EXIT_FAILURE,
+	   "macaddr contains 'g'");
+
+	rc.macaddr = "b1049d19af7";
+	OK_SUCCESS(create_rcfile(rcfile, &rc),
+	           "Create rc file, macaddr is too short");
+	tc((chp{ execname, NULL }),
+	   "",
+	   EXECSTR ": Wrong MAC address length, must be exactly 12 hex"
+	   " digits\n",
+	   EXIT_FAILURE,
+	   "macaddr is too short");
+
+	rc.macaddr = "b1049d19af790";
+	OK_SUCCESS(create_rcfile(rcfile, &rc),
+	           "Create rc file, macaddr is too long");
+	tc((chp{ execname, NULL }),
+	   "",
+	   EXECSTR ": Wrong MAC address length, must be exactly 12 hex"
+	   " digits\n",
+	   EXIT_FAILURE,
+	   "macaddr is too long");
+
+	rc.macaddr = "b0049d19af79";
+	OK_SUCCESS(create_rcfile(rcfile, &rc),
+	           "Create rc file, multicast bit not set");
+	tc((chp{ execname, NULL }),
+	   "",
+	   EXECSTR ": MAC address doesn't follow RFC 4122, multicast bit not"
+	   " set\n",
+	   EXIT_FAILURE,
+	   "Multicast bit not set");
+
+	OK_FALSE(file_exists(logfile),
+	         "Log file doesn't exist after invalid MAC addresses");
+
+	diag("Invalid host name");
+
+#define chk_irh(hostname, desc)  chk_irh(__LINE__, (hostname), (desc))
+	chk_irh("", "is empty");
+	chk_irh("with/slash", "contains slash");
+	chk_irh("with..dots", "contains \"..\"");
+	chk_irh("with space", "contains space");
+	chk_irh("has\xe5", "contains latin1 char");
+	chk_irh("with_ø", "contains 'ø'");
+	memset(longbuf, 'a', MAX_HOSTNAME_LENGTH + 1);
+	longbuf[MAX_HOSTNAME_LENGTH + 1] = '\0';
+	chk_irh(longbuf, "is too long");
+#undef chk_irh
+
+	OK_FALSE(file_exists(logfile),
+	         "Log file doesn't exist after invalid host names");
+
+	cleanup_tempdir(__LINE__);
+}
+
 /******************************************************************************
                         Top-level --selftest functions
 ******************************************************************************/
@@ -4776,6 +4894,7 @@ static void tests_with_tempdir(void)
 	test_whereto_option();
 	test_sigpipe_signal(__LINE__, "");
 	test_sigpipe_signal(__LINE__, "-w o");
+	test_invalid_rcfile_data();
 
 	OK_SUCCESS(rmdir(TMPDIR), "Delete temporary directory %s", TMPDIR);
 }
