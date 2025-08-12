@@ -3909,6 +3909,89 @@ static void test_count_option(void)
 	cleanup_tempdir(__LINE__);
 }
 
+                             /*** -l/--logdir ***/
+
+/*
+ * test_logdir_option() - Tests the -l/--logdir option. Returns nothing.
+ */
+
+static void test_logdir_option(void)
+{
+	struct Entry entry;
+	int result;
+	char *bck_home = NULL;
+	struct Rc rc;
+
+	diag("Test -l/--logdir");
+
+	if (init_tempdir())
+		return; /* gncov */
+	init_xml_entry(&entry);
+
+	OK_SUCCESS(result = rename(TMPDIR "/uuids", TMPDIR "/uuids2"),
+	           "rename uuids/ to uuids2/");
+	if (result) {
+		OK_ERROR("Cannot rename uuids/ to uuids2/" /* gncov */
+		         " directory, skipping tests: %s",
+		         strerror(errno));
+		errno = 0; /* gncov */
+		return; /* gncov */
+	}
+
+	entry.txt = "With -l/--logdir";
+	uc((chp{ execname, "-l", TMPDIR "/uuids2", "-c", "With -l/--logdir",
+	         NULL }),
+	   1, 0, "\"-l " TMPDIR "/uuids2\"");
+
+	uc((chp{ execname, "--logdir", TMPDIR "/uuids2", "-c",
+	         "With -l/--logdir", NULL }), 1, 0,
+	        "\"--logdir " TMPDIR "/uuids2\"");
+
+	OK_SUCCESS(result = rename(TMPDIR "/uuids2", TMPDIR "/uuids"),
+	           "Rename uuids2/ back to uuids/");
+	if (result) {
+		OK_ERROR("Cannot rename uuids2/ to uuids/: %s", /* gncov */
+		         strerror(errno));
+		errno = 0; /* gncov */
+		return; /* gncov */
+	}
+
+	verify_logfile(&entry, 2, "Log file, \"-l " TMPDIR "/uuids2\"");
+	delete_logfile();
+
+	diag("No HOME envvar, but -l is used");
+	OK_NOTNULL(getenv("HOME"), "getenv(\"HOME\") doesn't return NULL");
+	bck_home = mystrdup(getenv("HOME"));
+	if (!bck_home) {
+		failed_ok("mystrdup()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	unset_env("HOME");
+
+	tc((chp{ execname, "-l", TMPDIR "/uuids", NULL }),
+	   NULL,
+	   EXECSTR ": HOME environment variable not defined, cannot determine"
+	   " name of rcfile\n",
+	   EXIT_SUCCESS,
+	   "-l is used with undefined HOME");
+
+	if (OK_SUCCESS(setenv("HOME", bck_home, 1), "Restore HOME envvar")) {
+		failed_ok("setenv()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	init_rc(&rc);
+	entry.host = get_hostname(&rc);
+	entry.txt = NULL;
+	if (!entry.host)
+		failed_ok("get_hostname()"); /* gncov */
+	else
+		verify_logfile(&entry, 1, "Log file after -l without HOME");
+
+cleanup:
+	free(bck_home);
+	cleanup_tempdir(__LINE__);
+}
+
 /******************************************************************************
                         Top-level --selftest functions
 ******************************************************************************/
@@ -3985,6 +4068,7 @@ static void tests_with_tempdir(void)
 	test_unreadable_editor_file();
 	test_nonexisting_editor();
 	test_count_option();
+	test_logdir_option();
 
 	OK_SUCCESS(rmdir(TMPDIR), "Delete temporary directory %s", TMPDIR);
 }
