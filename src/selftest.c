@@ -3959,6 +3959,13 @@ static void test_logdir_option(void)
 	verify_logfile(&entry, 2, "Log file, \"-l " TMPDIR "/uuids2\"");
 	delete_logfile();
 
+	tc((chp{ execname, "--logdir", "", NULL }),
+	   "",
+	   EXECSTR ": -l/--logdir argument cannot be empty\n"
+	   OPTION_ERROR_STR,
+	   EXIT_FAILURE,
+	   "Empty argument to --logdir");
+
 	diag("No HOME envvar, but -l is used");
 	OK_NOTNULL(getenv("HOME"), "getenv(\"HOME\") doesn't return NULL");
 	bck_home = mystrdup(getenv("HOME"));

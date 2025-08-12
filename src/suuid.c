@@ -379,6 +379,10 @@ static int choose_opt_action(struct Options *dest,
 		dest->help = true;
 		break;
 	case 'l':
+		if (!*optarg) {
+			myerror("-l/--logdir argument cannot be empty");
+			return 1;
+		}
 		dest->logdir = optarg;
 		break;
 	case 'm':
