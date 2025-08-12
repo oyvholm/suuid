@@ -46,6 +46,32 @@ void free_rc(struct Rc *rc)
 }
 
 /*
+ * create_rcfile() - Create rcfile `file`, using the values in `rc`. Returns 0 
+ * if successful, or 1 if anything failed.
+ */
+
+int create_rcfile(const char *file, struct Rc *rc)
+{
+	FILE *fp = NULL;
+
+	assert(file);
+	assert(*file);
+	assert(rc);
+
+	fp = fopen(file, "w");
+	if (!fp)
+		return 1; /* gncov */
+	if (rc->hostname)
+		fprintf(fp, "hostname = %s\n", rc->hostname);
+	if (rc->macaddr)
+		fprintf(fp, "macaddr = %s\n", rc->macaddr);
+	if (fclose(fp))
+		return 1; /* gncov */
+
+	return 0;
+}
+
+/*
  * get_rcfilename() - Return pointer to an allocated string with name of 
  * rcfile. If neither opts->rcfile or HOME is defined, return NULL.
  */

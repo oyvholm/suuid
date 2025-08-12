@@ -162,6 +162,8 @@
 #define HNAME  "hname"
 #define TMPDIR  ".suuid-test.tmp"
 
+#define delete_logfile()  delete_logfile_func(__LINE__)
+#define init_tempdir()  init_tempdir_func(__LINE__)
 #define sc(cmd, num_stdout, num_stderr, desc, ...)  \
         sc_func(__LINE__, (cmd), (num_stdout), (num_stderr), \
                 (desc), ##__VA_ARGS__);
@@ -836,6 +838,114 @@ out:
 }
 
 /*
+ * hostname_logfile() - Returns an allocated string to the log file when HNAME 
+ * isn't used, i.e., when the value from get_hostname() is used. `dir` is the 
+ * name of the log directory. If `dir` is NULL, the default name "uuids" is 
+ * used. Returns NULL on error.
+ */
+
+static char *hostname_logfile(const char *dir)
+{
+	struct Rc rc;
+	char *hostname, *hostname_log;
+
+	init_rc(&rc);
+	hostname = get_hostname(&rc);
+	if (!hostname) {
+		failed_ok("get_hostname()"); /* gncov */
+		return NULL; /* gncov */
+	}
+	hostname_log = allocstr("%s/%s/%s%s",
+	                        TMPDIR, dir ? dir : "uuids", hostname,
+	                        LOGFILE_EXTENSION);
+	if (!hostname_log)
+		failed_ok("allocstr()"); /* gncov */
+
+	return hostname_log;
+}
+
+/*
+ * delete_logfile_func() - Deletes the log file. For the `funcname` value, 
+ * `__func__` should be used, and `__LINE__` for `linenum`. This is to avoid 
+ * duplicated test descriptions.
+ *
+ * Not meant to be called directly, but via the delete_logfile() macro that 
+ * logs the line number automatically.
+ *
+ * Returns 1 if anything failed, otherwise 0.
+ */
+
+static int delete_logfile_func(const int linenum)
+{
+	int result;
+	char *hostname_log;
+
+	if (!strstr(getenv("HOME"), TMPDIR)) {
+		bail_out("%s(): The string \"%s\" was not found" /* gncov */
+		         " in the HOME environment variable, will not delete"
+		         " the log file.", __func__, TMPDIR);
+	}
+
+	hostname_log = hostname_logfile(NULL);
+	if (hostname_log) {
+		if (file_exists(hostname_log))
+			OK_SUCCESS_L(remove(hostname_log), linenum,
+			             "Delete %s", hostname_log);
+		free(hostname_log);
+	} else {
+		failed_ok("hostname_logfile()"); /* gncov */
+	}
+
+	if (!file_exists(logfile))
+		return 0;
+
+	result = remove(logfile);
+	OK_SUCCESS_L(result, linenum, "Delete log file");
+	if (result) {
+		diag("test %d: errno = %d (%s)", /* gncov */
+		     testnum, errno, strerror(errno)); /* gncov */
+		errno = 0; /* gncov */
+	}
+
+	return !!result;
+}
+
+/*
+ * init_tempdir_func() - Populate the temporary work directory defined in 
+ * TMPDIR with an rc file and a `uuids` directory. Returns 0 if ok, or 1 if 
+ * anything failed.
+ */
+
+static int init_tempdir_func(const int linenum)
+{
+	struct Rc rc;
+	int result;
+
+	init_rc(&rc);
+	rc.hostname = HNAME;
+	OK_SUCCESS_L(result = create_rcfile(rcfile, &rc), linenum,
+	             "Create rcfile");
+	if (result) {
+		diag("%s(): Cannot create rcfile \"%s\", skipping" /* gncov */
+		     " tests: %s",
+		     __func__, rcfile, strerror(errno)); /* gncov */
+		errno = 0; /* gncov */
+		return 1; /* gncov */
+	}
+
+	OK_SUCCESS_L(result = mkdir(TMPDIR "/uuids", 0777), linenum,
+	             "mkdir uuids");
+	if (result) {
+		diag("Cannot create uuids/ directory, skipping" /* gncov */
+		     " tests: %s", strerror(errno)); /* gncov */
+		errno = 0; /* gncov */
+		return 1; /* gncov */
+	}
+
+	return 0;
+}
+
+/*
  * cleanup_tempdir() - Delete the files and the `uuids` directory in the 
  * temporary work directory defined in TMPDIR. Expects `linenum` to be 
  * `__LINE__` or the `linenum` value from a parent function. Returns nothing.
@@ -843,6 +953,10 @@ out:
 
 static void cleanup_tempdir(const int linenum)
 {
+	delete_logfile_func(linenum);
+	if (file_exists(TMPDIR "/uuids"))
+		OK_SUCCESS_L(rmdir(TMPDIR "/uuids"), linenum,
+		             "Delete " TMPDIR "/uuids");
 	if (file_exists(rcfile))
 		OK_SUCCESS_L(remove(rcfile), linenum,
 		             "Delete rc file");
@@ -2014,6 +2128,130 @@ cleanup:
 	cleanup_tempdir(__LINE__);
 }
 
+/*
+ * test_create_and_log_uuids() - Tests the create_and_log_uuids() function. 
+ * Returns nothing.
+ */
+
+static void test_create_and_log_uuids(void)
+{
+	struct Options o;
+	const char *desc;
+	char *s = NULL, *s2 = NULL;
+	struct uuid_result result;
+	struct Entry entry;
+
+	diag("Test create_and_log_uuids()");
+
+	if (init_tempdir())
+		return; /* gncov */
+
+	diag("o.uuid contains a valid UUID");
+
+	desc = "create_and_log_uuids() with predefined UUID";
+	o = opt_struct();
+	o.uuid = "a06f9b42-69d4-11f0-9d7b-83850402c3ce";
+
+	if (init_output_files()) {
+		restore_output_files(); /* gncov */
+		failed_ok("init_output_files()"); /* gncov */
+		return; /* gncov */
+	}
+	result = create_and_log_uuids(&o);
+	restore_output_files();
+
+	OK_TRUE(result.success, "%s (result.success)", desc);
+	OK_EQUAL(result.count, 1, "%s (result.count)", desc);
+	OK_STRCMP(result.lastuuid, o.uuid, "%s (result.lastuuid)", desc);
+
+	s2 = allocstr("%s\n", o.uuid);
+	if (!s2) {
+		failed_ok("allocstr()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	verify_output_files(desc, s2, "");
+	free(s2);
+
+	s = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+	    "<!DOCTYPE suuids SYSTEM \"dtd/suuids.dtd\">\n"
+	    "<suuids>\n"
+	    "<suuid t=\"2025-07-26T03:57:19.4137410Z\""
+	    " u=\"a06f9b42-69d4-11f0-9d7b-83850402c3ce\"> <host>";
+	s2 = read_from_file(logfile);
+	if (!s2) {
+		failed_ok("read_from_file(logfile)"); /* gncov */
+		s = NULL; /* gncov */
+		goto cleanup; /* gncov */
+	}
+	OK_NOTNULL(strstr(s2, s), "%s (log file)", desc);
+	free(s2);
+	s = s2 = NULL;
+	delete_logfile();
+
+	diag("o.uuid contains an invalid UUID");
+
+	desc = "create_and_log_uuids() with predefined invalid UUID";
+	o.uuid = "a06f9b42-69d4-11f0-9d7b-83850402c3cg";
+
+	if (init_output_files()) {
+		restore_output_files(); /* gncov */
+		failed_ok("init_output_files()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	result = create_and_log_uuids(&o);
+	restore_output_files();
+
+	OK_FALSE(result.success, "%s (result.success)", desc);
+	OK_EQUAL(result.count, 0, "%s (result.count)", desc);
+	OK_STRCMP(result.lastuuid, "", "%s (result.lastuuid)", desc);
+	s2 = str_replace("process_uuid(): UUID"
+	                 " \"a06f9b42-69d4-11f0-9d7b-83850402c3cg\" is not"
+	                 " valid.\n"
+	                 EXECSTR ": Generated only 0 of 1 UUIDs\n",
+	                 EXECSTR, execname);
+	if (!s2) {
+		failed_ok("str_replace()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	verify_output_files(desc, "", s2);
+	free(s2);
+
+	init_xml_entry(&entry);
+	delete_logfile();
+
+	diag("o.uuid contains a v4 UUID");
+
+	desc = "create_and_log_uuids() with predefined v4 UUID";
+	o.uuid = "17dc339e-9e43-4032-bf8d-449db7b2547b";
+
+	if (init_output_files()) {
+		restore_output_files(); /* gncov */
+		failed_ok("init_output_files()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	result = create_and_log_uuids(&o);
+	restore_output_files();
+
+	OK_FALSE(result.success, "%s (result.success)", desc);
+	OK_EQUAL(result.count, 0, "%s (result.count)", desc);
+	OK_STRCMP(result.lastuuid, "", "%s (result.lastuuid)", desc);
+	s2 = str_replace("process_uuid(): UUID"
+	                 " \"17dc339e-9e43-4032-bf8d-449db7b2547b\" is not"
+	                 " valid.\n"
+	                 EXECSTR ": Generated only 0 of 1 UUIDs\n",
+	                 EXECSTR, execname);
+	if (!s2) {
+		failed_ok("str_replace()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	verify_output_files(desc, "", s2);
+
+cleanup:
+	free(s);
+	free(s2);
+	cleanup_tempdir(__LINE__);
+}
+
                                 /*** io.c ***/
 
 /*
@@ -2484,6 +2722,7 @@ static void functests_with_tempdir(void)
 
 	/* genuuid.c */
 	test_fill_entry_struct();
+	test_create_and_log_uuids();
 
 	/* io.c */
 	test_create_file();
@@ -2631,7 +2870,9 @@ int opt_selftest(char *main_execname, const struct Options *o)
 #undef OPTION_ERROR_STR
 #undef TMPDIR
 #undef chp
+#undef delete_logfile
 #undef failed_ok
+#undef init_tempdir
 #undef sc
 #undef set_env
 #undef tc
