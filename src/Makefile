@@ -81,8 +81,6 @@ HTMLFILE = $(EXEC).html
 IGNFILES  =
 IGNFILES += -e ^COPYING
 IGNFILES += -e ^conv-suuid
-IGNFILES += -e ^t/fake-editor
-IGNFILES += -e ^t/rcfile1
 INSTALL_TARGETS  =
 INSTALL_TARGETS += $(PREFIX)/bin/$(EXEC)
 INSTALL_TARGETS += $(PREFIX)/share/man/man1/$(MANPAGE)
@@ -233,7 +231,6 @@ clean:
 	rm -f version.h
 	rm -fr $(TESTLOCKDIR)
 	rm -fr .suuid-test.tmp
-	cd t && $(MAKE) $@
 
 .PHONY: dupdesc
 dupdesc:
@@ -297,16 +294,7 @@ test: $(EXEC)
 .PHONY: testall
 testall:
 	$(MAKE) -s testcomb WHAT=test
-	$(MAKE) -s testoldall
 	$(MAKE) -s testsrc
-
-.PHONY: testold
-testold: $(EXEC)
-	cd t && $(MAKE) test
-
-.PHONY: testoldall
-testoldall:
-	$(MAKE) -s testcomb WHAT=testold
 
 .PHONY: testcomb
 testcomb:
@@ -387,13 +375,7 @@ uninstall:
 valgrind: $(EXEC)
 	./$(EXEC) --valgrind $(TESTS)
 	$(CMD_VALGRIND) ./$(EXEC) --selftest $(TESTS)
-	$(MAKE) valgrindold
 
 .PHONY: valgrindall
 valgrindall:
 	$(MAKE) testcomb WHAT=valgrind
-	$(MAKE) testcomb WHAT=valgrindold
-
-.PHONY: valgrindold
-valgrindold:
-	cd t && $(MAKE) -s valgrind
