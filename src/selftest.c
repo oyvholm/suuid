@@ -3211,6 +3211,73 @@ static void test_sess_elements(void)
 	cleanup_tempdir(__LINE__);
 }
 
+/*
+ * test_truncated_logfile() - Contains tests for situations where the log file 
+ * is truncated. Returns nothing.
+ */
+
+static void test_truncated_logfile(void)
+{
+	struct Entry entry;
+	char *exp_stderr, *contents;
+	struct stat sb;
+
+	diag("Log file is truncated");
+	if (init_tempdir())
+		return; /* gncov */
+	init_xml_entry(&entry);
+
+	uc((chp{ execname, NULL }), 1, 0, "Create log file before truncate");
+	verify_logfile(&entry, 1, "Log file is ok before it's truncated");
+
+	if (stat(logfile, &sb)) {
+		failed_ok("stat()"); /* gncov */
+		return; /* gncov */
+	}
+	OK_SUCCESS(truncate(logfile,
+	                    sb.st_size - (off_t)strlen("\n</suuids>")),
+	                    "Truncate log file");
+	exp_stderr = allocstr("%s: %s: Unknown end line, adding to end of"
+	                      " file\n", EXECSTR, logfile);
+	if (!exp_stderr) {
+		failed_ok("allocstr()"); /* gncov */
+		return; /* gncov */
+	}
+	tc((chp{ execname, NULL }),
+	   NULL,
+	   exp_stderr,
+	   EXIT_SUCCESS,
+	   "Add to truncated log file");
+	verify_logfile(&entry, 2, "Log file is ok after truncation");
+	delete_logfile();
+
+	OK_NOTNULL(create_file(logfile, NULL), "Create empty log file");
+	uc((chp{ execname, NULL }), 1, 0, "Add to empty log file");
+	verify_logfile(&entry, 1, "Log file header was generated");
+	delete_logfile();
+
+	diag("Initial log file has only 1 byte");
+
+	OK_NOTNULL(create_file(logfile, "a"), "Create file with 1 byte");
+	tc((chp{ execname, NULL }),
+	   NULL,
+	   exp_stderr,
+	   EXIT_SUCCESS,
+	   "Add to log file containing 1 char");
+
+	free(exp_stderr);
+
+	contents = read_from_file(logfile);
+	if (!contents) {
+		failed_ok("read_from_file(logfile)"); /* gncov */
+		return; /* gncov */
+	}
+	OK_STRNCMP(contents, "a<suuid t=\"", 11,
+	           "Start of log file is as expected");
+	free(contents);
+	cleanup_tempdir(__LINE__);
+}
+
 /******************************************************************************
                         Top-level --selftest functions
 ******************************************************************************/
@@ -3280,6 +3347,7 @@ static void tests_with_tempdir(void)
 
 	test_without_options();
 	test_sess_elements();
+	test_truncated_logfile();
 
 	OK_SUCCESS(rmdir(TMPDIR), "Delete temporary directory %s", TMPDIR);
 }
