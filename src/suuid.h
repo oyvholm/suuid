@@ -240,7 +240,7 @@ char *allocstr_va(const char *format, va_list ap);
 char *allocstr(const char *format, ...);
 size_t count_substr(const char *s, const char *substr);
 char *str_replace(const char *s, const char *s1, const char *s2);
-#if defined(UNUSED) || defined(TEST_FUNC)
+#if defined(UNUSED)
 char *squeeze_chars(char *s, const char *chars);
 #endif
 char *string_to_lower(char *str);

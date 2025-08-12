@@ -171,7 +171,7 @@ char *str_replace(const char *s, const char *s1, const char *s2)
 	return buf;
 }
 
-#if defined(UNUSED) || defined(TEST_FUNC)
+#if defined(UNUSED)
 /*
  * squeeze_chars() - Modify s directly by replacing all repeated characters in 
  * chars with a single char. Returns s if ok, NULL if error.

@@ -64,10 +64,6 @@ test -n "$NDEBUG" && newdef NDEBUG
 # PROF: Compile with profiling code for gprof(1) to find bottlenecks
 test -n "$PROF" && newdef PROF
 
-# TEST_FUNC: Send non-option arguments to a function for testing. Doesn't break 
-# anything, non-option arguments are ignored by the program.
-test -n "$TEST_FUNC" && newdef TEST_FUNC
-
 # UNUSED: Compile unused code
 test -n "$UNUSED" && newdef UNUSED
 

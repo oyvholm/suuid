@@ -300,11 +300,9 @@ testall:
 testcomb:
 	$(MAKE) clean $(WHAT) FAKE_HOST=1
 	$(MAKE) clean $(WHAT) NDEBUG=1
-	$(MAKE) clean $(WHAT) TEST_FUNC=1
 	$(MAKE) clean $(WHAT) UNUSED=1
 	$(MAKE) clean $(WHAT) VERIFY_UUID=1
-	$(MAKE) clean $(WHAT) FAKE_HOST=1 NDEBUG=1 \
-	                      TEST_FUNC=1 UNUSED=1 VERIFY_UUID=1
+	$(MAKE) clean $(WHAT) FAKE_HOST=1 NDEBUG=1 UNUSED=1 VERIFY_UUID=1
 	$(MAKE) clean $(WHAT)
 
 .PHONY: testhist

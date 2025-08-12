@@ -202,9 +202,6 @@ static int print_version(const struct Options *o)
 #ifdef PROF
 	printf("has PROF\n");
 #endif
-#ifdef TEST_FUNC
-	printf("has TEST_FUNC\n");
-#endif
 #ifdef UNUSED
 	printf("has UNUSED\n");
 #endif
@@ -587,29 +584,6 @@ int main(int argc, char *argv[])
 		return print_version(&opt);
 	if (opt.license)
 		return print_license();
-
-#ifdef TEST_FUNC
-	/*
-	 * Send non-option command line arguments to various functions for 
-	 * testing. This doesn't break anything, as the program only checks for 
-	 * options. Non-option arguments are ignored.
-	 */
-	if (optind < argc) {
-		int i;
-
-		for (i = optind; i < argc; i++) {
-			char *a = argv[i];
-			char buf[1000];
-
-			msg(3, "Checking arg %d \"%s\"", i, a);
-			memset(buf, 0, 1000);
-			strncpy(buf, a, 999);
-			printf("squeeze_chars(\"%s\", \",\") = \"%s\"\n",
-			       a, squeeze_chars(buf, "e"));
-		}
-		return EXIT_SUCCESS;
-	}
-#endif
 
 	result = create_and_log_uuids(&opt);
 	if (!result.success)
