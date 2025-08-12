@@ -167,6 +167,7 @@
 #define tc(cmd, num_stdout, num_stderr, desc, ...)  \
         tc_func(__LINE__, (cmd), (num_stdout), (num_stderr), \
                 (desc), ##__VA_ARGS__);
+#define unset_env(a)  unset_env_func(__LINE__, (a))
 static char *execname;
 static int failcount = 0;
 static int testnum = 0;
@@ -574,6 +575,30 @@ static void tc_func(const int linenum, char *cmd[], const char *exp_stdout,
 	test_command(linenum, 1, cmd, exp_stdout, exp_stderr, exp_retval,
 	             desc, ap);
 	va_end(ap);
+}
+
+/*
+ * unset_env_func() - Unsets the environment variable `name` and prefixes the 
+ * test description with `funcname` and `linenum` to avoid duplicated test 
+ * descriptions. It's normally not meant to be called directly, but via the 
+ * unset_env() macro that takes care of specifying `__LINE__` automatically.
+ *
+ * Returns 1 if unsetenv() failed, otherwise it returns 0.
+ */
+
+static int unset_env_func(const int linenum, const char *name)
+{
+	assert(name);
+	assert(*name);
+
+	if (!OK_SUCCESS_L(unsetenv(name), linenum, "Delete the %s envvar",
+                                                   name))
+		return 0;
+
+	diag("Cannot delete %s: %s", name, strerror(errno)); /* gncov */
+	errno = 0; /* gncov */
+
+	return 1; /* gncov */
 }
 
 /******************************************************************************
@@ -1592,6 +1617,71 @@ static void test_standard_options(void)
 	   "Unknown option: \"Option error\" message is printed");
 }
 
+/*
+ * chk_ihv() - Used by test_invalid_hostname_var(). Sets the environment 
+ * variable defined by ENV_HOSTNAME to the value in `val` and executes the 
+ * program. `desc` is a short test description. Returns nothing.
+ */
+
+static void chk_ihv(const int linenum, const char *val, const char *desc)
+{
+	char *exp_stderr;
+	int res;
+
+	exp_stderr = allocstr("%s: Got invalid hostname: \"%s\"\n",
+	                      execname, val);
+	if (!exp_stderr) {
+		failed_ok("allocstr()"); /* gncov */
+		return; /* gncov */
+	}
+	res = OK_SUCCESS_L(setenv(ENV_HOSTNAME, val, 1), linenum,
+	                   "Set the %s variable", ENV_HOSTNAME);
+	if (res) {
+		failed_ok("setenv()"); /* gncov */
+		return; /* gncov */
+	}
+	tc_func(linenum, (chp{ execname, NULL }),
+	        "",
+	        exp_stderr,
+	        EXIT_FAILURE,
+	        "%s %s", ENV_HOSTNAME, desc);
+	free(exp_stderr);
+}
+
+/*
+ * test_invalid_hostname_var() - Tests invalid values in the environment 
+ * variable defined in ENV_HOSTNAME. Returns nothing.
+ */
+
+static void test_invalid_hostname_var(void)
+{
+	char *p;
+
+	diag("Invalid value in %s", ENV_HOSTNAME);
+
+#define chk_ihv(val, desc)  chk_ihv(__LINE__, (val), (desc))
+
+	chk_ihv("", "is empty");
+	chk_ihv("a;b", "contains semicolon");
+	chk_ihv("a..b", "contains \"..\"");
+	chk_ihv("a/b", "contains slash");
+	chk_ihv("x\xf8z", "contains latin1 char");
+
+	p = malloc(MAX_HOSTNAME_LENGTH + 2);
+	if (!p) {
+		failed_ok("malloc()"); /* gncov */
+		return; /* gncov */
+	}
+	memset(p, 'a', MAX_HOSTNAME_LENGTH + 1);
+	p[MAX_HOSTNAME_LENGTH + 1] = '\0';
+	chk_ihv(p, "is too long");
+	free(p);
+
+#undef chk_ihv
+
+	unset_env(ENV_HOSTNAME);
+}
+
 /******************************************************************************
                         Top-level --selftest functions
 ******************************************************************************/
@@ -1691,6 +1781,7 @@ static void test_executable(const struct Options *o)
 	test_valgrind_option(o);
 	print_version_info(o);
 	test_standard_options();
+	test_invalid_hostname_var();
 	print_version_info(o);
 }
 
@@ -1754,5 +1845,6 @@ int opt_selftest(char *main_execname, const struct Options *o)
 #undef failed_ok
 #undef sc
 #undef tc
+#undef unset_env
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */
