@@ -180,6 +180,9 @@
 #define tc(cmd, num_stdout, num_stderr, desc, ...)  \
         tc_func(__LINE__, (cmd), (num_stdout), (num_stderr), \
                 (desc), ##__VA_ARGS__);
+#define uc(cmd, num_stdout, num_stderr, desc, ...)  \
+        uc_func(__LINE__, (cmd), (num_stdout), (num_stderr), \
+                (desc), ##__VA_ARGS__);
 #define unset_env(a)  unset_env_func(__LINE__, (a))
 #define verify_logfile(entry, uuid_count, desc, ...)  \
         verify_logfile_func(__LINE__, (entry), (uuid_count), \
@@ -847,6 +850,89 @@ static unsigned long count_uuids(const char *buf, const char *sep)
 
 out:
 	return count;
+}
+
+/*
+ * uc_check_va() - Verifies that `output` contains `num_exp` number of UUIDs. 
+ * `name` describes if it's stdout or stderr, and the value there can be "out" 
+ * or "err". `desc` is a short test description, and `ap` is printf-like 
+ * arguments as a va_list. `linenum` is `__LINE__` from the caller function.
+ */
+
+static void uc_check_va(const int linenum, const char *name,
+                        const char *output, const unsigned long num_exp,
+                        const char *desc, va_list ap)
+{
+	va_list ap_copy;
+	char *desc_str = NULL;
+	size_t buflen;
+	unsigned long found;
+
+	assert(name);
+	assert(strlen(name) == 3);
+	assert(output);
+	assert(desc);
+
+	buflen = strlen(desc) + strlen(" (stdXXX)") + 1;
+	desc_str = malloc(buflen);
+	if (!desc_str) {
+		failed_ok("malloc()"); /* gncov */
+		return; /* gncov */
+	}
+	snprintf(desc_str, buflen, "%s (std%s)", desc, name);
+
+	found = count_uuids(output, "\n");
+	va_copy(ap_copy, ap);
+	ok_va(!(found == num_exp), linenum, desc_str, ap_copy);
+	if (found != num_exp) {
+		diag("std%s: Found %lu UUID%s, expected %lu", /* gncov */
+		     name, found, found == 1 ? "" : "s", num_exp);
+		diag("%s(): std%s = \"%s\"", /* gncov */
+		     __func__, name, output);
+	}
+
+	va_end(ap_copy);
+	free(desc_str);
+}
+
+/*
+ * uc_func() - Execute command `cmd` and verify that stdout and stderr contains 
+ * the correct number of uuids. `desc` is a description of the test. Not meant 
+ * to be called directly, but via the uc() macro that logs the line number 
+ * automatically. Returns nothing.
+ */
+
+static void uc_func(const int linenum, char *cmd[],
+                    const unsigned long num_stdout,
+                    const unsigned long num_stderr, const char *desc, ...)
+{
+	struct streams ss;
+	struct Options opt = opt_struct();
+	va_list ap;
+	char *s;
+
+	assert(cmd);
+	if (!cmd) {
+		OK_ERROR("%s(): cmd is NULL", __func__); /* gncov */
+		return; /* gncov */
+	}
+	assert(desc);
+
+	streams_init(&ss);
+	streams_exec(&opt, &ss, cmd);
+
+	va_start(ap, desc);
+	uc_check_va(linenum, "out", ss.out.buf, num_stdout, desc, ap);
+	uc_check_va(linenum, "err", ss.err.buf, num_stderr, desc, ap);
+	s = allocstr_va(desc, ap);
+	if (s)
+		OK_EQUAL_L(ss.ret, EXIT_SUCCESS, linenum, "%s (retval)", s);
+	else
+		failed_ok("allocstr_va()"); /* gncov */
+	free(s);
+	va_end(ap);
+
+	streams_free(&ss);
 }
 
 /*
@@ -2929,6 +3015,137 @@ static void test_invalid_hostname_var(void)
 }
 
 /******************************************************************************
+              Test the executable file with a temporary directory
+******************************************************************************/
+
+                             /*** No options ***/
+
+/*
+ * test_without_options() - Test the executable without options. Returns 
+ * nothing.
+ */
+
+static void test_without_options(void)
+{
+	char *p = NULL, *orig_home = NULL;
+	int result;
+	struct Entry entry;
+
+	diag("Test without options");
+
+	diag("uuids directory doesn't exist");
+
+	if (init_tempdir())
+		return; /* gncov */
+	OK_SUCCESS(rmdir(TMPDIR "/uuids"), "rmdir uuids");
+
+	p = allocstr("%s: %s: Could not create log file: No such file or"
+	             " directory\n", EXECSTR, logfile);
+	if (!p) {
+		failed_ok("allocstr()"); /* gncov */
+		return; /* gncov */
+	}
+	tc((chp{ execname, NULL }),
+	   "",
+	   p,
+	   EXIT_FAILURE,
+	   "No options, uuids directory doesn't exist");
+	free(p);
+	p = NULL;
+
+	diag("uuids directory exists");
+
+	OK_SUCCESS(result = mkdir(TMPDIR "/uuids", 0777),
+	           "mkdir %s/uuids", TMPDIR);
+	if (result) {
+		diag("Cannot create uuids/ directory, skipping" /* gncov */
+		     " tests: %s", strerror(errno)); /* gncov */
+		errno = 0; /* gncov */
+		goto cleanup; /* gncov */
+	}
+
+	init_xml_entry(&entry);
+	uc((chp{ execname, NULL }), 1, 0, "No options, uuids directory exists");
+	verify_logfile(&entry, 1, "First entry created");
+	uc((chp{ execname, NULL }), 1, 0, "Create second entry");
+	verify_logfile(&entry, 2, "Entries are added, not replaced");
+	delete_logfile();
+
+	diag("A directory exists where the log file should be");
+
+	if (OK_SUCCESS(mkdir(logfile, 0755), "mkdir logfile")) {
+		diag("%s(): Cannot create directory in place of" /* gncov */
+		      " log file, skipping tests: %s",
+		      __func__, strerror(errno)); /* gncov */
+		errno = 0; /* gncov */
+		goto cleanup; /* gncov */
+	}
+	p = allocstr("%s: %s: Could not open file for read+write: Is a"
+	             " directory\n", EXECSTR, logfile);
+	if (!p) {
+		failed_ok("allocstr()"); /* gncov */
+		OK_SUCCESS(rmdir(logfile), /* gncov */
+		           "%s():%d: rmdir logfile", __func__, __LINE__);
+		goto cleanup; /* gncov */
+	}
+	tc((chp{ execname, NULL }),
+	   "",
+	   p,
+	   EXIT_FAILURE,
+	   "No options, log file is blocked by a directory");
+	if (OK_SUCCESS(rmdir(logfile), "rmdir logfile")) {
+		diag("%s(): Cannot create directory in place of" /* gncov */
+		      " log file, skipping tests: %s",
+		      __func__, strerror(errno)); /* gncov */
+		errno = 0; /* gncov */
+		goto cleanup; /* gncov */
+	}
+	free(p);
+	p = NULL;
+
+	diag("No HOME environment variable");
+
+	orig_home = mystrdup(getenv("HOME"));
+	if (!orig_home) {
+		failed_ok("mystrdup()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	if (unset_env("HOME"))
+		goto cleanup; /* gncov */
+	tc((chp{ execname, NULL }),
+	   "",
+	   EXECSTR ": HOME environment variable not defined, cannot determine"
+	   " name of rcfile\n"
+	   EXECSTR ": $SUUID_LOGDIR and $HOME environment variables are not"
+	   " defined, cannot create logdir path\n",
+	   EXIT_FAILURE,
+	   "No options and no HOME");
+	OK_FALSE(file_exists(logfile), "Log file doesn't exist");
+	if (OK_SUCCESS(setenv("HOME", orig_home, 1),
+	               "Restore HOME environment variable")) {
+		diag("%s(): Cannot restore HOME environment" /* gncov */
+		     " variable: %s", __func__, strerror(errno)); /* gncov */
+		errno = 0; /* gncov */
+		goto cleanup; /* gncov */
+	}
+
+	diag("%s is defined", ENV_LOGDIR);
+
+	if (set_env(ENV_LOGDIR, TMPDIR "/uuids"))
+		goto cleanup; /* gncov */
+	uc((chp{ execname, NULL }), 1, 0, "No options, %s is defined",
+	                                  ENV_LOGDIR);
+	verify_logfile(&entry, 1, "Log file after use with %s", ENV_LOGDIR);
+	if (unset_env(ENV_LOGDIR))
+		goto cleanup; /* gncov */
+
+cleanup:
+	free(p);
+	free(orig_home);
+	cleanup_tempdir(__LINE__);
+}
+
+/******************************************************************************
                         Top-level --selftest functions
 ******************************************************************************/
 
@@ -2972,6 +3189,32 @@ static void functests_with_tempdir(void)
 		errno = 0; /* gncov */
 		return; /* gncov */
 	}
+}
+
+/*
+ * tests_with_tempdir() - Executes tests on the executable with a temporary 
+ * directory. The temporary directory uses a standard name, defined in TMPDIR. 
+ * If the directory already exists or it's unable to create it, it aborts. 
+ * Returns nothing.
+ */
+
+static void tests_with_tempdir(void)
+{
+	int result;
+
+	result = mkdir(TMPDIR, 0777);
+	OK_SUCCESS(result, "%s(): Create temporary directory %s",
+	                   __func__, TMPDIR);
+	if (result) {
+		diag("Cannot create directory \"%s\", skipping" /* gncov */
+		     " tests: %s", TMPDIR, strerror(errno)); /* gncov */
+		errno = 0; /* gncov */
+		return; /* gncov */
+	}
+
+	test_without_options();
+
+	OK_SUCCESS(rmdir(TMPDIR), "Delete temporary directory %s", TMPDIR);
 }
 
 /*
@@ -3041,6 +3284,7 @@ static void test_executable(const struct Options *o)
 	print_version_info(o);
 	test_standard_options();
 	test_invalid_hostname_var();
+	tests_with_tempdir();
 	print_version_info(o);
 }
 
@@ -3113,6 +3357,7 @@ int opt_selftest(char *main_execname, const struct Options *o)
 #undef sc
 #undef set_env
 #undef tc
+#undef uc
 #undef unset_env
 #undef verify_logfile
 #undef verify_output_files
