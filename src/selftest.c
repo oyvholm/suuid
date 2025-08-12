@@ -843,6 +843,9 @@ out:
 
 static void cleanup_tempdir(const int linenum)
 {
+	if (file_exists(rcfile))
+		OK_SUCCESS_L(remove(rcfile), linenum,
+		             "Delete rc file");
 	if (file_exists(stderr_file))
 		OK_SUCCESS_L(remove(stderr_file), linenum,
 		             "Delete %s", stderr_file);
@@ -2116,6 +2119,70 @@ remove_file:
 }
 
 /*
+ * chk_rr_im() - "Check read_rcfile() with invalid MAC." Used by 
+ * test_read_rcfile(). Creates an rc file with an invalid MAC address, stored 
+ * in `mac` and verifies that the return value, `got.hostname`, stdout, and 
+ * stderr is correct. `desc` is a short description of the test. Returns 
+ * nothing.
+ */
+
+static void chk_rr_im(const int linenum, const char *mac, enum rr_msgs errval,
+                      const char *desc)
+{
+	struct Rc got;
+	char *contents, *exp_stderr = NULL;
+	int res;
+	const char *err_msgs[] = {
+		[RR_ILLEGAL_CHARS] = "MAC address contains illegal characters,"
+		                     " can only contain hex digits",
+		[RR_MULTICAST ] = "MAC address doesn't follow RFC 4122,"
+		                  " multicast bit not set",
+		[RR_WRONG_LENGTH] = "Wrong MAC address length, must be exactly"
+		                    " 12 hex digits"
+	};
+	const char *s;
+
+	assert(mac);
+	assert(desc);
+
+	diag("%s", desc);
+	init_rc(&got);
+	contents = allocstr("macaddr = %s\n", mac);
+	if (!contents) {
+		failed_ok("allocstr()"); /* gncov */
+		return; /* gncov */
+	}
+	if (OK_NOTNULL_L(create_file(rcfile, contents), linenum,
+	                 "Create rc file")) {
+		failed_ok("create_file()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	s = "Read rc file";
+	if (init_output_files()) {
+		restore_output_files(); /* gncov */
+		failed_ok("init_output_files()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	res = read_rcfile(rcfile, &got);
+	restore_output_files();
+	OK_EQUAL_L(res, 1, linenum, "%s (retval)", s);
+	OK_NULL_L(got.macaddr, linenum, "%s (macaddr)", s);
+	exp_stderr = allocstr("%s: %s\n", execname, err_msgs[errval]);
+	if (!exp_stderr) {
+		failed_ok("allocstr()"); /* gncov */
+		goto cleanup; /* gncov */
+	}
+	verify_output_files_func(linenum, desc, "", exp_stderr);
+	print_gotexp(got.macaddr, NULL);
+
+cleanup:
+	free(exp_stderr);
+	free_rc(&got);
+	free(contents);
+	cleanup_tempdir(linenum);
+}
+
+/*
  * test_read_rcfile() - Tests the read_rcfile() function. Returns nothing.
  */
 
@@ -2145,6 +2212,29 @@ static void test_read_rcfile(void)
 	chk_rr("macaddr: " MAC "\n", (sr{ .macaddr = NULL }),
 	       "macaddr with colon instead of equal sign");
 #undef chk_rr
+
+	diag("Invalid MAC address in the rc file");
+
+#define chk_rr_im(mac, errval, desc)  chk_rr_im(__LINE__, (mac), (errval), \
+                                                (desc))
+	chk_rr_im("10460a166a4d", RR_MULTICAST,
+	          "rc file with invalid macaddr, doesn't follow the RFC");
+	chk_rr_im("1b460a166a4", RR_WRONG_LENGTH,
+	          "rc file with invalid macaddr, one digit too short");
+	chk_rr_im(MAC "a", RR_WRONG_LENGTH,
+	          "rc file with invalid macaddr, one digit too long");
+	chk_rr_im(MAC "y", RR_WRONG_LENGTH,
+	          "rc file with invalid macaddr, extra invalid character");
+	chk_rr_im("iiiiiiiiiiii", RR_ILLEGAL_CHARS,
+	          "rc file with invalid macaddr, correct length, invalid hex"
+	          " digits");
+	chk_rr_im("invalid", RR_ILLEGAL_CHARS,
+	          "rc file with invalid macaddr, not a hex number at all");
+	chk_rr_im("'" MAC "'", RR_ILLEGAL_CHARS,
+	          "rc file with valid macaddr, but it's inside ''");
+	chk_rr_im("\"" MAC "\"", RR_ILLEGAL_CHARS,
+	          "rc file with valid macaddr, but it's inside \"\"");
+#undef chk_rr_im
 
 #undef MAC
 #undef sr

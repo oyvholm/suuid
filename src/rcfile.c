@@ -204,8 +204,11 @@ int read_rcfile(const char *rcfile, struct Rc *rc)
 		free(rc->macaddr);
 		rc->macaddr = NULL;
 	}
-	if (rc->macaddr && !valid_macaddr(rc->macaddr))
+	if (rc->macaddr && !valid_macaddr(rc->macaddr)) {
+		free(rc->macaddr);
+		rc->macaddr = NULL;
 		return 1;
+	}
 
 	return 0;
 }
