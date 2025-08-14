@@ -2660,6 +2660,64 @@ cleanup:
                                 /*** io.c ***/
 
 /*
+ * test_file_exists() - Tests the file_exists() function. Returns nothing.
+ */
+
+static void test_file_exists(void)
+{
+	diag("Test file_exists()");
+
+	OK_FALSE(file_exists(TMPDIR "/nonexisting"),
+	         "%s/nonexisting does not exist", TMPDIR);
+
+	OK_NOTNULL(create_file(TMPDIR "/regfile", NULL),
+	           "Create regular file %s/regfile", TMPDIR);
+	OK_TRUE(file_exists(TMPDIR "/regfile"),
+	        "File %s/regfile does exist", TMPDIR);
+
+	OK_SUCCESS(mkdir(TMPDIR "/dir", 0777), "mkdir %s/dir", TMPDIR);
+	OK_TRUE(file_exists(TMPDIR "/dir"),
+	        "Directory %s/dir does exist", TMPDIR);
+
+	OK_SUCCESS(symlink("regfile", TMPDIR "/symlink"),
+	           "Create %s/symlink, points to regfile", TMPDIR);
+	OK_TRUE(file_exists(TMPDIR "/symlink"),
+	        "%s/symlink does exist", TMPDIR);
+
+	OK_SUCCESS(symlink("dir", TMPDIR "/dirlink"),
+	           "Create %s/dirlink, points to dir", TMPDIR);
+	OK_TRUE(file_exists(TMPDIR "/dirlink"),
+	        "%s/dirlink does exist", TMPDIR);
+
+	OK_SUCCESS(symlink("nonexisting", TMPDIR "/broken"),
+	           "Create broken symlink %s/broken", TMPDIR);
+	OK_TRUE(file_exists(TMPDIR "/broken"),
+	        "Broken symlink %s/broken does exist", TMPDIR);
+
+	OK_SUCCESS(mkdir(TMPDIR "/nopermdir", 0),
+	                 "mkdir %s/nopermdir with no permissions", TMPDIR);
+	OK_TRUE(file_exists(TMPDIR "/nopermdir"),
+	        "Directory %s/nopermdir does exist", TMPDIR);
+	OK_FALSE(file_exists(TMPDIR "/nopermdir/inaccessible"),
+	        "Tries to check %s/nopermdir/inaccessible", TMPDIR);
+	if (is_root()) {
+		OK_TRUE(1, "errno is EACCES (%s)" /* gncov */
+		           " # SKIP Running as root", strerror(EACCES));
+	} else {
+		OK_EQUAL(errno, EACCES,
+		         "errno is EACCES (%s)", strerror(EACCES));
+	}
+	errno = 0;
+
+	OK_SUCCESS(remove(TMPDIR "/regfile"), "Delete %s/regfile", TMPDIR);
+	OK_SUCCESS(rmdir(TMPDIR "/dir"), "rmdir %s/dir", TMPDIR);
+	OK_SUCCESS(remove(TMPDIR "/symlink"), "Delete %s/symlink", TMPDIR);
+	OK_SUCCESS(remove(TMPDIR "/dirlink"), "Delete %s/dirlink", TMPDIR);
+	OK_SUCCESS(remove(TMPDIR "/broken"), "Delete %s/broken", TMPDIR);
+	OK_SUCCESS(rmdir(TMPDIR "/nopermdir"), "rmdir %s/nopermdir", TMPDIR);
+}
+
+/*
  * test_create_file() - Tests the create_file() function. Returns nothing.
  */
 
@@ -4892,6 +4950,7 @@ static void functests_with_tempdir(void)
 	test_create_and_log_uuids();
 
 	/* io.c */
+	test_file_exists();
 	test_create_file();
 
 	/* rcfile.c */
