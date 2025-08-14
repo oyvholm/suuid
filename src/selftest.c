@@ -2724,8 +2724,9 @@ static void test_file_exists(void)
 
 static void test_create_file(void)
 {
-	const char *desc, *file, *res;
+	const char *desc, *file, *res, *data;
 	struct stat sb;
+	char *s;
 
 	diag("Test create_file()");
 
@@ -2748,6 +2749,21 @@ static void test_create_file(void)
 		return; /* gncov */
 	}
 	OK_EQUAL(sb.st_size, 0, "%s is empty", file);
+	OK_SUCCESS(remove(file), "Delete %s", file);
+
+	desc = "create_file() with test data";
+	data = "Test data\n";
+	file = TMPDIR "/datafile";
+	OK_NOTNULL(res = create_file(file, data), "%s (exec)", desc);
+	if (!res)
+		diag_errno(); /* gncov */
+	OK_STRCMP(res, data, "%s (retval)", desc);
+	OK_NOTNULL(s = read_from_file(file), "Read data from file");
+	if (!s)
+		failed_ok("read_from_file()"); /* gncov */
+	else
+		OK_STRCMP(s, data, "Data from file is correct");
+	free(s);
 	OK_SUCCESS(remove(file), "Delete %s", file);
 }
 
