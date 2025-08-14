@@ -171,6 +171,10 @@
 #define OK_SUCCESS(func, desc, ...)  OK_SUCCESS_L((func), __LINE__, (desc), ##__VA_ARGS__)
 #define OK_TRUE(val, desc, ...)  OK_TRUE_L((val), __LINE__, (desc), ##__VA_ARGS__)
 
+#define diag_errno()  do { \
+	diag("errno = %d (%s)", errno, strerror(errno)); \
+	errno = 0; \
+} while (0)
 #define failed_ok(a)  do { \
 	if (errno) \
 		OK_ERROR("%s():%d: %s failed: %s", \
@@ -1049,11 +1053,8 @@ static int delete_logfile_func(const int linenum)
 
 	result = remove(logfile);
 	OK_SUCCESS_L(result, linenum, "Delete log file");
-	if (result) {
-		diag("test %d: errno = %d (%s)", /* gncov */
-		     testnum, errno, strerror(errno)); /* gncov */
-		errno = 0; /* gncov */
-	}
+	if (result)
+		diag_errno(); /* gncov */
 
 	return !!result;
 }
@@ -2732,20 +2733,15 @@ static void test_create_file(void)
 	OK_NULL(create_file(TMPDIR, NULL),
 	        "create_file(%s), but it's already a directory", TMPDIR);
 	OK_EQUAL(errno, EISDIR, "errno is EISDIR");
-	if (errno != EISDIR)  {
-		diag("test %d: errno = %d (%s)", /* gncov */
-		     testnum, errno, strerror(errno)); /* gncov */
-	}
+	if (errno != EISDIR)
+		diag_errno(); /* gncov */
 	errno = 0;
 
 	desc = "create_file() with NULL creates empty file";
 	file = TMPDIR "/emptyfile";
 	OK_NOTNULL(res = create_file(file, NULL), "%s (exec)", desc);
-	if (!res) {
-		diag("test %d: errno = %d (%s)", /* gncov */
-		     testnum, errno, strerror(errno)); /* gncov */
-		errno = 0; /* gncov */
-	}
+	if (!res)
+		diag_errno(); /* gncov */
 	OK_STRCMP(res, "", "%s (retval)", desc);
 	if (stat(file, &sb)) {
 		failed_ok("stat()"); /* gncov */
@@ -3818,11 +3814,8 @@ cleanup:
 	if (file_exists(fake_editor)) {
 		i = remove(fake_editor);
 		OK_SUCCESS(i, "Delete fake editor script");
-		if (i) {
-			diag("test %d: errno = %d (%s)", /* gncov */
-			     testnum, errno, strerror(errno)); /* gncov */
-			errno = 0; /* gncov */
-		}
+		if (i)
+			diag_errno(); /* gncov */
 	}
 	unset_env(ENV_EDITOR);
 	unset_env("EDITOR");
@@ -3914,11 +3907,8 @@ cleanup:
 	if (file_exists(fake_editor)) {
 		i = remove(fake_editor);
 		OK_SUCCESS(i, "%s(): Delete fake editor script", __func__);
-		if (i) {
-			diag("test %d: errno = %d (%s)", /* gncov */
-			     testnum, errno, strerror(errno)); /* gncov */
-			errno = 0; /* gncov */
-		}
+		if (i)
+			diag_errno(); /* gncov */
 	}
 	if (tempfile && file_exists(tempfile)) {
 		OK_SUCCESS(i = chmod(tempfile, 0555),
@@ -4777,7 +4767,7 @@ static void test_sigpipe_signal(const int linenum, const char *args)
 	OK_NOTNULL_L(contents = read_from_file(logfile), linenum,
 	             "Read contents from log file");
 	if (!contents) {
-		diag("test %d: %s", testnum, strerror(errno)); /* gncov */
+		diag_errno(); /* gncov */
 		goto cleanup; /* gncov */
 	}
 	OK_EQUAL_L(count_substr(contents, "<suuid t="), count, linenum,
@@ -4959,8 +4949,7 @@ static void functests_with_tempdir(void)
 	result = rmdir(TMPDIR);
 	OK_SUCCESS(result, "rmdir " TMPDIR " after function tests");
 	if (result) {
-		diag("test %d: %s", testnum, strerror(errno)); /* gncov */
-		errno = 0; /* gncov */
+		diag_errno(); /* gncov */
 		return; /* gncov */
 	}
 }
@@ -5145,6 +5134,7 @@ int opt_selftest(char *main_execname, const struct Options *o)
 #undef TMPDIR
 #undef chp
 #undef delete_logfile
+#undef diag_errno
 #undef failed_ok
 #undef init_tempdir
 #undef print_gotexp_int
