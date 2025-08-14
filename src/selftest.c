@@ -2331,6 +2331,45 @@ static void test_uuid_date(void)
                    Function tests, use a temporary directory
 ******************************************************************************/
 
+                                 /* suuid.c */
+
+/*
+ * test_myerror() - Tests the myerror() function. Returns nothing.
+ */
+
+static void test_myerror(void)
+{
+	int res, len_stderr;
+	const char *desc;
+	char *exp_stderr;
+
+	diag("Test myerror()");
+
+	desc = "myerror() with float";
+	if (init_output_files()) {
+		restore_output_files(); /* gncov */
+		failed_ok("init_output_files()"); /* gncov */
+		return; /* gncov */
+	}
+	errno = EACCES;
+	res = myerror("Test with float: %.5f", 3.14159);
+	restore_output_files();
+	OK_EQUAL(errno, 0, "%s (errno)", desc);
+	print_gotexp_int(errno, 0);
+	exp_stderr = allocstr("%s: Test with float: 3.14159: Permission"
+	                      " denied\n", execname);
+	if (!exp_stderr) {
+		failed_ok("allocstr()"); /* gncov */
+		return; /* gncov */
+	}
+	len_stderr = (int)strlen(exp_stderr);
+	verify_output_files(desc, "", exp_stderr);
+	OK_EQUAL(res, len_stderr, "%s (retval)", desc);
+	print_gotexp_int(res, len_stderr);
+	cleanup_tempdir(__LINE__);
+	free(exp_stderr);
+}
+
                               /*** environ.c ***/
 
 /*
@@ -4841,6 +4880,9 @@ static void functests_with_tempdir(void)
 		errno = 0; /* gncov */
 		return; /* gncov */
 	}
+
+	/* suuid.c */
+	test_myerror();
 
 	/* environ.c */
 	test_get_log_prefix();
