@@ -1315,9 +1315,9 @@ static int init_tempdir_func(const int linenum)
 }
 
 /*
- * cleanup_tempdir() - Delete the files and the `uuids` directory in the 
- * temporary work directory defined in TMPDIR. Expects `linenum` to be 
- * `__LINE__` or the `linenum` value from a parent function. Returns nothing.
+ * cleanup_tempdir() - Delete all known filesystem entries in the temporary 
+ * work directory defined in TMPDIR. Expects `linenum` to be `__LINE__` or the 
+ * `linenum` value from a parent function. Returns nothing.
  */
 
 static void cleanup_tempdir(const int linenum)
