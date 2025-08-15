@@ -845,6 +845,33 @@ static int is_root(void)
 	return !getuid();
 }
 
+/*
+ * print_version_info() - Display output from the --version command. Returns 0 
+ * if ok, or 1 if streams_exec() failed.
+ */
+
+static int print_version_info(const struct Options *o)
+{
+	struct streams ss;
+	int res;
+
+	assert(o);
+	streams_init(&ss);
+	res = streams_exec(o, &ss, chp{ execname, "--version", NULL });
+	if (res) {
+		failed_ok("streams_exec()"); /* gncov */
+		if (ss.err.buf) /* gncov */
+			diag(ss.err.buf); /* gncov */
+		return 1; /* gncov */
+	}
+	diag("========== BEGIN version info ==========\n"
+	     "%s"
+	     "=========== END version info ===========", no_null(ss.out.buf));
+	streams_free(&ss);
+
+	return 0;
+}
+
 /******************************************************************************
                        suuid-specific selftest functions
 ******************************************************************************/
@@ -2991,33 +3018,6 @@ static void test_valgrind_option(const struct Options *o)
 	   "",
 	   EXIT_SUCCESS,
 	   "--valgrind -h");
-}
-
-/*
- * print_version_info() - Display output from the --version command. Returns 0 
- * if ok, or 1 if streams_exec() failed.
- */
-
-static int print_version_info(const struct Options *o)
-{
-	struct streams ss;
-	int res;
-
-	assert(o);
-	streams_init(&ss);
-	res = streams_exec(o, &ss, chp{ execname, "--version", NULL });
-	if (res) {
-		failed_ok("streams_exec()"); /* gncov */
-		if (ss.err.buf) /* gncov */
-			diag(ss.err.buf); /* gncov */
-		return 1; /* gncov */
-	}
-	diag("========== BEGIN version info ==========\n"
-	     "%s"
-	     "=========== END version info ===========", no_null(ss.out.buf));
-	streams_free(&ss);
-
-	return 0;
 }
 
 /*
