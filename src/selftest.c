@@ -4744,8 +4744,16 @@ static void test_sigpipe_signal(const int linenum, const char *args)
 	          "%s: Cannot print UUID to stdout: Broken pipe\n"
 	          "%s: Generated only [0-9]+ of 1000 UUIDs\n"
 	          "%s: Returning from main\\(\\) with value 1\n"
+#ifdef __FreeBSD__
+	          /* FIXME: Happens in FreeBSD 14.2 */
+	          "%s: Termination signal \\(Broken pipe\\) received, aborting\n"
+#endif
 	          "$",
-	          execname, execname, execname, execname, execname);
+	          execname, execname, execname, execname, execname
+#ifdef __FreeBSD__
+	          , execname
+#endif
+	          );
 	result = regcomp(&regexp, pattern, REG_EXTENDED);
 	if (result) {
 		char errbuf[1024];
