@@ -1016,8 +1016,8 @@ static void uc_func(const int linenum, char *cmd[],
 /*
  * hostname_logfile() - Returns an allocated string to the log file when HNAME 
  * isn't used, i.e., when the value from get_hostname() is used. `dir` is the 
- * name of the log directory. If `dir` is NULL, the default name "uuids" is 
- * used. Returns NULL on error.
+ * name of the log directory. If `dir` is NULL, the default name defined in 
+ * LOGDIR_NAME is used. Returns NULL on error.
  */
 
 static char *hostname_logfile(const char *dir)
@@ -1032,7 +1032,7 @@ static char *hostname_logfile(const char *dir)
 		return NULL; /* gncov */
 	}
 	hostname_log = allocstr("%s/%s/%s%s",
-	                        TMPDIR, dir ? dir : "uuids", hostname,
+	                        TMPDIR, dir ? dir : LOGDIR_NAME, hostname,
 	                        LOGFILE_EXTENSION);
 	if (!hostname_log)
 		failed_ok("allocstr()"); /* gncov */
@@ -1261,8 +1261,9 @@ static int verify_logfile_func(const int linenum, const struct Entry *entry,
 		goto cleanup; /* gncov */
 	}
 	if (entry->host) {
-		log_file = allocstr("%s/uuids/%s%s",
-		                    TMPDIR, entry->host, LOGFILE_EXTENSION);
+		log_file = allocstr("%s/%s/%s%s",
+		                    TMPDIR, LOGDIR_NAME, entry->host,
+		                    LOGFILE_EXTENSION);
 	} else {
 		log_file = mystrdup(logfile);
 	}
@@ -1306,8 +1307,8 @@ cleanup:
 
 /*
  * init_tempdir_func() - Populate the temporary work directory defined in 
- * TMPDIR with an rc file and a `uuids` directory. Returns 0 if ok, or 1 if 
- * anything failed.
+ * TMPDIR with an rc file and a directory with the name defined in 
+ * `LOGDIR_NAME`. Returns 0 if ok, or 1 if anything failed.
  */
 
 static int init_tempdir_func(const int linenum)
@@ -1327,11 +1328,11 @@ static int init_tempdir_func(const int linenum)
 		return 1; /* gncov */
 	}
 
-	OK_SUCCESS_L(result = mkdir(TMPDIR "/uuids", 0777), linenum,
-	             "mkdir uuids");
+	OK_SUCCESS_L(result = mkdir(TMPDIR "/" LOGDIR_NAME, 0777), linenum,
+	             "mkdir %s", LOGDIR_NAME);
 	if (result) {
-		diag("Cannot create uuids/ directory, skipping" /* gncov */
-		     " tests: %s", strerror(errno)); /* gncov */
+		diag("Cannot create %s/ directory, skipping" /* gncov */
+		     " tests: %s", LOGDIR_NAME, strerror(errno)); /* gncov */
 		errno = 0; /* gncov */
 		return 1; /* gncov */
 	}
@@ -1348,9 +1349,9 @@ static int init_tempdir_func(const int linenum)
 static void cleanup_tempdir(const int linenum)
 {
 	delete_logfile_func(linenum);
-	if (file_exists(TMPDIR "/uuids"))
-		OK_SUCCESS_L(rmdir(TMPDIR "/uuids"), linenum,
-		             "Delete " TMPDIR "/uuids");
+	if (file_exists(TMPDIR "/" LOGDIR_NAME))
+		OK_SUCCESS_L(rmdir(TMPDIR "/" LOGDIR_NAME), linenum,
+		             "Delete %s/%s", TMPDIR, LOGDIR_NAME);
 	if (file_exists(rcfile))
 		OK_SUCCESS_L(remove(rcfile), linenum,
 		             "Delete rc file");
@@ -1429,8 +1430,9 @@ static int init_testvars(void)
 
 	init_rc(&rc);
 	rc.hostname = HNAME;
-	logfile = allocstr("%s/%s/uuids/%s%s",
-	                   cwd, TMPDIR, get_hostname(&rc), LOGFILE_EXTENSION);
+	logfile = allocstr("%s/%s/%s/%s%s",
+	                   cwd, TMPDIR, LOGDIR_NAME, get_hostname(&rc),
+	                   LOGFILE_EXTENSION);
 	if (!logfile) {
 		failed_ok("allocstr()"); /* gncov */
 		goto cleanup; /* gncov */
@@ -2435,8 +2437,8 @@ static void test_get_log_prefix(void)
 		failed_ok("getpath()"); /* gncov */
 		goto cleanup; /* gncov */
 	}
-	exp = allocstr("%s/%s/uuids/%s%s",
-	               dir, TMPDIR, hostname, LOGFILE_EXTENSION);
+	exp = allocstr("%s/%s/%s/%s%s",
+	               dir, TMPDIR, LOGDIR_NAME, hostname, LOGFILE_EXTENSION);
 	if (!exp) {
 		failed_ok("allocstr()"); /* gncov */
 		goto cleanup; /* gncov */
@@ -3184,11 +3186,11 @@ static void test_without_options(void)
 
 	diag("Test without options");
 
-	diag("uuids directory doesn't exist");
+	diag("%s directory doesn't exist", LOGDIR_NAME);
 
 	if (init_tempdir())
 		return; /* gncov */
-	OK_SUCCESS(rmdir(TMPDIR "/uuids"), "rmdir uuids");
+	OK_SUCCESS(rmdir(TMPDIR "/" LOGDIR_NAME), "rmdir %s", LOGDIR_NAME);
 
 	p = allocstr("%s: %s: Could not create log file: No such file or"
 	             " directory\n", EXECSTR, logfile);
@@ -3200,23 +3202,24 @@ static void test_without_options(void)
 	   "",
 	   p,
 	   EXIT_FAILURE,
-	   "No options, uuids directory doesn't exist");
+	   "No options, %s directory doesn't exist", LOGDIR_NAME);
 	free(p);
 	p = NULL;
 
-	diag("uuids directory exists");
+	diag("%s directory exists", LOGDIR_NAME);
 
-	OK_SUCCESS(result = mkdir(TMPDIR "/uuids", 0777),
-	           "mkdir %s/uuids", TMPDIR);
+	OK_SUCCESS(result = mkdir(TMPDIR "/" LOGDIR_NAME, 0777),
+	           "mkdir %s/%s", TMPDIR, LOGDIR_NAME);
 	if (result) {
-		diag("Cannot create uuids/ directory, skipping" /* gncov */
-		     " tests: %s", strerror(errno)); /* gncov */
+		diag("Cannot create %s/ directory, skipping" /* gncov */
+		     " tests: %s", LOGDIR_NAME, strerror(errno)); /* gncov */
 		errno = 0; /* gncov */
 		goto cleanup; /* gncov */
 	}
 
 	init_xml_entry(&entry);
-	uc((chp{ execname, NULL }), 1, 0, "No options, uuids directory exists");
+	uc((chp{ execname, NULL }), 1, 0,
+	   "No options, %s directory exists", LOGDIR_NAME);
 	verify_logfile(&entry, 1, "First entry created");
 	uc((chp{ execname, NULL }), 1, 0, "Create second entry");
 	verify_logfile(&entry, 2, "Entries are added, not replaced");
@@ -3282,7 +3285,7 @@ static void test_without_options(void)
 
 	diag("%s is defined", ENV_LOGDIR);
 
-	if (set_env(ENV_LOGDIR, TMPDIR "/uuids"))
+	if (set_env(ENV_LOGDIR, TMPDIR "/" LOGDIR_NAME))
 		goto cleanup; /* gncov */
 	uc((chp{ execname, NULL }), 1, 0, "No options, %s is defined",
 	                                  ENV_LOGDIR);
@@ -4044,35 +4047,38 @@ static void test_logdir_option(void)
 		return; /* gncov */
 	init_xml_entry(&entry);
 
-	OK_SUCCESS(result = rename(TMPDIR "/uuids", TMPDIR "/uuids2"),
-	           "rename uuids/ to uuids2/");
+	OK_SUCCESS(result = rename(TMPDIR "/" LOGDIR_NAME,
+	                           TMPDIR "/" LOGDIR_NAME "2"),
+	           "rename %s/ to %s2/", LOGDIR_NAME, LOGDIR_NAME);
 	if (result) {
-		OK_ERROR("Cannot rename uuids/ to uuids2/" /* gncov */
+		OK_ERROR("Cannot rename %s/ to %s2/" /* gncov */
 		         " directory, skipping tests: %s",
-		         strerror(errno));
+		         LOGDIR_NAME, LOGDIR_NAME, strerror(errno));
 		errno = 0; /* gncov */
 		return; /* gncov */
 	}
 
 	entry.txt = "With -l/--logdir";
-	uc((chp{ execname, "-l", TMPDIR "/uuids2", "-c", "With -l/--logdir",
-	         NULL }),
-	   1, 0, "\"-l " TMPDIR "/uuids2\"");
+	uc((chp{ execname, "-l", TMPDIR "/" LOGDIR_NAME "2",
+	         "-c", "With -l/--logdir", NULL }),
+	   1, 0, "\"-l %s/%s2\"", TMPDIR, LOGDIR_NAME);
 
-	uc((chp{ execname, "--logdir", TMPDIR "/uuids2", "-c",
+	uc((chp{ execname, "--logdir", TMPDIR "/" LOGDIR_NAME "2", "-c",
 	         "With -l/--logdir", NULL }), 1, 0,
-	        "\"--logdir " TMPDIR "/uuids2\"");
+	        "\"--logdir %s/%s2\"", TMPDIR, LOGDIR_NAME);
 
-	OK_SUCCESS(result = rename(TMPDIR "/uuids2", TMPDIR "/uuids"),
-	           "Rename uuids2/ back to uuids/");
+	OK_SUCCESS(result = rename(TMPDIR "/" LOGDIR_NAME "2",
+	                           TMPDIR "/" LOGDIR_NAME),
+	           "Rename %s2/ back to %s/", LOGDIR_NAME, LOGDIR_NAME);
 	if (result) {
-		OK_ERROR("Cannot rename uuids2/ to uuids/: %s", /* gncov */
-		         strerror(errno));
+		OK_ERROR("Cannot rename %s2/ to %s/: %s", /* gncov */
+		         LOGDIR_NAME, LOGDIR_NAME, strerror(errno));
 		errno = 0; /* gncov */
 		return; /* gncov */
 	}
 
-	verify_logfile(&entry, 2, "Log file, \"-l " TMPDIR "/uuids2\"");
+	verify_logfile(&entry, 2,
+	               "Log file, \"-l %s/%s2\"", TMPDIR, LOGDIR_NAME);
 	delete_logfile();
 
 	tc((chp{ execname, "--logdir", "", NULL }),
@@ -4091,7 +4097,7 @@ static void test_logdir_option(void)
 	}
 	unset_env("HOME");
 
-	tc((chp{ execname, "-l", TMPDIR "/uuids", NULL }),
+	tc((chp{ execname, "-l", TMPDIR "/" LOGDIR_NAME, NULL }),
 	   NULL,
 	   EXECSTR ": HOME environment variable not defined, cannot determine"
 	   " name of rcfile\n",

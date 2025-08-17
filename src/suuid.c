@@ -267,8 +267,8 @@ static int usage(const struct Options *o, const int retval)
 	       "    Store log files in directory x.\n"
 	       "    If the %s environment variable is defined,"
 	       " that value is \n"
-	       "    used. Otherwise the value \"$HOME/uuids\" is used.\n"
-	       "    Current default: %s\n", ENV_LOGDIR, logdir);
+	       "    used. Otherwise the value \"$HOME/%s\" is used.\n"
+	       "    Current default: %s\n", ENV_LOGDIR, LOGDIR_NAME, logdir);
 	printf("  -q, --quiet\n"
 	       "    Be more quiet. Can be repeated to increase silence.\n");
 	printf("  -m, --random-mac\n"

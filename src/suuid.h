@@ -81,6 +81,7 @@
 #define ENV_SESS  "SESS_UUID" /* Name of environment variable where the session 
                                * information is stored
                                */
+#define LOGDIR_NAME  "uuids"
 #define LOGFILE_EXTENSION  ".xml"
 #define MAX_HOSTNAME_LENGTH  100
 #define MAX_SESS  1000 /* Maximum number of sess elements per entry */

@@ -124,9 +124,9 @@ char *get_hostname(const struct Rc *rc)
 /*
  * get_logdir() - Return pointer to allocated string with location of the log 
  * directory. Use the value of opts->logdir if it's defined, otherwise use the 
- * environment variable defined in ENV_LOGDIR, otherwise use "$HOME/uuids". If 
- * that also fails, return NULL. `opts` is allowed to be NULL, it's called by 
- * usage().
+ * environment variable defined in ENV_LOGDIR, otherwise use `"$HOME/" 
+ * LOGDIR_NAME`. If that also fails, return NULL. `opts` is allowed to be NULL, 
+ * it's called by usage().
  */
 
 char *get_logdir(const struct Options *opts)
@@ -142,14 +142,14 @@ char *get_logdir(const struct Options *opts)
 		 * Use default hardcoded value.
 		 */
 		size_t size = strlen(getenv("HOME"))
-		              + strlen("/uuids") + 1; /* FIXME: slash */
+		              + strlen("/" LOGDIR_NAME) + 1; /* FIXME: slash */
 
 		retval = malloc(size + 1);
 		if (!retval) {
 			failed("malloc()"); /* gncov */
 			return NULL; /* gncov */
 		}
-		snprintf(retval, size, "%s/uuids", /* FIXME: slash */
+		snprintf(retval, size, "%s/" LOGDIR_NAME, /* FIXME: slash */
 		                       getenv("HOME"));
 	} else {
 		myerror("$%s and $HOME environment variables are not defined,"

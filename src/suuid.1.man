@@ -1,5 +1,6 @@
 .\" suuid.1.man
 .\" File ID: 0ce51f0a-1b5a-11f0-83c9-83850402c3ce
+.ds LD uuids
 .TH SUUID 1 "RPL_DATE" "suuid\-RPL_VERSION"
 .SH NAME
 suuid \- Generate v1 UUIDs and document the creation in a log file
@@ -53,7 +54,7 @@ Print the software license.
 \fB\-l\fP \fIx\fP, \fB\-\-logdir\fP \fIx\fP
 Store log files in directory \fIx\fP.
 If the \fBSUUID_LOGDIR\fP environment variable is defined, that value is used. 
-Otherwise the value "\fB$HOME/uuids\fP" is used.
+Otherwise the value "\fB$HOME/\*(LD\fP" is used.
 .TP
 \fB\-q\fP, \fB\-\-quiet\fP
 Be more quiet. Can be repeated to increase silence.
@@ -122,7 +123,7 @@ Use another hostname than the one reported by the system. This will affect the
 name of the log file and the value in the \fB<host>\fP element.
 .TP
 \fBSUUID_LOGDIR\fP
-The directory where log files are stored. Default value is \fB~/uuids\fP.
+The directory where log files are stored. Default value is \fB~/\*(LD\fP.
 .SH FILES
 .TP
 \fB~/.suuidrc\fP
