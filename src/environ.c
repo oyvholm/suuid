@@ -142,15 +142,14 @@ char *get_logdir(const struct Options *opts)
 		 * Use default hardcoded value.
 		 */
 		size_t size = strlen(getenv("HOME"))
-		              + strlen("/" LOGDIR_NAME) + 1; /* FIXME: slash */
+		              + strlen("/" LOGDIR_NAME) + 1;
 
 		retval = malloc(size + 1);
 		if (!retval) {
 			failed("malloc()"); /* gncov */
 			return NULL; /* gncov */
 		}
-		snprintf(retval, size, "%s/" LOGDIR_NAME, /* FIXME: slash */
-		                       getenv("HOME"));
+		snprintf(retval, size, "%s/" LOGDIR_NAME, getenv("HOME"));
 	} else {
 		myerror("$%s and $HOME environment variables are not defined,"
 		        " cannot create logdir path", ENV_LOGDIR);
@@ -206,14 +205,13 @@ char *get_log_prefix(const struct Rc *rc, const struct Options *opts,
 	 * it as an allocated string.
 	 */
 
-	prefix_length = strlen(logdir) + strlen("/") /* FIXME: slash */
-	                + strlen(hostname) + strlen(ext) + 1;
+	prefix_length = strlen(logdir) + strlen("/") + strlen(hostname)
+	                + strlen(ext) + 1;
 	prefix = malloc(prefix_length + 1);
 	if (!prefix) {
 		failed("malloc()"); /* gncov */
 		goto cleanup; /* gncov */
 	}
-	/* FIXME: Remove slash hardcoding, use some portable solution */
 	snprintf(prefix, prefix_length, "%s/%s%s", logdir, hostname, ext);
 
 cleanup:

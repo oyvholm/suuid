@@ -101,7 +101,7 @@ char *get_rcfilename(const struct Options *opts)
 		failed("malloc()"); /* gncov */
 		return NULL; /* gncov */
 	}
-	snprintf(retval, size, "%s/%s", env, STD_RCFILE); /* FIXME: slash */
+	snprintf(retval, size, "%s/%s", env, STD_RCFILE);
 
 	return retval;
 }
