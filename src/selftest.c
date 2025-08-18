@@ -4746,7 +4746,7 @@ static void test_sigpipe_signal(const int linenum, const char *args)
 	          "%s: Returning from main\\(\\) with value 1\n"
 #ifdef __FreeBSD__
 	          /* FIXME: Happens in FreeBSD 14.2 */
-	          "%s: Termination signal \\(Broken pipe\\) received, aborting\n"
+	          "(%s: Termination signal \\(Broken pipe\\) received, aborting\n)?"
 #endif
 	          "$",
 	          execname, execname, execname, execname, execname
