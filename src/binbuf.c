@@ -61,10 +61,8 @@ char *bb_allocstr(struct binbuf *dest, const char *format, ...)
 	va_start(ap, format);
 	p = allocstr_va(format, ap);
 	va_end(ap);
-	if (!p) {
-		failed("allocstr_va()"); /* gncov */
+	if (!p)
 		return NULL; /* gncov */
-	}
 	dest->buf = p;
 	dest->len = strlen(dest->buf);
 	dest->alloc = dest->len + 1;
