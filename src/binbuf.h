@@ -29,7 +29,7 @@ struct binbuf {
 
 void binbuf_init(struct binbuf *sb);
 void binbuf_free(struct binbuf *sb);
-char *binbuf_allocstr(struct binbuf *dest, const char *format, ...);
+char *bb_allocstr(struct binbuf *dest, const char *format, ...);
 
 #endif /* ifndef _BINBUF_H */
 

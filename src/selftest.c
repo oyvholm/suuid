@@ -3470,7 +3470,7 @@ static void chk_comment(const int linenum, char *cmt, char *regexp,
 		failed_ok("allocstr()"); /* gncov */
 		goto cleanup; /* gncov */
 	}
-	binbuf_allocstr(&ss.in, "%s", cmt);
+	bb_allocstr(&ss.in, "%s", cmt);
 	streams_exec(&opt, &ss, chp{ execname, "--comment", "-", NULL });
 	if (!ss.out.buf || !ss.err.buf) {
 		failed_ok("ss.out.buf or ss.err.buf is NULL," /* gncov */
@@ -3520,7 +3520,7 @@ static void chk_inv_comment(const int linenum, char *cmt, const char *desc)
 	        "%s, -c option", desc);
 
 	streams_init(&ss);
-	binbuf_allocstr(&ss.in, "%s", cmt);
+	bb_allocstr(&ss.in, "%s", cmt);
 	streams_exec(&opt, &ss, chp{ execname, "--comment", "-", NULL });
 	if (!ss.out.buf || !ss.err.buf) {
 		failed_ok("ss.out.buf or ss.err.buf is NULL," /* gncov */
@@ -3638,7 +3638,7 @@ static void read_long_text_from_stdin(void)
 		p += 6;
 	}
 	streams_init(&ss);
-	binbuf_allocstr(&ss.in, "%s", buf);
+	bb_allocstr(&ss.in, "%s", buf);
 	OK_EQUAL(streams_exec(&o, &ss, chp{ execname, "-c", "-", NULL }),
 	         EXIT_SUCCESS, "%s (retval)", desc);
 	free(buf);

@@ -45,12 +45,12 @@ void binbuf_free(struct binbuf *sb)
 }
 
 /*
- * binbuf_allocstr() - binbuf version of allocstr(), i.e., store a binbuf 
- * string in `dest` by providing printf()-like arguments. Returns `dest->buf`, 
- * or NULL if allocation failed.
+ * bb_allocstr() - binbuf version of allocstr(), i.e., store a binbuf string in 
+ * `dest` by providing printf()-like arguments. Returns `dest->buf`, or NULL if 
+ * allocation failed.
  */
 
-char *binbuf_allocstr(struct binbuf *dest, const char *format, ...)
+char *bb_allocstr(struct binbuf *dest, const char *format, ...)
 {
 	va_list ap;
 	char *p;
