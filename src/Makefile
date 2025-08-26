@@ -387,4 +387,4 @@ valgrind: $(EXEC)
 
 .PHONY: valgrindall
 valgrindall:
-	$(MAKE) testcomb WHAT=valgrind
+	$(MAKE) -s testcomb WHAT=valgrind

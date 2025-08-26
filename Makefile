@@ -156,5 +156,5 @@ valgrind:
 
 .PHONY: valgrindall
 valgrindall:
-	cd src && $(MAKE) $@
+	cd src && $(MAKE) -s $@
 	cd tests && $(MAKE) testall
