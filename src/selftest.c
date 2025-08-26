@@ -1382,10 +1382,13 @@ static void test_ok_macros(void)
 	OK_FAILURE(1, "OK_FAILURE(1, ...)");
 	OK_FALSE(5 == 9, "OK_FALSE(5 == 9, ...)");
 	OK_NOTEQUAL(19716, 1916, "OK_NOTEQUAL(%u, %u, ...)", 19716, 1916);
-	OK_NOTNULL(strstr("abcdef", "cde"), "OK_NOTNULL(strstr(\"abcdef\", \"cde\"), ...)");
-	OK_NULL(strstr("abcdef", "notfound"), "OK_NULL(strstr(\"abcdef\", \"notfound\"), ...)");
+	OK_NOTNULL(strstr("abcdef", "cde"),
+	           "OK_NOTNULL(strstr(\"abcdef\", \"cde\"), ...)");
+	OK_NULL(strstr("abcdef", "notfound"),
+	               "OK_NULL(strstr(\"abcdef\", \"notfound\"), ...)");
 	OK_STRCMP("str", "str", "OK_STRCMP(\"%s\", \"%s\", ...)", "str", "str");
-	OK_STRNCMP("abcde", "abcyz", 3, "OK_STRNCMP(\"abcde\", \"abcyz\", 3, ...)");
+	OK_STRNCMP("abcde", "abcyz", 3,
+	           "OK_STRNCMP(\"abcde\", \"abcyz\", 3, ...)");
 	OK_SUCCESS(0, "OK_SUCCESS(0, ...)");
 	OK_TRUE(9 > -4, "OK_TRUE(%d > %d, ...)", 9, -4);
 }
@@ -2170,7 +2173,8 @@ static void test_str_replace(void)
 
 	diag("Test str_replace()");
 
-#define chk_sr(s, s1, s2, exp, desc)  chk_sr(__LINE__, (s), (s1), (s2), (exp), (desc))
+#define chk_sr(s, s1, s2, exp, desc)  chk_sr(__LINE__, (s), (s1), (s2), \
+                                             (exp), (desc))
 	chk_sr("", "", "", "", "s, s1, and s2 are empty");
 	chk_sr("abc", "", "b", "abc", "s1 is empty");
 	chk_sr("", "a", "b", "", "s is empty");
@@ -2212,8 +2216,7 @@ static void test_str_replace(void)
 	s[1234] = 'y';
 	s[bsize - 1] = 'z';
 	s[bsize] = '\0';
-	chk_sr(s, "!!!!!!!!!!", "", "!!!!y!!!!z",
-	       "Large buffer with y and z");
+	chk_sr(s, "!!!!!!!!!!", "", "!!!!y!!!!z", "Large buffer with y and z");
 	free(s);
 #undef chk_sr
 }
@@ -2983,6 +2986,8 @@ static void test_read_rcfile(void)
             Test the executable file, no temporary directory needed
 ******************************************************************************/
 
+                             /*** --valgrind ***/
+
 /*
  * test_valgrind_option() - Tests the --valgrind command line option. Returns 
  * nothing.
@@ -3018,6 +3023,8 @@ static void test_valgrind_option(const struct Options *o)
 	   EXIT_SUCCESS,
 	   "--valgrind -h");
 }
+
+                          /*** Standard options ***/
 
 /*
  * test_standard_options() - Tests the various generic options available in 
@@ -3058,7 +3065,7 @@ static void test_standard_options(void)
 	   EXECSTR ": main(): Using verbose level 4\n",
 	   EXIT_SUCCESS,
 	   "-vvv --verbose: Using correct verbose level");
-	sc((chp{ execname, "-vvvvq", "--verbose", "--verbose", "--help", NULL }),
+	sc((chp{ execname, "-vvvvq", "-v", "--verbose", "--help", NULL }),
 	   "  Show this help",
 	   EXECSTR ": main(): Using verbose level 5\n",
 	   EXIT_SUCCESS,
@@ -3101,6 +3108,8 @@ static void test_standard_options(void)
 	   EXIT_FAILURE,
 	   "Unknown option: \"Option error\" message is printed");
 }
+
+                  /*** Invalid hostname in ENV_HOSTNAME ***/
 
 /*
  * chk_ihv() - Used by test_invalid_hostname_var(). Sets the environment 

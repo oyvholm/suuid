@@ -32,6 +32,19 @@ void binbuf_init(struct binbuf *sb)
 }
 
 /*
+ * binbuf_free() - Deallocate a `struct binbuf` and set struct values to 
+ * initial state.
+ */
+
+void binbuf_free(struct binbuf *sb)
+{
+	assert(sb);
+	if (sb->alloc)
+		free(sb->buf);
+	binbuf_init(sb);
+}
+
+/*
  * binbuf_allocstr() - binbuf version of allocstr(), i.e., store a binbuf 
  * string in `dest` by providing printf()-like arguments. Returns `dest->buf`, 
  * or NULL if allocation failed.
@@ -57,19 +70,6 @@ char *binbuf_allocstr(struct binbuf *dest, const char *format, ...)
 	dest->alloc = dest->len + 1;
 
 	return dest->buf;
-}
-
-/*
- * binbuf_free() - Deallocate a `struct binbuf` and set struct values to 
- * initial state.
- */
-
-void binbuf_free(struct binbuf *sb)
-{
-	assert(sb);
-	if (sb->alloc)
-		free(sb->buf);
-	binbuf_init(sb);
 }
 
 /* vim: set ts=8 sw=8 sts=8 noet fo+=w tw=79 fenc=UTF-8 : */
