@@ -278,6 +278,7 @@ static int ok_va(const int i, const int linenum, const char *desc, va_list ap)
 	char *s, *s2;
 
 	assert(desc);
+	assert(*desc);
 
 	if (!desc)
 		bail_out("%s(): desc is NULL", __func__); /* gncov */
@@ -313,6 +314,7 @@ static int ok(const int i, const int linenum, const char *desc, ...)
 	va_list ap;
 
 	assert(desc);
+	assert(*desc);
 
 	if (!desc)
 		bail_out("%s(): desc is NULL", __func__); /* gncov */
@@ -541,7 +543,9 @@ static void test_command(const int linenum, const char identical, char *cmd[],
 	char *e_stdout, *e_stderr, *descbuf;
 
 	assert(cmd);
+	assert(*cmd);
 	assert(desc);
+	assert(*desc);
 	if (!cmd) {
 		OK_ERROR_L(linenum, "%s(): cmd is NULL", __func__); /* gncov */
 		return; /* gncov */
@@ -602,7 +606,9 @@ static void sc_func(const int linenum, char *cmd[], const char *exp_stdout,
 	va_list ap;
 
 	assert(cmd);
+	assert(*cmd);
 	assert(desc);
+	assert(*desc);
 
 	va_start(ap, desc);
 	test_command(linenum, 0, cmd, exp_stdout, exp_stderr, exp_retval,
@@ -625,7 +631,9 @@ static void tc_func(const int linenum, char *cmd[], const char *exp_stdout,
 	va_list ap;
 
 	assert(cmd);
+	assert(*cmd);
 	assert(desc);
+	assert(*desc);
 
 	va_start(ap, desc);
 	test_command(linenum, 1, cmd, exp_stdout, exp_stderr, exp_retval,
@@ -761,6 +769,8 @@ static void verify_output_files_func(const int linenum, const char *desc,
 {
 	char *result;
 
+	assert(desc);
+	assert(*desc);
 	assert(exp_stdout);
 	assert(exp_stderr);
 
@@ -928,6 +938,7 @@ static void uc_check_va(const int linenum, const char *name,
 	assert(strlen(name) == 3);
 	assert(output);
 	assert(desc);
+	assert(*desc);
 
 	buflen = strlen(desc) + strlen(" (stdXXX)") + 1;
 	desc_str = malloc(buflen);
@@ -965,6 +976,7 @@ static void uc_check(const int linenum, const char *name, const char *output,
 	assert(strlen(name) == 3);
 	assert(output);
 	assert(desc);
+	assert(*desc);
 
 	va_start(ap, desc);
 	uc_check_va(linenum, name, output, num_exp, desc, ap);
@@ -988,11 +1000,13 @@ static void uc_func(const int linenum, char *cmd[],
 	char *s;
 
 	assert(cmd);
+	assert(*cmd);
 	if (!cmd) {
 		OK_ERROR("%s(): cmd is NULL", __func__); /* gncov */
 		return; /* gncov */
 	}
 	assert(desc);
+	assert(*desc);
 
 	streams_init(&ss);
 	streams_exec(&opt, &ss, cmd);
@@ -1229,6 +1243,7 @@ static int verify_logfile_func(const int linenum, const struct Entry *entry,
 
 	assert(entry);
 	assert(desc);
+	assert(*desc);
 
 	r_entry = generate_line_regexp(entry, uuid_count);
 	if (!r_entry) {
@@ -1657,6 +1672,7 @@ static void chk_cu(const int linenum, const char *s, const char *sep,
 	assert(s);
 	assert(sep);
 	assert(desc);
+	assert(*desc);
 
 	res = count_uuids(s, sep);
 	OK_EQUAL_L(res, count, linenum, "%s", desc);
@@ -1746,6 +1762,7 @@ static void chk_csx(const int linenum, const struct Sess *sess,
 	assert(sess);
 	assert(exp);
 	assert(desc);
+	assert(*desc);
 
 	init_xml_entry(&entry);
 	for (i = 0; i < MAX_SESS; i++) {
@@ -1815,6 +1832,7 @@ static void chk_hk(const int linenum, const char *line, const char *keyword,
 
 	assert(line);
 	assert(keyword);
+	assert(*keyword);
 
 	result = has_key(line, keyword);
 	if (!result || !exp) {
@@ -2088,6 +2106,9 @@ static void chk_cs(const int linenum, const char *s, const char *substr,
 {
 	size_t result;
 
+	assert(desc);
+	assert(*desc);
+
 	result = count_substr(s, substr);
 	OK_EQUAL_L(result, count, linenum, "count_substr(): %s", desc);
 	print_gotexp_size_t(result, count);
@@ -2152,6 +2173,7 @@ static void chk_sr(const int linenum, const char *s, const char *s1,
 	char *result;
 
 	assert(desc);
+	assert(*desc);
 
 	result = str_replace(s, s1, s2);
 	if (!result || !exp)
@@ -2813,6 +2835,7 @@ static void chk_rr_memb(const int linenum, const char *got, const char *exp,
 
 	assert(name);
 	assert(desc);
+	assert(*desc);
 
 	if (!exp)
 		return;
@@ -2837,6 +2860,7 @@ static void chk_rr(const int linenum, const char *contents, struct Rc *exp,
 	assert(contents);
 	assert(exp);
 	assert(desc);
+	assert(*desc);
 
 	diag("%s", desc);
 	init_rc(&got);
@@ -2886,6 +2910,7 @@ static void chk_rr_im(const int linenum, const char *mac, enum rr_msgs errval,
 
 	assert(mac);
 	assert(desc);
+	assert(*desc);
 
 	diag("%s", desc);
 	init_rc(&got);
@@ -3460,6 +3485,7 @@ static void chk_comment(const int linenum, char *cmt, char *regexp,
 	assert(cmt);
 	assert(regexp);
 	assert(desc);
+	assert(*desc);
 
 	uc_func(linenum, (chp{ execname, "-c", cmt, NULL }), 1, 0,
 	        "%s, -c option", desc);
@@ -3505,6 +3531,7 @@ static void chk_inv_comment(const int linenum, char *cmt, const char *desc)
 
 	assert(cmt);
 	assert(desc);
+	assert(*desc);
 
 	s = str_replace(EXECSTR ": Comment contains illegal characters or is"
 	                " not valid UTF-8\n", EXECSTR, execname);
@@ -4836,6 +4863,7 @@ static void chk_irh(const int linenum, char *hostname, const char *desc)
 
 	assert(hostname);
 	assert(desc);
+	assert(*desc);
 
 	init_rc(&rc);
 
@@ -5115,6 +5143,7 @@ static void test_executable(const struct Options *o)
 int opt_selftest(char *main_execname, const struct Options *o)
 {
 	assert(main_execname);
+	assert(*main_execname);
 	assert(o);
 
 	execname = main_execname;
