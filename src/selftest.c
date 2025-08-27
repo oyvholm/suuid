@@ -26,9 +26,9 @@
  */
 
 #define EXECSTR  "__EXSTR__"
-#define OPTION_ERROR_STR  EXECSTR ": Option error\n" \
-                          EXECSTR ": Type \"" EXECSTR " --help\" for help screen." \
-                          " Returning with value 1.\n"
+#define TYPE_HELP_STR  EXECSTR ": Type \"" EXECSTR " --help\" for help" \
+                       " screen. Returning with value 1.\n"
+#define OPTION_ERROR_STR  EXECSTR ": Option error\n" TYPE_HELP_STR
 #define chp  (char *[])
 #define print_gotexp_nostr(seq, got, exp)  do { \
 	char *g = allocstr((seq), (got)), *e = allocstr((seq), (exp)); \
@@ -38,6 +38,10 @@
 		print_gotexp(g, e); \
 	free(e); \
 	free(g); \
+} while (0)
+#define print_gotexp_double(got, exp)  do { \
+	if ((got) != (exp)) \
+		print_gotexp_nostr("%.8f", (got), (exp)); \
 } while (0)
 #define print_gotexp_int(got, exp)  do { \
 	if ((got) != (exp)) \
@@ -116,6 +120,11 @@
  * Examples: OK_FALSE(user_exists(user), "User %s doesn't exist", user);
  *           OK_FALSE(result == 5, "Result is not 5");
  *
+ * OK_MEMCMP(a, b, len, desc, ...) - Compares `len` bytes of the buffers `a` 
+ * and `b` and succeeds if the buffers are identical. This macro differs from 
+ * OK_STRNCMP in that the buffers can contain null bytes.
+ * Example: OK_MEMCMP(buf1, buf2, 512, "Buffers are identical");
+ *
  * OK_NOTEQUAL(a, b, desc, ...) - Expects the values `a` and `b` to be 
  * different. The `!=` operator is used for the comparison.
  * Example: OK_NOTEQUAL(userid1, userid2, "The users have different IDs");
@@ -151,6 +160,7 @@
 #define OK_ERROR_L(linenum, msg, ...)  ok(1, (linenum), (msg), ##__VA_ARGS__)
 #define OK_FAILURE_L(func, linenum, desc, ...)  ok(!(func), (linenum), (desc), ##__VA_ARGS__)
 #define OK_FALSE_L(val, linenum, desc, ...)  ok(!!(val), (linenum), (desc), ##__VA_ARGS__)
+#define OK_MEMCMP_L(a, b, len, linenum, desc, ...)  ok(!!memcmp((a), (b), (len)), (linenum), (desc), ##__VA_ARGS__)
 #define OK_NOTEQUAL_L(a, b, linenum, desc, ...)  ok(!((a) != (b)), (linenum), (desc), ##__VA_ARGS__)
 #define OK_NOTNULL_L(p, linenum, desc, ...)  ok(!(p), (linenum), (desc), ##__VA_ARGS__)
 #define OK_NULL_L(p, linenum, desc, ...)  ok(!!(p), (linenum), (desc), ##__VA_ARGS__)
@@ -163,6 +173,7 @@
 #define OK_ERROR(msg, ...)  OK_ERROR_L(__LINE__, (msg), ##__VA_ARGS__)
 #define OK_FAILURE(func, desc, ...)  OK_FAILURE_L((func), __LINE__, (desc), ##__VA_ARGS__)
 #define OK_FALSE(val, desc, ...)  OK_FALSE_L((val), __LINE__, (desc), ##__VA_ARGS__)
+#define OK_MEMCMP(a, b, len, desc, ...)  OK_MEMCMP_L((a), (b), (len), __LINE__, (desc), ##__VA_ARGS__)
 #define OK_NOTEQUAL(a, b, desc, ...)  OK_NOTEQUAL_L((a), (b), __LINE__, (desc), ##__VA_ARGS__)
 #define OK_NOTNULL(p, desc, ...)  OK_NOTNULL_L((p), __LINE__, (desc), ##__VA_ARGS__)
 #define OK_NULL(p, desc, ...)  OK_NULL_L((p), __LINE__, (desc), ##__VA_ARGS__)
@@ -1396,6 +1407,9 @@ static void test_ok_macros(void)
 	/* OK_ERROR("OK_ERROR(...), can't be tested"); */
 	OK_FAILURE(1, "OK_FAILURE(1, ...)");
 	OK_FALSE(5 == 9, "OK_FALSE(5 == 9, ...)");
+	OK_MEMCMP("with\0null", "with\0null", strlen("with null") + 1,
+	          "OK_MEMCMP(\"with\\0null\", \"with\\0null\","
+	          " strlen(\"with null\") + 1, ...)");
 	OK_NOTEQUAL(19716, 1916, "OK_NOTEQUAL(%u, %u, ...)", 19716, 1916);
 	OK_NOTNULL(strstr("abcdef", "cde"),
 	           "OK_NOTNULL(strstr(\"abcdef\", \"cde\"), ...)");
@@ -1488,6 +1502,7 @@ static void test_diag_big(void)
 	outp = diag_output("%s", p);
 	OK_NOTNULL(outp, "diag_big: diag_output() returns ok");
 	OK_EQUAL(strlen(outp), size + 2, "diag_big: String length is correct");
+	print_gotexp_size_t(strlen(outp), size + 2);
 	OK_STRNCMP(outp, "# aaabcaaa", 10, "diag_big: Beginning is ok");
 	free(outp);
 	free(p);
@@ -5185,6 +5200,8 @@ int opt_selftest(char *main_execname, const struct Options *o)
 #undef OK_FAILURE_L
 #undef OK_FALSE
 #undef OK_FALSE_L
+#undef OK_MEMCMP
+#undef OK_MEMCMP_L
 #undef OK_NOTEQUAL
 #undef OK_NOTEQUAL_L
 #undef OK_NOTNULL
@@ -5203,11 +5220,13 @@ int opt_selftest(char *main_execname, const struct Options *o)
 #undef R_TIMESTAMP
 #undef R_UUID
 #undef TMPDIR
+#undef TYPE_HELP_STR
 #undef chp
 #undef delete_logfile
 #undef diag_errno
 #undef failed_ok
 #undef init_tempdir
+#undef print_gotexp_double
 #undef print_gotexp_int
 #undef print_gotexp_nostr
 #undef print_gotexp_size_t
