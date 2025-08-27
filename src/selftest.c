@@ -2792,12 +2792,14 @@ static void test_create_file(void)
 	desc = "create_file() with NULL creates empty file";
 	file = TMPDIR "/emptyfile";
 	OK_NOTNULL(res = create_file(file, NULL), "%s (exec)", desc);
-	if (!res)
+	if (!res) {
 		diag_errno(); /* gncov */
+		goto cleanup; /* gncov */
+	}
 	OK_STRCMP(res, "", "%s (retval)", desc);
 	if (stat(file, &sb)) {
 		failed_ok("stat()"); /* gncov */
-		return; /* gncov */
+		goto cleanup; /* gncov */
 	}
 	OK_EQUAL(sb.st_size, 0, "%s is empty", file);
 	OK_SUCCESS(remove(file), "Delete %s", file);
@@ -2806,15 +2808,19 @@ static void test_create_file(void)
 	data = "Test data\n";
 	file = TMPDIR "/datafile";
 	OK_NOTNULL(res = create_file(file, data), "%s (exec)", desc);
-	if (!res)
+	if (!res) {
 		diag_errno(); /* gncov */
+		goto cleanup; /* gncov */
+	}
 	OK_STRCMP(res, data, "%s (retval)", desc);
 	OK_NOTNULL(s = read_from_file(file), "Read data from file");
 	if (!s)
-		failed_ok("read_from_file()"); /* gncov */
+		diag_errno(); /* gncov */
 	else
 		OK_STRCMP(s, data, "Data from file is correct");
 	free(s);
+
+cleanup:
 	OK_SUCCESS(remove(file), "Delete %s", file);
 }
 
