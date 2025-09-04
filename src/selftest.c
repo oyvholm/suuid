@@ -276,7 +276,7 @@ static void bail_out(const char *msg, ...) /* gncov */
 }
 
 /*
- * ok_va() - Print a log line to stdout. If `i` is 0, an "ok" line is printed, 
+ * ok_va() - Prints a log line to stdout. If `i` is 0, an "ok" line is printed, 
  * otherwise a "not ok" line is printed. `desc` is the test description and can 
  * use printf sequences.
  *
@@ -389,7 +389,7 @@ static char *diag_output_va(const char *format, va_list ap)
 
 /*
  * diag_output() - Frontend against diag_output_va(), used by the tests. 
- * Returns the value from diag_output_va(); a pointer to the allocated string, 
+ * Returns the value from diag_output_va() (a pointer to the allocated string), 
  * or NULL if anything failed.
  */
 
@@ -438,7 +438,7 @@ static int diag(const char *format, ...)
 }
 
 /*
- * gotexp_output() - Generate the output used by print_gotexp(). Returns NULL 
+ * gotexp_output() - Generates the output used by print_gotexp(). Returns NULL 
  * if allocstr() or mystrdup() fails. Otherwise, it returns a pointer to an 
  * allocated string with the output.
  */
@@ -463,8 +463,9 @@ static char *gotexp_output(const char *got, const char *exp)
 }
 
 /*
- * print_gotexp() - Print the value of the actual and exepected data. Used when 
- * a test fails. Returns 1 if `got` or `exp` are different, otherwise 0.
+ * print_gotexp() - Prints the value of the actual and exepected data if the 
+ * strings `got` and `exp` are different. Used when a test fails. Returns 1 if 
+ * `got` or `exp` are different, otherwise 0.
  */
 
 static int print_gotexp(const char *got, const char *exp)
@@ -540,7 +541,7 @@ static int tc_cmp(const int identical, const char *got, const char *exp)
 }
 
 /*
- * test_command() - Run the executable with arguments in `cmd` and verify 
+ * test_command() - Runs the executable with arguments in `cmd` and verifies 
  * stdout, stderr and the return value against `exp_stdout`, `exp_stderr` and 
  * `exp_retval`. Returns nothing.
  */
@@ -603,7 +604,7 @@ static void test_command(const int linenum, const char identical, char *cmd[],
 }
 
 /*
- * sc_func() - Execute command `cmd` and verify that stdout, stderr and the 
+ * sc_func() - Executes command `cmd` and verifies that stdout, stderr and the 
  * return value corresponds to the expected values. The `exp_*` variables are 
  * substrings that must occur in the actual output. Not meant to be called 
  * directly, but via the uc() macro that logs the line number automatically. 
@@ -628,7 +629,7 @@ static void sc_func(const int linenum, char *cmd[], const char *exp_stdout,
 }
 
 /*
- * tc_func() - Execute command `cmd` and verify that stdout, stderr and the 
+ * tc_func() - Executes command `cmd` and verifies that stdout, stderr and the 
  * return value are identical to the expected values. The `exp_*` variables are 
  * strings that must be identical to the actual output. Not meant to be called 
  * directly, but via the tc() macro that logs the line number automatically. 
@@ -864,7 +865,7 @@ static int is_root(void)
 }
 
 /*
- * print_version_info() - Display output from the --version command. Returns 0 
+ * print_version_info() - Displays output from the --version command. Returns 0 
  * if ok, or 1 if streams_exec() failed.
  */
 
@@ -995,10 +996,10 @@ static void uc_check(const int linenum, const char *name, const char *output,
 }
 
 /*
- * uc_func() - Execute command `cmd` and verify that stdout and stderr contains 
- * the correct number of uuids. `desc` is a description of the test. Not meant 
- * to be called directly, but via the uc() macro that logs the line number 
- * automatically. Returns nothing.
+ * uc_func() - Executes command `cmd` and verifies that stdout and stderr 
+ * contains the correct number of uuids. `desc` is a description of the test. 
+ * Not meant to be called directly, but via the uc() macro that logs the line 
+ * number automatically. Returns nothing.
  */
 
 static void uc_func(const int linenum, char *cmd[],
@@ -1210,7 +1211,7 @@ cleanup:
 }
 
 /*
- * diag_sess_array/() - Print all non-NULL values of a `Struct sess` array. 
+ * diag_sess_array/() - Prints all non-NULL values of a `Struct sess` array. 
  * Returns nothing.
  */
 
@@ -1231,8 +1232,8 @@ static void diag_sess_array(const struct Sess *sess) /* gncov */
 } /* gncov */
 
 /*
- * verify_logfile_func() - Verify that the contents in the log file defined in 
- * the file-static variable `logfile` corresponds to the data in `entry` and 
+ * verify_logfile_func() - Verifies that the contents in the log file defined 
+ * in the file-static variable `logfile` corresponds to the data in `entry` and 
  * that the number of entries is `uuid_count` is correct. `desc` is a test 
  * description, and can use printf escapes.
  *
@@ -1332,7 +1333,7 @@ cleanup:
 }
 
 /*
- * init_tempdir_func() - Populate the temporary work directory defined in 
+ * init_tempdir_func() - Populates the temporary work directory defined in 
  * TMPDIR with an rc file and a directory with the name defined in 
  * `LOGDIR_NAME`. Returns 0 if ok, or 1 if anything failed.
  */
@@ -1423,9 +1424,9 @@ static void test_ok_macros(void)
 }
 
 /*
- * init_testvars() - Initialize file-static variables and environment variables 
- * to use the temporary directory defined in TMPDIR. Returns 1 if anything 
- * fails, or 0 if OK.
+ * init_testvars() - Initializes file-static variables and environment 
+ * variables to use the temporary directory defined in TMPDIR. Returns 1 if 
+ * anything fails, or 0 if OK.
  */
 
 static int init_testvars(void)
@@ -1623,7 +1624,7 @@ static void test_gotexp_output(void)
 }
 
 /*
- * test_valgrind_lines() - Test the behavior of valgrind_lines(). Returns 
+ * test_valgrind_lines() - Tests the behavior of valgrind_lines(). Returns 
  * nothing.
  */
 
@@ -3229,7 +3230,7 @@ static void test_invalid_hostname_var(void)
                              /*** No options ***/
 
 /*
- * test_without_options() - Test the executable without options. Returns 
+ * test_without_options() - Tests the executable without options. Returns 
  * nothing.
  */
 
@@ -3770,7 +3771,7 @@ cleanup:
 }
 
 /*
- * external_editor_missing_vars() - Emulate a situation when the external 
+ * external_editor_missing_vars() - Emulates a situation when the external 
  * editor can't be executed because both the `ENV_EDITOR` or "EDITOR" variables 
  * are undefined or empty. Returns nothing.
  */
@@ -3896,7 +3897,7 @@ cleanup:
 }
 
 /*
- * test_unreadable_editor_file() - Simulate a situation when the external 
+ * test_unreadable_editor_file() - Simulates a situation when the external 
  * editor saves a file with wrong permissions, making it unreadable. Returns 
  * nothing.
  */
@@ -4181,7 +4182,7 @@ cleanup:
                            /*** -m/--random-mac ***/
 
 /*
- * chk_unique_macs() - Check that all `num` newline-separated UUID strings in 
+ * chk_unique_macs() - Checks that all `num` newline-separated UUID strings in 
  * the string `s` have unique or identical MAC addresses.
  *
  * `mode`:
@@ -5136,7 +5137,7 @@ static void test_functions(const struct Options *o)
 }
 
 /*
- * test_executable() - Run various tests with the executable and verify that 
+ * test_executable() - Runs various tests with the executable and verifies that 
  * stdout, stderr and the return value are as expected. Returns nothing.
  */
 
@@ -5156,9 +5157,9 @@ static void test_executable(const struct Options *o)
 }
 
 /*
- * opt_selftest() - Run internal testing to check that it works on the current 
+ * opt_selftest() - Runs internal testing to check that it works on the current 
  * system. Executed if --selftest is used. Returns `EXIT_FAILURE` if any tests 
- * fail; otherwise, it returns `EXIT_SUCCESS`.
+ * fail. Otherwise, it returns `EXIT_SUCCESS`.
  */
 
 int opt_selftest(char *main_execname, const struct Options *o)

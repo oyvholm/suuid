@@ -40,7 +40,7 @@ struct Options opt_struct(void)
 }
 
 /*
- * msg() - Print a message prefixed with "[progname]: " to stderr if the 
+ * msg() - Prints a message prefixed with "[progname]: " to stderr if the 
  * current verbose level is equal or higher than the first argument. The rest 
  * of the arguments are delivered to vfprintf().
  * Returns the number of characters written.
@@ -98,7 +98,7 @@ const char *std_strerror(const int errnum)
 }
 
 /*
- * myerror() - Print an error message to stderr using this format:
+ * myerror() - Prints an error message to stderr using this format:
  *
  *     a: b: c
  *
@@ -106,7 +106,7 @@ const char *std_strerror(const int errnum)
  * output from the printf-like string and optional arguments, and `c` is the 
  * error message from `errno`.
  *
- * If `errno` contained an error value (!0), it is reset to 0.
+ * If `errno` contained an error value (non-zero), it is reset to 0.
  *
  * If `errno` indicates no error, the ": c" part is not printed. Returns the 
  * number of characters written.
@@ -126,8 +126,7 @@ int myerror(const char *format, ...)
 	retval += vfprintf(stderr, format, ap);
 	va_end(ap);
 	if (orig_errno) {
-		retval += fprintf(stderr, ": %s",
-		                          std_strerror(orig_errno));
+		retval += fprintf(stderr, ": %s", std_strerror(orig_errno));
 		errno = 0;
 	}
 	retval += fprintf(stderr, "\n");
@@ -136,7 +135,7 @@ int myerror(const char *format, ...)
 }
 
 /*
- * print_license() - Display the program license. Returns `EXIT_SUCCESS`.
+ * print_license() - Displays the program license. Returns `EXIT_SUCCESS`.
  */
 
 static int print_license(void)
@@ -165,8 +164,8 @@ static int print_license(void)
 }
 
 /*
- * print_version() - Print version information on stdout. If `-q` is used, only 
- * the version number is printed. Returns `EXIT_SUCCESS`.
+ * print_version() - Prints version information on stdout. If `-q` is used, 
+ * only the version number is printed. Returns `EXIT_SUCCESS`.
  */
 
 static int print_version(const struct Options *o)
@@ -340,8 +339,8 @@ static int usage(const struct Options *o, const int retval)
 }
 
 /*
- * choose_opt_action() - Decide what to do when option `c` is found. Store 
- * changes in `dest`. Read definitions for long options from `opts`.
+ * choose_opt_action() - Decides what to do when option `c` is found. Changes 
+ * are stored in `dest`. Reads definitions for long options from `opts`. 
  * Returns 0 if ok, or 1 if `c` is unknown or anything fails.
  */
 
@@ -450,7 +449,7 @@ void init_opt(struct Options *dest)
 }
 
 /*
- * set_opt_valgrind() - Change the value of `opt.valgrind`. Used by 
+ * set_opt_valgrind() - Changes the value of `opt.valgrind`. Used by 
  * test_valgrind_option() in case --valgrind is used and Valgrind isn't 
  * installed.
  */
@@ -462,8 +461,8 @@ void set_opt_valgrind(bool b) /* gncov */
 } /* gncov */
 
 /*
- * parse_options() - Parse command line options and store the result in `dest`. 
- * Returns 0 if successful, or 1 if an error occurs.
+ * parse_options() - Parses command line options and stores the result in 
+ * `dest`. Returns 0 if successful, or 1 if an error occurs.
  */
 
 static int parse_options(struct Options *dest,
@@ -519,9 +518,9 @@ static int parse_options(struct Options *dest,
 }
 
 /*
- * setup_options() - Do necessary changes to `o` based on the user input.
+ * setup_options() - Makes necessary changes to `o` based on the user input.
  *
- * - Parse the optional argument to --selftest and set `o->testexec` and 
+ * - Parses the optional argument to --selftest and set `o->testexec` and 
  *   `o->testfunc`.
  *
  * Returns 0 if everything is ok, otherwise it returns 1.

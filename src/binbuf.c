@@ -21,7 +21,7 @@
 #include "suuid.h"
 
 /*
- * binbuf_init() - Prepare a `struct binbuf` for use, returns nothing.
+ * binbuf_init() - Prepares a `struct binbuf` for use, returns nothing.
  */
 
 void binbuf_init(struct binbuf *sb)
@@ -32,8 +32,8 @@ void binbuf_init(struct binbuf *sb)
 }
 
 /*
- * binbuf_free() - Deallocate a `struct binbuf` and set struct values to 
- * initial state.
+ * binbuf_free() - Deallocates a `struct binbuf` and sets the struct values to 
+ * their initial state.
  */
 
 void binbuf_free(struct binbuf *sb)
@@ -45,9 +45,9 @@ void binbuf_free(struct binbuf *sb)
 }
 
 /*
- * bb_allocstr() - binbuf version of allocstr(), i.e., store a binbuf string in 
- * `dest` by providing printf()-like arguments. Returns `dest->buf`, or NULL if 
- * allocation failed.
+ * bb_allocstr() - binbuf version of allocstr(), i.e., stores a binbuf string 
+ * in `dest` by providing printf()-like arguments. Returns `dest->buf`, or NULL 
+ * if allocation failed.
  */
 
 char *bb_allocstr(struct binbuf *dest, const char *format, ...)
