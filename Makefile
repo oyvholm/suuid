@@ -91,9 +91,9 @@ html:
 
 .PHONY: install
 install:
+	cd src && $(MAKE) $@
 	mkdir -p $(PREFIX)/bin
 	install $(EXECS) $(PREFIX)/bin
-	cd src && $(MAKE) $@
 
 .PHONY: longlines
 longlines:
