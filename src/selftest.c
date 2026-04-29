@@ -331,7 +331,7 @@ static int ok(const int i, const int linenum, const char *desc, ...)
 		bail_out("%s(): desc is NULL", __func__); /* gncov */
 
 	va_start(ap, desc);
-	ok_va(i, linenum,  desc, ap);
+	ok_va(i, linenum, desc, ap);
 	va_end(ap);
 
 	return !!i;
@@ -453,8 +453,7 @@ static char *gotexp_output(const char *got, const char *exp)
 			failed_ok("mystrdup()"); /* gncov */
 	} else {
 		s = allocstr("         got: '%s'\n"
-		             "    expected: '%s'",
-		             no_null(got), no_null(exp));
+		             "    expected: '%s'", no_null(got), no_null(exp));
 		if (!s)
 			failed_ok("allocstr()"); /* gncov */
 	}
@@ -1514,7 +1513,8 @@ static void test_diag_big(void)
  * directly because it would pollute the the test output. Returns nothing.
  */
 
-static void test_diag(void) {
+static void test_diag(void)
+{
 	char *p, *s;
 	const char *desc;
 
