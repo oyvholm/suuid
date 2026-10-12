@@ -70,7 +70,7 @@ An example of a valid v1 UUID is
 
 ### Status
 
-The software is stable and has been used daily for over 16 years.
+The software is stable and has been used daily since 2008.
 
 ### Examples
 
