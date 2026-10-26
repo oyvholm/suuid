@@ -214,7 +214,7 @@ example, if a function is inlined or optimized differently, lines that
 were once skipped might now be covered by tests.
 
 These commands need the `gcov-cmt` script, available from 
-<https://gitlab.com/oyvholm/utils/raw/master/gcov-cmt>.
+<https://github.com/oyvholm/utils/raw/master/gcov-cmt>.
 
 ### make gdb
 
@@ -266,7 +266,13 @@ Uses `cmark`, available from <https://commonmark.org/>.
 
 ## Download
 
-The main Git repository is stored at GitLab:
+The main Git repository is stored at GitHub:
+
+- URL: <https://github.com/oyvholm/suuid>
+- SSH clone: git@github.com:oyvholm/suuid.git
+- https clone: <https://github.com/oyvholm/suuid.git>
+
+The repository is mirrored to GitLab:
 
 - URL: <https://gitlab.com/oyvholm/suuid>
 - SSH clone: git@gitlab.com:oyvholm/suuid.git
